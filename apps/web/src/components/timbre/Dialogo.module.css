@@ -1,0 +1,56 @@
+.dialogo {
+  box-sizing: border-box;
+  width: min(520px, calc(100vw - 2 * var(--space-4)));
+  max-height: calc(100dvh - 2 * var(--space-4));
+  margin: auto;
+  padding: var(--space-6);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  background: var(--surface-raised);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Sin `display: flex` mientras está cerrado, para que el navegador lo oculte. */
+.dialogo:not([open]) {
+  display: none;
+}
+
+/* Velo: tinta sobre fondo claro, superficie hundida sobre fondo oscuro. */
+.dialogo::backdrop {
+  background: light-dark(
+    color-mix(in srgb, var(--ink) 40%, transparent),
+    color-mix(in srgb, var(--surface-sunken) 75%, transparent)
+  );
+}
+
+.titulo {
+  margin: 0;
+  font-size: var(--text-title-size);
+  line-height: var(--text-title-line);
+  font-weight: var(--text-title-weight);
+}
+
+.cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-line);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+}
+
+.dialogo[aria-busy="true"] {
+  cursor: progress;
+}

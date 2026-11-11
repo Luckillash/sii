@@ -1,0 +1,141 @@
+/* Generado por scripts/generar-tokens.ts desde design-system/timbre/tokens.json.
+ * No editar a mano: cambia tokens.json y corre `pnpm --filter web tokens`. */
+
+:root {
+  color-scheme: light;
+  --surface: #f6f5f0;
+  --surface-raised: #ffffff;
+  --surface-sunken: #ecebe3;
+  --line: #dcd9cf;
+  --line-strong: #858173;
+  --ink: #16201f;
+  --ink-muted: #565e5b;
+  --sello: #0b5f5a;
+  --sello-strong: #074743;
+  --sello-soft: #dcefec;
+  --on-sello: #ffffff;
+  --ocre: #d99a1e;
+  --on-ocre: #16201f;
+  --exito: #1c6b3a;
+  --exito-soft: #e0f0e4;
+  --aviso: #8a5300;
+  --aviso-soft: #fbefd3;
+  --error: #b3261e;
+  --error-soft: #fbe5e1;
+  --on-error: #ffffff;
+  --info: #2b55a8;
+  --info-soft: #e4ebfa;
+  --shadow-sm: 0 1px 2px #16201f14;
+  --shadow-lg: 0 4px 8px #16201f12, 0 16px 32px -4px #16201f24;
+  --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #0b5f5a;
+  --link: var(--sello);
+
+  --font-sans: var(--fuente-plex-sans, "IBM Plex Sans"), ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --font-mono: var(--fuente-plex-mono, "IBM Plex Mono"), ui-monospace, "SF Mono", Menlo, monospace;
+
+  --text-display-size: 32px;
+  --text-display-line: 40px;
+  --text-display-weight: 600;
+  --text-display-tracking: -0.01em;
+  --text-title-size: 22px;
+  --text-title-line: 28px;
+  --text-title-weight: 600;
+  --text-heading-size: 17px;
+  --text-heading-line: 24px;
+  --text-heading-weight: 600;
+  --text-body-size: 15px;
+  --text-body-line: 22px;
+  --text-body-weight: 400;
+  --text-label-size: 13px;
+  --text-label-line: 18px;
+  --text-label-weight: 500;
+  --text-caption-size: 12px;
+  --text-caption-line: 16px;
+  --text-caption-weight: 400;
+  --text-monto-size: 15px;
+  --text-monto-line: 22px;
+  --text-monto-weight: 500;
+  --text-folio-size: 13px;
+  --text-folio-line: 20px;
+  --text-folio-weight: 400;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-full: 9999px;
+
+  --duracion-rapida: 120ms;
+  --duracion-menu: 200ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --surface: #111615;
+    --surface-raised: #192120;
+    --surface-sunken: #0b0f0e;
+    --line: #2a3533;
+    --line-strong: #6b7a77;
+    --ink: #eef2f0;
+    --ink-muted: #a1aeaa;
+    --sello: #5ec8bd;
+    --sello-strong: #8adcd2;
+    --sello-soft: #10302d;
+    --on-sello: #0a1413;
+    --ocre: #e5b04a;
+    --on-ocre: #16201f;
+    --exito: #72d39b;
+    --exito-soft: #12301e;
+    --aviso: #f0c060;
+    --aviso-soft: #33270b;
+    --error: #ff9585;
+    --error-soft: #3a1613;
+    --on-error: #1a0907;
+    --info: #9bb9ff;
+    --info-soft: #18233f;
+    --shadow-sm: 0 1px 2px #00000099;
+    --shadow-lg: 0 16px 32px -4px #000000cc;
+    --focus-ring: 0 0 0 2px #111615, 0 0 0 4px #5ec8bd;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface: #111615;
+  --surface-raised: #192120;
+  --surface-sunken: #0b0f0e;
+  --line: #2a3533;
+  --line-strong: #6b7a77;
+  --ink: #eef2f0;
+  --ink-muted: #a1aeaa;
+  --sello: #5ec8bd;
+  --sello-strong: #8adcd2;
+  --sello-soft: #10302d;
+  --on-sello: #0a1413;
+  --ocre: #e5b04a;
+  --on-ocre: #16201f;
+  --exito: #72d39b;
+  --exito-soft: #12301e;
+  --aviso: #f0c060;
+  --aviso-soft: #33270b;
+  --error: #ff9585;
+  --error-soft: #3a1613;
+  --on-error: #1a0907;
+  --info: #9bb9ff;
+  --info-soft: #18233f;
+  --shadow-sm: 0 1px 2px #00000099;
+  --shadow-lg: 0 16px 32px -4px #000000cc;
+  --focus-ring: 0 0 0 2px #111615, 0 0 0 4px #5ec8bd;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duracion-rapida: 0ms;
+    --duracion-menu: 0ms;
+  }
+}

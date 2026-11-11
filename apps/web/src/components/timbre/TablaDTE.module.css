@@ -1,0 +1,106 @@
+.marco {
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.tabla caption {
+  text-align: left;
+  padding: var(--space-3) var(--space-3) var(--space-2);
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}
+
+.tabla th {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  font-weight: 500;
+  color: var(--ink-muted);
+  background: var(--surface-sunken);
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.tabla td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+.num,
+.tabla th.num {
+  text-align: right;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.filaActiva td {
+  background: var(--sello-soft);
+}
+
+.filaClic {
+  cursor: pointer;
+}
+
+.filaClic:hover td {
+  background: var(--surface);
+}
+
+.filaClic:focus-visible {
+  outline: 2px solid var(--sello);
+  outline-offset: -2px;
+  box-shadow: none;
+}
+
+.filaActiva:hover td {
+  background: var(--sello-soft);
+}
+
+.receptor {
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 240px;
+}
+
+.rut {
+  font-family: var(--font-mono);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+.fecha {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+/* Más específico que `.tabla td` para no necesitar !important. */
+.tabla td.vacia {
+  text-align: center;
+  color: var(--ink-muted);
+  padding: var(--space-8) var(--space-4);
+}
+
+/* Al final: es más específico que las reglas de fila. */
+.tabla tbody tr:last-child td {
+  border-bottom: 0;
+}

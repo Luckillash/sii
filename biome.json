@@ -5,10 +5,12 @@
     "includes": [
       "**",
       "!!packages/certificacion",
+      "!!design-system",
       "!**/.next",
       "!**/dist",
       "!.mcp.json",
       "!apps/web/src/server/supabase/tipos.ts",
+      "!apps/web/src/styles/tokens.css",
       "!**/*.md",
       "!**/*.yml",
       "!**/*.yaml",

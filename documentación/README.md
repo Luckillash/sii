@@ -78,6 +78,7 @@ sources: ["supabase_saas_sii.sql", "certificacion-node/docs/"]
 | Dato rápido (vigencia, tope, largo) | [07-referencia/reglas-y-limites.md](07-referencia/reglas-y-limites.md) |
 | Pasar una empresa a producción | [07-referencia/checklist-produccion.md](07-referencia/checklist-produccion.md) |
 | Algo no funciona como se espera | [07-referencia/trampas-conocidas.md](07-referencia/trampas-conocidas.md) |
+| Construir una pantalla, usar un componente o un token | [07-referencia/design-system.md](07-referencia/design-system.md) |
 | **Esquema:** entender o modificar el SQL | [08-esquema-supabase/arquitectura.md](08-esquema-supabase/arquitectura.md) |
 | **Esquema:** instalarlo o programar tareas | [08-esquema-supabase/despliegue.md](08-esquema-supabase/despliegue.md) |
 | **Esquema:** error de la base | [08-esquema-supabase/solucion-de-problemas.md](08-esquema-supabase/solucion-de-problemas.md) |
@@ -148,6 +149,7 @@ documentación/
 │   ├── reglas-y-limites.md
 │   ├── checklist-produccion.md
 │   ├── trampas-conocidas.md
+│   ├── design-system.md           tokens, componentes, layouts, /_ds, axe
 │   └── mapa-fuentes.md
 ├── 08-esquema-supabase/               ← el esquema SQL y su documentación
 │   ├── supabase_saas_sii.sql          ← el artefacto del repo (fuente de verdad)

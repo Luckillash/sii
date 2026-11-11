@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Timbre — documentos tributarios electrónicos</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/timbre/tokens.css">
+<link rel="stylesheet" href="ds/timbre/components/bundle.css">
+<script src="ds/timbre/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#0b5f5a}a:hover{color:#074743}
+</style>
+</helmet>
+<div class="tb-pagina {{claseTema}}" style="display: flex; flex-direction: column;">
+
+<header style="border-bottom: 1px solid var(--line); background: var(--surface);">
+<div style="max-width: 1200px; margin: 0 auto; padding: 16px clamp(16px, 4vw, 32px); display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px;">
+<a href="#inicio" style="font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); text-decoration: none;">Timbre</a>
+<nav aria-label="Principal" style="display: flex; flex-wrap: wrap; gap: 4px 24px; flex-grow: 1;">
+<a href="#producto" style="color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 500;">Producto</a>
+<a href="#certificacion" style="color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 500;">Certificación</a>
+<a href="#api" style="color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 500;">Desarrolladores</a>
+<a href="#precios" style="color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 500;">Precios</a>
+</nav>
+<div style="display: flex; gap: 8px; align-items: center;">
+<a href="Ingreso.dc.html" class="tb-btn tb-btn-discreto tb-btn-md">Ingresar</a>
+<a href="Ingreso.dc.html" class="tb-btn tb-btn-secundario tb-btn-md">Crear cuenta</a>
+</div>
+</div>
+</header>
+
+<main style="display: flex; flex-direction: column;">
+
+<section id="inicio" style="max-width: 1200px; width: 100%; box-sizing: border-box; margin: 0 auto; padding: 72px clamp(16px, 4vw, 32px) 96px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 56px; align-items: center;">
+<div style="display: flex; flex-direction: column; gap: 24px; align-items: flex-start;">
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 500; color: var(--sello);">Facturación electrónica ante el SII</p>
+<h1 style="margin: 0; font-size: 52px; line-height: 58px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink);">Emite, firma y envía tus documentos tributarios sin vueltas.</h1>
+<p style="margin: 0; font-size: 17px; line-height: 26px; color: var(--ink-muted); max-width: 520px;">Timbre arma el XML, lo firma con tu certificado digital, lo envía al Servicio de Impuestos Internos y te muestra en qué estado quedó cada factura, boleta o nota de crédito.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 8px;">
+<a href="Ingreso.dc.html" class="tb-btn tb-btn-primario tb-btn-md" style="height: 44px; padding: 0 20px; font-size: 15px;">Crear cuenta</a>
+<a href="#producto" class="tb-btn tb-btn-secundario tb-btn-md" style="height: 44px; padding: 0 20px; font-size: 15px;">Ver cómo funciona</a>
+</div>
+<p style="margin: 0; font-size: 12px; line-height: 16px; color: var(--ink-muted);">Funciona con tu certificado digital y los folios (CAF) que autoriza el SII.</p>
+</div>
+
+<div style="position: relative; padding: 32px 0 32px 32px;">
+<div aria-hidden="true" style="position: absolute; top: 0; right: 0; bottom: 0; width: 62%; background: var(--sello); border-radius: 3px;"></div>
+<div aria-hidden="true" style="position: absolute; top: 0; bottom: 0; right: calc(62% - 4px); width: 8px; background-image: radial-gradient(circle, var(--surface) 3.5px, transparent 4px); background-size: 8px 16px; background-position: 0 4px;"></div>
+<div aria-hidden="true" style="position: absolute; right: 0; bottom: -4px; width: 62%; height: 8px; background-image: radial-gradient(circle, var(--surface) 3.5px, transparent 4px); background-size: 16px 8px; background-position: 4px 0;"></div>
+<div aria-hidden="true" style="position: absolute; top: 12px; right: 24px; width: 48px; height: 48px; background: var(--ocre); border-radius: 3px;"></div>
+<div class="tb-tarjeta" style="position: relative; display: flex; flex-direction: column; gap: 12px; padding: 16px; box-shadow: var(--shadow-lg);">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+<span style="font-size: 17px; line-height: 24px; font-weight: 600;">Documentos emitidos</span>
+<span style="font-size: 12px; line-height: 16px; color: var(--ink-muted);">Noviembre 2026</span>
+</div>
+<x-import component-from-global-scope="Timbre.TablaDTE" documentos="{{docs}}" style="display: block;"></x-import>
+<x-import component-from-global-scope="Timbre.MedidorFolios" codigo="33" desde="18001" hasta="19000" siguiente="18245" style="display: block;"></x-import>
+</div>
+</div>
+</section>
+
+<section id="producto" style="background: var(--surface-raised); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
+<div style="max-width: 1200px; margin: 0 auto; padding: 88px clamp(16px, 4vw, 32px); display: flex; flex-direction: column; gap: 48px;">
+<div style="display: flex; flex-direction: column; gap: 12px; max-width: 640px;">
+<h2 style="margin: 0; font-size: 32px; line-height: 40px; font-weight: 600; letter-spacing: -0.01em;">Todo el ciclo del documento, en un solo lugar</h2>
+<p style="margin: 0; font-size: 17px; line-height: 26px; color: var(--ink-muted);">Desde el borrador hasta la respuesta del SII, cada documento muestra su estado con la palabra oficial. Sin adivinar qué pasó con un envío.</p>
+</div>
+
+<div class="tb-tarjeta" style="padding: 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; box-shadow: none; background: var(--surface);">
+<x-import component-from-global-scope="Timbre.EstadoDTE" estado="borrador"></x-import>
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+<x-import component-from-global-scope="Timbre.EstadoDTE" estado="firmado"></x-import>
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+<x-import component-from-global-scope="Timbre.EstadoDTE" estado="enviado"></x-import>
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+<x-import component-from-global-scope="Timbre.EstadoDTE" estado="aceptado"></x-import>
+<span style="font-size: 13px; color: var(--ink-muted);">o</span>
+<x-import component-from-global-scope="Timbre.EstadoDTE" estado="reparos"></x-import>
+<span style="font-size: 13px; color: var(--ink-muted);">o</span>
+<x-import component-from-global-scope="Timbre.EstadoDTE" estado="rechazado"></x-import>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 16px;">
+<article class="tb-tarjeta" style="padding: 24px; display: flex; flex-direction: column; gap: 12px; box-shadow: none;">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--sello)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M9 15h6"></path><path d="M12 18v-6"></path></svg>
+<h3 style="margin: 0; font-size: 17px; line-height: 24px; font-weight: 600;">Emite y firma</h3>
+<p style="margin: 0; color: var(--ink-muted);">Factura, boleta, guía de despacho y notas de crédito o débito, firmadas con tu certificado digital y timbradas con el folio que corresponde.</p>
+</article>
+<article class="tb-tarjeta" style="padding: 24px; display: flex; flex-direction: column; gap: 12px; box-shadow: none;">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--sello)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path></svg>
+<h3 style="margin: 0; font-size: 17px; line-height: 24px; font-weight: 600;">Envía al SII y sigue el Track ID</h3>
+<p style="margin: 0; color: var(--ink-muted);">Cada envío guarda su Track ID y la respuesta del SII. Si hay un rechazo, te decimos qué corregir en palabras simples.</p>
+</article>
+<article class="tb-tarjeta" style="padding: 24px; display: flex; flex-direction: column; gap: 12px; box-shadow: none;">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--sello)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="9" y2="9"></line><line x1="4" x2="20" y1="15" y2="15"></line><line x1="10" x2="8" y1="3" y2="21"></line><line x1="16" x2="14" y1="3" y2="21"></line></svg>
+<h3 style="margin: 0; font-size: 17px; line-height: 24px; font-weight: 600;">Controla tus folios</h3>
+<p style="margin: 0; color: var(--ink-muted);">Ve cuántos folios quedan en cada Código de Autorización de Folios (CAF) y recibe un aviso antes de quedarte sin rango.</p>
+</article>
+<article class="tb-tarjeta" style="padding: 24px; display: flex; flex-direction: column; gap: 12px; box-shadow: none;">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--sello)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+<h3 style="margin: 0; font-size: 17px; line-height: 24px; font-weight: 600;">Libro de Compras y Ventas</h3>
+<p style="margin: 0; color: var(--ink-muted);">Tus documentos emitidos y recibidos ordenados por período, listos para revisar con tu contador.</p>
+</article>
+</div>
+</div>
+</section>
+
+<section id="certificacion" style="max-width: 1200px; width: 100%; box-sizing: border-box; margin: 0 auto; padding: 88px clamp(16px, 4vw, 32px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 48px; align-items: start;">
+<div style="display: flex; flex-direction: column; gap: 16px;">
+<h2 style="margin: 0; font-size: 32px; line-height: 40px; font-weight: 600; letter-spacing: -0.01em;">Te llevamos paso a paso por la certificación</h2>
+<p style="margin: 0; font-size: 17px; line-height: 26px; color: var(--ink-muted);">Para emitir documentos electrónicos con tu propio sistema, el SII pide pasar por un proceso de certificación. Timbre te muestra en qué etapa estás y qué falta.</p>
+<x-import component-from-global-scope="Timbre.Alerta" tono="info" titulo="Ambiente de certificación separado" style="display: block;">Lo que emitas mientras te certificas no tiene validez tributaria, y Timbre lo marca en todas las pantallas.</x-import>
+</div>
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column;" class="tb-tarjeta">
+<li style="display: flex; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--line);">
+<span style="flex: none; width: 28px; height: 28px; border-radius: 3px; background: var(--sello-soft); color: var(--sello); font-family: var(--font-mono); font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center;">1</span>
+<div><p style="margin: 0; font-weight: 600;">Postulación</p><p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-muted);">Registras a tu empresa en el ambiente de certificación del SII.</p></div>
+</li>
+<li style="display: flex; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--line);">
+<span style="flex: none; width: 28px; height: 28px; border-radius: 3px; background: var(--sello-soft); color: var(--sello); font-family: var(--font-mono); font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center;">2</span>
+<div><p style="margin: 0; font-weight: 600;">Set de pruebas</p><p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-muted);">Emites los casos que el SII te asigna y los envías para su revisión.</p></div>
+</li>
+<li style="display: flex; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--line);">
+<span style="flex: none; width: 28px; height: 28px; border-radius: 3px; background: var(--sello-soft); color: var(--sello); font-family: var(--font-mono); font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center;">3</span>
+<div><p style="margin: 0; font-weight: 600;">Simulación</p><p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-muted);">Emites documentos como lo harías en tu operación real.</p></div>
+</li>
+<li style="display: flex; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--line);">
+<span style="flex: none; width: 28px; height: 28px; border-radius: 3px; background: var(--sello-soft); color: var(--sello); font-family: var(--font-mono); font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center;">4</span>
+<div><p style="margin: 0; font-weight: 600;">Intercambio de información</p><p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-muted);">Pruebas el acuse de recibo y la respuesta a documentos de otros contribuyentes.</p></div>
+</li>
+<li style="display: flex; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--line);">
+<span style="flex: none; width: 28px; height: 28px; border-radius: 3px; background: var(--sello-soft); color: var(--sello); font-family: var(--font-mono); font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center;">5</span>
+<div><p style="margin: 0; font-weight: 600;">Muestras de impresión</p><p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-muted);">Envías los PDF de tus documentos con el timbre electrónico visible.</p></div>
+</li>
+<li style="display: flex; gap: 16px; padding: 16px 20px;">
+<span style="flex: none; width: 28px; height: 28px; border-radius: 3px; background: var(--ocre); color: var(--on-ocre); font-family: var(--font-mono); font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center;">6</span>
+<div><p style="margin: 0; font-weight: 600;">Declaración de cumplimiento</p><p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-muted);">Firmas la declaración y quedas autorizado como emisor electrónico.</p></div>
+</li>
+</ol>
+</section>
+
+<section id="api" style="background: var(--surface-sunken); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
+<div style="max-width: 1200px; margin: 0 auto; padding: 88px clamp(16px, 4vw, 32px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 48px; align-items: center;">
+<div style="display: flex; flex-direction: column; gap: 16px; align-items: flex-start;">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--sello)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+<h2 style="margin: 0; font-size: 32px; line-height: 40px; font-weight: 600; letter-spacing: -0.01em;">Una API para tu sistema</h2>
+<p style="margin: 0; font-size: 17px; line-height: 26px; color: var(--ink-muted);">Envía los datos del documento en JSON. Timbre asigna el folio, arma y firma el XML, lo envía al SII y te avisa cuando cambia el estado.</p>
+<a href="#api" class="tb-btn tb-btn-secundario tb-btn-md">Leer la documentación</a>
+</div>
+<pre class="tb-tarjeta" style="margin: 0; padding: 20px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 20px; color: var(--ink); box-shadow: none;"><span style="color: var(--ink-muted);">POST [TU ENDPOINT]/dte</span>
+{
+  "tipo": 33,
+  "receptor": {
+    "rut": "76.354.771-K",
+    "razon_social": "Comercial Los Aromos SpA"
+  },
+  "detalle": [
+    { "nombre": "Servicio de mantención", "cantidad": 1, "precio": 1000000 }
+  ]
+}
+
+<span style="color: var(--ink-muted);">→ 201</span>
+{ "folio": 18244, "estado": "enviado", "track_id": "0219384756" }</pre>
+</div>
+</section>
+
+<section id="precios" style="max-width: 1200px; width: 100%; box-sizing: border-box; margin: 0 auto; padding: 88px clamp(16px, 4vw, 32px); display: flex; flex-direction: column; gap: 40px;">
+<div style="display: flex; flex-direction: column; gap: 12px; max-width: 640px;">
+<h2 style="margin: 0; font-size: 32px; line-height: 40px; font-weight: 600; letter-spacing: -0.01em;">Precios</h2>
+<p style="margin: 0; font-size: 17px; line-height: 26px; color: var(--ink-muted);">Montos en pesos chilenos, IVA incluido.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px;">
+<article class="tb-tarjeta" style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+<h3 style="margin: 0; font-size: 17px; line-height: 24px; font-weight: 600;">Pyme</h3>
+<p style="margin: 0; font-family: var(--font-mono); font-size: 28px; line-height: 36px; font-weight: 500;">[TU PRECIO]<span style="font-family: var(--font-sans); font-size: 13px; color: var(--ink-muted); font-weight: 400;"> al mes</span></p>
+<p style="margin: 0; color: var(--ink-muted);">Para una empresa que emite desde el navegador.</p>
+<ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 20px;">
+<li>[Documentos incluidos al mes]</li>
+<li>Factura, boleta y notas de crédito</li>
+<li>Certificación guiada</li>
+</ul>
+<a href="Ingreso.dc.html" class="tb-btn tb-btn-secundario tb-btn-md" style="margin-top: auto;">Elegir plan Pyme</a>
+</article>
+<article class="tb-tarjeta" style="padding: 24px; display: flex; flex-direction: column; gap: 16px; border-color: var(--sello);">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+<h3 style="margin: 0; font-size: 17px; line-height: 24px; font-weight: 600;">Contador</h3>
+<span style="font-size: 12px; line-height: 16px; font-weight: 500; padding: 2px 8px; border-radius: 3px; background: var(--ocre); color: var(--on-ocre);">Varias empresas</span>
+</div>
+<p style="margin: 0; font-family: var(--font-mono); font-size: 28px; line-height: 36px; font-weight: 500;">[TU PRECIO]<span style="font-family: var(--font-sans); font-size: 13px; color: var(--ink-muted); font-weight: 400;"> al mes</span></p>
+<p style="margin: 0; color: var(--ink-muted);">Para estudios contables que llevan a varios clientes.</p>
+<ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 20px;">
+<li>[Empresas incluidas]</li>
+<li>Libro de Compras y Ventas por empresa</li>
+<li>Usuarios con permisos por empresa</li>
+</ul>
+<a href="Ingreso.dc.html" class="tb-btn tb-btn-secundario tb-btn-md" style="margin-top: auto;">Elegir plan Contador</a>
+</article>
+<article class="tb-tarjeta" style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+<h3 style="margin: 0; font-size: 17px; line-height: 24px; font-weight: 600;">API</h3>
+<p style="margin: 0; font-family: var(--font-mono); font-size: 28px; line-height: 36px; font-weight: 500;">[TU PRECIO]<span style="font-family: var(--font-sans); font-size: 13px; color: var(--ink-muted); font-weight: 400;"> por documento</span></p>
+<p style="margin: 0; color: var(--ink-muted);">Para integrar la emisión a tu propio sistema.</p>
+<ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 20px;">
+<li>Todos los tipos de DTE</li>
+<li>Avisos de cambio de estado</li>
+<li>Ambiente de certificación aparte</li>
+</ul>
+<a href="#api" class="tb-btn tb-btn-secundario tb-btn-md" style="margin-top: auto;">Hablar con ventas</a>
+</article>
+</div>
+</section>
+
+<section style="background: var(--sello); color: var(--on-sello);">
+<div style="max-width: 1200px; margin: 0 auto; padding: 64px clamp(16px, 4vw, 32px); display: flex; flex-wrap: wrap; gap: 24px; align-items: center; justify-content: space-between;">
+<div style="display: flex; flex-direction: column; gap: 8px; max-width: 640px;">
+<h2 style="margin: 0; font-size: 32px; line-height: 40px; font-weight: 600; letter-spacing: -0.01em; color: var(--on-sello);">Empieza por la certificación</h2>
+<p style="margin: 0; font-size: 17px; line-height: 26px; color: var(--on-sello);">Crea tu cuenta, carga tu certificado digital y emite tu primer set de pruebas.</p>
+</div>
+<a href="Ingreso.dc.html" class="tb-btn tb-btn-secundario tb-btn-md" style="height: 44px; padding: 0 20px; font-size: 15px;">Crear cuenta</a>
+</div>
+</section>
+</main>
+
+<footer style="border-top: 1px solid var(--line);">
+<div style="max-width: 1200px; margin: 0 auto; padding: 40px clamp(16px, 4vw, 32px); display: flex; flex-wrap: wrap; gap: 24px 64px; justify-content: space-between;">
+<div style="display: flex; flex-direction: column; gap: 8px; max-width: 360px;">
+<span style="font-size: 17px; line-height: 24px; font-weight: 600;">Timbre</span>
+<p style="margin: 0; font-size: 12px; line-height: 16px; color: var(--ink-muted);">Timbre es un servicio independiente y no está afiliado al Servicio de Impuestos Internos.</p>
+</div>
+<nav aria-label="Pie de página" style="display: flex; flex-wrap: wrap; gap: 8px 32px; font-size: 14px;">
+<a href="#producto">Producto</a>
+<a href="#certificacion">Certificación</a>
+<a href="#api">Documentación de la API</a>
+<a href="#precios">Precios</a>
+<a href="#inicio">Términos y privacidad</a>
+</nav>
+</div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"tema":{"editor":"enum","options":["claro","oscuro"],"default":"claro"},"$preview":{"width":1440,"height":2760}}'>
+class Component extends DCLogic {
+renderVals() {
+const tema = this.props.tema ?? 'claro';
+return {
+claseTema: tema === 'oscuro' ? 'tema-oscuro' : '',
+docs: [
+{ id: 'a', tipo: 33, folio: 18244, receptor: 'Comercial Los Aromos SpA', rut: '76354771K', fecha: '10-11-2026', total: 1190000, estado: 'enviado' },
+{ id: 'b', tipo: 33, folio: 18243, receptor: 'Ferretería El Roble Ltda.', rut: '778124408', fecha: '09-11-2026', total: 499800, estado: 'aceptado' },
+{ id: 'c', tipo: 61, folio: 482, receptor: 'Distribuidora Pacífico Sur S.A.', rut: '96512330K', fecha: '08-11-2026', total: -220150, estado: 'reparos' }
+]
+};
+}
+}
+</script>
+</body>
+</html>

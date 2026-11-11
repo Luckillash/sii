@@ -1,0 +1,34 @@
+.tarjeta {
+  margin: 0;
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Las listas (`ol`, `ul`) pierden viñetas y sangría. */
+ol.tarjeta,
+ul.tarjeta {
+  list-style: none;
+}
+
+.ninguno {
+  padding: 0;
+}
+
+.md {
+  padding: 20px;
+}
+
+.lg {
+  padding: var(--space-6);
+}
+
+.plana {
+  box-shadow: none;
+}
+
+.tenue {
+  box-shadow: none;
+  background: var(--surface);
+}

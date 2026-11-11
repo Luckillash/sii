@@ -1,0 +1,146 @@
+.catalogo {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-8) clamp(16px, 3vw, 40px) 64px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+
+.titulo {
+  font-size: var(--text-display-size);
+  line-height: var(--text-display-line);
+  font-weight: var(--text-display-weight);
+  letter-spacing: var(--text-display-tracking);
+}
+
+.nota {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+.subtitulo {
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}
+
+.tema {
+  display: flex;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+}
+
+.temaOpcion {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-label-size);
+  accent-color: var(--sello);
+}
+
+.seccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--line);
+}
+
+.seccionCabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-4);
+}
+
+.seccionTitulo {
+  font-size: var(--text-title-size);
+  line-height: var(--text-title-line);
+  font-weight: var(--text-title-weight);
+}
+
+.muestra {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  align-items: flex-start;
+}
+
+.pila {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.pilaAncha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 760px;
+}
+
+.pilaDerecha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-end;
+}
+
+.pozo {
+  min-width: min(260px, 100%);
+  background: var(--surface-sunken);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.pozoTotal {
+  border-top: 1px solid var(--line);
+  margin-top: 6px;
+  padding-top: 6px;
+}
+
+.filaMonto {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-6);
+  padding: var(--space-1) 0;
+}
+
+.tarjetaDemo {
+  flex: 1 1 240px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.menuDemo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 232px;
+}
+
+.panelDemo {
+  flex: 0 1 380px;
+}

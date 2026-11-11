@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+/* Base */
+body { margin: 0; font-family: var(--font-sans); font-size: 15px; line-height: 22px; background: var(--surface); color: var(--ink); -webkit-font-smoothing: antialiased; }
+.tb-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.tb-glifo { flex: none; display: inline-block; vertical-align: middle; }
+.tb-mono { font-family: var(--font-mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+.tb-num { text-align: right; }
+.tb-fila { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; padding: var(--space-4); }
+.tb-pila { display: flex; flex-direction: column; gap: var(--space-3); align-items: flex-start; padding: var(--space-4); }
+
+/* Boton */
+.tb-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); font-family: var(--font-sans); font-weight: 500; border-radius: var(--radius-md); border: 1px solid var(--line-strong); background: var(--surface-raised); color: var(--ink); cursor: pointer; white-space: nowrap; transition: background-color 120ms, border-color 120ms, box-shadow 120ms; }
+.tb-btn-md { height: 36px; padding: 0 var(--space-4); font-size: 14px; }
+.tb-btn-sm { height: 28px; padding: 0 var(--space-3); font-size: 13px; }
+.tb-btn:hover { background: var(--surface-sunken); }
+.tb-btn:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.tb-btn:disabled { cursor: not-allowed; opacity: .5; }
+.tb-btn-primario { background: var(--sello); border-color: var(--sello); color: var(--on-sello); }
+.tb-btn-primario:hover { background: var(--sello-strong); border-color: var(--sello-strong); }
+.tb-btn-discreto { background: transparent; border-color: transparent; color: var(--sello); }
+.tb-btn-discreto:hover { background: var(--sello-soft); }
+.tb-btn-peligro { background: var(--error); border-color: var(--error); color: var(--on-error); }
+.tb-btn-peligro:hover { background: var(--error); filter: brightness(.92); }
+.tb-btn-icono { display: inline-flex; }
+
+/* Tonos compartidos (EstadoDTE, Alerta) */
+.tb-tono-neutro { --tb-fg: var(--ink-muted); --tb-bg: var(--surface-sunken); }
+.tb-tono-sello { --tb-fg: var(--sello); --tb-bg: var(--sello-soft); }
+.tb-tono-info { --tb-fg: var(--info); --tb-bg: var(--info-soft); }
+.tb-tono-exito { --tb-fg: var(--exito); --tb-bg: var(--exito-soft); }
+.tb-tono-aviso { --tb-fg: var(--aviso); --tb-bg: var(--aviso-soft); }
+.tb-tono-error { --tb-fg: var(--error); --tb-bg: var(--error-soft); }
+
+/* EstadoDTE */
+.tb-estado { display: inline-flex; align-items: center; gap: var(--space-1); height: 24px; padding: 0 10px 0 var(--space-2); border-radius: var(--radius-full); background: var(--tb-bg); color: var(--tb-fg); font-size: 13px; line-height: 18px; font-weight: 500; white-space: nowrap; }
+.tb-estado-anulado > span { text-decoration: line-through; }
+
+/* TipoDTE */
+.tb-tipo { display: inline-flex; align-items: center; gap: var(--space-2); font-size: 14px; color: var(--ink); white-space: nowrap; }
+.tb-tipo-codigo { display: inline-block; min-width: 28px; padding: 1px 5px; text-align: center; font-family: var(--font-mono); font-size: 12px; line-height: 18px; font-weight: 500; color: var(--sello); background: var(--sello-soft); border-radius: var(--radius-sm); }
+
+/* Monto */
+.tb-monto { font-family: var(--font-mono); font-size: 15px; line-height: 22px; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink); }
+.tb-monto-destacado { font-size: 28px; line-height: 36px; font-weight: 500; letter-spacing: -0.01em; }
+.tb-monto-tenue { color: var(--ink-muted); font-weight: 400; }
+
+/* Campos */
+.tb-campo { display: flex; flex-direction: column; gap: 6px; max-width: 280px; }
+.tb-campo-etiqueta { font-size: 13px; line-height: 18px; font-weight: 500; color: var(--ink); }
+.tb-input { height: 36px; box-sizing: border-box; padding: 0 var(--space-3); font: inherit; font-size: 15px; color: var(--ink); background: var(--surface-raised); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); transition: box-shadow 120ms, border-color 120ms; }
+.tb-input::placeholder { color: var(--ink-muted); }
+.tb-input:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.tb-input:disabled { background: var(--surface-sunken); color: var(--ink-muted); }
+.tb-input-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+.tb-campo-error .tb-input { border-color: var(--error); }
+.tb-campo-ayuda { display: flex; gap: var(--space-1); align-items: center; margin: 0; font-size: 12px; line-height: 16px; color: var(--ink-muted); }
+.tb-campo-ayuda-error { color: var(--error); }
+
+/* Alerta */
+.tb-alerta { display: flex; gap: var(--space-3); align-items: flex-start; padding: var(--space-3) var(--space-4); border: 1px solid var(--tb-fg); border-radius: var(--radius-md); background: var(--tb-bg); color: var(--ink); }
+.tb-alerta-glifo { color: var(--tb-fg); margin-top: 2px; }
+.tb-alerta-cuerpo { flex: 1; min-width: 0; }
+.tb-alerta-titulo { margin: 0; font-weight: 600; font-size: 15px; line-height: 22px; }
+.tb-alerta-texto { font-size: 14px; line-height: 20px; color: var(--ink); }
+.tb-alerta-texto p { margin: 2px 0 0; }
+.tb-alerta-accion { flex: none; align-self: center; }
+
+/* MedidorFolios */
+.tb-folios { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-4); background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); max-width: 420px; }
+.tb-folios-cabecera { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); }
+.tb-folios-cifra { font-size: 13px; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+.tb-folios-cifra strong { font-family: var(--font-mono); font-size: 15px; font-weight: 500; color: var(--ink); }
+.tb-folios-barra { height: 8px; border-radius: var(--radius-full); background: var(--surface-sunken); border: 1px solid var(--line); overflow: hidden; }
+.tb-folios-uso { height: 100%; border-radius: var(--radius-full); background: var(--sello); }
+.tb-folios-aviso .tb-folios-uso { background: var(--aviso); }
+.tb-folios-error .tb-folios-uso { background: var(--error); }
+.tb-folios-nota { display: flex; gap: var(--space-1); align-items: center; margin: 0; font-size: 12px; line-height: 16px; color: var(--ink-muted); }
+.tb-folios-aviso .tb-folios-nota { color: var(--aviso); }
+.tb-folios-error .tb-folios-nota { color: var(--error); }
+
+/* TablaDTE */
+.tb-tabla-marco { background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow-x: auto; }
+.tb-tabla { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 20px; }
+.tb-tabla caption { text-align: left; padding: var(--space-3) var(--space-3) var(--space-2); font-size: 17px; line-height: 24px; font-weight: 600; }
+.tb-tabla th { text-align: left; padding: var(--space-2) var(--space-3); font-size: 12px; line-height: 16px; font-weight: 500; color: var(--ink-muted); background: var(--surface-sunken); border-bottom: 1px solid var(--line); white-space: nowrap; }
+.tb-tabla th.tb-num { text-align: right; }
+.tb-tabla td { padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--line); vertical-align: middle; }
+.tb-tabla tbody tr:last-child td { border-bottom: 0; }
+.tb-fila-clic { cursor: pointer; }
+.tb-fila-clic:hover td { background: var(--surface); }
+.tb-fila-clic:focus-visible { outline: 2px solid var(--sello); outline-offset: -2px; }
+.tb-fila-activa td, .tb-fila-activa:hover td { background: var(--sello-soft); }
+.tb-receptor { color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px; }
+.tb-rut { font-family: var(--font-mono); font-size: 12px; line-height: 16px; color: var(--ink-muted); }
+.tb-fecha { font-variant-numeric: tabular-nums; color: var(--ink-muted); white-space: nowrap; }
+.tb-tabla-vacia { text-align: center; color: var(--ink-muted); padding: var(--space-8) var(--space-4) !important; }

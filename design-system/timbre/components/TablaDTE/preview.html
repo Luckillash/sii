@@ -1,0 +1,23 @@
+<!-- @dsCard group="Datos" height=340 subtitle="Documentos emitidos con selección" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>TablaDTE — vista previa</title></head>
+<body>
+<div id="root" style="padding:16px"></div>
+<script>
+  var T = window.Timbre, h = React.createElement;
+  var docs = [
+    { id: 'a', tipo: 33, folio: 18244, receptor: 'Ferretería Los Aromos SpA', rut: '771204562', fecha: '10-11-2026', total: 1190000, estado: 'enviado' },
+    { id: 'b', tipo: 33, folio: 18243, receptor: 'Distribuidora Pacífico Sur Ltda.', rut: '96874030K', fecha: '10-11-2026', total: 4522000, estado: 'aceptado' },
+    { id: 'c', tipo: 61, folio: 490, receptor: 'Comercial Andes Verde SpA', rut: '768912343', fecha: '09-11-2026', total: -238000, estado: 'reparos' },
+    { id: 'd', tipo: 52, folio: 1300, receptor: 'Panadería La Espiga Ltda.', rut: '784521907', fecha: '09-11-2026', total: 357000, estado: 'rechazado' },
+    { id: 'e', tipo: 33, folio: 18242, receptor: 'Ferretería Los Aromos SpA', rut: '771204562', fecha: '08-11-2026', total: 238000, estado: 'anulado' }
+  ];
+  function Demo() {
+    var s = React.useState('b');
+    return h(T.TablaDTE, { documentos: docs, seleccionado: s[0], onSeleccionar: s[1] });
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>

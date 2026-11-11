@@ -1,0 +1,21 @@
+.monto {
+  font-family: var(--font-mono);
+  font-size: var(--text-monto-size);
+  line-height: var(--text-monto-line);
+  font-weight: var(--text-monto-weight);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.destacado {
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.tenue {
+  color: var(--ink-muted);
+  font-weight: 400;
+}

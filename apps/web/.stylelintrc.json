@@ -1,0 +1,9 @@
+{
+  "ignoreFiles": ["src/styles/tokens.css"],
+  "rules": {
+    "color-no-hex": true,
+    "color-named": "never",
+    "function-disallowed-list": ["rgb", "rgba", "hsl", "hsla", "oklch", "lab", "lch"],
+    "declaration-no-important": true
+  }
+}

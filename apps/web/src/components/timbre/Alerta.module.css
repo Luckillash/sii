@@ -1,0 +1,42 @@
+.alerta {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--tb-fg);
+  border-radius: var(--radius-md);
+  background: var(--tb-bg);
+  color: var(--ink);
+}
+
+.glifo {
+  color: var(--tb-fg);
+  margin-top: 2px;
+}
+
+.cuerpo {
+  flex: 1;
+  min-width: 0;
+}
+
+.titulo {
+  margin: 0;
+  font-weight: 600;
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-line);
+}
+
+.texto {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink);
+}
+
+.texto p {
+  margin: 2px 0 0;
+}
+
+.accion {
+  flex: none;
+  align-self: center;
+}

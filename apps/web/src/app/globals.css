@@ -1,27 +1,54 @@
-/* Provisorio hasta la Fase 1, que genera tokens.css desde el design system «Timbre». */
-:root {
-  color-scheme: light dark;
-  --surface: #fbfaf7;
-  --text: #1c1b19;
-  --text-muted: #5f5b53;
-}
+@import "../styles/tokens.css";
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --surface: #161513;
-    --text: #ecebe7;
-    --text-muted: #a8a49b;
-  }
-}
-
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
+  min-height: 100vh;
   background: var(--surface);
-  color: var(--text);
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  line-height: 1.5;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-line);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--link);
+}
+
+a:hover {
+  color: var(--sello-strong);
+}
+
+:focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: var(--focus-ring);
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+/* Solo para lectores de pantalla. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }

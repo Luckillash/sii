@@ -21,7 +21,7 @@ Leyenda: ✅ listo · 🟡 en parte · ⬜ pendiente. Se actualiza al terminar c
 | Fase | Estado | Nota |
 |---|---|---|
 | 0. Fundaciones y prueba de conectividad | 🟡 | **Criterio de aceptación cumplido** (2026-11-11: token de apicert desde Vercel `gru1`, guardado cifrado en `tokens_sii`); spike del SII retirado. Pendiente: conectar Sentry y probar su depuración (`/api/spike/sentry`) |
-| 1. Design system en Next.js | ⬜ | |
+| 1. Design system en Next.js | ✅ | 2026-11-11: tokens generados, 8 componentes (+ `incierto`, D3), 11 de soporte, 2 layouts, `/_ds` y axe sin violaciones en claro/oscuro/móvil. Pendiente fuera de la app: agregar `incierto` al artifact del design system |
 | 2. Autenticación, organizaciones y equipo | ⬜ | |
 | 3. Empresas, certificados y resoluciones | ⬜ | |
 | 4. Capa de servicio SII (backend) | ⬜ | Núcleo técnico del producto |
@@ -483,7 +483,7 @@ certificación:
 |---|---|---|
 | D1 | Alcance del MVP: ¿solo boleta (39/41) o esperar facturas? | **Solo boleta**: es lo que la librería ya probó en producción; factura en la Fase 14 |
 | D2 | Cómo incorporar la librería | **git subtree** en `packages/certificacion` (§3.1) |
-| D3 | Nombre y tono del estado `incierto` en `EstadoDTE` | «Por verificar», tono `aviso`, glifo de interrogación; agregarlo al design system |
+| D3 | Nombre y tono del estado `incierto` en `EstadoDTE` | «Por verificar», tono `aviso`, glifo de interrogación; agregarlo al design system. **Aplicada en la Fase 1** (app); falta reflejarla en el artifact |
 | D4 | Pasarela de pagos | **Flow** (suscripciones recurrentes en CLP, ya tienes su MCP); Transbank Oneclick como alternativa |
 | D5 | Grilla de planes y precios | Unificar la landing (Pyme / Contador / API) con `planes`; «Contador» = varias empresas por organización |
 | D6 | Dominio | Sitio público y app en el mismo dominio (`/` y `/[org]`) para compartir sesión y simplificar; subdominio si se separa el marketing |

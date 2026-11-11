@@ -1,0 +1,106 @@
+.ingreso {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr));
+  min-height: 100vh;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+.panel {
+  position: relative;
+  overflow: hidden;
+  min-height: 320px;
+  padding: 48px clamp(16px, 5vw, 64px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 48px;
+  background: var(--sello);
+  color: var(--on-sello);
+}
+
+/* Círculos del color de la página sobre el borde derecho. */
+.perforacion {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -4px;
+  width: 8px;
+  background-image: radial-gradient(circle, var(--surface) 3.5px, transparent 4px);
+  background-size: 8px 16px;
+  background-position: 0 4px;
+}
+
+.marca,
+.marca:hover {
+  color: var(--on-sello);
+}
+
+.marca {
+  align-self: flex-start;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-title-size);
+  line-height: var(--text-title-line);
+  font-weight: var(--text-title-weight);
+  text-decoration: none;
+}
+
+.mensaje {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 440px;
+}
+
+.titular {
+  margin: 0;
+  font-size: clamp(var(--text-display-size), 6vw, 40px);
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--on-sello);
+}
+
+.bajada {
+  margin: 0;
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-line);
+  color: var(--on-sello);
+}
+
+.bloques {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-end;
+}
+
+.bloqueOcre {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-sm);
+  background: var(--ocre);
+}
+
+.bloqueSuave {
+  width: 96px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--sello-soft);
+}
+
+.principal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px clamp(16px, 5vw, 64px);
+  min-width: 0;
+}
+
+.columna {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}

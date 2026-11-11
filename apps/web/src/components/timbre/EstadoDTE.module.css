@@ -1,0 +1,18 @@
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 24px;
+  padding: 0 10px 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--tb-bg);
+  color: var(--tb-fg);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--text-label-weight);
+  white-space: nowrap;
+}
+
+.anulado > span {
+  text-decoration: line-through;
+}

@@ -1,0 +1,32 @@
+.tipo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 14px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.codigo {
+  display: inline-block;
+  min-width: 28px;
+  padding: 1px 5px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--sello);
+  background: var(--sello-soft);
+  border-radius: var(--radius-sm);
+}
+
+/* Solo para lectores de pantalla. */
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

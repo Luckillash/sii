@@ -1,0 +1,47 @@
+/* Compartido por Input y Select (`.tb-input`). */
+.control {
+  height: 36px;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0 var(--space-3);
+  font: inherit;
+  font-size: var(--text-body-size);
+  color: var(--ink);
+  background: var(--surface-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  transition:
+    box-shadow var(--duracion-rapida),
+    border-color var(--duracion-rapida);
+}
+
+.control::placeholder {
+  color: var(--ink-muted);
+}
+
+.control:focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: var(--focus-ring);
+}
+
+.control:disabled {
+  background: var(--surface-sunken);
+  color: var(--ink-muted);
+  cursor: not-allowed;
+}
+
+.control[aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+/* RUT, folios, montos, fechas. */
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.select {
+  padding-right: var(--space-2);
+  cursor: pointer;
+}

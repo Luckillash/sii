@@ -1,0 +1,31 @@
+/* Tonos compartidos (EstadoDTE, Alerta): cada clase fija --tb-fg y --tb-bg. */
+
+.neutro {
+  --tb-fg: var(--ink-muted);
+  --tb-bg: var(--surface-sunken);
+}
+
+.sello {
+  --tb-fg: var(--sello);
+  --tb-bg: var(--sello-soft);
+}
+
+.info {
+  --tb-fg: var(--info);
+  --tb-bg: var(--info-soft);
+}
+
+.exito {
+  --tb-fg: var(--exito);
+  --tb-bg: var(--exito-soft);
+}
+
+.aviso {
+  --tb-fg: var(--aviso);
+  --tb-bg: var(--aviso-soft);
+}
+
+.error {
+  --tb-fg: var(--error);
+  --tb-bg: var(--error-soft);
+}

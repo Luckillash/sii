@@ -1,0 +1,28 @@
+.panel {
+  position: relative;
+  flex: 1 1 340px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 20px;
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Deja espacio al botón de cierre para que no tape el encabezado. */
+.conCierre {
+  padding-right: calc(20px + 28px + var(--space-2));
+}
+
+/* Con `.panel` delante para ganarle al relleno de `.sm` del botón. */
+.panel .cerrar {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  width: 28px;
+  padding: 0;
+  color: var(--ink-muted);
+}

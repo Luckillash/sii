@@ -1,0 +1,17 @@
+{
+  "v": 3,
+  "layout": "files",
+  "createdOnFiles": { "v": 1, "at": "2026-11-10T19:40:00Z" },
+  "title": "Timbre",
+  "namespace": "Timbre",
+  "libraries": [
+    { "name": "react", "version": "18" },
+    { "name": "react-dom", "version": "18" }
+  ],
+  "sections": {},
+  "groups": [],
+  "assetGroups": {},
+  "blobs": {},
+  "docs": { "sections": [] },
+  "lastChange": { "by": "Claude", "at": "2026-11-10T19:40:00Z", "via": "Claude", "note": "Primera versión: tokens, manual de marca y ocho componentes para DTE." }
+}

@@ -1,0 +1,18 @@
+<!-- @dsCard group="Formularios" height=128 subtitle="Formato y dígito verificador al salir del campo" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>CampoRut — vista previa</title></head>
+<body>
+<div id="root" class="tb-fila" style="align-items:flex-start;gap:24px"></div>
+<script>
+  var T = window.Timbre, h = React.createElement;
+  function ConError() {
+    var s = React.useState('76.354.771-3');
+    return h(T.CampoRut, { etiqueta: 'RUT del receptor', value: s[0], onChange: function (v) { s[1](v); }, error: T.utils.validarRut(s[0]) ? null : 'El dígito verificador no corresponde a este RUT.' });
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(h(React.Fragment, null,
+    h(T.CampoRut, { etiqueta: 'RUT de la empresa', defaultValue: '76.354.771-K', ayuda: 'El mismo RUT que figura en tu certificado digital.' }),
+    h(ConError)));
+</script>
+</body>
+</html>
