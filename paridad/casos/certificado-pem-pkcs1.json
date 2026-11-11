@@ -1,0 +1,8 @@
+{
+  "descripcion": "PEM con la llave en PKCS#1 (BEGIN RSA PRIVATE KEY): openssl_pkey_export la entrega en PKCS#8",
+  "operacion": "certificado",
+  "entrada": {
+    "archivo": "cert-pkcs1.pem",
+    "clave": ""
+  }
+}

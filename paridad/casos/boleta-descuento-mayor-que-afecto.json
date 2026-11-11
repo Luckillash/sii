@@ -1,0 +1,41 @@
+{
+  "descripcion": "Descuento en monto mayor que el afecto: se acota y el exento queda intacto",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-09-05T15:00:00",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "64",
+    "detalles": [
+      {
+        "nombre": "A",
+        "cantidad": 1,
+        "precio": 1000
+      },
+      {
+        "nombre": "B",
+        "cantidad": 3,
+        "precio": 7
+      },
+      {
+        "nombre": "Exento",
+        "cantidad": 1,
+        "precio": 500,
+        "exento": true
+      }
+    ],
+    "descuento": {
+      "tipo": "monto",
+      "valor": 999999
+    }
+  }
+}

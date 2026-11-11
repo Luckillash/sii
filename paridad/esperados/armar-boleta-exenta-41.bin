@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<DTE xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
+  <Documento ID="F7T41">
+    <Encabezado>
+      <IdDoc>
+        <TipoDTE>41</TipoDTE>
+        <Folio>7</Folio>
+        <FchEmis>2026-09-05</FchEmis>
+        <IndServicio>3</IndServicio>
+      </IdDoc>
+      <Emisor>
+        <RUTEmisor>76123456-0</RUTEmisor>
+        <RznSocEmisor>DÍAZ Y MUÑOZ LTDA</RznSocEmisor>
+        <GiroEmisor>ACTIVIDADES DE CONSULTORIA DE INFORMATICA</GiroEmisor>
+        <DirOrigen>CALLE 123</DirOrigen>
+        <CmnaOrigen>SANTIAGO</CmnaOrigen>
+      </Emisor>
+      <Receptor>
+        <RUTRecep>66666666-6</RUTRecep>
+        <RznSocRecep>Cliente General</RznSocRecep>
+      </Receptor>
+      <Totales>
+        <MntExe>9500</MntExe>
+        <MntTotal>9500</MntTotal>
+      </Totales>
+    </Encabezado>
+    <Detalle>
+      <NroLinDet>1</NroLinDet>
+      <IndExe>1</IndExe>
+      <NmbItem>Libro</NmbItem>
+      <QtyItem>1</QtyItem>
+      <PrcItem>5000</PrcItem>
+      <MontoItem>5000</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>2</NroLinDet>
+      <IndExe>1</IndExe>
+      <NmbItem>Revista</NmbItem>
+      <QtyItem>3</QtyItem>
+      <PrcItem>1500</PrcItem>
+      <MontoItem>4500</MontoItem>
+    </Detalle>
+  <TED version="1.0"><DD><RE>76123456-0</RE><TD>41</TD><F>7</F><FE>2026-09-05</FE><RR>66666666-6</RR><RSR>Cliente General</RSR><MNT>9500</MNT><IT1>Libro</IT1><CAF version="1.0"><DA><RE>76123456-0</RE><RS>DÍAZ Y MUÑOZ LTDA</RS><TD>41</TD><RNG><D>1</D><H>100</H></RNG><FA>2026-09-01</FA><RSAPK><M>tpj76yFbkdTTeguyemYdcEd10rbIoo89LrlapNJpJtSmxRp7uNAPoRdrw9cA5iCRKYMpELZkFEoQSJ8EVUKGdQ==</M><E>Aw==</E></RSAPK><IDK>100</IDK></DA><FRMA algoritmo="SHA1withRSA">eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eA==</FRMA></CAF><TSTED>2026-09-05T11:00:00</TSTED></DD><FRMT algoritmo="SHA1withRSA">AYzIaWSHAXRdxyYr/adhGyvBw9M5InZOMc/KfNYl0366Cpi82pPQsmqeS0SnxYHFC45R25lkxkLgIYDVNMJ0wA==</FRMT></TED>
+<TmstFirma>2026-09-05T11:00:00</TmstFirma>
+</Documento>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+<SignedInfo>
+<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<Reference URI="#F7T41">
+<Transforms>
+<Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+</Transforms>
+<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<DigestValue>cusHbVi4YPOIF/sNuAtJy2XIO3c=</DigestValue>
+</Reference>
+</SignedInfo>
+<SignatureValue>Do7+tzsJDzWbzS2E2k2tWYtOyFMFi74EEyF6NTiB/7iJ4u22CZJ7z/mGtiHxfWlyB3Ex2dFJvsK04n1EzuDwfMgd9U+XVAVLFQSHTHlTcT0J5q1qchaRD65gaPh9acnmTTymPSDDdlqNOZZBYpt9yXgF8biqcIlQNVBSCTczoZSNd3YwXlSJstX3EXQMARXDNnQt54cjMurntyAfNk31av6dcoRWmH0JM4DCwkBzUS2pI9hYMPOfg+aSxtezuvSXa4S1R5wmt9hTGDW9KnKaqr9oTb5bTclUyxdOFxL/w76Ea5iEcooMG2EaCysmOIBq5rkbz5pDMKnTOreH7pVwAQ==</SignatureValue>
+<KeyInfo>
+<KeyValue>
+<RSAKeyValue>
+<Modulus>tflg6YLi3tIYPw+pC9Tvd6asaJTVI09mT3IawcvxsSXpHILMSBCGahikzqFqP7rXwzO4wkI+ZD00CG/3BTo6sUWSkZV69nSO0PPDB2OZGu5MsZKHVPckd1ys/fv3usk723nRksdmr2MES6DpfWqxUy8VIvOpDY1k4OMj03TxBYnx5DtyKBEWL88zesiPIkCyq+4q08H9pSLfYuQ3zTEEolfNTruYLkAKaD14BON7kjzVGJ6kDLeNiSN1hqspMD2fIGwVorhq7KN7yaaVDpbgQJzjZ2ErQT12NQw4hJRzEQneYEJrYrnxtQcVpGeN81kENKfEMXnQUFzk6SQfUFt5qw==</Modulus>
+<Exponent>AQAB</Exponent>
+</RSAKeyValue>
+</KeyValue>
+<X509Data>
+<X509Certificate>MIIDezCCAmOgAwIBAgIUfHA+6RtmK+GzEJs7ufLZ+t53Z18wDQYJKoZIhvcNAQELBQAwTDEaMBgGA1UEAwwRVGl0dWxhciBkZSBQcnVlYmExLjAsBgNVBAoMJU1hdGVyaWFsIGRlIHBydWViYSBjZXJ0aWZpY2FjaW9uLW5vZGUwIBcNMjYxMTA2MDEzMTIzWhgPMjEyNjEwMTMwMTMxMjNaMEwxGjAYBgNVBAMMEVRpdHVsYXIgZGUgUHJ1ZWJhMS4wLAYDVQQKDCVNYXRlcmlhbCBkZSBwcnVlYmEgY2VydGlmaWNhY2lvbi1ub2RlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtflg6YLi3tIYPw+pC9Tvd6asaJTVI09mT3IawcvxsSXpHILMSBCGahikzqFqP7rXwzO4wkI+ZD00CG/3BTo6sUWSkZV69nSO0PPDB2OZGu5MsZKHVPckd1ys/fv3usk723nRksdmr2MES6DpfWqxUy8VIvOpDY1k4OMj03TxBYnx5DtyKBEWL88zesiPIkCyq+4q08H9pSLfYuQ3zTEEolfNTruYLkAKaD14BON7kjzVGJ6kDLeNiSN1hqspMD2fIGwVorhq7KN7yaaVDpbgQJzjZ2ErQT12NQw4hJRzEQneYEJrYrnxtQcVpGeN81kENKfEMXnQUFzk6SQfUFt5qwIDAQABo1MwUTAdBgNVHQ4EFgQULRy9vn66ebHiNcLA60RZffgPP1UwHwYDVR0jBBgwFoAULRy9vn66ebHiNcLA60RZffgPP1UwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAKyHigem7SyuHNxfIF5dERoXdPAPEJlqwYG5E3PByAp5gRqMpv4+J9KImIwzC5+akZ3B/FwNo2e457HqKLt1FRTEHh9oVTvELjg8PJxeyUPwQi0+bCiwAN1CH+AArZO7UbmnegsxNkKbTBVBhBVC7G21605Ep/Pyiaa4nvErMmj/LcNY8H3PmDOJVy60lL2D1J8o52Z0NWfGclMqvERykVbr3U2A8Nf3Qv4wPYO6seBbYFCg4YbaTQyWHwzG8djn505PF9+BKRBuZ57pMGGJYOe9MTagwL3SE4KJ6l2XvOM3/1AeXkgC4eiMukL29VBarpTTN0+x/4Cf87NazV7vNxQ==</X509Certificate>
+</X509Data>
+</KeyInfo>
+</Signature></DTE>

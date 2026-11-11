@@ -1,0 +1,8 @@
+{
+    "caso": "http-dtews-token-pfx-legacy",
+    "operacion": "httpDtews",
+    "core": "1.9.1",
+    "bytes": 3900,
+    "sha256": "0b9726c05fb2443f1189d79a600cb7f73626c40009c185080f5da65f79b3f2e3",
+    "marcas": {}
+}

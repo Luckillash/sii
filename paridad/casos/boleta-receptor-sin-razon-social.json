@@ -1,0 +1,25 @@
+{
+  "descripcion": "Receptor sin razón social (sin RznSocRecep); folio numérico y tipo por defecto",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-09-05T17:00:00",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6"
+    },
+    "folio": 70,
+    "detalles": [
+      {
+        "nombre": "Papel",
+        "cantidad": 17,
+        "precio": 120
+      }
+    ]
+  }
+}

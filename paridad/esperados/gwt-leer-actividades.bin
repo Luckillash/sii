@@ -1,0 +1,11 @@
+{
+    "lecturas": [
+        {
+            "objeto": {
+                "@tipo": "java.lang.Integer/3438268394",
+                "valor": 3
+            }
+        }
+    ],
+    "error": null
+}

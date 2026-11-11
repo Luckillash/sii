@@ -1,0 +1,89 @@
+{
+    "codificacion": "UTF-8",
+    "casos": [
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Servicio",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 5000,
+                    "precioTexto": "5000",
+                    "precioTipo": "int",
+                    "exento": true
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-1"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "uno",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 100,
+                    "precioTexto": "100",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "dos",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 200,
+                    "precioTexto": "200",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-2"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Asesoria",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 9000,
+                    "precioTexto": "9000",
+                    "precioTipo": "int",
+                    "exento": true
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-3"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Asesoria",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 9000,
+                    "precioTexto": "9000",
+                    "precioTipo": "int",
+                    "exento": true
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-4"
+            }
+        }
+    ]
+}

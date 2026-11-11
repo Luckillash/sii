@@ -1,0 +1,7 @@
+{
+  "descripcion": "Formulario sin campos: cuerpo vacío",
+  "operacion": "httpBuildQuery",
+  "entrada": {
+    "campos": []
+  }
+}

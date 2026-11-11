@@ -1,0 +1,8 @@
+{
+  "descripcion": "Secciones CDATA (se emiten como texto escapado, incluida una vacía y una con \\r\\n)",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<r xmlns=\"urn:sii:a\"><a><![CDATA[x < y & z > w \"q\" ']]></a><a>pre<![CDATA[]]>post<![CDATA[l1\r\nl2]]></a></r>",
+    "etiqueta": "r"
+  }
+}

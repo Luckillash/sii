@@ -1,0 +1,8 @@
+{
+    "caso": "firmar-dte-boleta-39",
+    "operacion": "firmarDte",
+    "core": "1.9.1",
+    "bytes": 4522,
+    "sha256": "e0ad6e5d16187808643b28b162522036af772131e0a558de70bee3790b388aa6",
+    "marcas": {}
+}

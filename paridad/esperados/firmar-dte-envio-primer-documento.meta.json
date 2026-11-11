@@ -1,0 +1,8 @@
+{
+    "caso": "firmar-dte-envio-primer-documento",
+    "operacion": "firmarDte",
+    "core": "1.9.1",
+    "bytes": 12634,
+    "sha256": "7ff25301e2760e17d40e4de4363ec76a471924627529f123a5f87f08283ceadb",
+    "marcas": {}
+}

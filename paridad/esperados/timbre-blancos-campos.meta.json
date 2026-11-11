@@ -1,0 +1,10 @@
+{
+    "caso": "timbre-blancos-campos",
+    "operacion": "timbre",
+    "core": "1.9.1",
+    "bytes": 710,
+    "sha256": "2dae278ed7762a94f5209c3be58ec40d50b17245045d76c67ee8dd7d7174ccb0",
+    "marcas": {
+        "TSTED": "2026-09-05T10:37:08"
+    }
+}

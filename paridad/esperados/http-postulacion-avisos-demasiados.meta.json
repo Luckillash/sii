@@ -1,0 +1,8 @@
+{
+    "caso": "http-postulacion-avisos-demasiados",
+    "operacion": "httpPostulacion",
+    "core": "1.9.1",
+    "bytes": 2895,
+    "sha256": "8a489794b57a179c57f185f07578098ce6cb8a7a5f481e3fa95e98ffb5cc2c3a",
+    "marcas": {}
+}

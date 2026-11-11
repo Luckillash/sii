@@ -1,0 +1,57 @@
+{
+  "descripcion": "SesionSii: Set-Cookie host-only y con Domain (con y sin punto, mayúsculas), dominio que no es padre del host o fuera de sii.cl (se ignora), borrado por Max-Age/Expires/valor vacío, reemplazo en su lugar, document.cookie del login y cabecera Cookie por host",
+  "operacion": "sesionSii",
+  "entrada": {
+    "inicial": [
+      { "name": "GUARDADA", "value": "1", "domain": "sii.cl", "host_only": false },
+      { "name": "SINDOMINIO", "value": "x" },
+      { "name": "HOST", "value": "h", "domain": "maullin.sii.cl" }
+    ],
+    "pasos": [
+      {
+        "recibir": "https://herculesr.sii.cl/cgi_AUT2000/CAutInicio.cgi?x",
+        "setCookie": [
+          "s_aut=HOSTONLY; path=/",
+          "AMPLIA=A1; Domain=.sii.cl; Path=/",
+          "MAYUS=M1; DOMAIN=SII.CL",
+          "HERMANO=no; Domain=maullin.sii.cl",
+          "AJENA=no; Domain=.example.com",
+          "COLA=no; Domain=sii.cl.example.com",
+          "  ESPACIOS  =  con espacios  ; Path=/ ",
+          "SIN_IGUAL",
+          "=sinnombre",
+          "IGUALES=a=b=c; Domain=sii.cl"
+        ]
+      },
+      { "cabeceraPara": "https://herculesr.sii.cl/x" },
+      { "cabeceraPara": "https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios" },
+      { "cabeceraPara": "https://sii.cl/" },
+      { "cabeceraPara": "https://www4.sii.cl/" },
+      {
+        "recibir": "https://maullin.sii.cl/cvc_cgi/dte/x",
+        "setCookie": [
+          "JSESSIONID=J1; Path=/cvc_cgi; Secure; HttpOnly",
+          "AMPLIA=A2; Domain=sii.cl",
+          "GUARDADA=; Domain=sii.cl",
+          "MAYUS=borrar; Domain=sii.cl; Max-Age=0",
+          "NEGATIVA=borrar; Domain=sii.cl; Max-Age=-1",
+          "FUTURA=queda; Domain=sii.cl; Max-Age=3600",
+          "VENCIDA=borrar; Domain=sii.cl; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+          "VIGENTE=queda; Domain=sii.cl; Expires=Fri, 31 Dec 2099 23:59:59 GMT",
+          "NETSCAPE=queda; Domain=sii.cl; expires=Fri, 31-Dec-2099 23:59:59 GMT",
+          "MALAFECHA=queda; Domain=sii.cl; Expires=no es fecha"
+        ]
+      },
+      { "valor": "AMPLIA" },
+      { "valor": "GUARDADA" },
+      { "valor": "NOEXISTE" },
+      {
+        "html": "<script>document.cookie = \"TOKEN=T0K3N; path=/; domain=.sii.cl\";\ndocument.cookie='NETSCAPE_LIVEWIRE.rut=11111111; path=/';\nDOCUMENT.COOKIE = \"MAYUS_JS=1\";\ndocument.cookie = \"MAULLIN_JS=no; domain=maullin.sii.cl\";\nvar x = 'document.cookie=nada';</script>"
+      },
+      { "cabeceraPara": "https://maullin.sii.cl/cvc_cgi/dte/of_genera_folio" },
+      { "cabeceraPara": "https://palena.sii.cl/" },
+      { "cabeceraPara": "https://maullin.sii.cl.example.com/" },
+      { "valor": "TOKEN" }
+    ]
+  }
+}

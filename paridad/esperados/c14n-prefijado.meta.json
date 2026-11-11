@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-prefijado",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 74,
+    "sha256": "f7c8aefbab699e88a7872e237b6d16a4140f7af2cff9003a18705b8b1d138238",
+    "marcas": {}
+}

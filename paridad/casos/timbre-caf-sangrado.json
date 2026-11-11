@@ -1,0 +1,18 @@
+{
+  "descripcion": "CAF con CRLF, tabulaciones, encoding ISO-8859-1 declarado y RSA de 2048 bits: el DD se firma aplanado",
+  "operacion": "timbre",
+  "entrada": {
+    "caf": "caf-39-sangrado.xml",
+    "ahora": "2026-09-05T10:33:04",
+    "datos": {
+      "rut_emisor": "76123456-0",
+      "tipo_dte": "39",
+      "folio": "250",
+      "fecha": "2026-09-05",
+      "rut_receptor": "66666666-6",
+      "razon_social_receptor": "Cliente General",
+      "monto_total": "1190",
+      "nombre_item_1": "Producto de prueba"
+    }
+  }
+}

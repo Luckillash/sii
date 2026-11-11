@@ -1,0 +1,7 @@
+{
+  "descripcion": "Exento por número de ítem: uno de tres, ítem inexistente, \"exentos\" (sin \\b), \"Item1\" pegado, observación en minúsculas y dos ítems exentos",
+  "operacion": "setPruebas",
+  "entrada": {
+    "texto": "CASO-1\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nitem afecto 1\t\t\t8\t\t\t1590\nitem exento 2\t\t\t2\t\t\t1000\nitem afecto 3\t\t\t1\t\t\t500\n\n\nOBSERVACION: \"El item 1 es un servicio afecto. El item 2 es un servicio exento.\"\n\nCASO-2\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nuno\t\t\t1\t\t\t100\ndos\t\t\t1\t\t\t200\n\n\nOBSERVACION: \"El item 3 es exento.\"\n\nCASO-3\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nuno\t\t\t1\t\t\t100\ndos\t\t\t1\t\t\t200\n\n\nOBSERVACION: \"El item 1 y el item 2 son exentos.\"\n\nCASO-4\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nuno\t\t\t1\t\t\t100\ndos\t\t\t1\t\t\t200\n\n\nobservacion :  \"Item1 EXENTO; ITEM 2 afecto\"\n\nCASO-5\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nuno\t\t\t1\t\t\t100\ndos\t\t\t1\t\t\t200\n\n\nOBSERVACION: \"El item 2, que es exento. El item 1 tambien es exento\"\n\n"
+  }
+}

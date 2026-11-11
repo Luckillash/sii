@@ -1,0 +1,8 @@
+{
+    "caso": "http-dtews-token-rechazado",
+    "operacion": "httpDtews",
+    "core": "1.9.1",
+    "bytes": 3888,
+    "sha256": "14cf0925f83cc3720964b26ee5ded27ab0f6e7eabd9ef34b1a433bca11552c9b",
+    "marcas": {}
+}

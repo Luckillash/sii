@@ -1,0 +1,18 @@
+{
+    "lecturas": [
+        {
+            "objeto": {
+                "@tipo": "cl.prueba.Nodo/1",
+                "campos": [
+                    [
+                        "O",
+                        {
+                            "@tipo": "cl.prueba.Nodo/1"
+                        }
+                    ]
+                ]
+            }
+        }
+    ],
+    "error": null
+}

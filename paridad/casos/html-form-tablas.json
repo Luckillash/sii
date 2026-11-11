@@ -1,0 +1,18 @@
+{
+  "descripcion": "Formularios dentro de tablas, como el HTML del SII: qué cierra el <form> en libxml (un </td> sí; un </form> dentro de una celda no) y <form> directo en <table>/<tr>",
+  "operacion": "formFolios",
+  "entrada": {
+    "paginas": [
+      "<table><tr><td><form action=\"a\"><input name=\"x\"></td><td><input name=\"y\"></td></tr></table><input name=\"z\">",
+      "<form action=\"a\"><table><tr><td><input name=\"x\"></form><input name=\"y\"></td></tr></table><input name=\"z\">",
+      "<form action=\"a\"><table><tr><td><input name=\"x\"></td></form><td><input name=\"y\"></td></tr></table><input name=\"z\">",
+      "<table><tr><form action=\"a\"><td><input name=\"x\"></td></form></tr><tr><td><input name=\"y\"></td></tr></table>",
+      "<table><form action=\"a\"><tr><td><input name=\"x\"></td></tr></form></table><input name=\"y\">",
+      "<TABLE><TR><TD COLSPAN=2>Texto</TD></TR><FORM NAME=f METHOD=POST ACTION=of_x><TR><TD><INPUT TYPE=hidden NAME=A VALUE=1></TD></TR><TR><TD><INPUT TYPE=hidden NAME=B VALUE=2></TD></TR></FORM></TABLE><INPUT NAME=C VALUE=3>",
+      "<form action=\"a\"><font><table><tr><td><input name=\"x\"></font></td></tr></table><input name=\"y\"></form>",
+      "<form action=\"a\"><table><tr><td><form action=\"b\"><input name=\"y\"></td></tr></table><input name=\"z\"></form>",
+      "<form action=\"a\"><td><input name=\"x\"></form><input name=\"y\">",
+      "<table><tr><td><table><tr><td><form action=\"a\"><input name=\"x\"></td></tr></table><input name=\"y\"></td></tr></table><input name=\"z\">"
+    ]
+  }
+}

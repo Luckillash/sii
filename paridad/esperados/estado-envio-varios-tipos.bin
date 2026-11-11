@@ -1,0 +1,13 @@
+{
+    "trackId": "1234567890",
+    "estado": "EPR",
+    "glosa": "Envio Procesado",
+    "informados": 6,
+    "aceptados": 5,
+    "rechazados": 1,
+    "reparos": 2,
+    "enProceso": false,
+    "procesado": true,
+    "limpio": false,
+    "resumen": "EPR Envio Procesado: 6 informados, 5 aceptados, 1 rechazados, 2 con reparos"
+}

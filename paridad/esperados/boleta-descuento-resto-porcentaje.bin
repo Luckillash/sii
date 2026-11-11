@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<DTE xmlns="http://www.sii.cl/SiiDte" version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Documento ID="F63T39">
+    <Encabezado>
+      <IdDoc>
+        <TipoDTE>39</TipoDTE>
+        <Folio>63</Folio>
+        <FchEmis>2026-09-05</FchEmis>
+        <IndServicio>3</IndServicio>
+      </IdDoc>
+      <Emisor>
+        <RUTEmisor>76123456-0</RUTEmisor>
+        <RznSocEmisor>EMPRESA DE PRUEBA SPA</RznSocEmisor>
+        <GiroEmisor>ACTIVIDADES DE CONSULTORIA DE INFORMATICA</GiroEmisor>
+        <DirOrigen>CALLE 123</DirOrigen>
+        <CmnaOrigen>SANTIAGO</CmnaOrigen>
+      </Emisor>
+      <Receptor>
+        <RUTRecep>66666666-6</RUTRecep>
+        <RznSocRecep>Cliente General</RznSocRecep>
+      </Receptor>
+      <Totales>
+        <MntNeto>300</MntNeto>
+        <IVA>57</IVA>
+        <MntTotal>357</MntTotal>
+      </Totales>
+    </Encabezado>
+    <Detalle>
+      <NroLinDet>1</NroLinDet>
+      <NmbItem>A</NmbItem>
+      <QtyItem>1</QtyItem>
+      <PrcItem>101</PrcItem>
+      <DescuentoMonto>34</DescuentoMonto>
+      <MontoItem>67</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>2</NroLinDet>
+      <NmbItem>B</NmbItem>
+      <QtyItem>1</QtyItem>
+      <PrcItem>103</PrcItem>
+      <DescuentoMonto>35</DescuentoMonto>
+      <MontoItem>68</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>3</NroLinDet>
+      <NmbItem>C</NmbItem>
+      <QtyItem>1</QtyItem>
+      <PrcItem>107</PrcItem>
+      <DescuentoMonto>36</DescuentoMonto>
+      <MontoItem>71</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>4</NroLinDet>
+      <NmbItem>D</NmbItem>
+      <QtyItem>1</QtyItem>
+      <PrcItem>109</PrcItem>
+      <DescuentoMonto>36</DescuentoMonto>
+      <MontoItem>73</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>5</NroLinDet>
+      <NmbItem>E</NmbItem>
+      <QtyItem>1</QtyItem>
+      <PrcItem>113</PrcItem>
+      <DescuentoMonto>37</DescuentoMonto>
+      <MontoItem>76</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>6</NroLinDet>
+      <NmbItem>F</NmbItem>
+      <QtyItem>2</QtyItem>
+      <PrcItem>1</PrcItem>
+      <MontoItem>2</MontoItem>
+    </Detalle>
+  </Documento>
+</DTE>

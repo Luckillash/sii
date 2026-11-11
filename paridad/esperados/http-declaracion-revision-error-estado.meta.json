@@ -1,0 +1,8 @@
+{
+    "caso": "http-declaracion-revision-error-estado",
+    "operacion": "httpDeclaracion",
+    "core": "1.9.1",
+    "bytes": 1842,
+    "sha256": "529d731d6fabd5154820742d19108185f2304c7700685a9085e43ae58efff89e",
+    "marcas": {}
+}

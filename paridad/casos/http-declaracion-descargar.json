@@ -1,0 +1,65 @@
+{
+  "descripcion": "descargarSetPruebas(): sin postulación en P90 ni estado → GET DownloadFileServlet (query de http_build_query, Referer ?SET=1), set en ISO-8859-1",
+  "operacion": "httpDeclaracion",
+  "entrada": {
+    "accion": "descargarSetPruebas",
+    "sesion": [
+      {
+        "name": "TOKEN",
+        "value": "TOKENDEPRUEBAAUT2000",
+        "domain": "sii.cl",
+        "host_only": false
+      },
+      {
+        "name": "RUT_NS",
+        "value": "11111111",
+        "domain": "sii.cl",
+        "host_only": false
+      },
+      {
+        "name": "DV_NS",
+        "value": "1",
+        "domain": "sii.cl",
+        "host_only": false
+      },
+      {
+        "name": "MAULLINSOLO",
+        "value": "M1",
+        "domain": "maullin.sii.cl",
+        "host_only": true
+      },
+      {
+        "name": "WWW4SOLO",
+        "value": "W1",
+        "domain": "www4.sii.cl",
+        "host_only": true
+      }
+    ],
+    "rutEmpresa": "76123456-0",
+    "correoProveedor": "software.prueba@empresa-prueba.cl",
+    "http": {
+      "respuestas": [
+        {
+          "status": 200,
+          "cabeceras": [["Content-Type", "application/json; charset=utf-8"]],
+          "cuerpo": "//OK[0,[],0,7]"
+        },
+        {
+          "status": 200,
+          "cabeceras": [["Content-Type", "application/json; charset=utf-8"]],
+          "cuerpo": "//OK[0,[],0,7]"
+        },
+        {
+          "status": 200,
+          "cabeceras": [
+            ["Content-Type", "text/plain; charset=ISO-8859-1"],
+            ["Content-Disposition", "attachment; filename=\"SetPruebasBoleta.txt\""]
+          ],
+          "cuerpo": {
+            "base64": "U0VUIERFIFBSVUVCQSBCT0xFVEEgRUxFQ1RS005JQ0EgLSBO2k1FUk8gREUgQVRFTkNJ0046IDAwMDAwMDENCg0KQ0FTTy0xDQo9PT09PT09PT09DQpJVEVNICAgICAgICAgICAgICAgICAgICAgICAgQ0FOVElEQUQgICBQUkVDSU8gVU5JVEFSSU8NCkNhbWJpbyBkZSBhY2VpdGUgICAgICAgICAgICAgICAgICAgMSAgICAgICAgICAgICAxOTkwMA0KQWxpbmVhY2nzbiB5IGJhbGFuY2VvICAgICAgICAgICAgICAxICAgICAgICAgICAgICA5OTAwDQoNCkNBU08tMg0KPT09PT09PT09PQ0KSVRFTSAgICAgICAgICAgICAgICAgICAgICAgIENBTlRJREFEICAgUFJFQ0lPIFVOSVRBUklPDQpQYXBlbCBkZSByZWdhbG8gKHNl8WFsKSAgICAgICAgICAgMTcgICAgICAgICAgICAgICAxMjANCg=="
+          }
+        }
+      ]
+    }
+  }
+}

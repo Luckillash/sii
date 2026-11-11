@@ -1,0 +1,10 @@
+=== peticion 1 de 1 (https) ===
+GET /recursos/v1/boleta.electronica.envio/76123456-0-9876543210 HTTP/1.1
+accept: */*
+cookie: TOKEN=TOKENDEPRUEBA0003
+host: <https>
+
+
+=== fin de la peticion 1 ===
+=== resultado ===
+EPR

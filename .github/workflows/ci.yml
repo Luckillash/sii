@@ -1,0 +1,143 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  node:
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22', '24']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm exec biome ci .
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Tests (unitarios + paridad contra los esperados versionados)
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+  paridad-php:
+    # Regenera paridad/esperados/ con el core PHP congelado y falla si difieren
+    # de los versionados: detecta cambios en el PHP o esperados editados a mano.
+    name: Paridad con el core PHP
+    runs-on: ubuntu-latest
+    env:
+      CORE_REF: v1.9.1
+    steps:
+      # Misma disposición que en local: certificacion-node/ y certificacion-core/ hermanos.
+      - uses: actions/checkout@v4
+        with:
+          path: certificacion-node
+
+      # Repo público del autor original, en el tag congelado. No depende de la
+      # copia local de certificacion-core (que no se publica).
+      - uses: actions/checkout@v4
+        with:
+          repository: Winexnix/certificacion-core
+          ref: ${{ env.CORE_REF }}
+          path: certificacion-core
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl, dom, mbstring, openssl
+          coverage: none
+
+      # Los esperados versionados salieron de libxml 2.10.4 (PHP 8.3 de Windows).
+      # Si este job falla en casos xml-*/c14n-*, comparar con esta versión.
+      - name: Versión de libxml
+        run: php -r 'echo "libxml ", LIBXML_DOTTED_VERSION, PHP_EOL;'
+
+      - name: Instalar el core PHP
+        working-directory: certificacion-core
+        run: composer update --no-dev --no-interaction --no-progress --prefer-dist
+
+      # El servidor de captura de la paridad HTTP (paridad/http/) es Node sin
+      # dependencias: no hace falta pnpm install.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # Levanta el servidor de captura y corre paridad/php/generar.php con la CA de
+      # prueba (curl.cainfo, openssl.cafile). Ver "Paridad de requests HTTP" en
+      # paridad/README.md.
+      - name: Regenerar los esperados
+        working-directory: certificacion-node
+        run: node paridad/http/generar.mjs
+
+      - name: Comparar con los versionados
+        working-directory: certificacion-node
+        run: |
+          if [ -z "$(git status --porcelain -- paridad/esperados)" ]; then
+            echo "Esperados idénticos a los que genera winex/certificacion ${CORE_REF}."
+            exit 0
+          fi
+          echo "::error::Los esperados de paridad no coinciden con winex/certificacion ${CORE_REF} (libxml $(php -r 'echo LIBXML_DOTTED_VERSION;'))."
+          git status --short -- paridad/esperados
+          # Para cada .bin distinto: primer byte que difiere y contexto de ambos lados.
+          for archivo in $(git diff --name-only -- 'paridad/esperados/*.bin'); do
+            echo "::group::${archivo}"
+            git show "HEAD:${archivo}" > /tmp/versionado.bin
+            cmp /tmp/versionado.bin "${archivo}" | head -1 || true
+            byte=$(cmp /tmp/versionado.bin "${archivo}" 2>/dev/null | awk '{print $5}' | tr -d ,)
+            if [ -n "${byte}" ]; then
+              desde=$(( byte > 80 ? byte - 80 : 1 ))
+              echo "--- versionado:";  tail -c +"${desde}" /tmp/versionado.bin | head -c 160 | cat -v; echo
+              echo "--- regenerado:";  tail -c +"${desde}" "${archivo}" | head -c 160 | cat -v; echo
+            fi
+            echo "::endgroup::"
+          done
+          exit 1
+
+      # Validación contra los XSD del SII (paridad/xsd.json). Va en este job y no en
+      # `node`: corre una sola vez (sin matriz) y el script es PHP. Como Node produce
+      # los mismos bytes que estos esperados, validar los esperados cubre a ambos.
+      # Corre aunque falle la comparación (`!cancelled()`): señal independiente; en ese
+      # caso valida lo que regeneró el PHP. --estricto exige al menos un esperado por
+      # regla obligatoria.
+      - name: Instalar xmllint
+        if: ${{ !cancelled() }}
+        run: |
+          command -v xmllint >/dev/null || {
+            sudo apt-get update -q
+            sudo apt-get install -y -q --no-install-recommends libxml2-utils
+          }
+
+      - name: Validar contra los XSD del SII
+        if: ${{ !cancelled() }}
+        working-directory: certificacion-node
+        run: php paridad/php/validar-xsd.php --xmllint --estricto
+
+      # Si la comparación falla, los esperados regenerados quedan descargables
+      # para revisarlos en local (diff contra paridad/esperados/).
+      - name: Subir los esperados regenerados
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: esperados-regenerados
+          path: certificacion-node/paridad/esperados/

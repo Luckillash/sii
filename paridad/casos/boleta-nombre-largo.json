@@ -1,0 +1,26 @@
+{
+  "descripcion": "Nombre de ítem largo (más de 80 caracteres) con multibyte",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-09-05T19:00:00",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "75",
+    "detalles": [
+      {
+        "nombre": "Servicio de consultoría informática especializada en integración con el SII — boleta electrónica, folios y timbraje ñandú áéíóú",
+        "cantidad": 1,
+        "precio": 119000
+      }
+    ]
+  }
+}

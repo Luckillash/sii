@@ -1,0 +1,26 @@
+{
+  "descripcion": "Razón social del receptor vacía: <RznSocRecep/>",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-09-05T17:10:00",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": ""
+    },
+    "folio": "71",
+    "detalles": [
+      {
+        "nombre": "Papel",
+        "cantidad": 1,
+        "precio": 120
+      }
+    ]
+  }
+}

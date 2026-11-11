@@ -1,0 +1,7 @@
+{
+    "lecturas": [],
+    "error": {
+        "clase": "PostulacionException",
+        "mensaje": "El SII respondio un tipo no esperado (cl.sii.sdi.diii.certBolElectDte.to.Desconocido/1); pudo haber cambiado el portal."
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "caso": "timbre-numeros",
+    "operacion": "timbre",
+    "core": "1.9.1",
+    "bytes": 726,
+    "sha256": "f993e85b92a2472acd2170f94d096ddd70e85173ab7b1b99e539d357ce5a9197",
+    "marcas": {
+        "TSTED": "2026-09-05T10:38:09"
+    }
+}

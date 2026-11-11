@@ -1,0 +1,13 @@
+{
+    "trackId": "1234567890",
+    "estado": "RCH",
+    "glosa": "a&amp;b &lt;x&gt; &nbsp; &eacute; ééÉ A B &#0; &#xD800; &#xFFFE; 􏿿 &#1114112; &#65 &AMP; &Amp; ''\"\" &#x; \t\n\r A &#99999999999999999999; &#x00x41; &#x0x; &constructor; &toString; 😀",
+    "informados": 0,
+    "aceptados": 0,
+    "rechazados": 0,
+    "reparos": 0,
+    "enProceso": false,
+    "procesado": false,
+    "limpio": false,
+    "resumen": "RCH a&amp;b &lt;x&gt; &nbsp; &eacute; ééÉ A B &#0; &#xD800; &#xFFFE; 􏿿 &#1114112; &#65 &AMP; &Amp; ''\"\" &#x; \t\n\r A &#99999999999999999999; &#x00x41; &#x0x; &constructor; &toString; 😀"
+}

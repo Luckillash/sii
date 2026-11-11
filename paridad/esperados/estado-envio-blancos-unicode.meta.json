@@ -1,0 +1,8 @@
+{
+    "caso": "estado-envio-blancos-unicode",
+    "operacion": "estadoEnvio",
+    "core": "1.9.1",
+    "bytes": 290,
+    "sha256": "46b3f232f9ebe07fa827e3defeb11cc04802a65b029e6e197e353ce9783b14a9",
+    "marcas": {}
+}

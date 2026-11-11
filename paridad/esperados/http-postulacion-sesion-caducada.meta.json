@@ -1,0 +1,8 @@
+{
+    "caso": "http-postulacion-sesion-caducada",
+    "operacion": "httpPostulacion",
+    "core": "1.9.1",
+    "bytes": 1954,
+    "sha256": "00af15aa707247c3bbaa17540bc5f1d6078c587180cb8ccf84146c09ddcb940e",
+    "marcas": {}
+}

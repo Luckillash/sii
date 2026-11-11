@@ -1,0 +1,19 @@
+{
+  "descripcion": "Texto crudo de libxml: <script> y <style> hasta `</` + letra (esa etiqueta se procesa: un </td> dentro de un script cierra la celda), comentarios, <!DOCTYPE>, <?...?>, `<` suelto y <textarea>/<title> que NO son crudos",
+  "operacion": "formFolios",
+  "entrada": {
+    "paginas": [
+      "<form action=\"a\"><script>x=\"</td>\";</script><input name=\"x\"></form>",
+      "<table><tr><td><form action=\"a\"><script>x=\"</td>\";</script><input name=\"x\"></td></tr></table>",
+      "<form action=\"a\"><script>x=\"<input name='w'>\"; y=\"</b>\"; z=\"<input name='v'>\"</script><input name=\"x\"></form>",
+      "<form action=\"a\"><style>a{}</x> <input name=\"w\"></style><input name=\"x\"></form>",
+      "<script>var s=\"<form action='no'>\";</script><form action=\"si\"><input name=\"q\"></form>",
+      "<SCRIPT LANGUAGE=\"JavaScript\">document.write(\"<form action='js'><input name='js'></form>\");</SCRIPT><form action=\"real\"><input name=\"r\"></form>",
+      "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"><?php echo 1 ?><!-- <form action=\"no\"> --><form action=\"si\"><!---->< input name=\"t\"><input name=\"q\"></form>",
+      "<form action=\"a\"><textarea name=\"t\"><input name=\"dentro\"></textarea><input name=\"x\"></form>",
+      "<form action=\"a\"><title><input name=\"tt\"></title><input name=\"x\"></form>",
+      "<form action=\"a\">1 < 2 <= 3 <input name=\"x\"> a</ b> <input name=\"y\"></form>",
+      "<form action=\"a\"><script>sin cerrar <input name=\"x\">"
+    ]
+  }
+}

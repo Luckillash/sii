@@ -1,0 +1,8 @@
+{
+    "caso": "firmar-dte-prologo-y-epilogo",
+    "operacion": "firmarDte",
+    "core": "1.9.1",
+    "bytes": 4793,
+    "sha256": "cc84cc4129fa5fa8f3af97ce8279b8ea9803f051bbd0e71b97c9c5c4366e7d8f",
+    "marcas": {}
+}

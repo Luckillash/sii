@@ -1,0 +1,36 @@
+{
+  "descripcion": "Descuento global de 10 %; la glosa (con & y <) no va en el XML",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-09-05T13:00:00",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "60",
+    "detalles": [
+      {
+        "nombre": "X",
+        "cantidad": 1,
+        "precio": 10000
+      },
+      {
+        "nombre": "Y",
+        "cantidad": 2,
+        "precio": 2990
+      }
+    ],
+    "descuento": {
+      "tipo": "porcentaje",
+      "valor": 10,
+      "glosa": "Promo <10%> & más"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "descripcion": "El floor deja un resto que se reparte de a un peso (ítem de precio 0 fuera del reparto)",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-09-05T14:00:00",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "62",
+    "detalles": [
+      {
+        "nombre": "A",
+        "cantidad": 3,
+        "precio": 1333
+      },
+      {
+        "nombre": "B",
+        "cantidad": 1,
+        "precio": 777
+      },
+      {
+        "nombre": "C",
+        "cantidad": 1,
+        "precio": 1
+      },
+      {
+        "nombre": "Regalo",
+        "cantidad": 1,
+        "precio": 0
+      }
+    ],
+    "descuento": {
+      "tipo": "monto",
+      "valor": 1000
+    }
+  }
+}

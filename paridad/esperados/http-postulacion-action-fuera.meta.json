@@ -1,0 +1,8 @@
+{
+    "caso": "http-postulacion-action-fuera",
+    "operacion": "httpPostulacion",
+    "core": "1.9.1",
+    "bytes": 1952,
+    "sha256": "506fbbb94d0b1bda9a169027800283e00ea9a4587361533f87fb584a074a1a0e",
+    "marcas": {}
+}

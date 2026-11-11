@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-medianoche-utc",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 1117,
+    "sha256": "958b230f80251d799b08c2bfbcdd25fc8db7e3a14470d8c361be0ce7e655cdf3",
+    "marcas": {
+        "FchEmis": "2026-07-15"
+    }
+}

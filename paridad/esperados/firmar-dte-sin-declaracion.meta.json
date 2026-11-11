@@ -1,0 +1,8 @@
+{
+    "caso": "firmar-dte-sin-declaracion",
+    "operacion": "firmarDte",
+    "core": "1.9.1",
+    "bytes": 4808,
+    "sha256": "4597bd577b6b49c16e153a820c738acdf2ed7206206054e6cfbd1152c8047fb2",
+    "marcas": {}
+}

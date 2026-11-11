@@ -1,0 +1,7 @@
+{
+  "descripcion": "xmlns=\"\" en un documento sin namespace por defecto (redundante en todo nivel)",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<r><m xmlns=\"\"><a xmlns=\"\"/></m></r>"
+  }
+}

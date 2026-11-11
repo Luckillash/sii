@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-xmlns-ampersand",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 87,
+    "sha256": "f53cd91942179d916aeabca179039a0c07a68f1ade178dc8b06209b104ffb160",
+    "marcas": {}
+}

@@ -1,0 +1,8 @@
+{
+  "descripcion": ".pfx legacy (certificados con RC2-40, llave con 3DES, MAC SHA-1), como los del SII: el PHP lo lee con el binario openssl -legacy",
+  "operacion": "certificado",
+  "entrada": {
+    "archivo": "cert-legacy.pfx",
+    "clave": "clave-de-prueba"
+  }
+}

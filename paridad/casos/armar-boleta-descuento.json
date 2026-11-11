@@ -1,0 +1,38 @@
+{
+  "descripcion": "Descuento global de 10 % y cantidad con decimales: el MNT del TED sale del MntTotal ya descontado, sin recalcular",
+  "operacion": "armar-boleta",
+  "material": "base",
+  "entrada": {
+    "ahora": "2026-09-05T13:00:00",
+    "caf": "caf-39.xml",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": 100,
+    "detalles": [
+      {
+        "nombre": "Arroz",
+        "cantidad": 1.5,
+        "precio": 1990,
+        "unidad": "Kg"
+      },
+      {
+        "nombre": "Y",
+        "cantidad": 2,
+        "precio": 2990
+      }
+    ],
+    "descuento": {
+      "tipo": "porcentaje",
+      "valor": 10
+    }
+  }
+}

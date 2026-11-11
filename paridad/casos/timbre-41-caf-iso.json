@@ -1,0 +1,18 @@
+{
+  "descripcion": "Boleta exenta (41) con un CAF cuya razón social (DÍAZ Y MUÑOZ) viene en ISO-8859-1 sin declarar",
+  "operacion": "timbre",
+  "entrada": {
+    "caf": "caf-41-iso.xml",
+    "ahora": "2026-09-05T10:31:02",
+    "datos": {
+      "rut_emisor": "76123456-0",
+      "tipo_dte": "41",
+      "folio": "17",
+      "fecha": "2026-09-05",
+      "rut_receptor": "66666666-6",
+      "razon_social_receptor": "Muñoz Díaz",
+      "monto_total": "5000",
+      "nombre_item_1": "Producto de prueba"
+    }
+  }
+}

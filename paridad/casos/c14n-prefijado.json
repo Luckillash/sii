@@ -1,0 +1,8 @@
+{
+  "descripcion": "Elemento con prefijo seleccionado por nombre local (getElementsByTagName de PHP 8.3 compara el nombre local) con xml:lang heredado",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<r xmlns:p=\"urn:p\" xml:lang=\"es\"><p:Documento a=\"1\"><p:x/></p:Documento><Documento a=\"2\"/></r>",
+    "etiqueta": "Documento"
+  }
+}

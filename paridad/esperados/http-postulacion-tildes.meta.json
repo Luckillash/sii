@@ -1,0 +1,8 @@
+{
+    "caso": "http-postulacion-tildes",
+    "operacion": "httpPostulacion",
+    "core": "1.9.1",
+    "bytes": 3513,
+    "sha256": "dd82a4faf8d26326f9d7f6cb9365147e9b29f87f5657575bce71d412a9f5586f",
+    "marcas": {}
+}

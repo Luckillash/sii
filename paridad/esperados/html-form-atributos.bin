@@ -1,0 +1,12 @@
+{"action":"X","inputs":[["A","B"],["S","1"]]}
+{"action":"","inputs":[["x/",""],["y","z"],["s","t"]]}
+{"action":"of_x?a=1&b=2","inputs":[["a","dup"],["e","1"]]}
+{"action":"a","inputs":[["d","x'y&foo;zAB&amp"],["n","&amp<&LT;&eacuteéÉ €…∉&notit;&Amp;&;"]]}
+{"action":"ab😀AAAbЛ","inputs":[["t1","a"],["t2","a"],["t3","a"],["t4","a"],["t5","a"],["t6","a"],["t7","a"],["t8","\t\n\r"]]}
+{"action":"a","inputs":[["x","a\"b"],["y","a'b"],["z","sin comillas"]]}
+{"action":"a","inputs":[["x","  espacios  \n  y\tsaltos\r\n "],["ñ","á"],["c","ñ"]]}
+{"action":"a","inputs":[["x",""],["v","v"],["w",""]]}
+{"action":"a","inputs":[["x","<b>"],["y",""]]}
+{"action":"a","inputs":[["x","2"],["5","cinco"]]}
+{"action":"a","inputs":[["s","S"],["i",""],["c","on"],["d","dis"],["k",""]]}
+{"action":"a","inputs":[["sin-cierre","x"]]}

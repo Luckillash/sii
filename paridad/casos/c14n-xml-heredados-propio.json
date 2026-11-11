@@ -1,0 +1,8 @@
+{
+  "descripcion": "El ápice ya tiene xml:space propio y hereda xml:lang/xml:base; los descendientes no repiten los heredados",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<r xml:lang=\"es\" xml:space=\"preserve\" xml:base=\"http://a/b/\"><m xml:lang=\"en\"><a xml:space=\"default\">x<c/></a></m></r>",
+    "etiqueta": "a"
+  }
+}

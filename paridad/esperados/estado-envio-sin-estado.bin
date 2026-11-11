@@ -1,0 +1,6 @@
+{
+    "error": {
+        "clase": "RuntimeException",
+        "mensaje": "El SII no devolvió el estado del envío 777."
+    }
+}

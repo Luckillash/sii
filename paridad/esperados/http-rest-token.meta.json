@@ -1,0 +1,8 @@
+{
+    "caso": "http-rest-token",
+    "operacion": "httpRest",
+    "core": "1.9.1",
+    "bytes": 3086,
+    "sha256": "68fdc5aa472f0918e4928da36ec05186ff88059a0df47db7c60305fcf4722fb2",
+    "marcas": {}
+}

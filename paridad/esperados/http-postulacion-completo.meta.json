@@ -1,0 +1,8 @@
+{
+    "caso": "http-postulacion-completo",
+    "operacion": "httpPostulacion",
+    "core": "1.9.1",
+    "bytes": 5153,
+    "sha256": "fb12294e55a00f94cfc89bb5853ae777d67cb413d96c998bd8785e12a12f7576",
+    "marcas": {}
+}

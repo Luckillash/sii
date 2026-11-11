@@ -1,0 +1,8 @@
+{
+  "descripcion": "PEM con la llave PKCS#8 cifrada (AES-256) y su passphrase",
+  "operacion": "certificado",
+  "entrada": {
+    "archivo": "cert-cifrado.pem",
+    "clave": "clave-de-prueba"
+  }
+}

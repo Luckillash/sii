@@ -1,0 +1,8 @@
+{
+    "caso": "urlencoded-utf8",
+    "operacion": "httpBuildQuery",
+    "core": "1.9.1",
+    "bytes": 224,
+    "sha256": "ca3e2aec9e6b94c7c49adfe3d2acb7bd86458bda847b3407a47a062e020e3b22",
+    "marcas": {}
+}

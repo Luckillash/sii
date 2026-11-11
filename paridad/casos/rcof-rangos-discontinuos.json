@@ -1,0 +1,44 @@
+{
+  "descripcion": "Folios discontinuos: tres RangoUtilizados, con neto, IVA y exento",
+  "operacion": "consumoFolios",
+  "entrada": {
+    "ahora": "2026-09-05T23:10:42",
+    "caratula": {
+      "rut_emisor": "76123456-0",
+      "rut_envia": "11111111-1",
+      "fch_resol": "2026-09-04",
+      "nro_resol": "0",
+      "fch_inicio": "2026-09-05",
+      "fch_final": "2026-09-05",
+      "sec_envio": 1
+    },
+    "resumenes": [
+      {
+        "tipo": "39",
+        "neto": 10000,
+        "iva": 1900,
+        "tasa_iva": "19.00",
+        "exento": 2000,
+        "total": 13900,
+        "folios_emitidos": 7,
+        "folios_anulados": 0,
+        "folios_utilizados": 7,
+        "rangos_utilizados": [
+          {
+            "inicial": 1,
+            "final": 3
+          },
+          {
+            "inicial": 7,
+            "final": 9
+          },
+          {
+            "inicial": 15,
+            "final": 15
+          }
+        ],
+        "rangos_anulados": []
+      }
+    ]
+  }
+}

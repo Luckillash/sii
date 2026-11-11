@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-gettoken",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 65,
+    "sha256": "725f6fa30bd4382ce7de14398fb5c8efdf9bd7f5043ac878fdaff8458cb36ccb",
+    "marcas": {}
+}

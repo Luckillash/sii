@@ -1,0 +1,25 @@
+{
+  "descripcion": "enviarBoletaXml() con el sobre EnvioBOLETA del set completo (ISO-8859-1, bytes de esperados/set-completo.bin) al host de envío; nombre del temporal normalizado",
+  "operacion": "httpRest",
+  "material": "base",
+  "entrada": {
+    "accion": "enviarBoletaXml",
+    "token": "TOKENDEPRUEBA0003",
+    "rutEmisor": "76123456-0",
+    "rutEnvia": "11111111-1",
+    "xml": {
+      "esperado": "set-completo"
+    },
+    "http": {
+      "respuestas": [
+        {
+          "cabeceras": [["Content-Type", "application/json"]],
+          "cuerpo": "{\"rut_emisor\":\"76123456-0\",\"rut_envia\":\"11111111-1\",\"trackid\":9876543210,\"fecha_recepcion\":\"2026-11-06 12:00:00\",\"estado\":\"REC\",\"file\":\"envio.xml\"}"
+        }
+      ],
+      "normalizar": {
+        "nombresArchivo": true
+      }
+    }
+  }
+}

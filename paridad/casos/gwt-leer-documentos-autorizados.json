@@ -1,0 +1,14 @@
+{
+  "descripcion": "listarDocAutorizados: ArrayList de DocumentoAutorizadoTo, Long > 2^32 y > 2^53, back-reference a un Long",
+  "operacion": "gwtLeer",
+  "entrada": {
+    "respuesta": "//OK[15,'EAAAAA',4,18,13,0,'F',4,76123456,3,12,17,10,9,8,0,7,16,5,-4,41,3,2,15,'gAAAAAAAB',4,14,13,0,'F',4,76123456,3,12,11,10,9,8,0,7,6,5,'ZlFhXwA',4,39,3,2,2,1,[\"java.util.ArrayList/4159755760\",\"cl.sii.sdi.diii.certBolElectDte.to.DocumentoAutorizadoTo/493967287\",\"java.lang.Integer/3438268394\",\"java.lang.Long/4227064769\",\"BVE\",\"BOLETA ELECTRONICA\",\"S\",\"01-09-2026\",\"AUTORIZADO\",\"\",\"39\",\"N\",\"java.lang.String/2004016611\",\"Boleta afecta\",\"FIN\",\"BOLETA EXENTA ELECTRONICA\",\"41\",\"Boleta exenta\"],0,7]",
+    "esquemas": {
+      "cl.sii.sdi.diii.certBolElectDte.to.EstadoAutorizaTo/1011533792": "SSS",
+      "cl.sii.sdi.diii.certBolElectDte.to.PostulSegHistInsUpdTo/138688689": "SOSOSSOSSSOSSSOSSOOOOS",
+      "cl.sii.sdi.diii.certBolElectDte.to.TdtEmpresaAutorizadaTo/2240026086": "BSSSSSSSSSSSSOOOS",
+      "cl.sii.sdi.diii.certBolElectDte.to.DocumentoAutorizadoTo/493967287": "OOSSSSSSSSSOOOOOS"
+    },
+    "lecturas": ["objeto"]
+  }
+}

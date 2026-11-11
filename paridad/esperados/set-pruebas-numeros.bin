@@ -1,0 +1,86 @@
+{
+    "codificacion": "UTF-8",
+    "casos": [
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Computador",
+                    "cantidad": 2,
+                    "cantidadTexto": "2",
+                    "cantidadTipo": "int",
+                    "precio": 1250000,
+                    "precioTexto": "1250000",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "Monitor",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 1250000,
+                    "precioTexto": "1250000",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "Cable",
+                    "cantidad": 12345,
+                    "cantidadTexto": "12345",
+                    "cantidadTipo": "int",
+                    "precio": 1234,
+                    "precioTexto": "1234",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "Queso",
+                    "cantidad": 2.5,
+                    "cantidadTexto": "2.5",
+                    "cantidadTipo": "float",
+                    "precio": 7990,
+                    "precioTexto": "7990",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "Pan",
+                    "cantidad": 2.0,
+                    "cantidadTexto": "2",
+                    "cantidadTipo": "float",
+                    "precio": 0.5,
+                    "precioTexto": "0.5",
+                    "precioTipo": "float"
+                },
+                {
+                    "nombre": "Vino",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 1.0,
+                    "precioTexto": "1",
+                    "precioTipo": "float"
+                },
+                {
+                    "nombre": "Aceite",
+                    "cantidad": 1234.567,
+                    "cantidadTexto": "1234.567",
+                    "cantidadTipo": "float",
+                    "precio": 1.2345,
+                    "precioTexto": "1.2345",
+                    "precioTipo": "float"
+                },
+                {
+                    "nombre": "Sal",
+                    "cantidad": 7,
+                    "cantidadTexto": "7",
+                    "cantidadTipo": "int",
+                    "precio": 100,
+                    "precioTexto": "100",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-1"
+            }
+        }
+    ]
+}

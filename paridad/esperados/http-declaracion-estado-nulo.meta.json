@@ -1,0 +1,8 @@
+{
+    "caso": "http-declaracion-estado-nulo",
+    "operacion": "httpDeclaracion",
+    "core": "1.9.1",
+    "bytes": 1015,
+    "sha256": "47003e02561e971163970c8b9cfe2b26b30dd2c26df395bf20f69ad6415f8233",
+    "marcas": {}
+}

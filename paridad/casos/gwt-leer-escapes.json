@@ -1,0 +1,14 @@
+{
+  "descripcion": "Escapes de string: \\x, \\u (también con no-hex que hexdec ignora y surrogates que mb_chr descarta), \\n \\t \\r \\0 \\\" \\\\ \\/ y desconocidos",
+  "operacion": "gwtLeer",
+  "entrada": {
+    "respuesta": "//OK[2,1,[\"a\\x41\\u00e9\\n\\t\\r\\0\\\"\\\\\\/b\\uD83D\\uDE00c\\q\\u12zz\\x4g😀ñ\",\"\\u0000\\x00fin\\\\\"],0,7]",
+    "esquemas": {
+      "cl.sii.sdi.diii.certBolElectDte.to.EstadoAutorizaTo/1011533792": "SSS",
+      "cl.sii.sdi.diii.certBolElectDte.to.PostulSegHistInsUpdTo/138688689": "SOSOSSOSSSOSSSOSSOOOOS",
+      "cl.sii.sdi.diii.certBolElectDte.to.TdtEmpresaAutorizadaTo/2240026086": "BSSSSSSSSSSSSOOOS",
+      "cl.sii.sdi.diii.certBolElectDte.to.DocumentoAutorizadoTo/493967287": "OOSSSSSSSSSOOOOOS"
+    },
+    "lecturas": ["string", "string"]
+  }
+}

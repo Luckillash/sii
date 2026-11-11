@@ -1,0 +1,38 @@
+{
+  "descripcion": "Tildes, Ñ, & < > comillas, entidades ya escritas y caracteres fuera de ISO-8859-1 (€, emoji) en el DTE, el RSR y el IT1 (más de 40 caracteres, se trunca)",
+  "operacion": "armar-boleta",
+  "material": "base",
+  "entrada": {
+    "ahora": "2026-09-05T18:30:00",
+    "caf": "caf-39.xml",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "COMERCIAL ÑUÑOA & HIJOS \"LTDA.\"",
+      "giro": "VENTA DE ARTÍCULOS <VARIOS> Y SERVICIOS 'ESPECIALES'",
+      "direccion": "AV. JOSÉ PEDRO ALESSANDRI 1234, DEPTO. 5°",
+      "comuna": "ÑUÑOA"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Señora Pía & Cía <S.A.> € 😀"
+    },
+    "folio": "74",
+    "detalles": [
+      {
+        "nombre": "Café ☕ & <Queso> \"Extra\" ñandú 😀 de un nombre larguísimo que pasa los cuarenta",
+        "cantidad": 1,
+        "precio": 1000
+      },
+      {
+        "nombre": "Ya escapado &amp; &#233; &lt;",
+        "cantidad": 2,
+        "precio": 1500,
+        "unidad": "€/u"
+      }
+    ],
+    "referencia": {
+      "codigo": "SET",
+      "razon": "CASO-1 «año» & más ✓"
+    }
+  }
+}

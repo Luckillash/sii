@@ -1,0 +1,41 @@
+=== peticion 1 de 1 (https) ===
+POST /subir?empresa=Pe%C3%B1a&modo=prueba HTTP/1.1
+accept: */*
+content-length: 646
+content-type: multipart/form-data; boundary=<boundary>
+cookie: TOKEN=TOKENDEPRUEBA0003
+host: <https>
+
+--<boundary>
+Content-Disposition: form-data; name="rutSender"
+
+33333333
+--<boundary>
+Content-Disposition: form-data; name="dvSender"
+
+k
+--<boundary>
+Content-Disposition: form-data; name="rutCompany"
+
+76123456
+--<boundary>
+Content-Disposition: form-data; name="dvCompany"
+
+0
+--<boundary>
+Content-Disposition: form-data; name="glosa"
+
+Peña, Ñuñoa y Viña del Mar: «artículos» € ✓
+--<boundary>
+Content-Disposition: form-data; name="vacio"
+
+
+--<boundary>
+Content-Disposition: form-data; name="archivo"; filename="notas.txt"
+Content-Type: application/octet-stream
+
+Contenido UTF-8: año ñandú
+
+--<boundary>--
+
+=== fin de la peticion 1 ===

@@ -1,0 +1,7 @@
+{
+  "descripcion": "El set de ejemplo del SII (data/set_pruebas, ASCII y CRLF) completo",
+  "operacion": "setPruebas",
+  "entrada": {
+    "archivo": "data/set_pruebas/Set Prueba BE.txt"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "descripcion": "Comentarios y PIs fuera de la raíz al canonicalizar la raíz (no se emiten)",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<?xml version=\"1.0\"?>\n<!-- antes --><?pi antes?>\n<r>a<!-- dentro -->b</r>\n<!-- después --><?pi despues?>\n"
+  }
+}

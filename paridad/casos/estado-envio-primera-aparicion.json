@@ -1,0 +1,8 @@
+{
+  "descripcion": "Dos ESTADO/GLOSA: toma el primero; los números con signo o decimales no cuentan",
+  "operacion": "estadoEnvio",
+  "entrada": {
+    "respuesta": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<SII:RESPUESTA xmlns:SII=\"http://www.sii.cl/XMLSchema\"><SII:RESP_HDR><ESTADO>REC</ESTADO><GLOSA>primera</GLOSA><ESTADO>EPR</ESTADO><GLOSA>segunda</GLOSA></SII:RESP_HDR><SII:RESP_BODY><INFORMADOS>3</INFORMADOS><INFORMADOS>-1</INFORMADOS><INFORMADOS>1.5</INFORMADOS><INFORMADOS>007</INFORMADOS></SII:RESP_BODY></SII:RESPUESTA>",
+    "trackId": "783"
+  }
+}

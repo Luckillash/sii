@@ -1,0 +1,50 @@
+{
+    "codificacion": "ISO-8859-1",
+    "casos": [
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Pan ",
+                    "cantidad": 2,
+                    "cantidadTexto": "2",
+                    "cantidadTipo": "int",
+                    "precio": 300,
+                    "precioTexto": "300",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "Huevos",
+                    "cantidad": 12,
+                    "cantidadTexto": "12",
+                    "cantidadTipo": "int",
+                    "precio": 150,
+                    "precioTexto": "150",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-1"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Harina",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 1200,
+                    "precioTexto": "1200",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-2"
+            }
+        }
+    ]
+}

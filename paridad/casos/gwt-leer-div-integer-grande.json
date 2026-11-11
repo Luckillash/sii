@@ -1,0 +1,14 @@
+{
+  "descripcion": "DIVERGENCIA: Integer con valor 2^53+1. El PHP lo conserva (int de 64 bits); Node lanza (fuera del rango seguro de JS, y un Integer de Java es de 32 bits)",
+  "operacion": "gwtLeer",
+  "entrada": {
+    "respuesta": "//OK[9007199254740993,1,[\"java.lang.Integer/3438268394\"],0,7]",
+    "esquemas": {
+      "cl.sii.sdi.diii.certBolElectDte.to.EstadoAutorizaTo/1011533792": "SSS",
+      "cl.sii.sdi.diii.certBolElectDte.to.PostulSegHistInsUpdTo/138688689": "SOSOSSOSSSOSSSOSSOOOOS",
+      "cl.sii.sdi.diii.certBolElectDte.to.TdtEmpresaAutorizadaTo/2240026086": "BSSSSSSSSSSSSOOOS",
+      "cl.sii.sdi.diii.certBolElectDte.to.DocumentoAutorizadoTo/493967287": "OOSSSSSSSSSOOOOOS"
+    },
+    "lecturas": ["objeto"]
+  }
+}

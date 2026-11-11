@@ -1,0 +1,10 @@
+{
+  "descripcion": "NavegadorSii::form() con <meta charset=iso-8859-1>: los valores con tildes salen doblemente codificados (como en html-form-codificacion de folios); las entidades no",
+  "operacion": "formPostulacion",
+  "entrada": {
+    "paginas": [
+      "<html><head><META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=iso-8859-1\"></head><body><form action=\"pe_confirma\"><input type=\"hidden\" name=\"RAZON\" value=\"ÑUÑOA\"><input type=\"hidden\" name=\"ENT\" value=\"&Ntilde;U&Ntilde;OA\"><input type=\"hidden\" name=\"NOMBRE_Ñ\" value=\"á\"></form></body></html>",
+      "<html><body><form action=\"pe_confirma\"><input type=\"hidden\" name=\"RAZON\" value=\"ÑUÑOA\"><input type=\"hidden\" name=\"ENT\" value=\"&Ntilde;U&Ntilde;OA\"></form></body></html>"
+    ]
+  }
+}

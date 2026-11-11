@@ -1,0 +1,8 @@
+{
+    "caso": "xml-escapar-defecto",
+    "operacion": "escaparXml",
+    "core": "1.9.1",
+    "bytes": 260,
+    "sha256": "c8b4e7d89c99ba1d574eae59a4a4b7bbac19ebb9e264d4d6b5b586b2f5a56e2e",
+    "marcas": {}
+}

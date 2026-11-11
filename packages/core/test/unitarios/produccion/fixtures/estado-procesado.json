@@ -1,0 +1,9 @@
+{
+  "rut_emisor": "76543210-3",
+  "rut_envia": "11111111-1",
+  "trackid": 1234567890,
+  "fecha_recepcion": "2026-11-06 10:15:30",
+  "estado": "EPR",
+  "estadistica": [{ "tipo": 39, "informados": 5, "aceptados": 5, "rechazados": 0, "reparos": 0 }],
+  "detalle_rep_rech": []
+}

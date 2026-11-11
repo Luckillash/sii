@@ -1,0 +1,50 @@
+{
+  "descripcion": "estado(): //EX IncompatibleRemoteServiceException (el SII cambió el portal)",
+  "operacion": "httpDeclaracion",
+  "entrada": {
+    "accion": "estado",
+    "sesion": [
+      {
+        "name": "TOKEN",
+        "value": "TOKENDEPRUEBAAUT2000",
+        "domain": "sii.cl",
+        "host_only": false
+      },
+      {
+        "name": "RUT_NS",
+        "value": "11111111",
+        "domain": "sii.cl",
+        "host_only": false
+      },
+      {
+        "name": "DV_NS",
+        "value": "1",
+        "domain": "sii.cl",
+        "host_only": false
+      },
+      {
+        "name": "MAULLINSOLO",
+        "value": "M1",
+        "domain": "maullin.sii.cl",
+        "host_only": true
+      },
+      {
+        "name": "WWW4SOLO",
+        "value": "W1",
+        "domain": "www4.sii.cl",
+        "host_only": true
+      }
+    ],
+    "rutEmpresa": "76123456-0",
+    "esperaError": true,
+    "http": {
+      "respuestas": [
+        {
+          "status": 200,
+          "cabeceras": [["Content-Type", "application/json; charset=utf-8"]],
+          "cuerpo": "//EX[2,1,[\"com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException/3936916533\",\"This application is out of date, please click the refresh button on your browser. ( Blocked attempt to access interface 'cl.sii.sdi.diii.certBolElectDte.web.client.service.Facade', which is not implemented by 'x'; this is either misconfiguration or a hack attempt )\"],0,7]"
+        }
+      ]
+    }
+  }
+}

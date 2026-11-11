@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // Resuelve @winex/certificacion a su código fuente (condición "source" del
+    // package.json del core): no hace falta compilar el core para revisar tipos.
+    "customConditions": ["source"]
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts", "*.config.ts"]
+}

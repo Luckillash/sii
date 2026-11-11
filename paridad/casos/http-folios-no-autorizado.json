@@ -1,0 +1,58 @@
+{
+  "descripcion": "solicitar(): el SII rechaza en el paso 2 (\"no está autorizado\"): error antes de timbrar",
+  "operacion": "httpFolios",
+  "entrada": {
+    "accion": "solicitar",
+    "sesion": [
+      {
+        "name": "TOKEN",
+        "value": "TOKENDEPRUEBAAUT2000",
+        "domain": "sii.cl",
+        "host_only": false
+      },
+      {
+        "name": "NETSCAPE_LIVEWIRE.rut",
+        "value": "11111111",
+        "domain": "sii.cl",
+        "host_only": false
+      },
+      {
+        "name": "MAULLINSOLO",
+        "value": "M1",
+        "domain": "maullin.sii.cl",
+        "host_only": true
+      },
+      {
+        "name": "s_aut",
+        "value": "HOSTONLY01",
+        "domain": "herculesr.sii.cl",
+        "host_only": true
+      }
+    ],
+    "rutEmpresa": "76123456-0",
+    "tipoDte": 39,
+    "cantidad": 5,
+    "esperaError": true,
+    "http": {
+      "respuestas": [
+        {
+          "status": 200,
+          "cabeceras": [
+            ["Content-Type", "text/html; charset=ISO-8859-1"],
+            ["Set-Cookie", "JSESSIONID=MAULLIN0001; Path=/cvc_cgi; Secure"]
+          ],
+          "cuerpo": {
+            "base64": "PCFET0NUWVBFIEhUTUwgUFVCTElDICItLy9XM0MvL0RURCBIVE1MIDQuMDEgVHJhbnNpdGlvbmFsLy9FTiI+CjxIVE1MPgo8SEVBRD4KPE1FVEEgSFRUUC1FUVVJVj0iQ29udGVudC1UeXBlIiBDT05URU5UPSJ0ZXh0L2h0bWw7IGNoYXJzZXQ9aXNvLTg4NTktMSI+CjxUSVRMRT5Tb2xpY2l0dWQgZGUgRm9saW9zPC9USVRMRT4KPFNDUklQVCBMQU5HVUFHRT0iSmF2YVNjcmlwdCI+CmZ1bmN0aW9uIHZhbGlkYShmKSB7CiAgaWYgKGYuUlVUX0VNUC52YWx1ZSA9PSAiIikgeyBhbGVydCgiRGViZSBpbmdyZXNhciBlbCBSVVQgZGUgbGEgZW1wcmVzYSIpOyByZXR1cm4gZmFsc2U7IH0KICBkb2N1bWVudC53cml0ZSgiPGlucHV0IHR5cGU9J2hpZGRlbicgbmFtZT0nTk9fVkEnIHZhbHVlPScxJz48L3RkPiIpOwogIHJldHVybiB0cnVlOwp9CjwvU0NSSVBUPgo8L0hFQUQ+CjxCT0RZIEJHQ09MT1I9IiNGRkZGRkYiPgo8VEFCTEUgV0lEVEg9IjYwMCIgQk9SREVSPSIwIiBBTElHTj0iQ0VOVEVSIj4KPFRSPjxURD48Rk9OVCBGQUNFPSJBcmlhbCIgU0laRT0iMyI+PEI+VGltYnJhamUgRWxlY3RyJm9hY3V0ZTtuaWNvIC0gU29saWNpdHVkIGRlIEZvbGlvczwvQj48L0ZPTlQ+PC9URD48L1RSPgo8L1RBQkxFPgo8Rk9STSBOQU1FPSJmb3JtMSIgTUVUSE9EPSJQT1NUIiBBQ1RJT049Im9mX3NvbGljaXRhX2ZvbGlvc19kY3RvIiBvblN1Ym1pdD0icmV0dXJuIHZhbGlkYSh0aGlzKSI+CjxUQUJMRSBXSURUSD0iNjAwIiBCT1JERVI9IjAiIEFMSUdOPSJDRU5URVIiPgo8VFI+CjxURD48Rk9OVCBGQUNFPSJBcmlhbCIgU0laRT0iMiI+UlVUIGRlIGxhIEVtcHJlc2E6PC9GT05UPjwvVEQ+CjxURD48SU5QVVQgVFlQRT0idGV4dCIgTkFNRT0iUlVUX0VNUCIgU0laRT0iMTAiIE1BWExFTkdUSD0iOCIgVkFMVUU9IiI+Ci0gPElOUFVUIFRZUEU9InRleHQiIE5BTUU9IkRWX0VNUCIgU0laRT0iMSIgTUFYTEVOR1RIPSIxIiBWQUxVRT0iIj48L1REPgo8L1RSPgo8VFI+PFREIENPTFNQQU49IjIiIEFMSUdOPSJDRU5URVIiPgo8SU5QVVQgVFlQRT0iaGlkZGVuIiBOQU1FPSJPUklHRU4iIFZBTFVFPSJTT0xJQ0lUQSI+CjxJTlBVVCBUWVBFPSJzdWJtaXQiIE5BTUU9IkFDRVBUQVIiIFZBTFVFPSJDb250aW51YXIiPgo8SU5QVVQgVFlQRT0icmVzZXQiIE5BTUU9IkxJTVBJQVIiIFZBTFVFPSJMaW1waWFyIj4KPElOUFVUIFRZUEU9ImJ1dHRvbiIgTkFNRT0iVk9MVkVSIiBWQUxVRT0iVm9sdmVyIiBvbkNsaWNrPSJoaXN0b3J5LmJhY2soKSI+CjwvVEQ+PC9UUj4KPC9UQUJMRT4KPC9GT1JNPgo8L0JPRFk+CjwvSFRNTD4K"
+          }
+        },
+        {
+          "status": 200,
+          "cabeceras": [["Content-Type", "text/html; charset=ISO-8859-1"]],
+          "cuerpo": {
+            "base64": "PEhUTUw+CjxIRUFEPjxUSVRMRT5Tb2xpY2l0dWQgZGUgRm9saW9zPC9USVRMRT48L0hFQUQ+CjxCT0RZIEJHQ09MT1I9IiNGRkZGRkYiPgo8Rk9STSBOQU1FPSJmb3JtMiIgTUVUSE9EPSJQT1NUIiBBQ1RJT049Im9mX3NvbGljaXRhX2ZvbGlvcyI+CjxGT05UIEZBQ0U9IkFyaWFsIiBTSVpFPSIyIiBDT0xPUj0icmVkIj4KRWwgY29udHJpYnV5ZW50ZSBubyBlc3QmYWFjdXRlOyBhdXRvcml6YWRvIHBhcmEgdGltYnJhciBlc3RlIHRpcG8gZGUgZG9jdW1lbnRvLgo8L0ZPTlQ+CjxJTlBVVCBUWVBFPSJzdWJtaXQiIE5BTUU9IlZPTFZFUiIgVkFMVUU9IlZvbHZlciI+CjwvRk9STT4KPC9CT0RZPgo8L0hUTUw+Cg=="
+          }
+        }
+      ]
+    }
+  }
+}

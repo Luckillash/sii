@@ -1,0 +1,51 @@
+{
+  "descripcion": "setAttribute en un DOMDocument ISO-8859-1: xmlns (declaración de namespace, va primero y sin escapar), xmlns:xsi y xsi:schemaLocation (atributos comunes), escapes de atributo (&quot; &#9; &#10; &#13;), fuera de ISO-8859-1, valor vacío, atributo repetido y xmlns repetido",
+  "operacion": "serializarXml",
+  "entrada": {
+    "encoding": "ISO-8859-1",
+    "formatOutput": true,
+    "documento": [
+      {
+        "elemento": "Raiz",
+        "atributos": [
+          ["version", "1.0"],
+          ["xmlns", "http://www.sii.cl/SiiDte"],
+          ["xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance"],
+          ["xsi:schemaLocation", "http://www.sii.cl/SiiDte EnvioBOLETA_v11.xsd"],
+          ["especiales", "a&b<c>d\"e'f &amp; &#233;"],
+          ["blancos", "t\tn\nr\rcrlf\r\n fin"],
+          ["tildes", "Ñandú DÍAZ € 😀 中"],
+          ["control", "x\u0001\u007f\u0080y"],
+          ["vacio", ""],
+          ["version", "2.0"],
+          ["xmlns", "http://ignorado"]
+        ],
+        "hijos": [
+          {
+            "elemento": "NsConComillas",
+            "atributos": [["xmlns", "a\"b&c<d>é€"]]
+          },
+          {
+            "elemento": "NsConAmbas",
+            "atributos": [["xmlns", "a\"b'c"]]
+          },
+          {
+            "elemento": "NsSoloSimple",
+            "atributos": [["xmlns", "a'b"]]
+          },
+          {
+            "elemento": "Orden",
+            "atributos": [
+              ["z", "1"],
+              ["a", "2"],
+              ["xmlns:p", "urn:p"],
+              ["xmlns", "urn:d"],
+              ["p:x", "3"]
+            ],
+            "valor": "texto"
+          }
+        ]
+      }
+    ]
+  }
+}

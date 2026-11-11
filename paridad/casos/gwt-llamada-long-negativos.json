@@ -1,0 +1,24 @@
+{
+  "descripcion": "Defecto del PHP replicado: long() negativo sin extensión de signo (-1 → token vacío, -2 → \"$\", -64 → \"A\"); -1 repetido va como back-reference",
+  "operacion": "gwtLlamada",
+  "entrada": {
+    "base": "https://www4.sii.cl/certBolElectDteInternet/",
+    "policy": "082D0AC4BC4D75A5DF38F116C53877D4",
+    "servicio": "cl.sii.sdi.diii.certBolElectDte.web.client.service.Facade",
+    "metodo": "metodoLong",
+    "parametros": [
+      {
+        "tipo": "java.lang.Long/4227064769",
+        "pasos": [
+          ["long", "-1"],
+          ["long", "-2"],
+          ["long", "-64"],
+          ["long", "-65"],
+          ["long", "-129"],
+          ["long", "-9007199254740993"],
+          ["long", "-1"]
+        ]
+      }
+    ]
+  }
+}

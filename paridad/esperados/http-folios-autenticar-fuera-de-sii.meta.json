@@ -1,0 +1,8 @@
+{
+    "caso": "http-folios-autenticar-fuera-de-sii",
+    "operacion": "httpFolios",
+    "core": "1.9.1",
+    "bytes": 789,
+    "sha256": "b419b3857e53c7634152544aea38d51f3d5ef3092308447bd410d58825ecb527",
+    "marcas": {}
+}

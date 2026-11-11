@@ -1,0 +1,8 @@
+{
+  "descripcion": "Documento ISO-8859-1 con caracteres fuera de Latin-1 escritos como referencias (como los deja saveXML): €, —, emoji",
+  "operacion": "c14n",
+  "entrada": {
+    "xmlBase64": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iSVNPLTg4NTktMSI/Pgo8RFRFIHhtbG5zPSJodHRwOi8vd3d3LnNpaS5jbC9TaWlEdGUiPjxEb2N1bWVudG8gSUQ9IlgiPjxObWJJdGVtIGE9IiYjODM2NDsmI3gxRjYwMDsiPkNhZukgJiM4MzY0OzEgJiM4MjEyOyAyNTBnICYjeDFGNjAwOyAmIzIwMDEzOzwvTm1iSXRlbT48L0RvY3VtZW50bz48L0RURT4=",
+    "etiqueta": "Documento"
+  }
+}

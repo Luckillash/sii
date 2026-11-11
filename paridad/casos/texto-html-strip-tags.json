@@ -1,0 +1,21 @@
+{
+  "descripcion": "NavegadorSii::texto() y strip_tags(): \"<\" + blanco, comillas dentro de etiquetas, \"<\" anidado, comentarios, <!DOCTYPE>, <? ?>, <?xml, etiqueta sin cerrar, \">\" suelto, script/style con y sin cierre",
+  "operacion": "textoPostulacion",
+  "entrada": {
+    "max": 20,
+    "textos": [
+      "a < b y c > d",
+      "<a href=\"x>y\">enlace</a> <b title='1>2'>negrita</b>",
+      "<p <b>anidado</b>> fin",
+      "antes<!-- comentario > con > --> despues <!-- sin cerrar",
+      "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">texto <!x> y <!-- a --b> c -->d",
+      "<?php echo \"?>\"; if (a(b)) { ?> codigo ?> fin",
+      "x<?xml version=\"1.0\"?><raiz>contenido</raiz> <?xml al comienzo ?>",
+      "texto <sin cerrar",
+      "uno<script type=\"text/javascript\">alert(\"<b>hola</b>\")</script>dos<STYLE>p{}</style>tres<script>sin cierre",
+      "<SCRIPT>a</Script >b</sCrIpT>c",
+      "\u0000nul<\u0000b>x",
+      "<a\n href=\"1\">salto</a><br/>linea"
+    ]
+  }
+}

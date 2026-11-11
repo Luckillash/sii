@@ -1,0 +1,8 @@
+{
+    "caso": "xml-reserializar-variado",
+    "operacion": "reserializarXml",
+    "core": "1.9.1",
+    "bytes": 585,
+    "sha256": "3ae3da436837c0fd5b1e784ce0b8804da27334c42c575e83c5055555813c673c",
+    "marcas": {}
+}

@@ -1,0 +1,14 @@
+{
+  "descripcion": "Long en base64 (> 2^53, -1, extremos de 64 bits, 13 caracteres que se desbordan, vacío) y como número (exacto también > 2^53)",
+  "operacion": "gwtLeer",
+  "entrada": {
+    "respuesta": "//OK['',2,-9007199254740993,2,123,2,'AAAAAAAAAAAAB',2,'H__________',2,'IAAAAAAAAAA',2,'P__________',2,'gAAAAAAAB',2,8,1,[\"java.util.ArrayList/4159755760\",\"java.lang.Long/4227064769\"],0,7]",
+    "esquemas": {
+      "cl.sii.sdi.diii.certBolElectDte.to.EstadoAutorizaTo/1011533792": "SSS",
+      "cl.sii.sdi.diii.certBolElectDte.to.PostulSegHistInsUpdTo/138688689": "SOSOSSOSSSOSSSOSSOOOOS",
+      "cl.sii.sdi.diii.certBolElectDte.to.TdtEmpresaAutorizadaTo/2240026086": "BSSSSSSSSSSSSOOOS",
+      "cl.sii.sdi.diii.certBolElectDte.to.DocumentoAutorizadoTo/493967287": "OOSSSSSSSSSOOOOOS"
+    },
+    "lecturas": ["objeto"]
+  }
+}

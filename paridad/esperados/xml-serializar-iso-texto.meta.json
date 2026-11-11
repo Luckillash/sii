@@ -1,0 +1,8 @@
+{
+    "caso": "xml-serializar-iso-texto",
+    "operacion": "serializarXml",
+    "core": "1.9.1",
+    "bytes": 1071,
+    "sha256": "6156d3816da02b64d66b49ade44c0b92e810e931fb1107314a53bda926a969e8",
+    "marcas": {}
+}

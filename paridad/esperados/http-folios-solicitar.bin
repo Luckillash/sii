@@ -1,0 +1,90 @@
+=== peticion 1 de 7 (https2) ===
+GET /cvc_cgi/dte/of_solicita_folios HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+
+=== fin de la peticion 1 ===
+=== peticion 2 de 7 (https2) ===
+GET /cvc_cgi/dte/of_solicita_folios?inicio=1 HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1; JSESSIONID=MAULLIN0000
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+
+=== fin de la peticion 2 ===
+=== peticion 3 de 7 (https2) ===
+POST /cvc_cgi/dte/of_solicita_folios_dcto HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 102
+content-type: application/x-www-form-urlencoded
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1; JSESSIONID=MAULLIN0001
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+RUT_EMP=76123456&DV_EMP=0&ORIGEN=SOLICITA&ACEPTAR=Continuar&FOLIO_INICIAL=0&COD_DOCTO=39&CANT_DOCTOS=5
+=== fin de la peticion 3 ===
+=== peticion 4 de 7 (https2) ===
+POST /cvc_cgi/dte/of_solicita_folios_dcto HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 156
+content-type: application/x-www-form-urlencoded
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1; JSESSIONID=MAULLIN0002
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios_dcto
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+CANT_DOCTOS=5&RUT_EMP=76123456&DV_EMP=0&FOLIO_INICIAL=0&AFECTO_IVA=S&ANOTACION=%C3%83%C2%91and%C3%83%C2%BA+%26+C%C3%83%C2%ADa&ACEPTAR=Continuar&COD_DOCTO=39
+=== fin de la peticion 4 ===
+=== peticion 5 de 7 (https2) ===
+POST /cvc_cgi/dte/of_confirma_folio HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 120
+content-type: application/x-www-form-urlencoded
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1; JSESSIONID=MAULLIN0002
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios_dcto
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+CANT_DOCTOS=5&COD_DOCTO=39&RUT_EMP=76123456&DV_EMP=0&MAX_AUTOR=50&ACEPTA_CONDICIONES=S&ACEPTAR=Continuar&FOLIO_INICIAL=0
+=== fin de la peticion 5 ===
+=== peticion 6 de 7 (https2) ===
+POST /cvc_cgi/dte/of_genera_folio HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 220
+content-type: application/x-www-form-urlencoded
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1; JSESSIONID=MAULLIN0002
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_confirma_folio
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+NOMUSU=JOS%C3%89+P%C3%89REZ+%C3%91%C3%9A%C3%91EZ&CON_CREDITO=0&CON_AJUSTE=0&FOLIO_INI=101&FOLIO_FIN=105&DIA=06&MES=11&ANO=2026&HORA=22&MINUTO=15&RUT_EMP=76123456&DV_EMP=0&COD_DOCTO=39&CANT_DOCTOS=5&ACEPTAR=Obtener+Folios
+=== fin de la peticion 6 ===
+=== peticion 7 de 7 (https2) ===
+POST /cvc_cgi/dte/of_genera_archivo HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 99
+content-type: application/x-www-form-urlencoded
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1; JSESSIONID=MAULLIN0002
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_genera_folio
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+RUT_EMP=76123456&DV_EMP=0&COD_DOCTO=39&FOLIO_INI=101&FOLIO_FIN=105&FECHA=<normalizado>&ACEPTAR=AQUI
+=== fin de la peticion 7 ===
+=== resultado ===
+caf sha256 df251f70dceace5420cd2e0e61968e6533adb71e7c8a2c17fe85d394037077dc (1175 bytes)
+cookies [{"name":"TOKEN","value":"TOKENDEPRUEBAAUT2000","domain":"sii.cl","host_only":false},{"name":"NETSCAPE_LIVEWIRE.rut","value":"11111111","domain":"sii.cl","host_only":false},{"name":"MAULLINSOLO","value":"M1","domain":"maullin.sii.cl","host_only":true},{"name":"s_aut","value":"HOSTONLY01","domain":"herculesr.sii.cl","host_only":true},{"name":"JSESSIONID","value":"MAULLIN0002","domain":"maullin.sii.cl","host_only":true}]

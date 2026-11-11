@@ -1,0 +1,28 @@
+{
+  "descripcion": "23:59:59 de Chile (ya es otro día en UTC): FchEmis, FE, TSTED y TmstFirma del mismo instante",
+  "operacion": "armar-boleta",
+  "material": "base",
+  "entrada": {
+    "ahora": "2026-09-05T23:59:59",
+    "caf": "caf-39.xml",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "12345678-5",
+      "razon_social": "Juan Pérez"
+    },
+    "folio": "2",
+    "detalles": [
+      {
+        "nombre": "Papel de regalo",
+        "cantidad": 17,
+        "precio": 120
+      }
+    ]
+  }
+}

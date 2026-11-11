@@ -1,0 +1,8 @@
+{
+    "caso": "certificado-pem-cadena",
+    "operacion": "certificado",
+    "core": "1.9.1",
+    "bytes": 14072,
+    "sha256": "e78aec203a75b4e3e97780c10a5cab1b6aa7928c6b975d926ca269add7f3385d",
+    "marcas": {}
+}

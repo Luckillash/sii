@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-receptor-razon-social-vacia",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 1081,
+    "sha256": "72aa12ce2764fcdfea3d6d2ca7fc95ff386504cdec9736924998109f28f3a722",
+    "marcas": {
+        "FchEmis": "2026-09-05"
+    }
+}

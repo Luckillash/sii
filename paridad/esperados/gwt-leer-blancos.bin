@@ -1,0 +1,11 @@
+{
+    "lecturas": [
+        {
+            "string": "a"
+        },
+        {
+            "string": "b"
+        }
+    ],
+    "error": null
+}

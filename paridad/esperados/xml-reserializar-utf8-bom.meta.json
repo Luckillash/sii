@@ -1,0 +1,8 @@
+{
+    "caso": "xml-reserializar-utf8-bom",
+    "operacion": "reserializarXml",
+    "core": "1.9.1",
+    "bytes": 90,
+    "sha256": "5fcb9747bb4cefbcdef66b324ddaa5d5ba916d1edb5b6f6beec4c1e7ce913688",
+    "marcas": {}
+}

@@ -1,0 +1,7 @@
+{
+  "descripcion": "El segundo caso no trae ningún ítem legible: error con su número",
+  "operacion": "setPruebas",
+  "entrada": {
+    "texto": "CASO-1\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nuno\t\t\t1\t\t\t100\n\nCASO-2\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\n(nada)\nPan\t\t\tuno\t\t\t100\n\n\n"
+  }
+}

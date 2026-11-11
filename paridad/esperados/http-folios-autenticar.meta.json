@@ -1,0 +1,8 @@
+{
+    "caso": "http-folios-autenticar",
+    "operacion": "httpFolios",
+    "core": "1.9.1",
+    "bytes": 2037,
+    "sha256": "8ea6d5d69d82f961fd1ebcb1d95291905497322decd2a16992dae4bab10816e9",
+    "marcas": {}
+}

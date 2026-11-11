@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-iso-8859-1-referencias",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 122,
+    "sha256": "a2ec76d14fc1e0cbdb53d99bca04fc4f0d86a41a4fb79651556dc3cedb5632e6",
+    "marcas": {}
+}

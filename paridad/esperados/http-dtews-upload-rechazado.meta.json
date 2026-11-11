@@ -1,0 +1,8 @@
+{
+    "caso": "http-dtews-upload-rechazado",
+    "operacion": "httpDtews",
+    "core": "1.9.1",
+    "bytes": 992,
+    "sha256": "46db180f393e05505c0e4da51a0e10996952c87ddac8c5dbce73c71b2428934c",
+    "marcas": {}
+}

@@ -1,0 +1,14 @@
+{
+  "descripcion": "Orden de inserción con claves numéricas (un objeto de JS las reordenaría), clave vacía y valores vacíos",
+  "operacion": "httpBuildQuery",
+  "entrada": {
+    "campos": [
+      ["10", "diez"],
+      ["b", "be"],
+      ["2", "dos"],
+      ["", "sin clave"],
+      ["vacio", ""],
+      ["0", "cero"]
+    ]
+  }
+}

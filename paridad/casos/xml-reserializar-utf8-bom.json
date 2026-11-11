@@ -1,0 +1,7 @@
+{
+  "descripcion": "loadXML + saveXML de bytes UTF-8 con BOM y declaración encoding=\"utf-8\" en minúsculas y standalone: se descarta el BOM, se respeta el nombre del encoding y la salida queda en UTF-8 crudo",
+  "operacion": "reserializarXml",
+  "entrada": {
+    "xml_base64": "77u/PD94bWwgdmVyc2lvbj0nMS4wJyBlbmNvZGluZz0ndXRmLTgnIHN0YW5kYWxvbmU9J3llcyc/Pgo8UiBhPSfDqeKCrCc+w6kg4oKsIPCfmIAg5LitDQo8L1I+Cg=="
+  }
+}

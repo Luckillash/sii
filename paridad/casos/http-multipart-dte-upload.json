@@ -1,0 +1,48 @@
+{
+  "descripcion": "Multipart como SiiSoapClient::enviarDte(): campos del SII en su orden, CURLFile text/xml con un XML en ISO-8859-1, Cookie TOKEN, User-Agent del SII y \"Expect:\" (quita el 100-continue de cURL)",
+  "operacion": "httpMultipart",
+  "entrada": {
+    "origen": "https",
+    "ruta": "/cgi_dte/UPL/DTEUpload",
+    "cabeceras": [
+      "Cookie: TOKEN=TOKENDEPRUEBA0001",
+      "User-Agent: Mozilla/4.0 (compatible; PROG 1.0; Windows NT 5.1)",
+      "Expect:"
+    ],
+    "campos": [
+      {
+        "nombre": "rutSender",
+        "valor": "11111111"
+      },
+      {
+        "nombre": "dvSender",
+        "valor": "1"
+      },
+      {
+        "nombre": "rutCompany",
+        "valor": "76123456"
+      },
+      {
+        "nombre": "dvCompany",
+        "valor": "0"
+      },
+      {
+        "nombre": "archivo",
+        "archivo": {
+          "base64": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iSVNPLTg4NTktMSI/Pg0KPEVudmlvQk9MRVRBIHZlcnNpb249IjEuMCI+PFNldERURSBJRD0iU2V0RG9jIj48Q2FyYXR1bGE+PFJ1dEVtaXNvcj43NjEyMzQ1Ni0wPC9SdXRFbWlzb3I+PC9DYXJhdHVsYT48UnpuU29jPkNvbWVyY2lhbCBQZfFhIHkgRO1heiBMdGRhLjwvUnpuU29jPjxHaXJvPlZlbnRhIGRlIGFydO1jdWxvcyBkZSDRdfFvYTwvR2lybz48L1NldERURT48L0VudmlvQk9MRVRBPg0K"
+        },
+        "nombreArchivo": "envio-set-pruebas.xml",
+        "contentType": "text/xml"
+      }
+    ],
+    "http": {
+      "respuestas": [
+        {
+          "status": 200,
+          "cabeceras": [["Content-Type", "text/html"]],
+          "cuerpo": "<?xml version=\"1.0\"?>\n<RECEPCIONDTE>\n<RUTSENDER>11111111-1</RUTSENDER>\n<RUTCOMPANY>76123456-0</RUTCOMPANY>\n<FILE>envio-set-pruebas.xml</FILE>\n<TIMESTAMP>2026-11-06 12:00:00</TIMESTAMP>\n<STATUS>0</STATUS>\n<TRACKID>1234567890</TRACKID>\n</RECEPCIONDTE>\n"
+        }
+      ]
+    }
+  }
+}

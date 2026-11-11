@@ -1,0 +1,23 @@
+{
+  "descripcion": "getToken() con un .pfx legacy (RC2-40, como los del SII; ruta de la CLI de openssl, sin \"\\n\" final)",
+  "operacion": "httpDtews",
+  "entrada": {
+    "accion": "getToken",
+    "archivo": "cert-legacy.pfx",
+    "clave": "clave-de-prueba",
+    "http": {
+      "respuestas": [
+        {
+          "status": 200,
+          "cabeceras": [["Content-Type", "text/xml;charset=utf-8"]],
+          "cuerpo": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soapenv:Body><ns1:getSeedResponse soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:ns1=\"http://DefaultNamespace\"><ns1:getSeedReturn xsi:type=\"xsd:string\">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;SII:RESPUESTA xmlns:SII=&quot;http://www.sii.cl/XMLSchema&quot;&gt;&lt;SII:RESP_BODY&gt;&lt;SEMILLA&gt;000000000001&lt;/SEMILLA&gt;&lt;/SII:RESP_BODY&gt;&lt;SII:RESP_HDR&gt;&lt;ESTADO&gt;00&lt;/ESTADO&gt;&lt;/SII:RESP_HDR&gt;&lt;/SII:RESPUESTA&gt;</ns1:getSeedReturn></ns1:getSeedResponse></soapenv:Body></soapenv:Envelope>"
+        },
+        {
+          "status": 200,
+          "cabeceras": [["Content-Type", "text/xml;charset=utf-8"]],
+          "cuerpo": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soapenv:Body><ns1:getTokenResponse soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:ns1=\"http://DefaultNamespace\"><ns1:getTokenReturn xsi:type=\"xsd:string\">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;SII:RESPUESTA xmlns:SII=&quot;http://www.sii.cl/XMLSchema&quot;&gt;&lt;SII:RESP_BODY&gt;&lt;TOKEN&gt;TOKENDEPRUEBA0002&lt;/TOKEN&gt;&lt;/SII:RESP_BODY&gt;&lt;SII:RESP_HDR&gt;&lt;ESTADO&gt;00&lt;/ESTADO&gt;&lt;GLOSA&gt;Token Creado&lt;/GLOSA&gt;&lt;/SII:RESP_HDR&gt;&lt;/SII:RESPUESTA&gt;</ns1:getTokenReturn></ns1:getTokenResponse></soapenv:Body></soapenv:Envelope>"
+        }
+      ]
+    }
+  }
+}

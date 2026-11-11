@@ -1,0 +1,68 @@
+{
+  "descripcion": "DeclaracionBoletas::declarar(): autorizarEmpresaBolProd con PostulSegHistInsUpdTo, TdtEmpresaAutorizadaTo y los documentos de listarDocAutorizados reescritos con valor() (Long repetidos como back-reference)",
+  "operacion": "gwtLlamada",
+  "entrada": {
+    "base": "https://www4.sii.cl/certBolElectDteInternet/",
+    "policy": "082D0AC4BC4D75A5DF38F116C53877D4",
+    "servicio": "cl.sii.sdi.diii.certBolElectDte.web.client.service.Facade",
+    "metodo": "autorizarEmpresaBolProd",
+    "parametros": [
+      {
+        "tipo": "cl.sii.sdi.diii.certBolElectDte.to.PostulSegHistInsUpdTo/138688689",
+        "pasos": [
+          ["tipo", "cl.sii.sdi.diii.certBolElectDte.to.PostulSegHistInsUpdTo/138688689"],
+          ["string", "P91"],
+          ["nulo"],
+          ["string", "BVE"],
+          ["integer", 90],
+          ["nulo"],
+          ["string", null],
+          ["nulo"],
+          ["string", null],
+          ["string", "0"],
+          ["string", null],
+          ["tipo", "cl.sii.sdi.diii.certBolElectDte.to.TdtEmpresaAutorizadaTo/2240026086"],
+          ["int", 0],
+          ["string", "BVE"],
+          ["string", "0"],
+          ["string", "1"],
+          ["string", "2"],
+          ["string", "SII"],
+          ["string", "07-11-2026"],
+          ["string", "07-11-2026"],
+          ["string", "07-11-2026"],
+          ["string", "contacto@proveedor-prueba.cl"],
+          ["string", "Proveedor de Prueba SpA"],
+          ["string", "19"],
+          ["string", "S"],
+          ["integer", 76123456],
+          ["integer", 11111111],
+          ["integer", 22222222],
+          ["string", "https://proveedor-prueba.cl/consulta"],
+          ["string", "07-11-2026"],
+          ["string", "07-11-2026"],
+          ["string", null],
+          [
+            "valorLeido",
+            {
+              "respuesta": "//OK[15,'EAAAAA',4,18,13,0,'F',4,76123456,3,12,17,10,9,8,0,7,16,5,-4,41,3,2,15,'gAAAAAAAB',4,14,13,0,'F',4,76123456,3,12,11,10,9,8,0,7,6,5,'ZlFhXwA',4,39,3,2,2,1,[\"java.util.ArrayList/4159755760\",\"cl.sii.sdi.diii.certBolElectDte.to.DocumentoAutorizadoTo/493967287\",\"java.lang.Integer/3438268394\",\"java.lang.Long/4227064769\",\"BVE\",\"BOLETA ELECTRONICA\",\"S\",\"01-09-2026\",\"AUTORIZADO\",\"\",\"39\",\"N\",\"java.lang.String/2004016611\",\"Boleta afecta\",\"FIN\",\"BOLETA EXENTA ELECTRONICA\",\"41\",\"Boleta exenta\"],0,7]",
+              "esquemas": {
+                "cl.sii.sdi.diii.certBolElectDte.to.EstadoAutorizaTo/1011533792": "SSS",
+                "cl.sii.sdi.diii.certBolElectDte.to.PostulSegHistInsUpdTo/138688689": "SOSOSSOSSSOSSSOSSOOOOS",
+                "cl.sii.sdi.diii.certBolElectDte.to.TdtEmpresaAutorizadaTo/2240026086": "BSSSSSSSSSSSSOOOS",
+                "cl.sii.sdi.diii.certBolElectDte.to.DocumentoAutorizadoTo/493967287": "OOSSSSSSSSSOOOOOS"
+              }
+            }
+          ],
+          ["string", null],
+          ["string", "EMPRESA DE PRUEBA SPA"],
+          ["long", "0"],
+          ["nulo"],
+          ["integer", 76123456],
+          ["nulo"],
+          ["string", null]
+        ]
+      }
+    ]
+  }
+}

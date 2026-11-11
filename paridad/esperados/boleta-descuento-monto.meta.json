@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-descuento-monto",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 1379,
+    "sha256": "9376b3726492d1cd94d185fcb05e587213155db93eb6aea52d3eddf74ae9c53d",
+    "marcas": {
+        "FchEmis": "2026-09-05"
+    }
+}

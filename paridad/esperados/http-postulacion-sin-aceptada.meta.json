@@ -1,0 +1,8 @@
+{
+    "caso": "http-postulacion-sin-aceptada",
+    "operacion": "httpPostulacion",
+    "core": "1.9.1",
+    "bytes": 2796,
+    "sha256": "201412ca8f5c8eb8e231fdb6067ae70badf86d129a505f6da811c739d18595ad",
+    "marcas": {}
+}

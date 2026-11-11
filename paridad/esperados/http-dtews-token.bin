@@ -1,0 +1,61 @@
+=== peticion 1 de 2 (https) ===
+POST /DTEWS/CrSeed.jws HTTP/1.1
+content-length: 151
+content-type: text/xml; charset=utf-8
+host: <https>
+soapaction: ""
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><soapenv:Header/><soapenv:Body><getSeed/></soapenv:Body></soapenv:Envelope>
+=== fin de la peticion 1 ===
+=== peticion 2 de 2 (https) ===
+POST /DTEWS/GetTokenFromSeed.jws HTTP/1.1
+content-length: 3338
+content-type: text/xml; charset=utf-8
+host: <https>
+soapaction: ""
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><soapenv:Header/><soapenv:Body><getToken><pszXml>&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;getToken&gt;
+&lt;item&gt;
+&lt;Semilla&gt;012345678901&lt;/Semilla&gt;
+&lt;/item&gt;
+&lt;Signature xmlns=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt;
+&lt;SignedInfo xmlns=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt;&lt;CanonicalizationMethod Algorithm=&quot;http://www.w3.org/TR/2001/REC-xml-c14n-20010315&quot;/&gt;&lt;SignatureMethod Algorithm=&quot;http://www.w3.org/2000/09/xmldsig#rsa-sha1&quot;/&gt;&lt;Reference URI=&quot;&quot;&gt;&lt;Transforms&gt;&lt;Transform Algorithm=&quot;http://www.w3.org/2000/09/xmldsig#enveloped-signature&quot;/&gt;&lt;/Transforms&gt;&lt;DigestMethod Algorithm=&quot;http://www.w3.org/2000/09/xmldsig#sha1&quot;/&gt;&lt;DigestValue&gt;Hzd+XHyW8FgYsNMFay1THmZlULA=&lt;/DigestValue&gt;&lt;/Reference&gt;&lt;/SignedInfo&gt;
+&lt;SignatureValue&gt;e1YkTJYVl0nKjoqCJoHR4t13kQdnh9sWyoJjF/mOQT2HfLpoO+NaeqfUEgRVRG7beS5m3ED9bNWZD7lki8cXIBoFU+XZx1m2f1rW7NpMSkEjd8OBo7dRRdtMDl0+FwT7awD8QaDF4JZb1dnQfcQJj/6ACiEEfood5e1p2NwX8IBjFOMs+1ATtswmsg0abB2wh2mHaHePjmr0939ZHPSRgbDUM0e4A7NR66E6jLH6SItvyA2X4fZi2NeQS6lCQc5ffHfHfHkwf0WubwMHk3GKkLbQ3p8iKWnhdgvUh3Ab1Mf8tBY+W3sbyofeqxUVdvUzqXwU54EvUWnHTfCkO31NSQ==&lt;/SignatureValue&gt;
+&lt;KeyInfo&gt;
+&lt;KeyValue&gt;
+&lt;RSAKeyValue&gt;
+&lt;Modulus&gt;wD7LqsDWNVrBKRxEG78utX6riQ7fwx7NX+9rMlSGIzAOz9+zo+aHst4WRiD0WlYhIJH5xx4gRph/blJ8GClutEIuzbEU5tnEna0V/0Duw1F/OqkSArc9YCo3dtNPURd/QAntmkfcLsjX80VfaxyEB8cQsb1Doy1ulf7HlW2grbAmeqc7StInDYyWAdQ2VmGxUhHNoqWmqkrfHS7cS2Ns6SLq1VIjtzpuV8sInxJxpzTFZfIAsuE2QeoaygkJtJI3gVD7iw8xxJxRGRckkzzTnAO4y6wtK1O+yChd7/VzEqxMufDWqb4klwFJACbPs9TXGRTMhbpXwBDR8cdIr/28Jw==&lt;/Modulus&gt;
+&lt;Exponent&gt;AQAB&lt;/Exponent&gt;
+&lt;/RSAKeyValue&gt;
+&lt;/KeyValue&gt;
+&lt;X509Data&gt;
+&lt;X509Certificate&gt;-----BEGIN CERTIFICATE-----
+MIIDnzCCAoegAwIBAgIBAzANBgkqhkiG9w0BAQsFADBSMSAwHgYDVQQDDBdDQSBJ
+bnRlcm1lZGlhIGRlIFBydWViYTEuMCwGA1UECgwlTWF0ZXJpYWwgZGUgcHJ1ZWJh
+IGNlcnRpZmljYWNpb24tbm9kZTAgFw0yNjExMDYxMTQ1MjBaGA8yMTI2MTAxMzEx
+NDUyMFowVDEiMCAGA1UEAwwZVGl0dWxhciBkZSBQcnVlYmEgw5F1w7FvYTEuMCwG
+A1UECgwlTWF0ZXJpYWwgZGUgcHJ1ZWJhIGNlcnRpZmljYWNpb24tbm9kZTCCASIw
+DQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMA+y6rA1jVawSkcRBu/LrV+q4kO
+38MezV/vazJUhiMwDs/fs6Pmh7LeFkYg9FpWISCR+cceIEaYf25SfBgpbrRCLs2x
+FObZxJ2tFf9A7sNRfzqpEgK3PWAqN3bTT1EXf0AJ7ZpH3C7I1/NFX2schAfHELG9
+Q6MtbpX+x5VtoK2wJnqnO0rSJw2MlgHUNlZhsVIRzaKlpqpK3x0u3EtjbOki6tVS
+I7c6blfLCJ8Scac0xWXyALLhNkHqGsoJCbSSN4FQ+4sPMcScURkXJJM805wDuMus
+LStTvsgoXe/1cxKsTLnw1qm+JJcBSQAmz7PU1xkUzIW6V8AQ0fHHSK/9vCcCAwEA
+AaN8MHowCQYDVR0TBAIwADAOBgNVHQ8BAf8EBAMCBeAwHQYDVR0lBBYwFAYIKwYB
+BQUHAwIGCCsGAQUFBwMEMB0GA1UdDgQWBBRQpx5/luMhmL57Ll9EG7lvoY6/wzAf
+BgNVHSMEGDAWgBRVTbkJ0v3/4PiII3XTccY5rAUnkjANBgkqhkiG9w0BAQsFAAOC
+AQEAJnQC3yv+mI3FVuyvb1k2D9LX1X5GtAyighy0QjuI7HsGUOxiLjD4EPz69Pw+
+IGgVn0z168J4FTqFZ3Yg4sbO8rFx5F1UEg1IqrIqxJf29LQ6XN3kA7ua5BnBRBzc
+smT13x4zYaCHdFT+0wvI5ArxCmjtIk/v8rrW/QRyMrmzJKDr9q0zQRz1rfj8lHSd
+ygn3yt4PyFp8UQmTd8vlIOx6Ca/HvjeoC4vLjxiqMqgqTCJ11uhRq8+By0T0X+5R
+pkGck4113FTUBsIdm2FvmxeGCD5Z6q53Zh8guM6W7uC7wOz5UmKF39sgGHfDryFD
+x0RmkbPMi//ahoygVyTJw/+Vlg==
+-----END CERTIFICATE-----&lt;/X509Certificate&gt;
+&lt;/X509Data&gt;
+&lt;/KeyInfo&gt;
+&lt;/Signature&gt;
+&lt;/getToken&gt;</pszXml></getToken></soapenv:Body></soapenv:Envelope>
+=== fin de la peticion 2 ===
+=== resultado ===
+TOKENDEPRUEBA0001

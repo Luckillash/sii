@@ -1,0 +1,8 @@
+{
+    "caso": "http-multipart-tildes",
+    "operacion": "httpMultipart",
+    "core": "1.9.1",
+    "bytes": 893,
+    "sha256": "ef487b6583aa7822f2f2ee61f66fd95dbd0ae43241cc5586ef31f555e0eac9fd",
+    "marcas": {}
+}

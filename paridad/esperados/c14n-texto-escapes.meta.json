@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-texto-escapes",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 83,
+    "sha256": "3878f6898a5346fcf575c1b5f150979e17978b9d293dc762cf29ad064ecc009d",
+    "marcas": {}
+}

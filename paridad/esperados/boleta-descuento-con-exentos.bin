@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<DTE xmlns="http://www.sii.cl/SiiDte" version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Documento ID="F68T39">
+    <Encabezado>
+      <IdDoc>
+        <TipoDTE>39</TipoDTE>
+        <Folio>68</Folio>
+        <FchEmis>2026-09-05</FchEmis>
+        <IndServicio>3</IndServicio>
+      </IdDoc>
+      <Emisor>
+        <RUTEmisor>76123456-0</RUTEmisor>
+        <RznSocEmisor>EMPRESA DE PRUEBA SPA</RznSocEmisor>
+        <GiroEmisor>ACTIVIDADES DE CONSULTORIA DE INFORMATICA</GiroEmisor>
+        <DirOrigen>CALLE 123</DirOrigen>
+        <CmnaOrigen>SANTIAGO</CmnaOrigen>
+      </Emisor>
+      <Receptor>
+        <RUTRecep>66666666-6</RUTRecep>
+        <RznSocRecep>Cliente General</RznSocRecep>
+      </Receptor>
+      <Totales>
+        <MntNeto>3713</MntNeto>
+        <MntExe>2302</MntExe>
+        <IVA>705</IVA>
+        <MntTotal>6720</MntTotal>
+      </Totales>
+    </Encabezado>
+    <Detalle>
+      <NroLinDet>1</NroLinDet>
+      <IndExe>1</IndExe>
+      <NmbItem>Exento 1</NmbItem>
+      <QtyItem>2</QtyItem>
+      <PrcItem>951</PrcItem>
+      <MontoItem>1902</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>2</NroLinDet>
+      <NmbItem>Afecto 1</NmbItem>
+      <QtyItem>3</QtyItem>
+      <PrcItem>1333</PrcItem>
+      <DescuentoMonto>300</DescuentoMonto>
+      <MontoItem>3699</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>3</NroLinDet>
+      <IndExe>1</IndExe>
+      <NmbItem>Exento 2</NmbItem>
+      <QtyItem>1</QtyItem>
+      <PrcItem>400</PrcItem>
+      <MontoItem>400</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>4</NroLinDet>
+      <NmbItem>Afecto 2</NmbItem>
+      <QtyItem>1</QtyItem>
+      <PrcItem>777</PrcItem>
+      <DescuentoMonto>58</DescuentoMonto>
+      <MontoItem>719</MontoItem>
+    </Detalle>
+  </Documento>
+</DTE>

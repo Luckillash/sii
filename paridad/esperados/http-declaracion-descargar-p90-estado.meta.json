@@ -1,0 +1,8 @@
+{
+    "caso": "http-declaracion-descargar-p90-estado",
+    "operacion": "httpDeclaracion",
+    "core": "1.9.1",
+    "bytes": 1823,
+    "sha256": "08507698acd8df86ed8593daad6feee3ae51e90023276fb13b602df39791c158",
+    "marcas": {}
+}

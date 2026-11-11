@@ -1,0 +1,8 @@
+{
+    "caso": "firmar-dte-crlf",
+    "operacion": "firmarDte",
+    "core": "1.9.1",
+    "bytes": 4732,
+    "sha256": "f7fa130777269118f96b40d174a4c258eb3751fc509688f1ad779fe46324bee2",
+    "marcas": {}
+}

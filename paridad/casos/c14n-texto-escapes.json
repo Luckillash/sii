@@ -1,0 +1,8 @@
+{
+  "descripcion": "Texto con &, <, >, comillas, \\r\\n literal, \\r suelto y &#13; (solo el CR por referencia sobrevive)",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<r xmlns=\"urn:sii:a\">\r\n<t>a &amp; b &lt; c &gt; d \" ' &quot;&apos; x\r\ny\rz&#13;w&#13;&#10;v &#9;\t]]&gt;</t>\r\n</r>\r\n",
+    "etiqueta": "t"
+  }
+}

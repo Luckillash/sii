@@ -1,0 +1,10 @@
+{
+    "caso": "timbre-escapes",
+    "operacion": "timbre",
+    "core": "1.9.1",
+    "bytes": 790,
+    "sha256": "e902e917cb172822c9e9679183d6b40f3b00b52f30900654c8aac9a8f6aba117",
+    "marcas": {
+        "TSTED": "2026-09-05T10:35:06"
+    }
+}

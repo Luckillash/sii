@@ -1,0 +1,23 @@
+{
+  "descripcion": "<meta> con charset: libxml vuelve a decodificar con esa codificación lo que sigue a la etiqueta, aunque el PHP ya le entrega UTF-8 y antepone <?xml encoding=\"UTF-8\">: los valores con tildes salen doblemente codificados. Solo cuenta el primer <meta> con una codificación conocida",
+  "operacion": "formFolios",
+  "entrada": {
+    "paginas": [
+      "<form action=\"a\"><input name=\"a\" value=\"Ñandú\"></form>",
+      "<head><meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'></head><form action=\"a\"><input name=\"a\" value=\"Ñandú\"></form>",
+      "<form action=\"á\"><input name=\"a\" value=\"Ñ\"><meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'><input name=\"b\" value=\"Ñ\"></form>",
+      "<meta charset='iso-8859-1'><form action=\"a\"><input name=\"a\" value=\"Ñ\"></form>",
+      "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'><meta charset='iso-8859-1'><form action=\"a\"><input name=\"a\" value=\"Ñ\"></form>",
+      "<meta http-equiv='Content-Type' content='text/html; charset=windows-1252'><form action=\"a\"><input name=\"a\" value=\"Ñ\"></form>",
+      "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=ISO-8859-1\"><form action=\"a\"><input name=\"a\" value=\"Ñ\"></form>",
+      "<meta content='text/html; charset=iso-8859-1'><form action=\"a\"><input name=\"a\" value=\"Ñ\"></form>",
+      "<meta http-equiv='Content-Type' content='text/html; charset=latin1'><form action=\"a\"><input name=\"a\" value=\"Ñ\"></form>",
+      "<body><p>x</p><meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'><form action=\"a\"><input name=\"a\" value=\"Ñ\"></form>",
+      "<meta charset='iso-8859-1'><meta charset='utf-8'><form action=\"a\"><input name=\"a\" value=\"Ñ\"></form>",
+      "<meta charset='x-nada'><meta charset='iso-8859-1'><form action=\"a\"><input name=\"a\" value=\"Ñ\"></form>",
+      "<meta charset='iso-8859-15'><form action=\"a\"><input name=\"a\" value=\"€\"></form>",
+      "<meta http-equiv='content-type' content='text/html;charset = iso-8859-1'><form action=\"a\"><input name=\"a\" value=\"Ñ\"></form>",
+      "<script>x='<meta charset=iso-8859-1>'</script><form action=\"a\"><input name=\"a\" value=\"Ñ\"></form>"
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "descripcion": "Esperados de paridad que se validan contra los XSD del SII (data/schemas/). 'patron' y las claves de 'excluir' son globs sobre el nombre del caso (sin .bin). Con --estricto (CI), cada regla 'obligatorio' debe calzar con al menos un esperado. Ver paridad/README.md.",
+  "esquemas": [
+    {
+      "patron": "envio-boleta-*",
+      "xsd": "EnvioBOLETA_v11.xsd",
+      "obligatorio": true,
+      "excluir": {
+        "envio-boleta-crudo-bytes": "Sus DTE entran 'crudo' (sin firmar) a propósito; el XSD exige ds:Signature en cada DTE.",
+        "envio-boleta-declaraciones": "Cuatro de sus DTE entran 'crudo' (sin firmar) para probar declaraciones raras; el XSD exige ds:Signature en cada DTE."
+      }
+    },
+    { "patron": "set-completo", "xsd": "EnvioBOLETA_v11.xsd", "obligatorio": true },
+    { "patron": "rcof-firmado", "xsd": "ConsumoFolio_v10.xsd", "obligatorio": true },
+    { "patron": "rcof-set-completo", "xsd": "ConsumoFolio_v10.xsd", "obligatorio": true }
+  ],
+  "noDeclarados": {
+    "rcof-* sin firmar": "ConsumoFolio_v10.xsd exige ds:Signature; esos casos prueban el generador sin la firma y no son lo que se envía al SII."
+  }
+}

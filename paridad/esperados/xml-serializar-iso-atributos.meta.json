@@ -1,0 +1,8 @@
+{
+    "caso": "xml-serializar-iso-atributos",
+    "operacion": "serializarXml",
+    "core": "1.9.1",
+    "bytes": 587,
+    "sha256": "6e96f6b03241371bd3b6aa5219455ed2973f03e522c79914dd0799f101083db1",
+    "marcas": {}
+}

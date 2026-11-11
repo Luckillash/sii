@@ -1,0 +1,27 @@
+{
+  "descripcion": "enviarBoletaXml() respondido con HTTP 500: la misma petición y los dos clientes lanzan (solo se compara el cable)",
+  "operacion": "httpRest",
+  "material": "base",
+  "entrada": {
+    "accion": "enviarBoletaXml",
+    "esperaError": true,
+    "token": "TOKENDEPRUEBA0003",
+    "rutEmisor": "76123456-0",
+    "rutEnvia": "22222222-2",
+    "xml": {
+      "esperado": "set-completo"
+    },
+    "http": {
+      "respuestas": [
+        {
+          "status": 500,
+          "cabeceras": [["Content-Type", "text/html"]],
+          "cuerpo": "<html><body>Error interno</body></html>"
+        }
+      ],
+      "normalizar": {
+        "nombresArchivo": true
+      }
+    }
+  }
+}

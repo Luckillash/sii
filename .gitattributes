@@ -1,0 +1,12 @@
+* text=auto eol=lf
+
+# Salidas esperadas de paridad: bytes exactos generados por el PHP.
+# Git no debe tocar saltos de línea ni codificación.
+paridad/esperados/** -text -diff
+paridad/material/** -text
+
+# Archivos del SII (ISO-8859-1): se versionan tal cual.
+data/** -text
+
+*.pfx binary
+*.p12 binary

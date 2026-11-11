@@ -1,0 +1,8 @@
+{
+    "caso": "http-declaracion-estado-paso-raro",
+    "operacion": "httpDeclaracion",
+    "core": "1.9.1",
+    "bytes": 1050,
+    "sha256": "38775b8e7a525d7dffe742544c7f641e2593803c4dfa63888e164d161863ad03",
+    "marcas": {}
+}

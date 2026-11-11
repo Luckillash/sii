@@ -1,0 +1,7 @@
+{
+  "descripcion": "Raíz con xml:lang y namespaces propios (el padre del ápice es el documento)",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<r xml:lang=\"es\" xmlns=\"urn:a\" xmlns:b=\"urn:b\" b:x=\"1\" y=\"2\"><c xml:lang=\"es\"/></r>"
+  }
+}

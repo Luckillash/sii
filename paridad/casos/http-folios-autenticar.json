@@ -1,0 +1,36 @@
+{
+  "descripcion": "autenticar(): POST a CAutInicio.cgi con TLS mutuo (PEM con cadena), 302 con Set-Cookie (host-only, Domain, borrado y dominio ajeno) y página con document.cookie",
+  "operacion": "httpFolios",
+  "entrada": {
+    "accion": "autenticar",
+    "archivo": "cert-cadena.pem",
+    "http": {
+      "respuestas": [
+        {
+          "status": 302,
+          "cabeceras": [
+            [
+              "Location",
+              "/cgi_AUT2000/CAutValida.cgi?https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios"
+            ],
+            ["Set-Cookie", "s_aut=HOSTONLY01; path=/"],
+            ["Set-Cookie", "NETSCAPE_LIVEWIRE.exp=EXPDEPRUEBA; Domain=.sii.cl; Path=/"],
+            ["Set-Cookie", "VIEJA=borrar; Domain=.sii.cl; expires=Thu, 01 Jan 1970 00:00:00 GMT"],
+            ["Set-Cookie", "AJENA=no; Domain=.example.com; Path=/"]
+          ],
+          "cuerpo": ""
+        },
+        {
+          "status": 200,
+          "cabeceras": [
+            ["Content-Type", "text/html; charset=ISO-8859-1"],
+            ["Set-Cookie", "NETSCAPE_LIVEWIRE.exp=EXPRENOVADA; Domain=sii.cl; Path=/"]
+          ],
+          "cuerpo": {
+            "base64": "PEhUTUw+CjxIRUFEPgo8VElUTEU+QXV0ZW50aWNhY2kmb2FjdXRlO248L1RJVExFPgo8U0NSSVBUIExBTkdVQUdFPSJKYXZhU2NyaXB0Ij4KPCEtLQpkb2N1bWVudC5jb29raWUgPSAiTkVUU0NBUEVfTElWRVdJUkUucnV0PTExMTExMTExOyBwYXRoPS87IGRvbWFpbj0uc2lpLmNsIjsKZG9jdW1lbnQuY29va2llID0gIk5FVFNDQVBFX0xJVkVXSVJFLmR2PTE7IHBhdGg9LzsgZG9tYWluPS5zaWkuY2wiOwpkb2N1bWVudC5jb29raWUgPSAnTkVUU0NBUEVfTElWRVdJUkUuY2xhdmU9Q0xBVkVERVBSVUVCQTsgcGF0aD0vOyBkb21haW49LnNpaS5jbCc7CmRvY3VtZW50LmNvb2tpZSA9ICJUT0tFTj1UT0tFTkRFUFJVRUJBQVVUMjAwMDsgcGF0aD0vOyBkb21haW49LnNpaS5jbCI7CmRvY3VtZW50LmNvb2tpZSA9ICJDU0VTU0lPTklEPVNFU0lPTkRFUFJVRUJBOyBwYXRoPS8iOwpmdW5jdGlvbiBzaWd1ZSgpIHsgd2luZG93LmxvY2F0aW9uID0gImh0dHBzOi8vbWF1bGxpbi5zaWkuY2wvY3ZjX2NnaS9kdGUvb2Zfc29saWNpdGFfZm9saW9zIjsgfQovLy0tPgo8L1NDUklQVD4KPC9IRUFEPgo8Qk9EWSBvbkxvYWQ9InNpZ3VlKCkiPgo8Rk9OVCBGQUNFPSJBcmlhbCIgU0laRT0iMiI+SW5ncmVzYW5kby4uLjwvRk9OVD4KPC9CT0RZPgo8L0hUTUw+Cg=="
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+    "codificacion": "UTF-8",
+    "casos": [
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Café con leche",
+                    "cantidad": 2,
+                    "cantidadTexto": "2",
+                    "cantidadTipo": "int",
+                    "precio": 1500,
+                    "precioTexto": "1500",
+                    "precioTipo": "int",
+                    "unidad": "Kil"
+                },
+                {
+                    "nombre": "Ñandú de peluche",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 9990,
+                    "precioTexto": "9990",
+                    "precioTipo": "int",
+                    "unidad": "Kil"
+                },
+                {
+                    "nombre": "Jamón serrano",
+                    "cantidad": 3,
+                    "cantidadTexto": "3",
+                    "cantidadTipo": "int",
+                    "precio": 4200,
+                    "precioTexto": "4200",
+                    "precioTipo": "int",
+                    "unidad": "Kil"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-1"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Piñón",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 800,
+                    "precioTexto": "800",
+                    "precioTipo": "int",
+                    "exento": true
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-2"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Té verde",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 800,
+                    "precioTexto": "800",
+                    "precioTipo": "int",
+                    "exento": true
+                },
+                {
+                    "nombre": "Azúcar",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 900,
+                    "precioTexto": "900",
+                    "precioTipo": "int",
+                    "exento": true
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-3"
+            }
+        }
+    ]
+}

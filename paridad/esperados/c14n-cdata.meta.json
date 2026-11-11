@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-cdata",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 80,
+    "sha256": "84354aa059b297d7b44ff761227ecad98c635abb9055aba676e8e262176a351c",
+    "marcas": {}
+}

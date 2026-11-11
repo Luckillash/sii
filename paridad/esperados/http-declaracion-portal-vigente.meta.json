@@ -1,0 +1,8 @@
+{
+    "caso": "http-declaracion-portal-vigente",
+    "operacion": "httpDeclaracion",
+    "core": "1.9.1",
+    "bytes": 353,
+    "sha256": "f01a9bc6e9783594c2246ff0ecaee7af71a515e4e32484d4d10979658fa784da",
+    "marcas": {}
+}

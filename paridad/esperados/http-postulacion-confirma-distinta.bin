@@ -1,0 +1,41 @@
+=== peticion 1 de 3 (https2) ===
+POST /cvc_cgi/dte/pe_ingrut HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 27
+content-type: application/x-www-form-urlencoded
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1
+host: <https2>
+referer: https://maullin.sii.cl/cvc/dte/pe_condiciones.html
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+ACEPTAR=Aceptar+Condiciones
+=== fin de la peticion 1 ===
+=== peticion 2 de 3 (https2) ===
+POST /cvc_cgi/dte/pe_datos_empresa HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 36
+content-type: application/x-www-form-urlencoded
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1; JSESSIONID=MAULLINPE01
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/pe_ingrut
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+RUT_EMP=76123456&DV_EMP=0&OPCION=BOL
+=== fin de la peticion 2 ===
+=== peticion 3 de 3 (https2) ===
+POST /cvc_cgi/dte/pe_confirma HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 312
+content-type: application/x-www-form-urlencoded
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1; JSESSIONID=MAULLINPE01
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/pe_datos_empresa
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+RUT_EMP=76123456&DV_EMP=0&RAZON_SOCIAL=COMERCIAL+DE+PRUEBA+LIMITADA&RUT_USU=11111111&DV_USU=1&MAIL_SUP=admin%40empresa-prueba.cl&MAIL_SII=contacto%40empresa-prueba.cl&MAIL_DTE=dte%40empresa-prueba.cl&URL=www.empresa-prueba.cl&NOM_SW=Software+de+Prueba&TIPO_SW=M&BOLELEC=S&ESBOL=S&BOLEXEN=S&GRABAR=Confirmar+Datos
+=== fin de la peticion 3 ===
+=== resultado ===
+error postulacion [MAIL_DTE='otro\'correo@empresa-prueba.cl']

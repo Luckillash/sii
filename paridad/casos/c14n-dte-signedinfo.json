@@ -1,0 +1,7 @@
+{
+  "descripcion": "Raíz <SignedInfo> tal como la arma firmarDte para firmar (xmlns:xsi sin usar, saltos de línea)",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<SignedInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n<CanonicalizationMethod Algorithm=\"http://www.w3.org/TR/2001/REC-xml-c14n-20010315\"/>\n<SignatureMethod Algorithm=\"http://www.w3.org/2000/09/xmldsig#rsa-sha1\"/>\n<Reference URI=\"#F1T39\">\n<Transforms>\n<Transform Algorithm=\"http://www.w3.org/TR/2001/REC-xml-c14n-20010315\"/>\n</Transforms>\n<DigestMethod Algorithm=\"http://www.w3.org/2000/09/xmldsig#sha1\"/>\n<DigestValue>khkIqh+P+8mKOmnVsO4NZ8eJSBY=</DigestValue>\n</Reference>\n</SignedInfo>"
+  }
+}

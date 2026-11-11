@@ -1,0 +1,26 @@
+{
+  "descripcion": "Último segundo del día en Chile (verano, UTC-3)",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-12-31T23:59:59",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "77",
+    "detalles": [
+      {
+        "nombre": "Producto",
+        "cantidad": 1,
+        "precio": 1190
+      }
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+    "caso": "estado-envio-error-servicio",
+    "operacion": "estadoEnvio",
+    "core": "1.9.1",
+    "bytes": 282,
+    "sha256": "2425e5e93ac73a73af36056121d37e156606029c97a9c0d77d256e9a0ad6e2ea",
+    "marcas": {}
+}

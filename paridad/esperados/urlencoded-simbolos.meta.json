@@ -1,0 +1,8 @@
+{
+    "caso": "urlencoded-simbolos",
+    "operacion": "httpBuildQuery",
+    "core": "1.9.1",
+    "bytes": 397,
+    "sha256": "2a0cb6b4eb4356eeadda7209ef4723a5e171a3fe3fb373c7aa3c495ca841c8b9",
+    "marcas": {}
+}

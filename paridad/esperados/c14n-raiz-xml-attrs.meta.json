@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-raiz-xml-attrs",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 86,
+    "sha256": "ca95e4fdfd2cf92b6919765b5087595b21ee4eacc2fcbf5c876287105aabd4c6",
+    "marcas": {}
+}

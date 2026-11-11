@@ -1,0 +1,15 @@
+{
+  "descripcion": "NavegadorSii::texto(): entidades de HTML5 (apos, NewLine, Tab, colon, NotEqualTilde, AMP, nombres sin \";\"), numéricas permitidas y no (&#12; &#13; &#xFFFE; &#x0x41;), blancos Unicode de \\s con /u (nbsp, U+2003, U+0085, U+180E; no U+200B), y los marcadores con mayúsculas, tildes como entidades, ſ e ı",
+  "operacion": "textoPostulacion",
+  "entrada": {
+    "textos": [
+      "&apos;uno&apos; &quot;dos&quot; &NewLine;tres&Tab;cuatro &colon; &NotEqualTilde; &AMP; &Amp; &amp &lt;b&gt; &amp;lt;",
+      "&#12;ff &#13;cr &#xFFFE; &#x0x41; &#65 &#0; &#128; &#x1F600; &#xD800; &#1114112;",
+      "a&nbsp;b c de᠎f​g　h \t\n i",
+      "La postulaci&oacute;n HA&nbsp;SIDO ACEPTADA",
+      "El c&Oacute;digo de este mensaje es 1 / USTED NO TIENE permisos / no est&aacute; AUTORIZADO",
+      "ha ſido aceptada / Usted no tıene / No ha sido posible completar su solicitud",
+      "No es&#32;representante &mdash; &hellip; &euro; &ntilde;"
+    ]
+  }
+}

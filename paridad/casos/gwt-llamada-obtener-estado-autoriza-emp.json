@@ -1,0 +1,28 @@
+{
+  "descripcion": "DeclaracionBoletas::estado(): obtenerEstadoAutorizaEmp(rut, dv, 90, null)",
+  "operacion": "gwtLlamada",
+  "entrada": {
+    "base": "https://www4.sii.cl/certBolElectDteInternet/",
+    "policy": "082D0AC4BC4D75A5DF38F116C53877D4",
+    "servicio": "cl.sii.sdi.diii.certBolElectDte.web.client.service.Facade",
+    "metodo": "obtenerEstadoAutorizaEmp",
+    "parametros": [
+      {
+        "tipo": "java.lang.Integer/3438268394",
+        "pasos": [["integer", 76123456]]
+      },
+      {
+        "tipo": "java.lang.String/2004016611",
+        "pasos": [["string", "0"]]
+      },
+      {
+        "tipo": "java.lang.Integer/3438268394",
+        "pasos": [["integer", 90]]
+      },
+      {
+        "tipo": "java.lang.String/2004016611",
+        "pasos": [["string", null]]
+      }
+    ]
+  }
+}

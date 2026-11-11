@@ -1,0 +1,36 @@
+{
+  "descripcion": "Boleta exenta (41) con caf-41-iso.xml (razón social del CAF en ISO-8859-1 sin declarar); folio como número",
+  "operacion": "armar-boleta",
+  "material": "base",
+  "entrada": {
+    "ahora": "2026-09-05T11:00:00",
+    "caf": "caf-41-iso.xml",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "DÍAZ Y MUÑOZ LTDA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": 7,
+    "tipo_dte": "41",
+    "detalles": [
+      {
+        "nombre": "Libro",
+        "cantidad": 1,
+        "precio": 5000,
+        "exento": true
+      },
+      {
+        "nombre": "Revista",
+        "cantidad": 3,
+        "precio": 1500,
+        "exento": true
+      }
+    ]
+  }
+}

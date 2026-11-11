@@ -1,0 +1,20 @@
+{
+  "descripcion": "Atributos como los lee libxml: mayúsculas, sin comillas, sin valor, repetidos (gana el primero), basura que se descarta, entidades con nombre (HTML 4 + &apos;, ; obligatorio) y numéricas (; opcional; una inválida trunca el valor)",
+  "operacion": "formFolios",
+  "entrada": {
+    "paginas": [
+      "<FORM ACTION=\"X\"><INPUT NAME=\"A\" VALUE=\"B\"><Select Name=\"S\"><OPTION VALUE=\"1\" SELECTED>x</OPTION></SELECT></FORM>",
+      "<form action><input name=x/><input name=\"y\"value=\"z\"><input name = \"s\" value = \"t\" ><input/name=\"u\"></form>",
+      "<form ACTION='of_x?a=1&amp;b=2' action=\"otro\"><input name=a value=b&eacute;c><input name=\"a\" value=\"dup\"><input name=\"e\" value=\"1\" value=\"2\"></form>",
+      "<form action=\"a\"><input name=\"d\" value=\"x&apos;y&foo;z&#65;&#x42;&amp\"><input name=\"n\" value=\"&amp&lt;&LT;&eacute&eacute;&Eacute;&nbsp;&euro;&hellip;&notin;&notit;&Amp;&;\"></form>",
+      "<form action=\"a&#128;b&#159;&#x1F600;&#X41;&#0065;&#65b&#x41b\"><input name=\"t1\" value=\"a&#0;b\"><input name=\"t2\" value=\"a&#x110000;b\"><input name=\"t3\" value=\"a&#xD800;b\"><input name=\"t4\" value=\"a&#1;b\"><input name=\"t5\" value=\"a&#xFFFE;b\"><input name=\"t6\" value=\"a&#;b\"><input name=\"t7\" value=\"a&#99999999999;b\"><input name=\"t8\" value=\"&#9;&#10;&#13;\"></form>",
+      "<form action=\"a\"><input name=\"x\" value='a\"b'><input name=\"y\" value=\"a'b\"><input name=\"z\" value=sin&nbsp;comillas>raro</form>",
+      "<form action=\"a\"><input name=\"x\" value=\"  espacios  \n  y\tsaltos\r\n \"><input name=\"ñ\" value=\"á\"><input name='c' value='ñ'></form>",
+      "<form action=\"a\"><input name=\"x\"<input name=\"y\"><input name=\"v\" value=\"v\" / ><input name=\"w\" =z></form>",
+      "<form action=\"a\"><input name=\"x\" value=\"<b>\">te<xt</form><input name=\"y\">",
+      "<form action=\"a\"><input name=\"x\" value=\"1\"><input name=\"x\" value=\"2\"><input name=\"\" value=\"3\"><input value=\"4\"><input name=\"5\" value=\"cinco\"></form>",
+      "<form action=\"a\"><input name=\"b1\" type=\"BUTTON\"><input name=\"r\" type=\"reset\"><input name=\"s\" type=\"submit\" value=\"S\"><input name=\"i\" type=\"image\"><input name=\"c\" type=\"checkbox\" value=\"on\"><input name=\"d\" disabled value=\"dis\"><input name=\"k\" type=\"Reset \"></form>",
+      "<form action=\"a\"><input name=\"sin-cierre\" value=\"x"
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "descripcion": "Certificate desde un .pfx moderno de OpenSSL 3 (PBES2 AES-256-CBC, MAC SHA-256): lo lee openssl_pkcs12_read",
+  "operacion": "certificado",
+  "entrada": {
+    "archivo": "cert-moderno.pfx",
+    "clave": "clave-de-prueba"
+  }
+}

@@ -1,0 +1,5 @@
+# Configuración mínima de OpenSSL para generar los esperados certificado-* en
+# Windows, donde el PHP no trae openssl.cnf (ver paridad/README.md).
+[req]
+distinguished_name = dn
+[dn]

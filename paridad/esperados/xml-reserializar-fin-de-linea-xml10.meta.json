@@ -1,0 +1,8 @@
+{
+    "caso": "xml-reserializar-fin-de-linea-xml10",
+    "operacion": "reserializarXml",
+    "core": "1.9.1",
+    "bytes": 105,
+    "sha256": "cb785ce5b868d34539997643c9c655de58dfc86e6cba49b119d811ff9954c9cc",
+    "marcas": {}
+}

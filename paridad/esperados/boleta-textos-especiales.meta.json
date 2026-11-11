@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-textos-especiales",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 1836,
+    "sha256": "a74d1196890b6315951189a7fd51c327728f68c35d064bb8af9479a5570327fc",
+    "marcas": {
+        "FchEmis": "2026-09-05"
+    }
+}

@@ -1,0 +1,37 @@
+{
+  "descripcion": "Boleta afecta (39) del caso 1 del set, con referencia SET / CASO-1 y CAF caf-39.xml",
+  "operacion": "armar-boleta",
+  "material": "base",
+  "entrada": {
+    "ahora": "2026-09-05T10:30:01",
+    "caf": "caf-39.xml",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "1",
+    "detalles": [
+      {
+        "nombre": "Cambio de aceite",
+        "cantidad": 1,
+        "precio": 19900
+      },
+      {
+        "nombre": "Alineacion y balanceo",
+        "cantidad": 1,
+        "precio": 9900
+      }
+    ],
+    "referencia": {
+      "codigo": "SET",
+      "razon": "CASO-1"
+    }
+  }
+}

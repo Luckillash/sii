@@ -1,0 +1,9 @@
+{
+  "descripcion": ".pfx legacy con hoja + CA intermedia + CA raíz: cadena que arma la ruta de la CLI de openssl. Sin toPem(): en Windows el PHP repite la hoja (ver operaciones/certificado.php)",
+  "operacion": "certificado",
+  "entrada": {
+    "archivo": "cert-legacy-cadena.pfx",
+    "clave": "clave-de-prueba",
+    "sinPem": true
+  }
+}

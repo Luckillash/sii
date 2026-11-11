@@ -1,0 +1,40 @@
+{
+  "descripcion": "Unidad de medida (UnmdItem), con caracteres ISO-8859-1 (m², µg)",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-09-05T17:30:00",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "72",
+    "detalles": [
+      {
+        "nombre": "Arroz",
+        "cantidad": 5,
+        "precio": 700,
+        "unidad": "Kg"
+      },
+      {
+        "nombre": "Cerámica",
+        "cantidad": 12,
+        "precio": 9990,
+        "unidad": "m²"
+      },
+      {
+        "nombre": "Vitamina",
+        "cantidad": 1,
+        "precio": 3000,
+        "unidad": "µg",
+        "exento": true
+      }
+    ]
+  }
+}

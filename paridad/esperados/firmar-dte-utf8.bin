@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DTE xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
+  <Documento ID="F6T39">
+    <Encabezado>
+      <IdDoc>
+        <TipoDTE>39</TipoDTE>
+        <Folio>6</Folio>
+        <FchEmis>2026-11-05</FchEmis>
+        <IndServicio>3</IndServicio>
+      </IdDoc>
+      <Emisor>
+        <RUTEmisor>76123456-7</RUTEmisor>
+        <RznSocEmisor>Comercial Ñuñoa &amp; Cía. Ltda.</RznSocEmisor>
+        <GiroEmisor>Venta de artículos "varios" &lt;menor&gt;</GiroEmisor>
+        <DirOrigen>Av. José Pedro Alessandri 1234</DirOrigen>
+        <CmnaOrigen>Ñuñoa</CmnaOrigen>
+      </Emisor>
+      <Receptor>
+        <RUTRecep>66666666-6</RUTRecep>
+        <RznSocRecep>Cliente Genérico</RznSocRecep>
+      </Receptor>
+      <Totales>
+        <MntNeto>8387</MntNeto>
+        <MntExe>1000</MntExe>
+        <IVA>1593</IVA>
+        <MntTotal>10980</MntTotal>
+      </Totales>
+    </Encabezado>
+    <Detalle>
+      <NroLinDet>1</NroLinDet>
+      <NmbItem>Café en grano €1 — 250g</NmbItem>
+      <QtyItem>2</QtyItem>
+      <UnmdItem>kg</UnmdItem>
+      <PrcItem>4990</PrcItem>
+      <MontoItem>9980</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>2</NroLinDet>
+      <IndExe>1</IndExe>
+      <NmbItem>Servicio exento</NmbItem>
+      <QtyItem>1</QtyItem>
+      <PrcItem>1000</PrcItem>
+      <MontoItem>1000</MontoItem>
+    </Detalle>
+    <Referencia>
+      <NroLinRef>1</NroLinRef>
+      <CodRef>SET</CodRef>
+      <RazonRef>Ñandú € 😀</RazonRef>
+    </Referencia>
+  <TED version="1.0"><DD><RE>76123456-7</RE><TD>39</TD><F>1</F><FE>2026-11-05</FE><RR>66666666-6</RR><RSR>Cliente Genérico</RSR><MNT>10980</MNT><IT1>Café en grano ?1 ? 250g</IT1><CAF version="1.0"><DA><RE>76123456-7</RE><RS>COMERCIAL ÑUÑOA</RS><TD>39</TD><RNG><D>1</D><H>100</H></RNG><FA>2026-01-01</FA><RSAPK><M>AAAA</M><E>Aw==</E></RSAPK><IDK>100</IDK></DA><FRMA algoritmo="SHA1withRSA">RELLENO==</FRMA></CAF><TSTED>2026-11-05T10:00:00</TSTED></DD><FRMT algoritmo="SHA1withRSA">RELLENO==</FRMT></TED>
+<TmstFirma>2026-11-05T10:00:00</TmstFirma>
+</Documento>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+<SignedInfo>
+<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<Reference URI="#F6T39">
+<Transforms>
+<Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+</Transforms>
+<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<DigestValue>31klQyDtUVPKzLFnZboXNXQNs9c=</DigestValue>
+</Reference>
+</SignedInfo>
+<SignatureValue>o7+Gvn3VRGFe1jobxG+rYI2kBrImQpKpx7zABV8JDNJeTq0qtV8Oyn6EW+5jcJWXLCGbxx6voNOzykFg0p3BydP+2lowiDo5iVSvPfdhRUZzoWiP+7U1PHNOKV19i09nyWXbTAFYFx9KSy4LQAOJ4SFIWIUdiXdHfnCkPDXQgbkFcqGmzCWKoOmgTcWEmMKrSfQN0OPi3Fli/KU9DXc//A2+uT0qgOKkIVDBXk4NgFuVmI/yuqw7LkHAOs5cN/E5XHBESSW3RecejpDTj7LBy8nmHy1vK0yRBw9a8429oeJrRJexcPqOUMJy5tE9fKZRxzwtTPMLfyjtwzZJaxosyw==</SignatureValue>
+<KeyInfo>
+<KeyValue>
+<RSAKeyValue>
+<Modulus>tflg6YLi3tIYPw+pC9Tvd6asaJTVI09mT3IawcvxsSXpHILMSBCGahikzqFqP7rXwzO4wkI+ZD00CG/3BTo6sUWSkZV69nSO0PPDB2OZGu5MsZKHVPckd1ys/fv3usk723nRksdmr2MES6DpfWqxUy8VIvOpDY1k4OMj03TxBYnx5DtyKBEWL88zesiPIkCyq+4q08H9pSLfYuQ3zTEEolfNTruYLkAKaD14BON7kjzVGJ6kDLeNiSN1hqspMD2fIGwVorhq7KN7yaaVDpbgQJzjZ2ErQT12NQw4hJRzEQneYEJrYrnxtQcVpGeN81kENKfEMXnQUFzk6SQfUFt5qw==</Modulus>
+<Exponent>AQAB</Exponent>
+</RSAKeyValue>
+</KeyValue>
+<X509Data>
+<X509Certificate>MIIDezCCAmOgAwIBAgIUfHA+6RtmK+GzEJs7ufLZ+t53Z18wDQYJKoZIhvcNAQELBQAwTDEaMBgGA1UEAwwRVGl0dWxhciBkZSBQcnVlYmExLjAsBgNVBAoMJU1hdGVyaWFsIGRlIHBydWViYSBjZXJ0aWZpY2FjaW9uLW5vZGUwIBcNMjYxMTA2MDEzMTIzWhgPMjEyNjEwMTMwMTMxMjNaMEwxGjAYBgNVBAMMEVRpdHVsYXIgZGUgUHJ1ZWJhMS4wLAYDVQQKDCVNYXRlcmlhbCBkZSBwcnVlYmEgY2VydGlmaWNhY2lvbi1ub2RlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtflg6YLi3tIYPw+pC9Tvd6asaJTVI09mT3IawcvxsSXpHILMSBCGahikzqFqP7rXwzO4wkI+ZD00CG/3BTo6sUWSkZV69nSO0PPDB2OZGu5MsZKHVPckd1ys/fv3usk723nRksdmr2MES6DpfWqxUy8VIvOpDY1k4OMj03TxBYnx5DtyKBEWL88zesiPIkCyq+4q08H9pSLfYuQ3zTEEolfNTruYLkAKaD14BON7kjzVGJ6kDLeNiSN1hqspMD2fIGwVorhq7KN7yaaVDpbgQJzjZ2ErQT12NQw4hJRzEQneYEJrYrnxtQcVpGeN81kENKfEMXnQUFzk6SQfUFt5qwIDAQABo1MwUTAdBgNVHQ4EFgQULRy9vn66ebHiNcLA60RZffgPP1UwHwYDVR0jBBgwFoAULRy9vn66ebHiNcLA60RZffgPP1UwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAKyHigem7SyuHNxfIF5dERoXdPAPEJlqwYG5E3PByAp5gRqMpv4+J9KImIwzC5+akZ3B/FwNo2e457HqKLt1FRTEHh9oVTvELjg8PJxeyUPwQi0+bCiwAN1CH+AArZO7UbmnegsxNkKbTBVBhBVC7G21605Ep/Pyiaa4nvErMmj/LcNY8H3PmDOJVy60lL2D1J8o52Z0NWfGclMqvERykVbr3U2A8Nf3Qv4wPYO6seBbYFCg4YbaTQyWHwzG8djn505PF9+BKRBuZ57pMGGJYOe9MTagwL3SE4KJ6l2XvOM3/1AeXkgC4eiMukL29VBarpTTN0+x/4Cf87NazV7vNxQ==</X509Certificate>
+</X509Data>
+</KeyInfo>
+</Signature></DTE>

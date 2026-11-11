@@ -1,0 +1,8 @@
+{
+    "caso": "xml-serializar-sin-encoding",
+    "operacion": "serializarXml",
+    "core": "1.9.1",
+    "bytes": 414,
+    "sha256": "4f42b8c18f27669f687828061aba0ea2b81fe71abcb11b1e1ea1836cae964907",
+    "marcas": {}
+}

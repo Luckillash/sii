@@ -1,0 +1,8 @@
+{
+  "descripcion": "ESTADO con &lt; escapado una sola vez: tras decodificar no calza [^<]*: error",
+  "operacion": "estadoEnvio",
+  "entrada": {
+    "respuesta": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<SII:RESPUESTA xmlns:SII=\"http://www.sii.cl/XMLSchema\"><SII:RESP_HDR><ESTADO>E&lt;PR</ESTADO></SII:RESP_HDR></SII:RESPUESTA>",
+    "trackId": "779"
+  }
+}

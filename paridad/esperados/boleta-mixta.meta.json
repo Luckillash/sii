@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-mixta",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 1498,
+    "sha256": "cd3810ff45e40b4dd676a6437bc50eef2d383f76282a118d8ac0d00cd373232f",
+    "marcas": {
+        "FchEmis": "2026-09-05"
+    }
+}

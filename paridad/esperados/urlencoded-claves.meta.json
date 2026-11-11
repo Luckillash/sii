@@ -1,0 +1,8 @@
+{
+    "caso": "urlencoded-claves",
+    "operacion": "httpBuildQuery",
+    "core": "1.9.1",
+    "bytes": 43,
+    "sha256": "c1535a129dfce7c75852edaf4466748301e444e40de242731c858918936e89c8",
+    "marcas": {}
+}

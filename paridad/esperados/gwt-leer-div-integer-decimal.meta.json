@@ -1,0 +1,10 @@
+{
+    "caso": "gwt-leer-div-integer-decimal",
+    "operacion": "gwtLeer",
+    "core": "1.9.1",
+    "bytes": 189,
+    "sha256": "99374f08b6e43b3a6457f97ef72ad19b3824a1ac733c9ff45c3448ef288213ad",
+    "marcas": {
+        "numerosInexactos": "1.5"
+    }
+}

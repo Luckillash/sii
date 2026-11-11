@@ -1,0 +1,18 @@
+{
+  "descripcion": "RSR solo con blancos ASCII (se aplanan, incluidos VT y FF) e IT1 con NBSP y U+0085 (no se aplanan)",
+  "operacion": "timbre",
+  "entrada": {
+    "caf": "caf-39.xml",
+    "ahora": "2026-09-05T10:37:08",
+    "datos": {
+      "rut_emisor": "76123456-0",
+      "tipo_dte": "39",
+      "folio": "5",
+      "fecha": "2026-09-05",
+      "rut_receptor": "66666666-6",
+      "razon_social_receptor": " \t\u000b\f\r\n ",
+      "monto_total": "1190",
+      "nombre_item_1": "\u00a0\u0085"
+    }
+  }
+}

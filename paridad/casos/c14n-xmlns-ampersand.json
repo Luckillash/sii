@@ -1,0 +1,8 @@
+{
+  "descripcion": "URIs de namespace con & (libxml las guarda como &#38; y C14N las escribe sin escapar) y con comilla simple",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<r xmlns:p=\"urn:a&amp;b\" xmlns=\"urn:x&#38;y\" xmlns:q=\"urn:it's\"><m p:a=\"1\"><p:h xmlns:p=\"urn:a&amp;b\"/></m></r>",
+    "etiqueta": "m"
+  }
+}

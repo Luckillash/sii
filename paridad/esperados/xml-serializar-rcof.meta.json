@@ -1,0 +1,8 @@
+{
+    "caso": "xml-serializar-rcof",
+    "operacion": "serializarXml",
+    "core": "1.9.1",
+    "bytes": 1683,
+    "sha256": "df4dd1c97f901bd4a2a62e73752ad1408f64573fb2ad5fbab64a84bccf41b1a8",
+    "marcas": {}
+}

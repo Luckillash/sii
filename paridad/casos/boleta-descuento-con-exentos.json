@@ -1,0 +1,47 @@
+{
+  "descripcion": "Descuento de 7.5 % con exentos intercalados (el reparto salta los exentos)",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-09-05T16:00:00",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "68",
+    "detalles": [
+      {
+        "nombre": "Exento 1",
+        "cantidad": 2,
+        "precio": 951,
+        "exento": true
+      },
+      {
+        "nombre": "Afecto 1",
+        "cantidad": 3,
+        "precio": 1333
+      },
+      {
+        "nombre": "Exento 2",
+        "cantidad": 1,
+        "precio": 400,
+        "exento": true
+      },
+      {
+        "nombre": "Afecto 2",
+        "cantidad": 1,
+        "precio": 777
+      }
+    ],
+    "descuento": {
+      "tipo": "porcentaje",
+      "valor": 7.5
+    }
+  }
+}

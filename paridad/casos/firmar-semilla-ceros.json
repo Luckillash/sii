@@ -1,0 +1,8 @@
+{
+  "descripcion": "firmarSemilla con ceros a la izquierda: la semilla se trata como texto, no como número",
+  "operacion": "firmarSemilla",
+  "material": "base",
+  "entrada": {
+    "semilla": "000012345678"
+  }
+}

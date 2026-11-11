@@ -1,0 +1,8 @@
+{
+  "descripcion": ".pfx cifrado solo con 3DES (lo lee openssl_pkcs12_read sin el proveedor legacy), con cadena",
+  "operacion": "certificado",
+  "entrada": {
+    "archivo": "cert-3des-cadena.pfx",
+    "clave": "clave-de-prueba"
+  }
+}

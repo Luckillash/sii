@@ -1,0 +1,8 @@
+{
+    "caso": "http-rest-consulta-envio",
+    "operacion": "httpRest",
+    "core": "1.9.1",
+    "bytes": 216,
+    "sha256": "912eee1308910606de891e18c1fc59c4a8b5b9161d8a63b55b931b2eb34b1c69",
+    "marcas": {}
+}

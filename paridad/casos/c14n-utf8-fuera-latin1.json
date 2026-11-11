@@ -1,0 +1,8 @@
+{
+  "descripcion": "Documento UTF-8 con caracteres fuera de Latin-1 crudos: €, —, CJK, emoji (plano astral), U+2028 y U+0085 (en XML 1.0 no son saltos de línea)",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><r><e a=\"€    😀\">€—中文 😀  ||\r|\r </e></r>",
+    "etiqueta": "e"
+  }
+}

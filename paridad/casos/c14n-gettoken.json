@@ -1,0 +1,8 @@
+{
+  "descripcion": "Raíz <getToken> sin namespaces (digest de firmarSemilla)",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<getToken><item><Semilla>123456789012</Semilla></item></getToken>",
+    "etiqueta": "getToken"
+  }
+}

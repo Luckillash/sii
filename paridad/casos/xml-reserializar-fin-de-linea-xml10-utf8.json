@@ -1,0 +1,7 @@
+{
+  "descripcion": "U+0085 y U+2028 en un documento UTF-8 (texto, atributo, comentario), junto a \r\n: se conservan como caracteres",
+  "operacion": "reserializarXml",
+  "entrada": {
+    "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<R a=\"x\u0085y\u2028z\r\nw\">a\u0085b\u2028c\r\nd\r\u2028e<!-- \u2028\u0085 --></R>"
+  }
+}

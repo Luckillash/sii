@@ -1,0 +1,6 @@
+{
+    "error": {
+        "clase": "Exception",
+        "mensaje": "No se encontraron casos (CASO-N) en el archivo: <archivo>"
+    }
+}

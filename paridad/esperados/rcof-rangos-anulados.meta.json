@@ -1,0 +1,10 @@
+{
+    "caso": "rcof-rangos-anulados",
+    "operacion": "consumoFolios",
+    "core": "1.9.1",
+    "bytes": 1863,
+    "sha256": "110de8b1fc6ab21befb26c6b64d8e0344926bcdbe0efe02d0fe8bc904013c0dc",
+    "marcas": {
+        "TmstFirmaEnv": "2026-09-05T23:10:42"
+    }
+}

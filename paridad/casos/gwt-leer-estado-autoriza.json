@@ -1,0 +1,14 @@
+{
+  "descripcion": "obtenerEstadoAutorizaEmp: EstadoAutorizaTo P90",
+  "operacion": "gwtLeer",
+  "entrada": {
+    "respuesta": "//OK[4,3,2,1,[\"cl.sii.sdi.diii.certBolElectDte.to.EstadoAutorizaTo/1011533792\",\"P90\",\"90\",\"PENDIENTE DECLARACION DE CUMPLIMIENTO\"],0,7]",
+    "esquemas": {
+      "cl.sii.sdi.diii.certBolElectDte.to.EstadoAutorizaTo/1011533792": "SSS",
+      "cl.sii.sdi.diii.certBolElectDte.to.PostulSegHistInsUpdTo/138688689": "SOSOSSOSSSOSSSOSSOOOOS",
+      "cl.sii.sdi.diii.certBolElectDte.to.TdtEmpresaAutorizadaTo/2240026086": "BSSSSSSSSSSSSOOOS",
+      "cl.sii.sdi.diii.certBolElectDte.to.DocumentoAutorizadoTo/493967287": "OOSSSSSSSSSOOOOOS"
+    },
+    "lecturas": ["objeto"]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "descripcion": "XML escapado dos veces: tras una pasada siguen las etiquetas escapadas y no hay ESTADO",
+  "operacion": "estadoEnvio",
+  "entrada": {
+    "respuesta": "&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;&lt;soapenv:Body&gt;&lt;ns1:getEstUpResponse soapenv:encodingStyle=&quot;http://schemas.xmlsoap.org/soap/encoding/&quot; xmlns:ns1=&quot;http://DefaultNamespace&quot;&gt;&lt;getEstUpReturn xsi:type=&quot;xsd:string&quot;&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;\n&amp;lt;SII:RESPUESTA xmlns:SII=&amp;quot;http://www.sii.cl/XMLSchema&amp;quot;&amp;gt;&amp;lt;SII:RESP_HDR&amp;gt;&amp;lt;RUTCOMPANIA&amp;gt;76123456&amp;lt;/RUTCOMPANIA&amp;gt;&amp;lt;DVCOMPANIA&amp;gt;0&amp;lt;/DVCOMPANIA&amp;gt;&amp;lt;TRACKID&amp;gt;1234567890&amp;lt;/TRACKID&amp;gt;&amp;lt;ESTADO&amp;gt;EPR&amp;lt;/ESTADO&amp;gt;&amp;lt;GLOSA&amp;gt;ok&amp;lt;/GLOSA&amp;gt;&amp;lt;NUM_ATENCION&amp;gt;123456 ( 2026/09/15 10:00:00)&amp;lt;/NUM_ATENCION&amp;gt;&amp;lt;/SII:RESP_HDR&amp;gt;&amp;lt;/SII:RESPUESTA&amp;gt;&lt;/getEstUpReturn&gt;&lt;/ns1:getEstUpResponse&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;",
+    "trackId": "782"
+  }
+}

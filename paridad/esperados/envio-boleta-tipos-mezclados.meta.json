@@ -1,0 +1,10 @@
+{
+    "caso": "envio-boleta-tipos-mezclados",
+    "operacion": "envioBoleta",
+    "core": "1.9.1",
+    "bytes": 21578,
+    "sha256": "8c7d7df8890fd2403d183708c8870ebbb0e59725dec9791d422b6ccda0b53cef",
+    "marcas": {
+        "TmstFirmaEnv": "2026-12-31T23:59:59"
+    }
+}

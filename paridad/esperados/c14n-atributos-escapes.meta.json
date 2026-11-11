@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-atributos-escapes",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 135,
+    "sha256": "5601c4e45905bdeec44f3f66ebc329f3523c4b6176c80e7ecebd026053658706",
+    "marcas": {}
+}

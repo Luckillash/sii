@@ -1,0 +1,82 @@
+{
+  "descripcion": "declarar(): la respuesta a autorizarEmpresaBolProd es el login → incierta",
+  "operacion": "httpDeclaracion",
+  "entrada": {
+    "accion": "declarar",
+    "sesion": [
+      {
+        "name": "TOKEN",
+        "value": "TOKENDEPRUEBAAUT2000",
+        "domain": "sii.cl",
+        "host_only": false
+      },
+      {
+        "name": "RUT_NS",
+        "value": "11111111",
+        "domain": "sii.cl",
+        "host_only": false
+      },
+      {
+        "name": "DV_NS",
+        "value": "1",
+        "domain": "sii.cl",
+        "host_only": false
+      },
+      {
+        "name": "MAULLINSOLO",
+        "value": "M1",
+        "domain": "maullin.sii.cl",
+        "host_only": true
+      },
+      {
+        "name": "WWW4SOLO",
+        "value": "W1",
+        "domain": "www4.sii.cl",
+        "host_only": true
+      }
+    ],
+    "datos": {
+      "rutEmpresa": "76123456-0",
+      "linkConsulta": "https://www.empresa-prueba.cl/boletas/consulta",
+      "rutProveedor": "22222222-2",
+      "nombreProveedor": "Programación Ñandú SpA",
+      "correoProveedor": "software@empresa-prueba.cl"
+    },
+    "esperaError": true,
+    "http": {
+      "respuestas": [
+        {
+          "status": 200,
+          "cabeceras": [
+            ["Content-Type", "application/json; charset=utf-8"],
+            [
+              "Set-Cookie",
+              "JSESSIONID=SESIONGWTPRUEBA01; Path=/certBolElectDteInternet; Secure; HttpOnly"
+            ]
+          ],
+          "cuerpo": "//OK[4,3,2,1,[\"cl.sii.sdi.diii.certBolElectDte.to.EstadoAutorizaTo/1011533792\",\"P90\",\"90\",\"PENDIENTE DECLARACION DE CUMPLIMIENTO\"],0,7]"
+        },
+        {
+          "status": 200,
+          "cabeceras": [["Content-Type", "application/json; charset=utf-8"]],
+          "cuerpo": "//OK[1,[\"SOCIEDAD DE PRUEBA ÑUÑOA SPA\"],0,7]"
+        },
+        {
+          "status": 200,
+          "cabeceras": [["Content-Type", "application/json; charset=utf-8"]],
+          "cuerpo": "//OK[15,'EAAAAA',4,18,13,0,'F',4,76123456,3,12,17,10,9,8,0,7,16,5,-4,41,3,2,15,'gAAAAAAAB',4,14,13,0,'F',4,76123456,3,12,11,10,9,8,0,7,6,5,'ZlFhXwA',4,39,3,2,2,1,[\"java.util.ArrayList/4159755760\",\"cl.sii.sdi.diii.certBolElectDte.to.DocumentoAutorizadoTo/493967287\",\"java.lang.Integer/3438268394\",\"java.lang.Long/4227064769\",\"BVE\",\"BOLETA ELECTRONICA\",\"S\",\"01-09-2026\",\"AUTORIZADO\",\"\",\"39\",\"N\",\"java.lang.String/2004016611\",\"Boleta afecta\",\"FIN\",\"BOLETA EXENTA ELECTRONICA\",\"41\",\"Boleta exenta\"],0,7]"
+        },
+        {
+          "status": 200,
+          "cabeceras": [["Content-Type", "text/html; charset=ISO-8859-1"]],
+          "cuerpo": {
+            "base64": "PGh0bWw+PGhlYWQ+PHNjcmlwdD53aW5kb3cubG9jYXRpb249Imh0dHBzOi8vemV1c3Iuc2lpLmNsL0FVVDIwMDAvSW5pY2lvQXV0ZW50aWNhY2lvbi9JbmdyZXNvUnV0Q2xhdmUuaHRtbD9odHRwczovL3d3dzQuc2lpLmNsL2NlcnRCb2xFbGVjdER0ZUludGVybmV0LyI7PC9zY3JpcHQ+PC9oZWFkPjxib2R5PjwvYm9keT48L2h0bWw+"
+          }
+        }
+      ],
+      "normalizar": {
+        "fechasGwt": true
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "sii": {
+      "command": "node",
+      "args": ["--conditions=source", "apps/cli/src/mcp-main.ts"]
+    }
+  }
+}

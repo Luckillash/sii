@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<DTE xmlns="http://www.sii.cl/SiiDte" version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Documento ID="F1234T39">
+    <Encabezado>
+      <IdDoc>
+        <TipoDTE>39</TipoDTE>
+        <Folio>1234</Folio>
+        <FchEmis>2026-11-05</FchEmis>
+        <IndServicio>3</IndServicio>
+      </IdDoc>
+      <Emisor>
+        <RUTEmisor>76123456-K</RUTEmisor>
+        <RznSocEmisor>Comercial Ñandú &amp; Díaz &lt;Hnos.&gt; "Ltda." &#8364;</RznSocEmisor>
+        <GiroEmisor>Venta de artículos de librería y café 'gourmet'</GiroEmisor>
+        <DirOrigen>Av. Libertador B. O'Higgins 1234, Of. 5°</DirOrigen>
+        <CmnaOrigen>Ñuñoa</CmnaOrigen>
+      </Emisor>
+      <Receptor>
+        <RUTRecep>66666666-6</RUTRecep>
+        <RznSocRecep>José Pérez &amp; Cía. &#128512;</RznSocRecep>
+      </Receptor>
+      <Totales>
+        <MntNeto>8403</MntNeto>
+        <MntExe>1500</MntExe>
+        <IVA>1597</IVA>
+        <MntTotal>11500</MntTotal>
+      </Totales>
+    </Encabezado>
+    <Detalle>
+      <NroLinDet>1</NroLinDet>
+      <NmbItem>Cuaderno universitario 100 hojas "Torre" &amp; lápiz &lt;HB&gt;</NmbItem>
+      <QtyItem>2</QtyItem>
+      <UnmdItem>Unid</UnmdItem>
+      <PrcItem>3500</PrcItem>
+      <DescuentoMonto>500</DescuentoMonto>
+      <MontoItem>6500</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>2</NroLinDet>
+      <NmbItem>Café de grano 250 g &#8211; tostado «medio»</NmbItem>
+      <QtyItem>1</QtyItem>
+      <PrcItem>3500</PrcItem>
+      <MontoItem>3500</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>3</NroLinDet>
+      <IndExe>1</IndExe>
+      <NmbItem>Servicio exento</NmbItem>
+      <QtyItem>1.5</QtyItem>
+      <PrcItem>1000</PrcItem>
+      <MontoItem>1500</MontoItem>
+    </Detalle>
+    <Referencia>
+      <NroLinRef>1</NroLinRef>
+      <CodRef>SET</CodRef>
+      <RazonRef>CASO-1 &amp; ajuste &lt;prueba&gt;</RazonRef>
+    </Referencia>
+  </Documento>
+</DTE>

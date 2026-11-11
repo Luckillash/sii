@@ -1,0 +1,8 @@
+{
+    "caso": "http-rest-envio-boleta-http-500",
+    "operacion": "httpRest",
+    "core": "1.9.1",
+    "bytes": 27591,
+    "sha256": "0dbd61fb5164ea9e441fbcf50af66c92c7d7cc321d30625b2019a430235180f2",
+    "marcas": {}
+}

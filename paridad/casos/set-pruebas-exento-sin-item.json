@@ -1,0 +1,7 @@
+{
+  "descripcion": "Exento sin número de ítem: aplica con un solo ítem (aunque diga \"exentos\" o \"inexento\") y no con varios",
+  "operacion": "setPruebas",
+  "entrada": {
+    "texto": "CASO-1\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nServicio\t\t\t1\t\t\t5000\n\n\nOBSERVACION: \"Este servicio es exento de IVA.\"\n\nCASO-2\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nuno\t\t\t1\t\t\t100\ndos\t\t\t1\t\t\t200\n\n\nOBSERVACION: \"Todos los servicios son exentos.\"\n\nCASO-3\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nAsesoria\t\t\t1\t\t\t9000\n\n\nOBSERVACION: \"Servicios EXENTOS.\"\n\nCASO-4\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nAsesoria\t\t\t1\t\t\t9000\n\n\nOBSERVACION: \"Servicio inexento\"\n\n"
+  }
+}

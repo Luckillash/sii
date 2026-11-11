@@ -1,0 +1,8 @@
+{
+    "caso": "estado-envio-estado-vacio",
+    "operacion": "estadoEnvio",
+    "core": "1.9.1",
+    "bytes": 129,
+    "sha256": "80071fbea7d7a7301a77d294ce9e9f129a06830c66c0ae262e35eaed20918ce7",
+    "marcas": {}
+}

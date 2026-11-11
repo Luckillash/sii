@@ -1,0 +1,8 @@
+{
+    "caso": "http-declaracion-estado-redireccion",
+    "operacion": "httpDeclaracion",
+    "core": "1.9.1",
+    "bytes": 1676,
+    "sha256": "ccf6f232b45d356ec0b5be77d99ea18955666a6226c269cceb09e10f02ea8325",
+    "marcas": {}
+}

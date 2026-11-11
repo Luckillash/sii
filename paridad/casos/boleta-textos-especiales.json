@@ -1,0 +1,41 @@
+{
+  "descripcion": "Tildes, Ñ, & < > comillas, entidades ya escritas y caracteres fuera de ISO-8859-1 (€, emoji) en todos los textos",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-09-05T18:30:00",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "COMERCIAL ÑUÑOA & HIJOS \"LTDA.\"",
+      "giro": "VENTA DE ARTÍCULOS <VARIOS> Y SERVICIOS 'ESPECIALES'",
+      "direccion": "AV. JOSÉ PEDRO ALESSANDRI 1234, DEPTO. 5°",
+      "comuna": "ÑUÑOA"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Señora Pía & Cía <S.A.>"
+    },
+    "folio": "74",
+    "detalles": [
+      {
+        "nombre": "Pan & <Queso> \"Extra\" 'fino'",
+        "cantidad": 1,
+        "precio": 1000
+      },
+      {
+        "nombre": "Café €2 ☕ 😀",
+        "cantidad": 2,
+        "precio": 1500,
+        "unidad": "€/u"
+      },
+      {
+        "nombre": "Ya escapado &amp; &#233; &lt;",
+        "cantidad": 1,
+        "precio": 10
+      }
+    ],
+    "referencia": {
+      "codigo": "SET",
+      "razon": "CASO-1 «año» & más ✓"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<DTE xmlns="http://www.sii.cl/SiiDte" version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Documento ID="F70T39">
+    <Encabezado>
+      <IdDoc>
+        <TipoDTE>39</TipoDTE>
+        <Folio>70</Folio>
+        <FchEmis>2026-09-05</FchEmis>
+        <IndServicio>3</IndServicio>
+      </IdDoc>
+      <Emisor>
+        <RUTEmisor>76123456-0</RUTEmisor>
+        <RznSocEmisor>EMPRESA DE PRUEBA SPA</RznSocEmisor>
+        <GiroEmisor>ACTIVIDADES DE CONSULTORIA DE INFORMATICA</GiroEmisor>
+        <DirOrigen>CALLE 123</DirOrigen>
+        <CmnaOrigen>SANTIAGO</CmnaOrigen>
+      </Emisor>
+      <Receptor>
+        <RUTRecep>66666666-6</RUTRecep>
+      </Receptor>
+      <Totales>
+        <MntNeto>1714</MntNeto>
+        <IVA>326</IVA>
+        <MntTotal>2040</MntTotal>
+      </Totales>
+    </Encabezado>
+    <Detalle>
+      <NroLinDet>1</NroLinDet>
+      <NmbItem>Papel</NmbItem>
+      <QtyItem>17</QtyItem>
+      <PrcItem>120</PrcItem>
+      <MontoItem>2040</MontoItem>
+    </Detalle>
+  </Documento>
+</DTE>

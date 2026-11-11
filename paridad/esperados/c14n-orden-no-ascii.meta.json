@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-orden-no-ascii",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 163,
+    "sha256": "41b9c087cdaab4e84cd2b6a1195e7ec0f0f1049cf77d712bcdf065e46a5d690d",
+    "marcas": {}
+}

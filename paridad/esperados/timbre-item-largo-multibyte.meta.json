@@ -1,0 +1,10 @@
+{
+    "caso": "timbre-item-largo-multibyte",
+    "operacion": "timbre",
+    "core": "1.9.1",
+    "bytes": 763,
+    "sha256": "ed9aab179be6d6b7ba4b53406d8f3648e4f824bfa7b4b7c4924bb9ba447e95ff",
+    "marcas": {
+        "TSTED": "2026-09-05T10:34:05"
+    }
+}

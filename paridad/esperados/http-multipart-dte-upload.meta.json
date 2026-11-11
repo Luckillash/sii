@@ -1,0 +1,8 @@
+{
+    "caso": "http-multipart-dte-upload",
+    "operacion": "httpMultipart",
+    "core": "1.9.1",
+    "bytes": 981,
+    "sha256": "6cc274625b8093a6db770bed540d5b2ae0cad853754de0f583ddffb603abf578",
+    "marcas": {}
+}

@@ -1,0 +1,8 @@
+{
+    "caso": "estado-envio-rechazado",
+    "operacion": "estadoEnvio",
+    "core": "1.9.1",
+    "bytes": 300,
+    "sha256": "778985c4d1cbbbdafeba0776bf25e9d7bf0f8dd3e93b102561b055d2b59e6432",
+    "marcas": {}
+}

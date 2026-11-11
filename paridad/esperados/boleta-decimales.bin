@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<DTE xmlns="http://www.sii.cl/SiiDte" version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Documento ID="F73T39">
+    <Encabezado>
+      <IdDoc>
+        <TipoDTE>39</TipoDTE>
+        <Folio>73</Folio>
+        <FchEmis>2026-09-05</FchEmis>
+        <IndServicio>3</IndServicio>
+      </IdDoc>
+      <Emisor>
+        <RUTEmisor>76123456-0</RUTEmisor>
+        <RznSocEmisor>EMPRESA DE PRUEBA SPA</RznSocEmisor>
+        <GiroEmisor>ACTIVIDADES DE CONSULTORIA DE INFORMATICA</GiroEmisor>
+        <DirOrigen>CALLE 123</DirOrigen>
+        <CmnaOrigen>SANTIAGO</CmnaOrigen>
+      </Emisor>
+      <Receptor>
+        <RUTRecep>66666666-6</RUTRecep>
+        <RznSocRecep>Cliente General</RznSocRecep>
+      </Receptor>
+      <Totales>
+        <MntNeto>16950</MntNeto>
+        <IVA>3221</IVA>
+        <MntTotal>20171</MntTotal>
+      </Totales>
+    </Encabezado>
+    <Detalle>
+      <NroLinDet>1</NroLinDet>
+      <NmbItem>Queso</NmbItem>
+      <QtyItem>1.5</QtyItem>
+      <UnmdItem>Kg</UnmdItem>
+      <PrcItem>8990</PrcItem>
+      <MontoItem>13485</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>2</NroLinDet>
+      <NmbItem>Jamón</NmbItem>
+      <QtyItem>0.333</QtyItem>
+      <PrcItem>12990.5</PrcItem>
+      <MontoItem>4326</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>3</NroLinDet>
+      <NmbItem>Tercio</NmbItem>
+      <QtyItem>0.33333333333333</QtyItem>
+      <PrcItem>1000</PrcItem>
+      <MontoItem>333</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>4</NroLinDet>
+      <NmbItem>Preredondeo</NmbItem>
+      <QtyItem>5.055</QtyItem>
+      <PrcItem>100</PrcItem>
+      <MontoItem>506</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>5</NroLinDet>
+      <NmbItem>Gramos</NmbItem>
+      <QtyItem>1000</QtyItem>
+      <PrcItem>0.285</PrcItem>
+      <MontoItem>285</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>6</NroLinDet>
+      <IndExe>1</IndExe>
+      <NmbItem>Mínimo</NmbItem>
+      <QtyItem>1.0E-5</QtyItem>
+      <PrcItem>49999</PrcItem>
+      <MontoItem>0</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>7</NroLinDet>
+      <NmbItem>Suma</NmbItem>
+      <QtyItem>2</QtyItem>
+      <PrcItem>0.3</PrcItem>
+      <MontoItem>1</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>8</NroLinDet>
+      <NmbItem>Precisión 14</NmbItem>
+      <QtyItem>1</QtyItem>
+      <PrcItem>1234.5678901235</PrcItem>
+      <MontoItem>1235</MontoItem>
+    </Detalle>
+  </Documento>
+</DTE>

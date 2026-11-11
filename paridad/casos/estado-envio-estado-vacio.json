@@ -1,0 +1,8 @@
+{
+  "descripcion": "ESTADO solo con blancos: error",
+  "operacion": "estadoEnvio",
+  "entrada": {
+    "respuesta": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<SII:RESPUESTA xmlns:SII=\"http://www.sii.cl/XMLSchema\"><SII:RESP_HDR><TRACKID>1</TRACKID><ESTADO> \n </ESTADO><GLOSA>x</GLOSA></SII:RESP_HDR></SII:RESPUESTA>",
+    "trackId": "778"
+  }
+}

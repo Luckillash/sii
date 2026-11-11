@@ -1,0 +1,22 @@
+{
+  "descripcion": "enviarDte(): DTEUpload multipart con un EnvioBOLETA en ISO-8859-1, Cookie TOKEN y el User-Agent del SII",
+  "operacion": "httpDtews",
+  "entrada": {
+    "accion": "enviarDte",
+    "token": "TOKENDEPRUEBA0001",
+    "rutEmisor": "76123456-0",
+    "rutEnvia": "11111111-1",
+    "xml": {
+      "base64": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iSVNPLTg4NTktMSI/Pg0KPEVudmlvQk9MRVRBIHZlcnNpb249IjEuMCI+PFNldERURSBJRD0iU2V0RG9jIj48Q2FyYXR1bGE+PFJ1dEVtaXNvcj43NjEyMzQ1Ni0wPC9SdXRFbWlzb3I+PC9DYXJhdHVsYT48UnpuU29jPkNvbWVyY2lhbCBQZfFhIHkgRO1heiBMdGRhLjwvUnpuU29jPjxHaXJvPlZlbnRhIGRlIGFydO1jdWxvcyBkZSDRdfFvYTwvR2lybz48L1NldERURT48L0VudmlvQk9MRVRBPg0K"
+    },
+    "nombreArchivo": "envio-set-pruebas.xml",
+    "http": {
+      "respuestas": [
+        {
+          "cabeceras": [["Content-Type", "text/html"]],
+          "cuerpo": "<?xml version=\"1.0\"?>\n<RECEPCIONDTE>\n<RUTSENDER>11111111-1</RUTSENDER>\n<RUTCOMPANY>76123456-0</RUTCOMPANY>\n<FILE>envio-set-pruebas.xml</FILE>\n<TIMESTAMP>2026-11-06 12:00:00</TIMESTAMP>\n<STATUS>0</STATUS>\n<TRACKID>1234567890</TRACKID>\n</RECEPCIONDTE>\n"
+        }
+      ]
+    }
+  }
+}

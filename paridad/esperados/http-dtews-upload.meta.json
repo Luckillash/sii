@@ -1,0 +1,8 @@
+{
+    "caso": "http-dtews-upload",
+    "operacion": "httpDtews",
+    "core": "1.9.1",
+    "bytes": 1010,
+    "sha256": "134cf2535b204497831411dcb2346c35e412e5ead6d68b3b29e872bdeca852a8",
+    "marcas": {}
+}

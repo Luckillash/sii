@@ -1,0 +1,8 @@
+{
+    "caso": "certificado-pfx-legacy-cadena",
+    "operacion": "certificado",
+    "core": "1.9.1",
+    "bytes": 7155,
+    "sha256": "192cc67f6c28287c6408a4d518064dafb50687c6af852536a9aacd693379895f",
+    "marcas": {}
+}

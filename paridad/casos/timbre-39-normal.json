@@ -1,0 +1,18 @@
+{
+  "descripcion": "Boleta afecta (39) con un CAF como los del SII (RSA 512 bits, e=3)",
+  "operacion": "timbre",
+  "entrada": {
+    "caf": "caf-39.xml",
+    "ahora": "2026-09-05T10:30:01",
+    "datos": {
+      "rut_emisor": "76123456-0",
+      "tipo_dte": "39",
+      "folio": "5",
+      "fecha": "2026-09-05",
+      "rut_receptor": "66666666-6",
+      "razon_social_receptor": "Cliente General",
+      "monto_total": "1190",
+      "nombre_item_1": "Producto de prueba"
+    }
+  }
+}

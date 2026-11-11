@@ -1,0 +1,337 @@
+{
+  "descripcion": "formatOutput con contenido mixto (un hijo de texto, CDATA o referencia de entidad apaga el formato de todo el subárbol), comentarios y PIs indentados, CDATA con ]]>, nodo de texto vacío, hijos del documento antes y después de la raíz, y la sangría máxima de 60 espacios",
+  "operacion": "serializarXml",
+  "entrada": {
+    "encoding": "ISO-8859-1",
+    "formatOutput": true,
+    "documento": [
+      {
+        "comentario": " antes de la raíz "
+      },
+      {
+        "pi": "instruccion",
+        "datos": "a=\"1\""
+      },
+      {
+        "elemento": "Raiz",
+        "atributos": [["version", "1.0"]],
+        "hijos": [
+          {
+            "elemento": "Mixto",
+            "hijos": [
+              {
+                "texto": "texto "
+              },
+              {
+                "elemento": "Dentro",
+                "hijos": [
+                  {
+                    "elemento": "Profundo",
+                    "hijos": [
+                      {
+                        "elemento": "MasProfundo",
+                        "valor": "x"
+                      }
+                    ]
+                  },
+                  {
+                    "elemento": "Vacio"
+                  }
+                ]
+              },
+              {
+                "texto": " cola"
+              }
+            ]
+          },
+          {
+            "elemento": "ConCdata",
+            "hijos": [
+              {
+                "elemento": "A"
+              },
+              {
+                "cdata": "a <b> & c"
+              },
+              {
+                "elemento": "B"
+              }
+            ]
+          },
+          {
+            "elemento": "CdataPartido",
+            "hijos": [
+              {
+                "cdata": "x]]>y]]>"
+              }
+            ]
+          },
+          {
+            "elemento": "CdataVacio",
+            "hijos": [
+              {
+                "cdata": ""
+              }
+            ]
+          },
+          {
+            "elemento": "ConEntidad",
+            "hijos": [
+              {
+                "elemento": "A"
+              },
+              {
+                "elemento": "B",
+                "valor": "x&ent;y"
+              }
+            ]
+          },
+          {
+            "elemento": "EntidadSola",
+            "valor": "&ent;"
+          },
+          {
+            "elemento": "TextoVacio",
+            "hijos": [
+              {
+                "texto": ""
+              }
+            ]
+          },
+          {
+            "elemento": "TextoVacioYElemento",
+            "hijos": [
+              {
+                "texto": ""
+              },
+              {
+                "elemento": "A"
+              }
+            ]
+          },
+          {
+            "elemento": "SoloComentarios",
+            "hijos": [
+              {
+                "comentario": "uno"
+              },
+              {
+                "elemento": "A",
+                "valor": "a"
+              },
+              {
+                "pi": "p"
+              },
+              {
+                "pi": "q",
+                "datos": "datos  con  espacios "
+              },
+              {
+                "comentario": ""
+              }
+            ]
+          },
+          {
+            "elemento": "Anidado",
+            "hijos": [
+              {
+                "elemento": "B",
+                "hijos": [
+                  {
+                    "elemento": "C",
+                    "hijos": [
+                      {
+                        "elemento": "D",
+                        "valor": "d"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "elemento": "N0",
+            "hijos": [
+              {
+                "elemento": "N1",
+                "hijos": [
+                  {
+                    "elemento": "N2",
+                    "hijos": [
+                      {
+                        "elemento": "N3",
+                        "hijos": [
+                          {
+                            "elemento": "N4",
+                            "hijos": [
+                              {
+                                "elemento": "N5",
+                                "hijos": [
+                                  {
+                                    "elemento": "N6",
+                                    "hijos": [
+                                      {
+                                        "elemento": "N7",
+                                        "hijos": [
+                                          {
+                                            "elemento": "N8",
+                                            "hijos": [
+                                              {
+                                                "elemento": "N9",
+                                                "hijos": [
+                                                  {
+                                                    "elemento": "N10",
+                                                    "hijos": [
+                                                      {
+                                                        "elemento": "N11",
+                                                        "hijos": [
+                                                          {
+                                                            "elemento": "N12",
+                                                            "hijos": [
+                                                              {
+                                                                "elemento": "N13",
+                                                                "hijos": [
+                                                                  {
+                                                                    "elemento": "N14",
+                                                                    "hijos": [
+                                                                      {
+                                                                        "elemento": "N15",
+                                                                        "hijos": [
+                                                                          {
+                                                                            "elemento": "N16",
+                                                                            "hijos": [
+                                                                              {
+                                                                                "elemento": "N17",
+                                                                                "hijos": [
+                                                                                  {
+                                                                                    "elemento": "N18",
+                                                                                    "hijos": [
+                                                                                      {
+                                                                                        "elemento": "N19",
+                                                                                        "hijos": [
+                                                                                          {
+                                                                                            "elemento": "N20",
+                                                                                            "hijos": [
+                                                                                              {
+                                                                                                "elemento": "N21",
+                                                                                                "hijos": [
+                                                                                                  {
+                                                                                                    "elemento": "N22",
+                                                                                                    "hijos": [
+                                                                                                      {
+                                                                                                        "elemento": "N23",
+                                                                                                        "hijos": [
+                                                                                                          {
+                                                                                                            "elemento": "N24",
+                                                                                                            "hijos": [
+                                                                                                              {
+                                                                                                                "elemento": "N25",
+                                                                                                                "hijos": [
+                                                                                                                  {
+                                                                                                                    "elemento": "N26",
+                                                                                                                    "hijos": [
+                                                                                                                      {
+                                                                                                                        "elemento": "N27",
+                                                                                                                        "hijos": [
+                                                                                                                          {
+                                                                                                                            "elemento": "N28",
+                                                                                                                            "hijos": [
+                                                                                                                              {
+                                                                                                                                "elemento": "N29",
+                                                                                                                                "hijos": [
+                                                                                                                                  {
+                                                                                                                                    "elemento": "N30",
+                                                                                                                                    "hijos": [
+                                                                                                                                      {
+                                                                                                                                        "elemento": "N31",
+                                                                                                                                        "hijos": [
+                                                                                                                                          {
+                                                                                                                                            "elemento": "N32",
+                                                                                                                                            "hijos": [
+                                                                                                                                              {
+                                                                                                                                                "elemento": "N33",
+                                                                                                                                                "hijos": [
+                                                                                                                                                  {
+                                                                                                                                                    "elemento": "Hoja",
+                                                                                                                                                    "valor": "v"
+                                                                                                                                                  }
+                                                                                                                                                ]
+                                                                                                                                              }
+                                                                                                                                            ]
+                                                                                                                                          }
+                                                                                                                                        ]
+                                                                                                                                      }
+                                                                                                                                    ]
+                                                                                                                                  }
+                                                                                                                                ]
+                                                                                                                              }
+                                                                                                                            ]
+                                                                                                                          }
+                                                                                                                        ]
+                                                                                                                      }
+                                                                                                                    ]
+                                                                                                                  }
+                                                                                                                ]
+                                                                                                              }
+                                                                                                            ]
+                                                                                                          }
+                                                                                                        ]
+                                                                                                      }
+                                                                                                    ]
+                                                                                                  }
+                                                                                                ]
+                                                                                              }
+                                                                                            ]
+                                                                                          }
+                                                                                        ]
+                                                                                      }
+                                                                                    ]
+                                                                                  }
+                                                                                ]
+                                                                              }
+                                                                            ]
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "comentario": "después"
+      },
+      {
+        "pi": "fin"
+      }
+    ]
+  }
+}

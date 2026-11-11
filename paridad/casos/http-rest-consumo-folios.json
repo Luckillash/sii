@@ -1,0 +1,25 @@
+{
+  "descripcion": "enviarConsumoFolios() con el RCOF del set completo (bytes de esperados/rcof-set-completo.bin) a boleta.electronica.consumo",
+  "operacion": "httpRest",
+  "material": "base",
+  "entrada": {
+    "accion": "enviarConsumoFolios",
+    "token": "TOKENDEPRUEBA0003",
+    "rutEmisor": "76123456-0",
+    "rutEnvia": "11111111-1",
+    "xml": {
+      "esperado": "rcof-set-completo"
+    },
+    "http": {
+      "respuestas": [
+        {
+          "cabeceras": [["Content-Type", "application/json"]],
+          "cuerpo": "{\"rut_emisor\":\"76123456-0\",\"rut_envia\":\"11111111-1\",\"trackid\":9876543210,\"fecha_recepcion\":\"2026-11-06 12:00:00\",\"estado\":\"REC\",\"file\":\"rcof.xml\"}"
+        }
+      ],
+      "normalizar": {
+        "nombresArchivo": true
+      }
+    }
+  }
+}

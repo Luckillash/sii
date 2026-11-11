@@ -1,0 +1,7 @@
+{
+    "lecturas": [],
+    "error": {
+        "clase": "PostulacionException",
+        "mensaje": "El servicio del SII respondio con un error. (SII: No existe postulaciu00F3n \"vigente\"\tparaA el RUTA\\)"
+    }
+}

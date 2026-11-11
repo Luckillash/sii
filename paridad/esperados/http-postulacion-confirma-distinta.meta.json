@@ -1,0 +1,8 @@
+{
+    "caso": "http-postulacion-confirma-distinta",
+    "operacion": "httpPostulacion",
+    "core": "1.9.1",
+    "bytes": 1996,
+    "sha256": "27a1c6e21f20d5c026d93b27a28e4c99de580ee82feabb5e26524fb5ac7b5348",
+    "marcas": {}
+}

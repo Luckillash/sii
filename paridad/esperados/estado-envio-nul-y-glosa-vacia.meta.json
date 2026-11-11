@@ -1,0 +1,8 @@
+{
+    "caso": "estado-envio-nul-y-glosa-vacia",
+    "operacion": "estadoEnvio",
+    "core": "1.9.1",
+    "bytes": 240,
+    "sha256": "66c9bff9f84051ee5b43ea1a5151404cc500796d8068e416d80226c9b9afbd2d",
+    "marcas": {}
+}

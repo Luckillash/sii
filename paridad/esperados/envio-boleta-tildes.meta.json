@@ -1,0 +1,10 @@
+{
+    "caso": "envio-boleta-tildes",
+    "operacion": "envioBoleta",
+    "core": "1.9.1",
+    "bytes": 12411,
+    "sha256": "92897ea5b1e4c341a86c82fe0d5643592b6699e499078072a37ecafd20c343ec",
+    "marcas": {
+        "TmstFirmaEnv": "2026-09-05T10:31:15"
+    }
+}

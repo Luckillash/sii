@@ -1,0 +1,36 @@
+{
+  "descripcion": "secEnvio 3, nroResol 80 (int), tipo como int y fechas de un período",
+  "operacion": "consumoFolios",
+  "entrada": {
+    "ahora": "2026-09-05T23:10:42",
+    "caratula": {
+      "rut_emisor": "76123456-0",
+      "rut_envia": "11111111-1",
+      "fch_resol": "2014-08-22",
+      "nro_resol": 80,
+      "fch_inicio": "2026-09-01",
+      "fch_final": "2026-09-30",
+      "sec_envio": 3
+    },
+    "resumenes": [
+      {
+        "tipo": 39,
+        "neto": 10000,
+        "iva": 1900,
+        "tasa_iva": "19.00",
+        "exento": 0,
+        "total": 11900,
+        "folios_emitidos": 5,
+        "folios_anulados": 0,
+        "folios_utilizados": 5,
+        "rangos_utilizados": [
+          {
+            "inicial": 56,
+            "final": 60
+          }
+        ],
+        "rangos_anulados": []
+      }
+    ]
+  }
+}

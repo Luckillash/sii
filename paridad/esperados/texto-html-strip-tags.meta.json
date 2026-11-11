@@ -1,0 +1,8 @@
+{
+    "caso": "texto-html-strip-tags",
+    "operacion": "textoPostulacion",
+    "core": "1.9.1",
+    "bytes": 2062,
+    "sha256": "771193962364d67675257308a0fc186345062729903626040150797d6246d921",
+    "marcas": {}
+}

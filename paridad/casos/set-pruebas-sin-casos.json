@@ -1,0 +1,7 @@
+{
+  "descripcion": "Archivo sin ningún CASO-N: error",
+  "operacion": "setPruebas",
+  "entrada": {
+    "texto": "texto cualquiera\nsin casos\n"
+  }
+}

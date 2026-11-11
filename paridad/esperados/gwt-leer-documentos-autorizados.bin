@@ -1,0 +1,194 @@
+{
+    "lecturas": [
+        {
+            "objeto": {
+                "@tipo": "java.util.ArrayList/4159755760",
+                "elementos": [
+                    {
+                        "@tipo": "cl.sii.sdi.diii.certBolElectDte.to.DocumentoAutorizadoTo/493967287",
+                        "campos": [
+                            [
+                                "O",
+                                {
+                                    "@tipo": "java.lang.Integer/3438268394",
+                                    "valor": 39
+                                }
+                            ],
+                            [
+                                "O",
+                                {
+                                    "@tipo": "java.lang.Long/4227064769",
+                                    "valor": "1757808000000"
+                                }
+                            ],
+                            [
+                                "S",
+                                "BVE"
+                            ],
+                            [
+                                "S",
+                                "BOLETA ELECTRONICA"
+                            ],
+                            [
+                                "S",
+                                "S"
+                            ],
+                            [
+                                "S",
+                                null
+                            ],
+                            [
+                                "S",
+                                "01-09-2026"
+                            ],
+                            [
+                                "S",
+                                "AUTORIZADO"
+                            ],
+                            [
+                                "S",
+                                ""
+                            ],
+                            [
+                                "S",
+                                "39"
+                            ],
+                            [
+                                "S",
+                                "N"
+                            ],
+                            [
+                                "O",
+                                {
+                                    "@tipo": "java.lang.Integer/3438268394",
+                                    "valor": 76123456
+                                }
+                            ],
+                            [
+                                "O",
+                                {
+                                    "@tipo": "java.lang.Long/4227064769",
+                                    "valor": "5"
+                                }
+                            ],
+                            [
+                                "O",
+                                null
+                            ],
+                            [
+                                "O",
+                                {
+                                    "@tipo": "java.lang.String/2004016611",
+                                    "valor": "Boleta afecta"
+                                }
+                            ],
+                            [
+                                "O",
+                                {
+                                    "@tipo": "java.lang.Long/4227064769",
+                                    "valor": "9007199254740993"
+                                }
+                            ],
+                            [
+                                "S",
+                                "FIN"
+                            ]
+                        ]
+                    },
+                    {
+                        "@tipo": "cl.sii.sdi.diii.certBolElectDte.to.DocumentoAutorizadoTo/493967287",
+                        "campos": [
+                            [
+                                "O",
+                                {
+                                    "@tipo": "java.lang.Integer/3438268394",
+                                    "valor": 41
+                                }
+                            ],
+                            [
+                                "O",
+                                {
+                                    "@tipo": "java.lang.Long/4227064769",
+                                    "valor": "1757808000000"
+                                }
+                            ],
+                            [
+                                "S",
+                                "BVE"
+                            ],
+                            [
+                                "S",
+                                "BOLETA EXENTA ELECTRONICA"
+                            ],
+                            [
+                                "S",
+                                "S"
+                            ],
+                            [
+                                "S",
+                                null
+                            ],
+                            [
+                                "S",
+                                "01-09-2026"
+                            ],
+                            [
+                                "S",
+                                "AUTORIZADO"
+                            ],
+                            [
+                                "S",
+                                ""
+                            ],
+                            [
+                                "S",
+                                "41"
+                            ],
+                            [
+                                "S",
+                                "N"
+                            ],
+                            [
+                                "O",
+                                {
+                                    "@tipo": "java.lang.Integer/3438268394",
+                                    "valor": 76123456
+                                }
+                            ],
+                            [
+                                "O",
+                                {
+                                    "@tipo": "java.lang.Long/4227064769",
+                                    "valor": "5"
+                                }
+                            ],
+                            [
+                                "O",
+                                null
+                            ],
+                            [
+                                "O",
+                                {
+                                    "@tipo": "java.lang.String/2004016611",
+                                    "valor": "Boleta exenta"
+                                }
+                            ],
+                            [
+                                "O",
+                                {
+                                    "@tipo": "java.lang.Long/4227064769",
+                                    "valor": "4294967296"
+                                }
+                            ],
+                            [
+                                "S",
+                                "FIN"
+                            ]
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "error": null
+}

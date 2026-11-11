@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?estilo href="x.xsl"?>
+<Raiz xmlns="urn:x" a="é€😀&quot;'&lt;&gt;&amp;&#9;&#10;&#13;￾"><A/><B><C><D>1</D><E/></C><!--c--><F/></B></Raiz>
+<!--fin-->

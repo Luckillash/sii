@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-vacios",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 80,
+    "sha256": "fcaffbe0ec4868301e118c2bbaedc970d0884d478e741032f2f3f30715171eb5",
+    "marcas": {}
+}

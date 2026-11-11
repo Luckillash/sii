@@ -1,0 +1,8 @@
+{
+    "caso": "firmar-dte-rcof",
+    "operacion": "firmarDte",
+    "core": "1.9.1",
+    "bytes": 4187,
+    "sha256": "2aa0e591921a743dbaf9024464e1f40b67d1db30320b778ea59c4f207ba82515",
+    "marcas": {}
+}

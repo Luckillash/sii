@@ -1,0 +1,19 @@
+{
+  "descripcion": "Todo el ASCII imprimible, *-._~, espacios, saltos de línea, tabulación, URLs y correos en claves y valores",
+  "operacion": "httpBuildQuery",
+  "entrada": {
+    "campos": [
+      [
+        "ascii",
+        " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+      ],
+      ["*-._~", "*-._~"],
+      ["clave con espacios", "  dos  espacios  "],
+      ["a[b]", "x"],
+      ["salto", "linea1\r\nlinea2\tfin"],
+      ["url", "https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios?a=1&b=2#f"],
+      ["correo", "contacto+sii@empresa.cl"],
+      ["mas", "1+1=2"]
+    ]
+  }
+}

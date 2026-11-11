@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-afecta-39",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 1127,
+    "sha256": "d54863479e7a03b2963f16952d95a12e9582e9722edfde3dc352c1efead0adf5",
+    "marcas": {
+        "FchEmis": "2026-09-05"
+    }
+}

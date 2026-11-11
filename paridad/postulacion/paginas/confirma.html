@@ -1,0 +1,28 @@
+<HTML>
+<HEAD><TITLE>Confirmaci&oacute;n de la Postulaci&oacute;n</TITLE>{{META}}</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<FONT FACE="Arial" SIZE="2">Revise los datos de la postulaci&oacute;n antes de confirmar.</FONT>
+<FORM NAME="frmConfirma" METHOD="POST" ACTION="{{ACTION}}">
+<TABLE BORDER="1" WIDTH="700">
+<TR><TD>Empresa</TD><TD>{{RUT_EMP}}-{{DV_EMP}}</TD></TR>
+<TR><TD>Usuario administrador</TD><TD>{{RUT_USU}}-{{DV_USU}}</TD></TR>
+<TR><TD>Software</TD><TD>{{NOM_SW}}</TD></TR>
+</TABLE>
+<INPUT TYPE="hidden" NAME="RUT_EMP" VALUE="{{RUT_EMP}}">
+<INPUT TYPE="hidden" NAME="DV_EMP" VALUE="{{DV_EMP}}">
+<INPUT TYPE="hidden" NAME="RUT_USU" VALUE="{{RUT_USU}}">
+<INPUT TYPE="hidden" NAME="DV_USU" VALUE="{{DV_USU}}">
+<INPUT TYPE="hidden" NAME="MAIL_SUP" VALUE="{{MAIL_SUP}}">
+<INPUT TYPE="hidden" NAME="MAIL_SII" VALUE="{{MAIL_SII}}">
+<INPUT TYPE="hidden" NAME="MAIL_DTE" VALUE="{{MAIL_DTE}}">
+<INPUT TYPE="hidden" NAME="URL" VALUE="{{URL}}">
+<INPUT TYPE="hidden" NAME="NOM_SW" VALUE="{{NOM_SW}}">
+<INPUT TYPE="hidden" NAME="ESBOL" VALUE="{{ESBOL}}">
+<INPUT TYPE="hidden" NAME="BOLELEC" VALUE="{{BOLELEC}}">
+{{BOLEXEN}}<INPUT TYPE="hidden" NAME="ESFAC" VALUE="{{ESFAC}}">
+<INPUT TYPE="hidden" NAME="RAZON_SOCIAL" VALUE="{{RAZON_SOCIAL}}">
+<INPUT TYPE="submit" NAME="CONF" VALUE="Confirmar Postulaci&oacute;n">
+<INPUT TYPE="button" NAME="VOLVER" VALUE="Modificar" onClick="history.back()">
+</FORM>
+</BODY>
+</HTML>

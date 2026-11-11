@@ -1,0 +1,26 @@
+{
+  "descripcion": "Hora de Chile 20:30 (00:30 UTC del día siguiente): FchEmis es la fecha de Chile",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-07-15T20:30:00",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "76",
+    "detalles": [
+      {
+        "nombre": "Producto",
+        "cantidad": 1,
+        "precio": 1190
+      }
+    ]
+  }
+}

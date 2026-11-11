@@ -1,0 +1,7 @@
+{"action":"","inputs":[["s","2"],["t","9"]]}
+{"action":"a","inputs":[["s","2"]]}
+{"action":"a","inputs":[["s","1"],["v",""]]}
+{"action":"a","inputs":[["despues","1"],["s","33"]]}
+{"action":"a","inputs":[["s","3"]]}
+{"action":"a","inputs":[["s",""]]}
+{"action":"a","inputs":[["s"," con espacios "]]}

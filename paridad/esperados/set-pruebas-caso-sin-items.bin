@@ -1,0 +1,6 @@
+{
+    "error": {
+        "clase": "Exception",
+        "mensaje": "CASO-2: no se pudo extraer ningun item (nombre/cantidad/precio)."
+    }
+}

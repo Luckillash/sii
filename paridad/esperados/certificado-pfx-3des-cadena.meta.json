@@ -1,0 +1,8 @@
+{
+    "caso": "certificado-pfx-3des-cadena",
+    "operacion": "certificado",
+    "core": "1.9.1",
+    "bytes": 12780,
+    "sha256": "50d12c349bbad209fe9beed6f5a3682f147829db9a9596b3453cc0464c8e6e92",
+    "marcas": {}
+}

@@ -1,0 +1,8 @@
+{
+  "descripcion": "Blancos entre elementos dentro del ápice y fuera de él (hermanos), con tabs e indentación",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<r>\n  <antes/>\n  <m>\n\t<a> x </a>  \n\n    <b/>\n  </m>\n  <despues/>\n</r>\n",
+    "etiqueta": "m"
+  }
+}

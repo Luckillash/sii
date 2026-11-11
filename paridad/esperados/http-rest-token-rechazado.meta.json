@@ -1,0 +1,8 @@
+{
+    "caso": "http-rest-token-rechazado",
+    "operacion": "httpRest",
+    "core": "1.9.1",
+    "bytes": 3074,
+    "sha256": "d5df6f8da36f64c25db62163c8e99a2f4ec5a44289f21321f5fe214682685596",
+    "marcas": {}
+}

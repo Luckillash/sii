@@ -1,0 +1,11 @@
+{
+  "descripcion": "DIVERGENCIA: DTO que se referencia a sí mismo. El PHP devuelve un objeto a medias (solo @tipo); Node lanza",
+  "operacion": "gwtLeer",
+  "entrada": {
+    "respuesta": "//OK[-1,1,[\"cl.prueba.Nodo/1\"],0,7]",
+    "esquemas": {
+      "cl.prueba.Nodo/1": "O"
+    },
+    "lecturas": ["objeto"]
+  }
+}

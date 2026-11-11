@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-decimales",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 2500,
+    "sha256": "84ab970f4def019be7153fb78a18b97df6b4824938929f068ce95050fca30b8c",
+    "marcas": {
+        "FchEmis": "2026-09-05"
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "lecturas": [],
+    "error": {
+        "clase": "PostulacionException",
+        "mensaje": "El servicio del SII respondio con un error. (el SII actualizo el portal de boletas: hay que volver a capturar la version de GWT)"
+    }
+}

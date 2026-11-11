@@ -1,0 +1,8 @@
+{
+    "caso": "xml-serializar-boleta",
+    "operacion": "serializarXml",
+    "core": "1.9.1",
+    "bytes": 1962,
+    "sha256": "224d7df041b5be4a376024de7ea5e84dee2976dce9f54148212dc6ad02f23478",
+    "marcas": {}
+}

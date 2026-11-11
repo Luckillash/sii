@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<DTE xmlns="http://www.sii.cl/SiiDte" version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Documento ID="F69T41">
+    <Encabezado>
+      <IdDoc>
+        <TipoDTE>41</TipoDTE>
+        <Folio>69</Folio>
+        <FchEmis>2026-09-05</FchEmis>
+        <IndServicio>3</IndServicio>
+      </IdDoc>
+      <Emisor>
+        <RUTEmisor>76123456-0</RUTEmisor>
+        <RznSocEmisor>EMPRESA DE PRUEBA SPA</RznSocEmisor>
+        <GiroEmisor>ACTIVIDADES DE CONSULTORIA DE INFORMATICA</GiroEmisor>
+        <DirOrigen>CALLE 123</DirOrigen>
+        <CmnaOrigen>SANTIAGO</CmnaOrigen>
+      </Emisor>
+      <Receptor>
+        <RUTRecep>66666666-6</RUTRecep>
+        <RznSocRecep>Cliente General</RznSocRecep>
+      </Receptor>
+      <Totales>
+        <MntExe>5000</MntExe>
+        <MntTotal>5000</MntTotal>
+      </Totales>
+    </Encabezado>
+    <Detalle>
+      <NroLinDet>1</NroLinDet>
+      <IndExe>1</IndExe>
+      <NmbItem>Libro</NmbItem>
+      <QtyItem>1</QtyItem>
+      <PrcItem>5000</PrcItem>
+      <MontoItem>5000</MontoItem>
+    </Detalle>
+    <Referencia>
+      <NroLinRef>1</NroLinRef>
+      <CodRef>SET</CodRef>
+      <RazonRef>CASO-5</RazonRef>
+    </Referencia>
+  </Documento>
+</DTE>

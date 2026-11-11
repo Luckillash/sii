@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-fin-del-dia",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 1117,
+    "sha256": "446b31920083b6512d0639d9cde7b65cfdc1e1d80258339da9a7f99f72deebfe",
+    "marcas": {
+        "FchEmis": "2026-12-31"
+    }
+}

@@ -1,0 +1,37 @@
+=== peticion 1 de 1 (https) ===
+POST /cgi_dte/UPL/DTEUpload HTTP/1.1
+accept: */*
+content-length: 685
+content-type: multipart/form-data; boundary=<boundary>
+cookie: TOKEN=TOKENDEPRUEBA0001
+host: <https>
+user-agent: Mozilla/4.0 (compatible; PROG 1.0; Windows NT 5.1)
+
+--<boundary>
+Content-Disposition: form-data; name="rutSender"
+
+11111111
+--<boundary>
+Content-Disposition: form-data; name="dvSender"
+
+1
+--<boundary>
+Content-Disposition: form-data; name="rutCompany"
+
+76123456
+--<boundary>
+Content-Disposition: form-data; name="dvCompany"
+
+0
+--<boundary>
+Content-Disposition: form-data; name="archivo"; filename="envio-set-pruebas.xml"
+Content-Type: text/xml
+
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<EnvioBOLETA version="1.0"><SetDTE ID="SetDoc"><Caratula><RutEmisor>76123456-0</RutEmisor></Caratula><RznSoc>Comercial Peña y Díaz Ltda.</RznSoc><Giro>Venta de artículos de Ñuñoa</Giro></SetDTE></EnvioBOLETA>
+
+--<boundary>--
+
+=== fin de la peticion 1 ===
+=== resultado ===
+1234567890

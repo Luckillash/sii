@@ -1,0 +1,50 @@
+{
+  "descripcion": "Multipart como SiiBoletaProduccion::enviarBoletaXml(): host de envío (https2), DV K, sin \"Expect:\", y el nombre del temporal de tempnam() (normalizado: cambia en cada corrida y entre Windows y Linux)",
+  "operacion": "httpMultipart",
+  "entrada": {
+    "origen": "https2",
+    "ruta": "/recursos/v1/boleta.electronica.envio",
+    "cabeceras": [
+      "Cookie: TOKEN=TOKENDEPRUEBA0002",
+      "User-Agent: Mozilla/4.0 ( compatible; PROG 1.0; Windows NT)"
+    ],
+    "campos": [
+      {
+        "nombre": "rutSender",
+        "valor": "22222222"
+      },
+      {
+        "nombre": "dvSender",
+        "valor": "K"
+      },
+      {
+        "nombre": "rutCompany",
+        "valor": "76123456"
+      },
+      {
+        "nombre": "dvCompany",
+        "valor": "0"
+      },
+      {
+        "nombre": "archivo",
+        "archivo": {
+          "base64": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iSVNPLTg4NTktMSI/Pg0KPEVudmlvQk9MRVRBIHZlcnNpb249IjEuMCI+PFNldERURSBJRD0iU2V0RG9jIj48Q2FyYXR1bGE+PFJ1dEVtaXNvcj43NjEyMzQ1Ni0wPC9SdXRFbWlzb3I+PC9DYXJhdHVsYT48UnpuU29jPkNvbWVyY2lhbCBQZfFhIHkgRO1heiBMdGRhLjwvUnpuU29jPjxHaXJvPlZlbnRhIGRlIGFydO1jdWxvcyBkZSDRdfFvYTwvR2lybz48L1NldERURT48L0VudmlvQk9MRVRBPg0K"
+        },
+        "contentType": "text/xml",
+        "prefijoTemporal": "bol_"
+      }
+    ],
+    "http": {
+      "respuestas": [
+        {
+          "status": 200,
+          "cabeceras": [["Content-Type", "application/json"]],
+          "cuerpo": "{\"rut_emisor\":\"76123456-0\",\"rut_envia\":\"22222222-K\",\"trackid\":9876543210,\"fecha_recepcion\":\"2026-11-06 12:00:00\",\"estado\":\"REC\",\"file\":\"envio.xml\"}"
+        }
+      ],
+      "normalizar": {
+        "nombresArchivo": true
+      }
+    }
+  }
+}

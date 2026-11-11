@@ -1,0 +1,12 @@
+{
+    "caso": "armar-boleta-descuento",
+    "operacion": "armar-boleta",
+    "core": "1.9.1",
+    "bytes": 4799,
+    "sha256": "74f9494f7d9245b3025daf4b9d3038534b479931031167b2b060be62d1c947d8",
+    "marcas": {
+        "FchEmis": "2026-09-05",
+        "TSTED": "2026-09-05T13:00:00",
+        "TmstFirma": "2026-09-05T13:00:00"
+    }
+}

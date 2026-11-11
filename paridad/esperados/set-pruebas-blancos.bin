@@ -1,0 +1,77 @@
+{
+    "codificacion": "UTF-8",
+    "casos": [
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Cambio de aceite",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 19900,
+                    "precioTexto": "19900",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "Alineacion y balanceo",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 9900,
+                    "precioTexto": "9900",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "Item especial",
+                    "cantidad": 2,
+                    "cantidadTexto": "2",
+                    "cantidadTipo": "int",
+                    "precio": 300,
+                    "precioTexto": "300",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "Lavado",
+                    "cantidad": 3,
+                    "cantidadTexto": "3",
+                    "cantidadTipo": "int",
+                    "precio": 4500,
+                    "precioTexto": "4500",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "Pulido",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 2500,
+                    "precioTexto": "2500",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-1"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Papel de regalo",
+                    "cantidad": 17,
+                    "cantidadTexto": "17",
+                    "cantidadTipo": "int",
+                    "precio": 120,
+                    "precioTexto": "120",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-2"
+            }
+        }
+    ]
+}

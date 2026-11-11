@@ -1,0 +1,8 @@
+{
+  "descripcion": "PEM con la llave PKCS#8 sin cifrar y el certificado",
+  "operacion": "certificado",
+  "entrada": {
+    "archivo": "cert-titular.pem",
+    "clave": ""
+  }
+}

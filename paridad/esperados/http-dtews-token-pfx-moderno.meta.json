@@ -1,0 +1,8 @@
+{
+    "caso": "http-dtews-token-pfx-moderno",
+    "operacion": "httpDtews",
+    "core": "1.9.1",
+    "bytes": 3901,
+    "sha256": "ef71f10a5be6de7abaa72cc7a9cfe1f6d1a0a1b4c790be4a342b8d1e6513d2da",
+    "marcas": {}
+}

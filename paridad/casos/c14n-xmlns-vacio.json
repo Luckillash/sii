@@ -1,0 +1,8 @@
+{
+  "descripcion": "xmlns=\"\" bajo un namespace por defecto (se emite), redundante (se omite) y vuelta al namespace",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<r xmlns=\"urn:a\"><s><t xmlns=\"\"><u xmlns=\"\"/><v xmlns=\"urn:a\"><w xmlns=\"\"/></v></t></s><x xmlns=\"\"><y xmlns=\"\"/></x></r>",
+    "etiqueta": "s"
+  }
+}

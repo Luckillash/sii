@@ -1,0 +1,8 @@
+{
+    "caso": "http-declaracion-declarar-sin-usuario",
+    "operacion": "httpDeclaracion",
+    "core": "1.9.1",
+    "bytes": 61,
+    "sha256": "dac1799c35a0f993947fd1fe78f04d9071cbebdb4fe41c5fc24d754c1ededb3c",
+    "marcas": {}
+}

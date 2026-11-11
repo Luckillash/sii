@@ -1,0 +1,123 @@
+=== peticion 1 de 11 (https2) ===
+GET /cvc_cgi/dte/of_solicita_folios HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+
+=== fin de la peticion 1 ===
+=== peticion 2 de 11 (https2) ===
+GET /cvc_cgi/dte/of_solicita_folios?vuelta=1 HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+
+=== fin de la peticion 2 ===
+=== peticion 3 de 11 (https2) ===
+GET /cvc_cgi/dte/of_solicita_folios?vuelta=2 HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios?vuelta=1
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+
+=== fin de la peticion 3 ===
+=== peticion 4 de 11 (https2) ===
+GET /cvc_cgi/dte/of_solicita_folios?vuelta=3 HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios?vuelta=2
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+
+=== fin de la peticion 4 ===
+=== peticion 5 de 11 (https2) ===
+GET /cvc_cgi/dte/of_solicita_folios?vuelta=4 HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios?vuelta=3
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+
+=== fin de la peticion 5 ===
+=== peticion 6 de 11 (https2) ===
+GET /cvc_cgi/dte/of_solicita_folios?vuelta=5 HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios?vuelta=4
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+
+=== fin de la peticion 6 ===
+=== peticion 7 de 11 (https2) ===
+GET /cvc_cgi/dte/of_solicita_folios?vuelta=6 HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios?vuelta=5
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+
+=== fin de la peticion 7 ===
+=== peticion 8 de 11 (https2) ===
+GET /cvc_cgi/dte/of_solicita_folios?vuelta=7 HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios?vuelta=6
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+
+=== fin de la peticion 8 ===
+=== peticion 9 de 11 (https2) ===
+GET /cvc_cgi/dte/of_solicita_folios?vuelta=8 HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios?vuelta=7
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+
+=== fin de la peticion 9 ===
+=== peticion 10 de 11 (https2) ===
+GET /cvc_cgi/dte/of_solicita_folios?vuelta=9 HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios?vuelta=8
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+
+=== fin de la peticion 10 ===
+=== peticion 11 de 11 (https2) ===
+GET /cvc_cgi/dte/of_solicita_folios?vuelta=10 HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios?vuelta=9
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+
+=== fin de la peticion 11 ===
+=== resultado ===
+error solicitud

@@ -1,0 +1,43 @@
+{
+  "descripcion": "Qué XML acepta DOMDocument::loadXML (parsearDocumento debe dar el mismo veredicto). <!DOCTYPE> queda fuera: PHP lo acepta y Node lo rechaza a propósito",
+  "operacion": "bienFormado",
+  "entrada": {
+    "xml": {
+      "valido": "<a b=\"1 &amp; 2\">x &lt; y &#233; &#x1F600; ]] > <![CDATA[ & ]]> <!-- & --></a>",
+      "texto-tras-raiz": "<a/>texto",
+      "elemento-tras-raiz": "<a/><b/>",
+      "cierre-cdata-en-texto": "<a>x]]>y</a>",
+      "cierre-cdata-en-atributo": "<a b=\"]]>\"/>",
+      "menor-en-atributo": "<a b=\"<\"/>",
+      "mayor-en-atributo": "<a b=\">\"/>",
+      "ref-cero": "<a>&#0;</a>",
+      "ref-control": "<a>&#1;</a>",
+      "ref-control-hex": "<a b=\"&#x1F;\"/>",
+      "ref-fffe": "<a>&#xFFFE;</a>",
+      "ref-enorme": "<a>&#99999999999;</a>",
+      "ref-tab-valida": "<a b=\"&#9;\">&#x9;</a>",
+      "control-crudo": "<a>\u0001</a>",
+      "control-crudo-en-comentario": "<a><!-- \u0001 --></a>",
+      "amp-suelto": "<a>x & y</a>",
+      "amp-suelto-en-atributo": "<a b=\"x & y\"/>",
+      "amp-sin-punto-y-coma": "<a>&amp</a>",
+      "amp-en-cdata": "<a><![CDATA[x & y &#0;]]></a>",
+      "amp-en-comentario": "<a><!-- x & y --></a>",
+      "amp-en-pi": "<a><?t x & y?></a>",
+      "entidad-desconocida": "<a>&foo;</a>",
+      "sin-cerrar": "<a><b></a>",
+      "atributo-duplicado": "<a x=\"1\" x=\"2\"/>",
+      "atributo-sin-comillas": "<a x=1/>",
+      "dos-raices": "<a></a><a></a>",
+      "prefijo-no-declarado": "<p:a/>",
+      "declaracion-mayusculas": "<?XML version=\"1.0\"?><a/>",
+      "declaracion-en-medio": "<a><?xml version=\"1.0\"?></a>",
+      "declaracion-en-medio-con-salto": "<a><?xml version=\"1.0\"\n?></a>",
+      "pi-xml-mezclada": "<a><?XmL x?></a>",
+      "pi-xml-tras-raiz": "<a/><?xml x?>",
+      "declaracion-tras-comentario": "<!--c--><?xml version=\"1.0\"?><a/>",
+      "pi-xml-stylesheet": "<a><?xml-stylesheet x?></a>",
+      "pi-xmlfoo": "<a><?xmlfoo x?></a>"
+    }
+  }
+}

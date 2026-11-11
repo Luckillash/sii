@@ -1,0 +1,7 @@
+{
+  "descripcion": "Saltos de línea solo con \\r (Mac antiguo): no se reconocen casos",
+  "operacion": "setPruebas",
+  "entrada": {
+    "texto": "CASO-1\r=====\r\rItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\runo\t\t\t1\t\t\t100\r"
+  }
+}

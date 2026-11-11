@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-ns-redundante",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 130,
+    "sha256": "07e26386efb41bc71514e91611d923484b731ccd402b9b343817ef49d754babd",
+    "marcas": {}
+}

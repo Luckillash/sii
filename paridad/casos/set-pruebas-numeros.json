@@ -1,0 +1,7 @@
+{
+  "descripcion": "Separador de miles con punto y coma, decimales, 2.0 (float en PHP), 1.000,50 y números que no lo son",
+  "operacion": "setPruebas",
+  "entrada": {
+    "texto": "CASO-1\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nComputador\t\t\t2\t\t\t1.250.000\nMonitor\t\t\t1\t\t\t1,250,000\nCable\t\t\t12,345\t\t\t1.234\nQueso\t\t\t2,5\t\t\t7.990\nPan\t\t\t2.0\t\t\t0.5\nVino\t\t\t1\t\t\t1.000,50\nAceite\t\t\t1234,567\t\t\t1.2345\nSal\t\t\t007\t\t\t0100\nAzucar\t\t\t1.5.0\t\t\t100\nTe\t\t\t1\t\t\t-100\nCafe\t\t\t1\t\t\t1 000\nLeche\t\t\t1,\t\t\t900\n\n\n"
+  }
+}

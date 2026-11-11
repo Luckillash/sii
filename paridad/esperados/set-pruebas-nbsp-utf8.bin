@@ -1,0 +1,77 @@
+{
+    "codificacion": "UTF-8",
+    "casos": [
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Pan ",
+                    "cantidad": 2,
+                    "cantidadTexto": "2",
+                    "cantidadTipo": "int",
+                    "precio": 300,
+                    "precioTexto": "300",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "Huevos",
+                    "cantidad": 12,
+                    "cantidadTexto": "12",
+                    "cantidadTipo": "int",
+                    "precio": 150,
+                    "precioTexto": "150",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-1"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Harina",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 1200,
+                    "precioTexto": "1200",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-2"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Mate ",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 2500,
+                    "precioTexto": "2500",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "Cacao",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 3500,
+                    "precioTexto": "3500",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-3"
+            }
+        }
+    ]
+}

@@ -1,0 +1,32 @@
+{
+  "descripcion": "Montos desde 1e14: el (string) de los float de PHP pasa a notación exponencial",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-09-05T20:00:00",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "78",
+    "detalles": [
+      {
+        "nombre": "Grande",
+        "cantidad": 1,
+        "precio": 100000000000005
+      },
+      {
+        "nombre": "Exento grande",
+        "cantidad": 2,
+        "precio": 60000000000000,
+        "exento": true
+      }
+    ]
+  }
+}

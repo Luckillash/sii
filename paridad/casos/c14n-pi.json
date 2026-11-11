@@ -1,0 +1,8 @@
+{
+  "descripcion": "Instrucciones de procesamiento dentro del subárbol (sin datos, con espacios, con \\r\\n) y fuera del ápice",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<?xml version=\"1.0\"?>\n<?fuera antes?>\n<r><?hermano x?><m><?vacia?><?datos  con   espacios  ?>\n<?crlf a\r\nb?><h/><?xml-stylesheet href=\"a.xsl\" type=\"text/xsl\"?></m></r>\n<?fuera despues?>",
+    "etiqueta": "m"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "descripcion": "htmlspecialchars en modo xml1-iso-8859-1 (ver ModoEscape en codificacion.ts)",
+  "operacion": "escaparXml",
+  "entrada": {
+    "modo": "xml1-iso-8859-1",
+    "textos": [
+      "a&b<c>d\"e'f",
+      "&amp; &#233; &#x20AC; &lt; &quot; &apos; &foo; & ;",
+      "Ñandú DÍAZ € 😀 中",
+      "\t\r\n x \r\n",
+      "\u0001\u007f\u0080\ufffd\ufffe",
+      "]]> <![CDATA[ --> <?pi?>",
+      "Cía. \"La Única\" & Asociados <Ltda>",
+      ""
+    ]
+  }
+}

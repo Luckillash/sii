@@ -1,0 +1,19 @@
+{
+  "descripcion": "consultarEnvio(): GET al host de autenticación (no al de envío, como en el PHP) con la cookie del token",
+  "operacion": "httpRest",
+  "material": "base",
+  "entrada": {
+    "accion": "consultarEnvio",
+    "token": "TOKENDEPRUEBA0003",
+    "rutEmisor": "76123456-0",
+    "trackId": "9876543210",
+    "http": {
+      "respuestas": [
+        {
+          "cabeceras": [["Content-Type", "application/json"]],
+          "cuerpo": "{\"rut_emisor\":\"76123456-0\",\"rut_envia\":\"11111111-1\",\"trackid\":9876543210,\"fecha_recepcion\":\"2026-11-06 12:00:00\",\"estado\":\"EPR\",\"estadistica\":[{\"tipo\":39,\"informados\":8,\"aceptados\":8,\"rechazados\":0,\"reparos\":0}],\"detalle_rep_rech\":[]}"
+        }
+      ]
+    }
+  }
+}
