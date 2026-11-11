@@ -1,6 +1,7 @@
 import { Certificado, ClienteBoletaRest, TransporteUndici } from '@winex/certificacion';
 import { leerLlave } from '@/server/cifrado';
 import { envSpike } from '@/server/env';
+import { TokenStoreSupabase } from '@/server/sii/token-store-supabase';
 import { rechazoSpike } from '@/server/spike/autorizar';
 import {
   HOSTS_CERTIFICACION,
@@ -11,7 +12,6 @@ import {
   rsaSha1Disponible,
 } from '@/server/spike/conectividad';
 import { clienteServicio } from '@/server/supabase/service';
-import { TokenStoreSupabase } from '@/server/sii/token-store-supabase';
 
 // Spike de red Vercel → SII (Fase 0). Temporal: se borra al cerrar la fase.
 //
@@ -21,7 +21,6 @@ import { TokenStoreSupabase } from '@/server/sii/token-store-supabase';
 // Criterio de aceptación: obtiene un token de apicert y lo guarda cifrado en tokens_sii.
 
 export const runtime = 'nodejs';
-export const preferredRegion = 'gru1';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
@@ -135,9 +134,8 @@ export async function GET(request: Request) {
     hosts,
     token,
     ok:
-      hosts.every(
-        (h) => h.handshake.ok && h.get.ok && (h.handshakeConCertificado?.ok ?? true),
-      ) && token.ok,
+      hosts.every((h) => h.handshake.ok && h.get.ok && (h.handshakeConCertificado?.ok ?? true)) &&
+      token.ok,
     msTotal: Math.round(performance.now() - inicio),
   };
 

@@ -2,7 +2,7 @@ import { depurarBreadcrumb, depurarEvento } from './depurar';
 
 /**
  * Opciones comunes de Sentry para navegador, servidor y edge. Sin DSN, Sentry queda
- * apagado (desarrollo local y CI).
+ * apagado (por ejemplo, en desarrollo local).
  */
 export function opcionesSentry() {
   const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;

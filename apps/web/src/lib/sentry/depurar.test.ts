@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { depurarBreadcrumb, depurarEvento, depurarTexto, FILTRADO } from './depurar';
 
-const PEM = '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASC\n-----END PRIVATE KEY-----';
+const PEM =
+  '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASC\n-----END PRIVATE KEY-----';
 const JWT =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIn0.c2lnbmF0dXJhLWRlLXBydWViYQ';
 

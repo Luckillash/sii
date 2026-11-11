@@ -67,7 +67,9 @@ function mensaje(error: unknown): string {
 }
 
 /** Relajación mínima de OpenSSL 3 según el error, igual que scripts/humo-tls.ts. */
-function relajacionPara(error: unknown): { nombre: string; opciones: tls.ConnectionOptions } | null {
+function relajacionPara(
+  error: unknown,
+): { nombre: string; opciones: tls.ConnectionOptions } | null {
   const texto = mensaje(error).toLowerCase();
   if (texto.includes('legacy renegotiation') || texto.includes('legacy_renegotiation')) {
     return {
@@ -75,7 +77,11 @@ function relajacionPara(error: unknown): { nombre: string; opciones: tls.Connect
       opciones: { secureOptions: constants.SSL_OP_LEGACY_SERVER_CONNECT },
     };
   }
-  if (/key too small|md too weak|no ciphers|no shared cipher|handshake failure|unsupported protocol|no protocols/.test(texto)) {
+  if (
+    /key too small|md too weak|no ciphers|no shared cipher|handshake failure|unsupported protocol|no protocols/.test(
+      texto,
+    )
+  ) {
     return {
       nombre: 'DEFAULT@SECLEVEL=1 + TLSv1',
       opciones: { ciphers: 'DEFAULT@SECLEVEL=1', minVersion: 'TLSv1' },
@@ -93,7 +99,12 @@ async function medir<T>(
   const inicio = performance.now();
   try {
     const valor = await fn(base);
-    return { ok: esOk(valor), ms: Math.round(performance.now() - inicio), detalle: describir(valor), valor };
+    return {
+      ok: esOk(valor),
+      ms: Math.round(performance.now() - inicio),
+      detalle: describir(valor),
+      valor,
+    };
   } catch (error) {
     const relajacion = relajacionPara(error);
     if (relajacion) {
@@ -123,7 +134,13 @@ interface InfoHandshake {
 
 function handshake(host: string, extra: tls.ConnectionOptions): Promise<InfoHandshake> {
   return new Promise((resolver, rechazar) => {
-    const socket = tls.connect({ host, port: 443, servername: host, rejectUnauthorized: true, ...extra });
+    const socket = tls.connect({
+      host,
+      port: 443,
+      servername: host,
+      rejectUnauthorized: true,
+      ...extra,
+    });
     const timer = setTimeout(
       () => socket.destroy(new Error(`timeout de conexión (${MS_CONEXION / 1000} s)`)),
       MS_CONEXION,
@@ -147,7 +164,10 @@ function handshake(host: string, extra: tls.ConnectionOptions): Promise<InfoHand
   });
 }
 
-function get(host: HostSii, extra: tls.ConnectionOptions): Promise<{ status: number; tipo: string }> {
+function get(
+  host: HostSii,
+  extra: tls.ConnectionOptions,
+): Promise<{ status: number; tipo: string }> {
   return new Promise((resolver, rechazar) => {
     const req = https.request({
       host: host.host,
@@ -165,7 +185,9 @@ function get(host: HostSii, extra: tls.ConnectionOptions): Promise<{ status: num
       () => req.destroy(new Error(`timeout de respuesta (${MS_RESPUESTA / 1000} s)`)),
       MS_RESPUESTA,
     );
-    req.once('timeout', () => req.destroy(new Error(`timeout de conexión (${MS_CONEXION / 1000} s)`)));
+    req.once('timeout', () =>
+      req.destroy(new Error(`timeout de conexión (${MS_CONEXION / 1000} s)`)),
+    );
     req.once('error', (error) => {
       clearTimeout(timer);
       rechazar(error);
@@ -181,7 +203,10 @@ function get(host: HostSii, extra: tls.ConnectionOptions): Promise<{ status: num
   });
 }
 
-export async function probarHost(host: HostSii, material: MaterialTls | null): Promise<ResultadoHost> {
+export async function probarHost(
+  host: HostSii,
+  material: MaterialTls | null,
+): Promise<ResultadoHost> {
   const sinCert = await medir(
     (e) => handshake(host.host, e),
     {},

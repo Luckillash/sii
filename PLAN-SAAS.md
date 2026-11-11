@@ -20,7 +20,7 @@ Leyenda: ✅ listo · 🟡 en parte · ⬜ pendiente. Se actualiza al terminar c
 
 | Fase | Estado | Nota |
 |---|---|---|
-| 0. Fundaciones y prueba de conectividad | ⬜ | Incluye el spike de red Vercel → SII |
+| 0. Fundaciones y prueba de conectividad | 🟡 | Monorepo, librería, Next, Sentry y `supabase/` listos y probados en local; faltan migraciones en el remoto, Vercel y el spike desde *preview* |
 | 1. Design system en Next.js | ⬜ | |
 | 2. Autenticación, organizaciones y equipo | ⬜ | |
 | 3. Empresas, certificados y resoluciones | ⬜ | |
@@ -64,7 +64,8 @@ Las cuatro fuentes no cubren exactamente lo mismo. Estas brechas condicionan el 
 3. **Las operaciones ⚠️ no se repiten a ciegas.** Cada operación que graba en el SII tiene ensayo (equivalente a no pasar `--confirmar`) y confirmación explícita. Un resultado `incierto` bloquea el reintento y explica cómo revisar en el SII.
 4. **Paridad con la librería.** No se reimplementa nada que `@winex/certificacion` ya haga (firma, TED, sobres, clientes REST/SOAP, folios, postulación). La app solo adapta persistencia, secretos y UI.
 5. **Auditoría total.** Toda llamada al SII deja una fila en `operaciones_sii`, con `resultado` equivalente al código de salida de la CLI (0–7). Nunca tokens, claves ni cookies en mensajes, logs ni Sentry.
-6. **El tono y los formatos del design system son ley:** español de Chile con tú, sin exclamaciones ni emoji, nombres oficiales del SII, `$ 1.190.000`, `76.354.771-K`, `10-11-2026`, 24 h.
+6. **Una sola base, y es producción.** Hay un único proyecto de Supabase en la nube (`rbrntkztzijaxsnpgpqn`); desarrollo, *Preview* y *Production* lo usan. Sin base local, ramas ni datos semilla: cada migración es aditiva y se verifica con SQL de solo lectura. La base de producción guarda los dos ambientes del SII (`certificacion` y `produccion`), separados por la columna `ambiente`.
+7. **El tono y los formatos del design system son ley:** español de Chile con tú, sin exclamaciones ni emoji, nombres oficiales del SII, `$ 1.190.000`, `76.354.771-K`, `10-11-2026`, 24 h.
 
 ---
 
@@ -124,13 +125,13 @@ timbre/
 │   ├── instrumentation.ts            Sentry (servidor/edge) + onRequestError
 │   ├── instrumentation-client.ts     Sentry navegador
 │   └── proxy.ts                      refresco de sesión y protección de rutas (ex middleware.ts)
-├── packages/certificacion/           @winex/certificacion (git subtree de certificacion-node, con LICENSE y NOTICE)
+├── packages/certificacion/           git subtree de certificacion-node completo (LICENSE, NOTICE, paridad/);
+│                                     @winex/certificacion = packages/core, CLI sii = apps/cli
 ├── packages/correos/                 plantillas React Email con estilos Timbre en línea
 ├── supabase/
 │   ├── migrations/0001_esquema_inicial.sql   ← supabase_saas_sii.sql tal cual
 │   ├── migrations/00NN_*.sql                 cambios posteriores (nunca editar 0001)
-│   ├── seed.sql                               datos de desarrollo (org, empresa demo)
-│   └── tests/                                 pgTAP: RLS, triggers, cuotas
+│   └── verificaciones/                        SQL de solo lectura por migración (se corre en producción)
 ├── scripts/  generar-tokens.ts · tipos-supabase.sh
 └── documentación/                    la carpeta actual, completada fase a fase
 ```
@@ -177,20 +178,20 @@ para no compartir estado entre usuarios en el servidor.
 
 ### 4.4 Supabase
 
-- **Migración inicial = `supabase_saas_sii.sql` sin cambios.** Todo cambio va en migraciones nuevas, revisadas con `supabase db diff`.
+- **Migración inicial = `supabase_saas_sii.sql` sin cambios.** Todo cambio va en migraciones nuevas y aditivas, aplicadas con `supabase db push` sobre el único proyecto (producción) y verificadas con su archivo de `supabase/verificaciones/`.
 - Clientes con `@supabase/ssr`: navegador, servidor (cookies) y `service-role` (archivo `server-only`, jamás importable desde un componente cliente).
-- Tipos generados (`supabase gen types typescript`) en CI; el build falla si están desfasados.
+- Tipos generados (`supabase gen types typescript`, `pnpm db:tipos`) y versionados; se regeneran después de cada migración.
 - **Vault** con `guardar_secreto()` / `leer_secreto()` (solo `service_role`) para `.pfx`, clave, XML del CAF y secretos HMAC.
 - **Tokens del SII y cookies AUT2000:** AES-256-GCM en la app (`iv || ciphertext || tag`), llave `SII_TOKENS_KEY` en variables de entorno de Vercel marcadas como *sensitive*; nunca en la base.
 - **Storage** `documentos-xml`: rutas `<org>/<empresa>/<ambiente>/<archivo>`; descargas con URL firmada de corta duración.
 - **Realtime** para el panel en vivo (más la migración de H9).
-- **Branching** de Supabase para las *preview deployments* de Vercel (el MCP del proyecto ya tiene `branching` habilitado).
+- **Sin Branching ni base local:** las *preview deployments* y el desarrollo local usan el mismo proyecto que *Production* (principio 6).
 - **Cron:** `pg_cron` + `pg_net` llaman a `/api/cron/*` con un token en Vault (`cron_token`). Funciona en cualquier plan de Vercel; Vercel Cron solo permite frecuencias de minutos en Pro.
 
 ### 4.5 Vercel
 
-- Proyecto con raíz `apps/web`, comando de build `pnpm -r --filter ./packages/* build && pnpm --filter web build`.
-- Entornos: *Production* (dominio propio, Supabase producción), *Preview* (rama de Supabase) y *Development*.
+- Proyecto con raíz `apps/web`, comando de build `pnpm --dir ../.. build` (compila la librería y luego la app; ver `apps/web/vercel.json`).
+- Entornos: *Production* (dominio propio), *Preview* y *Development*; los tres con las mismas variables de Supabase (el único proyecto, producción). Los *Preview* quedan protegidos con *Vercel Authentication* y los cron de `pg_cron` apuntan solo a *Production*.
 - Dominio: `app.<dominio>` para la aplicación y el apex para el sitio público (o todo en uno; ver D6). DNS de Resend (SPF, DKIM, DMARC) en el mismo dominio.
 - Firewall de Vercel: regla de *rate limiting* para `/api/v1/*` y para las rutas de autenticación.
 - Fluid compute activo; revisar los límites de `maxDuration` del plan (Hobby 300 s, Pro hasta 800 s) al configurar.
@@ -248,31 +249,33 @@ cada empresa y viven en Vault.
 
 | Migración | Fase | Contenido |
 |---|---|---|
-| `0002_realtime_operaciones` | 4 | Agregar `operaciones_sii` y `solicitudes_folios` a `supabase_realtime` |
-| `0003_bloqueos_sii` | 4 | RPC `bloquear_certificado(uuid)` con `pg_try_advisory_xact_lock` para serializar sesiones AUT2000 por certificado (el SII frena el re-login, error `01.01.215.500.771.52`) |
-| `0004_preferencias` | 2 | `perfiles.tema`, `perfiles.ultima_organizacion`, `perfiles.ultima_empresa` |
-| `0005_notificaciones` | 8 | Tabla `notificaciones` (tipo, clave de deduplicación, enviado_en) para alertas por correo |
-| `0006_planes_comerciales` | 10 | Grilla de planes definitiva (D5) |
-| `0007_pagos` | 10 | `pagos` y `eventos_pasarela` (idempotencia de webhooks de la pasarela) |
+| `0002_extensiones_cron` | 0 | `pg_cron` y `pg_net` (el `cron_token` se crea a mano en Vault) |
+| `0003_realtime_operaciones` | 4 | Agregar `operaciones_sii` y `solicitudes_folios` a `supabase_realtime` |
+| `0004_bloqueos_sii` | 4 | RPC `bloquear_certificado(uuid)` con `pg_try_advisory_xact_lock` para serializar sesiones AUT2000 por certificado (el SII frena el re-login, error `01.01.215.500.771.52`) |
+| `0005_preferencias` | 2 | `perfiles.tema`, `perfiles.ultima_organizacion`, `perfiles.ultima_empresa` |
+| `0006_notificaciones` | 8 | Tabla `notificaciones` (tipo, clave de deduplicación, enviado_en) para alertas por correo |
+| `0007_planes_comerciales` | 10 | Grilla de planes definitiva (D5) |
+| `0008_pagos` | 10 | `pagos` y `eventos_pasarela` (idempotencia de webhooks de la pasarela) |
 | `00NN_dte_factura` | 14 | Tipos 33/34/52/56/61, columnas de receptor (giro, dirección, comuna), forma de pago, vencimiento, tabla `documento_referencias`, documentos recibidos, RCV |
 
-Cada migración trae su prueba pgTAP en `supabase/tests/`.
+Cada migración trae su verificación de solo lectura en `supabase/verificaciones/`. Los números son provisorios: el
+definitivo se asigna al crear el archivo, en orden de creación (la de preferencias, de la
+Fase 2, se crea antes que las de la Fase 4).
 
 ---
 
 ## 7. Fases
 
-Cada fase termina con: código en `main` con CI en verde, prueba en *preview*, archivos de
+Cada fase termina con: código en `main` con lint, typecheck y tests en verde (locales), prueba en *preview*, archivos de
 `documentación/` correspondientes completos, y esta tabla de estado actualizada.
 
 ### Fase 0 — Fundaciones y prueba de conectividad
 
-1. Monorepo pnpm, Biome (igual que `certificacion-node`), TypeScript estricto, `packages/certificacion` por subtree con su `LICENSE` y `NOTICE`.
+1. Monorepo pnpm, Biome (igual que `certificacion-node`), TypeScript estricto, `packages/certificacion` por subtree con su `LICENSE` y `NOTICE`. Se incorpora el monorepo completo de la librería: solo `packages/core` rompería las pruebas de paridad, que leen `paridad/` de la raíz.
 2. **Spike de red:** una ruta Node.js en Vercel (`gru1`) que ejecuta el equivalente de `pnpm humo:tls` contra los 5 hosts de certificación, y una obtención de semilla/token en `apicert` con un certificado de prueba. Si el SII no responde desde Vercel, se decide antes de seguir (otra región o un worker propio con IP fija).
-3. Proyecto Supabase (sa-east-1): migración `0001`, Vault, `pg_cron`, `pg_net`, bucket y Realtime verificados.
-4. Proyecto Vercel con los tres entornos, dominio y variables; integración con Supabase Branching.
+3. Proyecto Supabase (sa-east-1, el único, producción): migraciones `0001` y `0002` aplicadas con `supabase db push`; Vault, `pg_cron`, `pg_net`, bucket y Realtime verificados con `supabase/verificaciones/0001_esquema.sql`.
+4. Proyecto Vercel con los tres entornos, dominio y variables (los tres apuntan al mismo proyecto de Supabase).
 5. Sentry conectado (error de prueba visible con *source maps*) y depuración de secretos probada.
-6. CI de GitHub Actions: lint, typecheck, tests de la librería y de la app, `supabase db lint`, pgTAP, verificación de tipos generados.
 
 **Criterio de aceptación:** un deploy de *preview* obtiene un token del SII de certificación desde Vercel y lo guarda cifrado en `tokens_sii`.
 
@@ -294,7 +297,7 @@ Cada fase termina con: código en `main` con CI en verde, prueba en *preview*, a
 4. Equipo: `crear_invitacion()` + correo Resend; `/invitacion/[token]` llama a `aceptar_invitacion()` (el correo debe calzar); cambio de rol y baja según RLS (`tg_proteger_ultimo_propietario`).
 5. Permisos en la UI derivados del rol (`propietario`, `administrador`, `emisor`, `lector`): se ocultan acciones, pero la autoridad es RLS.
 
-**Criterio:** dos usuarios de organizaciones distintas no ven datos del otro (prueba e2e + pgTAP); un `lector` no puede crear borradores.
+**Criterio:** dos usuarios de organizaciones distintas no ven datos del otro (prueba e2e con dos organizaciones de prueba + simulación de roles en SQL con `rollback`); un `lector` no puede crear borradores.
 
 ### Fase 3 — Empresas, certificados y resoluciones
 
@@ -437,7 +440,7 @@ Flujo del servidor (`emitirDocumento`):
 
 ### Fase 13 — Endurecimiento y lanzamiento
 
-1. Revisión de seguridad: RLS (pgTAP por tabla según `acceso-por-tabla`), que ninguna ruta use `service_role` sin filtrar por organización, cabeceras (CSP con Turnstile y Sentry, HSTS), `server-only` en todo `server/`.
+1. Revisión de seguridad: RLS (simulación de roles por tabla según `acceso-por-tabla`, en transacciones con `rollback`), que ninguna ruta use `service_role` sin filtrar por organización, cabeceras (CSP con Turnstile y Sentry, HSTS), `server-only` en todo `server/`.
 2. Pruebas e2e con Playwright de los flujos críticos: registro → organización → empresa → certificado → certificación (con SII falso) → folios → emisión → seguimiento.
 3. Respaldo: PITR de Supabase; procedimiento de restauración probado; rotación de `SII_TOKENS_KEY` documentada.
 4. Observabilidad: tableros y alertas de Sentry de §4.8; *runbook* para `incierto`, caída del SII y CAF agotado.
@@ -464,12 +467,12 @@ certificación:
 
 | Nivel | Herramienta | Qué cubre |
 |---|---|---|
-| Librería | Vitest (existente, ~1.900 tests y paridad) | Se corren en el CI del monorepo sin cambios |
+| Librería | Vitest (existente, ~1.900 tests y paridad) | Se corren con `pnpm test` del monorepo sin cambios |
 | Unitarias de la app | Vitest | formatos, cálculo de totales, traducción de errores, cifrado de tokens, firma HMAC |
 | Capa SII | Vitest + `TransporteFalso` | cada operación y cada resultado 0–7, sin red |
-| Base de datos | pgTAP (`supabase test db`) | RLS por tabla y rol, triggers de cuotas, `asignar_folio` concurrente |
+| Base de datos | SQL de solo lectura (`supabase/verificaciones/`) y simulación de roles con `rollback`, sobre el único proyecto (producción) | esquema tras cada migración, RLS por tabla y rol, triggers de cuotas, `asignar_folio` concurrente |
 | e2e | Playwright (el proyecto ya tiene el MCP) | flujos críticos con SII falso; accesibilidad con axe |
-| Integración real | job manual en CI contra certificación | humo TLS, token, estado de un envío conocido; nunca automático en cada PR |
+| Integración real | ejecución manual contra certificación (`pnpm humo:tls`, ruta del spike) | humo TLS, token, estado de un envío conocido; nunca automática |
 
 ---
 
@@ -494,8 +497,9 @@ certificación:
 |---|---|
 | El SII bloquea o ralentiza conexiones desde IPs de Vercel | Spike en la Fase 0; plan B: worker Node con IP fija en Chile para la capa SII |
 | Operaciones largas exceden `maxDuration` | `maxDuration` por ruta, progreso por Realtime, y operaciones idempotentes desde `operaciones_sii` |
-| Re-login AUT2000 frenado por el SII | Reutilizar `sesiones_sii` y bloqueo por certificado (`0003`) |
+| Re-login AUT2000 frenado por el SII | Reutilizar `sesiones_sii` y bloqueo por certificado (migración `bloqueos_sii`) |
 | Doble envío tras un resultado incierto | Bloqueo de reintento en UI y API; guía para revisar en el SII |
 | Fuga de secretos (pfx, tokens, CAF) | Vault, cifrado AES-GCM, `server-only`, depuración en Sentry con prueba automática |
 | Cambios del portal del SII (GWT, formularios `of_*`) | `verificar_portal` antes de operar; alertas de código 7; la librería tiene pruebas de paridad para ajustar rápido |
+| Una sola base (producción) para desarrollo, *Preview* y *Production*: un error de desarrollo o una migración mala toca datos reales | Migraciones aditivas con `db push --dry-run` y respaldo previo; verificación de solo lectura después; pruebas de escritura solo dentro de `begin … rollback`; organizaciones de prueba identificadas y borradas al terminar; PITR (Fase 13) |
 | Expectativa de factura por las plantillas | Ocultar lo no soportado y textos del sitio honestos sobre el alcance |

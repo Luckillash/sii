@@ -1,4 +1,4 @@
-import { withSentryConfig } from '@sentry/nextjs';
+import { withSentryConfig } from '@sentry/nextjs/config';
 import type { NextConfig } from 'next';
 
 const config: NextConfig = {
@@ -21,7 +21,7 @@ export default withSentryConfig(config, {
   authToken: process.env.SENTRY_AUTH_TOKEN,
   // Túnel para que los bloqueadores de anuncios no frenen los eventos del navegador.
   tunnelRoute: '/api/monitoring',
-  silent: !process.env.CI,
+  silent: true,
   widenClientFileUpload: true,
   sourcemaps: {
     // Los source maps se suben a Sentry y no quedan públicos en el deploy.
