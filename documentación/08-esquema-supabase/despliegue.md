@@ -85,6 +85,24 @@ La CLI registra cada archivo con su número (`0001`, `0002`…) en
 `apply_migration`: las registra con un timestamp propio y el historial deja de calzar con
 los archivos (habría que repararlo con `supabase migration repair`).
 
+## Estado actual y avisos conocidos
+
+Aplicadas el 2026-11-10 con `db push`: `0001_esquema_inicial` y `0002_extensiones_cron`
+(`supabase_migrations.schema_migrations` = `0001`, `0002`). La verificación
+`supabase/verificaciones/0001_esquema.sql` dio las 13 comprobaciones en `ok`.
+
+Avisos de *Advisors* que son **esperados** y no se corrigen:
+
+| Aviso | Por qué es correcto |
+|---|---|
+| `rls_enabled_no_policy` en `tokens_sii` y `sesiones_sii` (INFO) | Diseño: RLS activo y sin políticas = solo `service_role` |
+| `authenticated_security_definer_function_executable` (WARN, 10 funciones) | Son las RPC pensadas para el panel (`crear_organizacion`, `crear_invitacion`, `aceptar_invitacion`, `crear_api_key`, `crear_webhook`) y las funciones de acceso que usan las políticas (`es_miembro`, `tiene_rol`, `es_admin`, `puede_emitir`, `comparte_organizacion`). Validan `auth.uid()` adentro; las de acceso solo responden sobre el propio usuario |
+| `unused_index` (INFO) | La base está vacía; se revisa con datos reales |
+
+Pendiente (rendimiento, antes de tener volumen): `unindexed_foreign_keys` (INFO, 52 FK sin
+índice, la mayoría `organizacion_id`, que filtran todas las políticas RLS). Se resuelve con
+una migración aditiva de índices `concurrently` (prevista en PLAN-SAAS §6).
+
 ## Requisitos del proyecto
 
 - Postgres 17 (`supabase/config.toml` declara `major_version = 17`).

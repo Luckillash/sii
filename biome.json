@@ -8,6 +8,7 @@
       "!**/.next",
       "!**/dist",
       "!.mcp.json",
+      "!apps/web/src/server/supabase/tipos.ts",
       "!**/*.md",
       "!**/*.yml",
       "!**/*.yaml",

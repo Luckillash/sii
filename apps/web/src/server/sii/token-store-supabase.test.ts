@@ -1,7 +1,8 @@
 import { randomBytes } from 'node:crypto';
 import type { ClaveToken } from '@winex/certificacion';
 import { describe, expect, it } from 'vitest';
-import { type ClienteRpc, ErrorTokenStore, TokenStoreSupabase } from './token-store-supabase';
+import type { ClienteServicio } from '../supabase/service';
+import { ErrorTokenStore, TokenStoreSupabase } from './token-store-supabase';
 
 const CLAVE: ClaveToken = {
   canal: 'rest',
@@ -16,8 +17,8 @@ function clienteFalso() {
   const llamadas: { funcion: string; argumentos: Record<string, unknown> }[] = [];
   const id = (a: Record<string, unknown>) => [a.p_canal, a.p_ambiente, a.p_rut, a.p_huella].join();
   let fallar: string | null = null;
-  const cliente: ClienteRpc = {
-    async rpc(funcion, argumentos) {
+  const falso = {
+    async rpc(funcion: string, argumentos: Record<string, unknown>) {
       llamadas.push({ funcion, argumentos });
       if (fallar === funcion) {
         return { data: null, error: { code: '42501', message: 'detalle con datos de la fila' } };
@@ -38,7 +39,8 @@ function clienteFalso() {
     },
   };
   return {
-    cliente,
+    // Solo implementa rpc(): el store no usa nada más del cliente.
+    cliente: falso as unknown as ClienteServicio,
     filas,
     llamadas,
     fallarEn: (f: string) => {

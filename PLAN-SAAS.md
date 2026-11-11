@@ -20,7 +20,7 @@ Leyenda: ✅ listo · 🟡 en parte · ⬜ pendiente. Se actualiza al terminar c
 
 | Fase | Estado | Nota |
 |---|---|---|
-| 0. Fundaciones y prueba de conectividad | 🟡 | Monorepo, librería, Next, Sentry y `supabase/` listos y probados en local; faltan migraciones en el remoto, Vercel y el spike desde *preview* |
+| 0. Fundaciones y prueba de conectividad | 🟡 | Hecho: monorepo, librería, Next, Sentry (código), migraciones 0001–0002 en Supabase verificadas, tipos generados. Falta: Sentry y Vercel conectados, `cron_token`, y el spike desde *preview* |
 | 1. Design system en Next.js | ⬜ | |
 | 2. Autenticación, organizaciones y equipo | ⬜ | |
 | 3. Empresas, certificados y resoluciones | ⬜ | |
@@ -256,6 +256,7 @@ cada empresa y viven en Vault.
 | `0006_notificaciones` | 8 | Tabla `notificaciones` (tipo, clave de deduplicación, enviado_en) para alertas por correo |
 | `0007_planes_comerciales` | 10 | Grilla de planes definitiva (D5) |
 | `0008_pagos` | 10 | `pagos` y `eventos_pasarela` (idempotencia de webhooks de la pasarela) |
+| `0009_indices_fk` | 13 (o antes, con volumen) | Índices `concurrently` para las FK sin índice que reporta *Advisors* (sobre todo `organizacion_id`, que filtran las políticas RLS); una migración por índice o sin transacción |
 | `00NN_dte_factura` | 14 | Tipos 33/34/52/56/61, columnas de receptor (giro, dirección, comuna), forma de pago, vencimiento, tabla `documento_referencias`, documentos recibidos, RCV |
 
 Cada migración trae su verificación de solo lectura en `supabase/verificaciones/`. Los números son provisorios: el
