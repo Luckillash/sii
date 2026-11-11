@@ -1,0 +1,54 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--browser",
+        "chrome"
+      ]
+    },
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=mjnqvnhzowenbbvbzrym&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching"
+    },
+    "vercel": {
+      "type": "http",
+      "url": "https://mcp.vercel.com"
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "flow": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "C:/Users/lucas/OneDrive/Escritorio/MCPS/flow/mcp/server.js"
+      ],
+      "env": {
+        "FLOW_MCP_TOOLS": "all"
+      }
+    },
+    "transbank": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "C:/Users/lucas/OneDrive/Escritorio/MCPS/transbank/mcp/server.js"
+      ],
+      "env": {
+        "TBK_MCP_TOOLS": "all"
+      }
+    },
+    "sii": {
+      "command": "node",
+      "args": [
+        "C:/Users/lucas/OneDrive/Escritorio/sii/certificacion-node/apps/cli/dist/mcp-main.js",
+        "--cwd", "C:/ruta/a/la/carpeta/con/el/.env"
+      ]
+    }
+  }
+}
