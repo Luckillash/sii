@@ -20,7 +20,7 @@ Leyenda: ✅ listo · 🟡 en parte · ⬜ pendiente. Se actualiza al terminar c
 
 | Fase | Estado | Nota |
 |---|---|---|
-| 0. Fundaciones y prueba de conectividad | 🟡 | Hecho: monorepo, librería, Next, Sentry (código), migraciones 0001–0002 en Supabase verificadas, tipos generados. Falta: Sentry y Vercel conectados, `cron_token`, y el spike desde *preview* |
+| 0. Fundaciones y prueba de conectividad | 🟡 | **Criterio de aceptación cumplido** (2026-11-11: token de apicert desde Vercel `gru1`, guardado cifrado en `tokens_sii`). Falta: conectar Sentry y probar su depuración, y retirar el spike |
 | 1. Design system en Next.js | ⬜ | |
 | 2. Autenticación, organizaciones y equipo | ⬜ | |
 | 3. Empresas, certificados y resoluciones | ⬜ | |

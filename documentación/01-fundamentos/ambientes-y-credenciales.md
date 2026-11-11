@@ -37,7 +37,14 @@ equivocado.
 - El SII exige **RSA-SHA1** (semilla, DTE, sobres). Node 24 con OpenSSL 3.5 lo permite;
   el spike lo verifica en cada ejecución (`entorno.rsaSha1`).
 - Los hosts de certificación negocian TLS 1.2/1.3 con certificados de servidor válidos y
-  **no requieren relajar OpenSSL** (verificado el 2026-11-10 desde una red local en Chile).
+  **no requieren relajar OpenSSL**, con y sin certificado de cliente (mTLS).
+- **Spike del 2026-11-11 desde Vercel `gru1`** (deploy de Production, OpenSSL 3.5.8): los
+  5 hosts respondieron (handshake ~110–310 ms; GET ~170–225 ms) y `apicert` entregó un
+  token en ~2 s, guardado cifrado en `tokens_sii`. El SII no bloquea las IP de Vercel:
+  no hace falta el plan B (worker con IP fija).
+- El runtime de Node lo fija `engines.node` de `apps/web/package.json` (`24.x`): Vercel
+  lo prioriza sobre la configuración del proyecto, y con `>=22.19` elegía la versión más
+  nueva (26).
 
 ## La base de datos: una sola, en producción
 
