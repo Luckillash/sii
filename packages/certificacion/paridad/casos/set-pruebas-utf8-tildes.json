@@ -1,0 +1,7 @@
+{
+  "descripcion": "Tildes y Ñ en UTF-8 con BOM; \"ítem\" con tilde no calza con /item/; [A-Za-z]+ corta \"Kilógramos\"; é/ñ no son \\w para \\b",
+  "operacion": "setPruebas",
+  "entrada": {
+    "texto": "﻿SII SET DE PRUEBA\n\nCASO-1\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nCafé con leche\t\t\t2\t\t\t1.500\nÑandú de peluche\t\t\t1\t\t\t9.990\nJamón serrano \t\t\t3\t\t\t4.200\n\n\nOBSERVACION: \"El ítem 2 es exento. Unidad de medida en Kilógramos.\"\n\nCASO-2\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nPiñón\t\t\t1\t\t\t800\n\n\nOBSERVACION: \"Producto exentoñ\"\n\nCASO-3\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nTé verde\t\t\t1\t\t\t800\nAzúcar\t\t\t1\t\t\t900\n\n\nOBSERVACION: \"El item 2 es exentoé. El item 1 es exento\"\n\n"
+  }
+}

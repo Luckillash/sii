@@ -1,0 +1,31 @@
+{
+  "descripcion": "Neto, IVA y exento en 0 (se omiten) y total 0; sin rangos utilizados",
+  "operacion": "consumoFolios",
+  "entrada": {
+    "ahora": "2026-09-05T23:10:42",
+    "caratula": {
+      "rut_emisor": "76123456-0",
+      "rut_envia": "11111111-1",
+      "fch_resol": "2026-09-04",
+      "nro_resol": "0",
+      "fch_inicio": "2026-09-05",
+      "fch_final": "2026-09-05",
+      "sec_envio": 1
+    },
+    "resumenes": [
+      {
+        "tipo": "39",
+        "neto": 0,
+        "iva": 0,
+        "tasa_iva": "19.00",
+        "exento": 0,
+        "total": 0,
+        "folios_emitidos": 0,
+        "folios_anulados": 0,
+        "folios_utilizados": 0,
+        "rangos_utilizados": [],
+        "rangos_anulados": []
+      }
+    ]
+  }
+}

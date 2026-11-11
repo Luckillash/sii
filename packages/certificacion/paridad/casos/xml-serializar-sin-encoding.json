@@ -1,0 +1,51 @@
+{
+  "descripcion": "new DOMDocument() sin encoding: <?xml version=\"1.0\"?>, UTF-8 con todo lo no ASCII de texto y atributos como &#xHEX; (\\r → &#xD;), y lo inválido de un atributo byte a byte; nombres, comentarios, CDATA y xmlns quedan en UTF-8 crudo",
+  "operacion": "serializarXml",
+  "entrada": {
+    "formatOutput": true,
+    "documento": [
+      {
+        "comentario": " comentario é € "
+      },
+      {
+        "elemento": "Raíz",
+        "atributos": [
+          ["xmlns", "urn:é"],
+          ["a", "é€😀\"'<>&\t\n\r x"],
+          ["control", "x\u0001\u007fy"],
+          ["noCaracter", "a\ufffeb\uffff"],
+          ["noCaracterAlFinal", "a\ufffe"]
+        ],
+        "hijos": [
+          {
+            "elemento": "Texto",
+            "valor": "é € 😀 中 a\rb\tc\nd \"'> &amp;"
+          },
+          {
+            "elemento": "Del",
+            "valor": "x\u007fy"
+          },
+          {
+            "elemento": "Ref",
+            "valor": "&#233;&#13;"
+          },
+          {
+            "elemento": "Mixto",
+            "hijos": [
+              {
+                "cdata": "é€"
+              },
+              {
+                "pi": "pí",
+                "datos": "é"
+              }
+            ]
+          },
+          {
+            "elemento": "Ñ"
+          }
+        ]
+      }
+    ]
+  }
+}

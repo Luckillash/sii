@@ -1,0 +1,9 @@
+{
+  "descripcion": "El mismo PEM con saltos de línea de Windows (CRLF): debe quedar idéntico al de LF",
+  "operacion": "certificado",
+  "entrada": {
+    "archivo": "cert-titular.pem",
+    "clave": "",
+    "crlf": true
+  }
+}

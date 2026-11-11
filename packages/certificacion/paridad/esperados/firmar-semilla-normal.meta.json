@@ -1,0 +1,8 @@
+{
+    "caso": "firmar-semilla-normal",
+    "operacion": "firmarSemilla",
+    "core": "1.9.1",
+    "bytes": 2716,
+    "sha256": "338f64e5f8ded8a06aae9e57ef782f61c08619853191d421d6cb9ad892cc2ab4",
+    "marcas": {}
+}

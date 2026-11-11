@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-unidad-medida",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 1637,
+    "sha256": "44cdd53c43e0401397aebe9a83c88ad285429858e2f7cb91c160a180e54a1ac9",
+    "marcas": {
+        "FchEmis": "2026-09-05"
+    }
+}

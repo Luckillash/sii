@@ -1,0 +1,50 @@
+<Documento xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="F2T41">
+    <Encabezado>
+      <IdDoc>
+        <TipoDTE>41</TipoDTE>
+        <Folio>2</Folio>
+        <FchEmis>2026-11-05</FchEmis>
+        <IndServicio>3</IndServicio>
+      </IdDoc>
+      <Emisor>
+        <RUTEmisor>76123456-7</RUTEmisor>
+        <RznSocEmisor>Comercial Ñuñoa &amp; Cía. Ltda.</RznSocEmisor>
+        <GiroEmisor>Venta de artículos "varios" &lt;menor&gt;</GiroEmisor>
+        <DirOrigen>Av. José Pedro Alessandri 1234</DirOrigen>
+        <CmnaOrigen>Ñuñoa</CmnaOrigen>
+      </Emisor>
+      <Receptor>
+        <RUTRecep>66666666-6</RUTRecep>
+        <RznSocRecep>Cliente Genérico</RznSocRecep>
+      </Receptor>
+      <Totales>
+        <MntNeto>8387</MntNeto>
+        <MntExe>1000</MntExe>
+        <IVA>1593</IVA>
+        <MntTotal>10980</MntTotal>
+      </Totales>
+    </Encabezado>
+    <Detalle>
+      <NroLinDet>1</NroLinDet>
+      <NmbItem>Café en grano €1 — 250g</NmbItem>
+      <QtyItem>2</QtyItem>
+      <UnmdItem>kg</UnmdItem>
+      <PrcItem>4990</PrcItem>
+      <MontoItem>9980</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>2</NroLinDet>
+      <IndExe>1</IndExe>
+      <NmbItem>Servicio exento</NmbItem>
+      <QtyItem>1</QtyItem>
+      <PrcItem>1000</PrcItem>
+      <MontoItem>1000</MontoItem>
+    </Detalle>
+    <Referencia>
+      <NroLinRef>1</NroLinRef>
+      <CodRef>SET</CodRef>
+      <RazonRef>CASO-2</RazonRef>
+    </Referencia>
+  <TED version="1.0"><DD><RE>76123456-7</RE><TD>41</TD><F>2</F><FE>2026-11-05</FE><RR>66666666-6</RR><RSR>Cliente Genérico</RSR><MNT>10980</MNT><IT1>Café en grano ?1 ? 250g</IT1><CAF version="1.0"><DA><RE>76123456-7</RE><RS>COMERCIAL ÑUÑOA</RS><TD>41</TD><RNG><D>1</D><H>100</H></RNG><FA>2026-01-01</FA><RSAPK><M>AAAA</M><E>Aw==</E></RSAPK><IDK>100</IDK></DA><FRMA algoritmo="SHA1withRSA">RELLENO==</FRMA></CAF><TSTED>2026-11-05T10:00:00</TSTED></DD><FRMT algoritmo="SHA1withRSA">RELLENO==</FRMT></TED>
+<TmstFirma>2026-11-05T10:00:00</TmstFirma>
+</Documento>

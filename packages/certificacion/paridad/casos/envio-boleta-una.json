@@ -1,0 +1,18 @@
+{
+  "descripcion": "Una boleta afecta (39) firmada; nroResol \"0\" (string, como el bin)",
+  "operacion": "envioBoleta",
+  "material": "base",
+  "entrada": {
+    "ahora": "2026-09-05T10:31:15",
+    "rutEmisor": "76123456-0",
+    "rutEnvia": "11111111-1",
+    "fchResol": "2026-09-04",
+    "nroResol": "0",
+    "dtes": [
+      {
+        "xml": "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n<DTE xmlns=\"http://www.sii.cl/SiiDte\" version=\"1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <Documento ID=\"F1T39\">\n    <Encabezado>\n      <IdDoc>\n        <TipoDTE>39</TipoDTE>\n        <Folio>1</Folio>\n        <FchEmis>2026-09-05</FchEmis>\n        <IndServicio>3</IndServicio>\n      </IdDoc>\n      <Emisor>\n        <RUTEmisor>76123456-0</RUTEmisor>\n        <RznSocEmisor>EMPRESA DE PRUEBA SPA</RznSocEmisor>\n        <GiroEmisor>VENTA AL POR MENOR</GiroEmisor>\n        <DirOrigen>CALLE 1</DirOrigen>\n        <CmnaOrigen>SANTIAGO</CmnaOrigen>\n      </Emisor>\n      <Receptor>\n        <RUTRecep>66666666-6</RUTRecep>\n        <RznSocRecep>Cliente General</RznSocRecep>\n      </Receptor>\n      <Totales>\n        <MntNeto>16723</MntNeto>\n        <IVA>3177</IVA>\n        <MntTotal>19900</MntTotal>\n      </Totales>\n    </Encabezado>\n    <Detalle>\n      <NroLinDet>1</NroLinDet>\n      <NmbItem>Cambio de aceite</NmbItem>\n      <QtyItem>1</QtyItem>\n      <PrcItem>19900</PrcItem>\n      <MontoItem>19900</MontoItem>\n    </Detalle>\n    <Referencia>\n      <NroLinRef>1</NroLinRef>\n      <CodRef>SET</CodRef>\n      <RazonRef>CASO-1</RazonRef>\n    </Referencia>\n  <TED version=\"1.0\"><DD><RE>76123456-0</RE><TD>39</TD><F>1</F><FE>2026-09-05</FE><RR>66666666-6</RR><RSR>Cliente General</RSR><MNT>19900</MNT><IT1>Cambio de aceite</IT1><CAF version=\"1.0\"><DA><RE>76123456-0</RE><RS>EMPRESA DE PRUEBA SPA</RS><TD>39</TD><RNG><D>1</D><H>100</H></RNG><FA>2026-09-01</FA><RSAPK><M>8DbQizf0nwi5/ccpzln1Mz1bgzGUIPIJnCMJxSGdtJ+XD/1fQ4c1FTh9cdVqKXlSvqp04gHJ6jrzzB7UEk6gWQ==</M><E>Aw==</E></RSAPK><IDK>100</IDK></DA><FRMA algoritmo=\"SHA1withRSA\">eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eA==</FRMA></CAF><TSTED>2026-09-05T10:30:01</TSTED></DD><FRMT algoritmo=\"SHA1withRSA\">lNYazGlpbH3cY74gSwcxRYrIcQ0W1faqeD+x2E9nb7e2AsEhfoIyqMz4KnDNWI0YaCsdri18F2vx3ap+LUuC+A==</FRMT></TED>\n<TmstFirma>2026-09-05T10:30:01</TmstFirma>\n</Documento>\n</DTE>\n",
+        "uri": "#F1T39"
+      }
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+    "caso": "estado-envio-blancos-ascii",
+    "operacion": "estadoEnvio",
+    "core": "1.9.1",
+    "bytes": 328,
+    "sha256": "b2bcad298481a5fa5f707030ae73a5a034248658011788ff61348af32284ef01",
+    "marcas": {}
+}

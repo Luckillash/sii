@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+/.env
+
+# Material sensible: certificado real, CAF (traen la llave privada del folio)
+# y todo lo que generan los scripts. NUNCA versionar.
+/data/certs/
+/data/caf/
+/data/output/
+/data/piloto/
+
+.claude/

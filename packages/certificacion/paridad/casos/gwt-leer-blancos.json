@@ -1,0 +1,14 @@
+{
+  "descripcion": "Blancos de ctype_space (\\f, \\v) entre tokens, coma final, coma faltante y trim de PHP al inicio",
+  "operacion": "gwtLeer",
+  "entrada": {
+    "respuesta": " \t\u0000//OK[ 2 1 ,\f[ \"a\" ,\u000b\"b\", ] , 0 , 7 , ] \n",
+    "esquemas": {
+      "cl.sii.sdi.diii.certBolElectDte.to.EstadoAutorizaTo/1011533792": "SSS",
+      "cl.sii.sdi.diii.certBolElectDte.to.PostulSegHistInsUpdTo/138688689": "SOSOSSOSSSOSSSOSSOOOOS",
+      "cl.sii.sdi.diii.certBolElectDte.to.TdtEmpresaAutorizadaTo/2240026086": "BSSSSSSSSSSSSOOOS",
+      "cl.sii.sdi.diii.certBolElectDte.to.DocumentoAutorizadoTo/493967287": "OOSSSSSSSSSOOOOOS"
+    },
+    "lecturas": ["string", "string"]
+  }
+}

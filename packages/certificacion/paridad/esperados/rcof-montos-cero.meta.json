@@ -1,0 +1,10 @@
+{
+    "caso": "rcof-montos-cero",
+    "operacion": "consumoFolios",
+    "core": "1.9.1",
+    "bytes": 887,
+    "sha256": "b06eb44dc156fbab8de9ae972796ec4aad91a38e8ce5a412bf47fc08ded188ee",
+    "marcas": {
+        "TmstFirmaEnv": "2026-09-05T23:10:42"
+    }
+}

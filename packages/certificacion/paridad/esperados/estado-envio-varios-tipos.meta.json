@@ -1,0 +1,8 @@
+{
+    "caso": "estado-envio-varios-tipos",
+    "operacion": "estadoEnvio",
+    "core": "1.9.1",
+    "bytes": 327,
+    "sha256": "6eecb67f492097733edfa7305784629dcc456c407fad9c40c2c0c4a509710af3",
+    "marcas": {}
+}

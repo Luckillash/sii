@@ -1,0 +1,13 @@
+{
+  "descripcion": "http_build_query con tildes, ñ y caracteres fuera de ISO-8859-1 en UTF-8 (se codifican sus bytes UTF-8)",
+  "operacion": "httpBuildQuery",
+  "entrada": {
+    "campos": [
+      ["razon", "Comercial Díaz & Peña Ltda."],
+      ["giro", "Venta de artículos para el ñandú"],
+      ["ciudad", "Viña del Mar"],
+      ["ACEPTAR", "Confirmar Postulación"],
+      ["fuera", "€ “comillas” ✓ 😀"]
+    ]
+  }
+}

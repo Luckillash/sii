@@ -1,0 +1,8 @@
+{
+  "descripcion": "El ápice tiene xmlns=\"\" (no se emite: no hay ancestro visible con namespace por defecto)",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<r xmlns=\"urn:a\" xmlns:p=\"urn:p\"><t xmlns=\"\"><u/><v xmlns=\"urn:b\"/></t></r>",
+    "etiqueta": "t"
+  }
+}

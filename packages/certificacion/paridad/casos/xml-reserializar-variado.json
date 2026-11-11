@@ -1,0 +1,8 @@
+{
+  "descripcion": "loadXML + saveXML de un ISO-8859-1 con todo lo que libxml cambia o conserva: \\r\\n y \\r → \\n, blancos fuera de la raíz, comentarios y PIs del prólogo/epílogo, <?t?> vs <?t ?>, comillas simples → dobles, xmlns primero, normalización de blancos en atributos, &#9; &#10; &#13;, entidades, CDATA, <a></a> → <a/>, &#8364; en un documento ISO, & en un xmlns, xmlns:xml",
+  "operacion": "reserializarXml",
+  "entrada": {
+    "bytes": "iso-8859-1",
+    "xml": "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\r\n\r\n<!-- prólogo -->\r\n<?pi  con  espacios ?>\n<?vacia?>\n<?vacia-con-espacio ?>\n  <R b='x\"y' a=\"1\" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns='http://www.sii.cl/SiiDte' c=\"t\tn\nr\r\nz &#9;&#10;&#13; &apos;&gt;&lt;&amp;\" xmlns:p=\"urn:a&amp;b\" xmlns:xml=\"http://www.w3.org/XML/1998/namespace\" p:d=\"Ñ\">\r\n  <a></a>\r\n  <b>Ñandú &#8364; &#128512; &#233; &amp; &lt; &gt; &quot; &apos; > ' \" \r x\r\n</b>\r\n  <c>&#13;&#10;&#xD;&#9;</c><![CDATA[ <&> ]]> é ]]&gt;<d><!-- comentario\r\n con salto --></d>\n  <e attr = 'v' /><f> </f><g><?t?><?u ?><?v  x  y ?></g>\r\n  <h><![CDATA[]]></h><i>texto<j/>mixto</i>\n</R>\r\n<!-- epílogo -->\n\n<?fin?>\n\n"
+  }
+}

@@ -1,0 +1,8 @@
+{
+    "caso": "xml-serializar-utf8",
+    "operacion": "serializarXml",
+    "core": "1.9.1",
+    "bytes": 196,
+    "sha256": "49c021b18222f0a7e8343967cc90842e73217be24a0626de92d3d606a584ac84",
+    "marcas": {}
+}

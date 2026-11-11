@@ -1,0 +1,8 @@
+{
+    "caso": "firmar-dte-exenta-41-compacta",
+    "operacion": "firmarDte",
+    "core": "1.9.1",
+    "bytes": 4387,
+    "sha256": "d2f98cc93f8dade4ba94eae89a93bd8fbfdae4a850fe873729fef6d2f0303d61",
+    "marcas": {}
+}

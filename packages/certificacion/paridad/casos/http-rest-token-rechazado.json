@@ -1,0 +1,21 @@
+{
+  "descripcion": "solicitarToken() cuando el SII rechaza la firma (ESTADO -07, sin <TOKEN>): las mismas dos peticiones y los dos clientes lanzan",
+  "operacion": "httpRest",
+  "material": "base",
+  "entrada": {
+    "accion": "solicitarToken",
+    "esperaError": true,
+    "http": {
+      "respuestas": [
+        {
+          "cabeceras": [["Content-Type", "text/xml;charset=UTF-8"]],
+          "cuerpo": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><SII:RESPUESTA xmlns:SII=\"http://www.sii.cl/XMLSchema\"><SII:RESP_BODY><SEMILLA>012345678901</SEMILLA></SII:RESP_BODY><SII:RESP_HDR><ESTADO>00</ESTADO></SII:RESP_HDR></SII:RESPUESTA>"
+        },
+        {
+          "cabeceras": [["Content-Type", "text/xml;charset=UTF-8"]],
+          "cuerpo": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><SII:RESPUESTA xmlns:SII=\"http://www.sii.cl/XMLSchema\"><SII:RESP_HDR><ESTADO>-07</ESTADO><GLOSA>Error en Firma</GLOSA></SII:RESP_HDR></SII:RESPUESTA>"
+        }
+      ]
+    }
+  }
+}

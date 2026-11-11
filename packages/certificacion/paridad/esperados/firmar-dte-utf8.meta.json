@@ -1,0 +1,8 @@
+{
+    "caso": "firmar-dte-utf8",
+    "operacion": "firmarDte",
+    "core": "1.9.1",
+    "bytes": 4742,
+    "sha256": "70fd8a9ee431c9fa7d39ec6f5fdd8ca0058b42bfec34e918ed6c32ac44a52af6",
+    "marcas": {}
+}

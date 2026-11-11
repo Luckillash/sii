@@ -1,0 +1,8 @@
+{
+    "caso": "certificado-pem-crlf",
+    "operacion": "certificado",
+    "core": "1.9.1",
+    "bytes": 7708,
+    "sha256": "240bb094fae0693b03dcd5dafdaee14fa4d9a9c0f543895f91dac9a61ae15d4b",
+    "marcas": {}
+}

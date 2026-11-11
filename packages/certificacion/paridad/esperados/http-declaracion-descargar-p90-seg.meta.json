@@ -1,0 +1,8 @@
+{
+    "caso": "http-declaracion-descargar-p90-seg",
+    "operacion": "httpDeclaracion",
+    "core": "1.9.1",
+    "bytes": 930,
+    "sha256": "4a0235f036328f52aea2735ff6ab591dd55c8aa5f0947b139b098fed178974b8",
+    "marcas": {}
+}

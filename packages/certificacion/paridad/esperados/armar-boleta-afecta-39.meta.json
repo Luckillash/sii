@@ -1,0 +1,12 @@
+{
+    "caso": "armar-boleta-afecta-39",
+    "operacion": "armar-boleta",
+    "core": "1.9.1",
+    "bytes": 4847,
+    "sha256": "9f7e48083c0dff8eeedec202073bceb802e5f9b17c802b3e8f59893e812982df",
+    "marcas": {
+        "FchEmis": "2026-09-05",
+        "TSTED": "2026-09-05T10:30:01",
+        "TmstFirma": "2026-09-05T10:30:01"
+    }
+}

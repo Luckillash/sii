@@ -1,0 +1,18 @@
+{
+  "descripcion": "& < > y comillas en RSR e IT1 (htmlspecialchars ENT_XML1: comillas sin escapar)",
+  "operacion": "timbre",
+  "entrada": {
+    "caf": "caf-39.xml",
+    "ahora": "2026-09-05T10:35:06",
+    "datos": {
+      "rut_emisor": "76123456-0",
+      "tipo_dte": "39",
+      "folio": "5",
+      "fecha": "2026-09-05",
+      "rut_receptor": "66666666-6",
+      "razon_social_receptor": "Pan & Vino <SA> \"Hnos\" 'Ltda'",
+      "monto_total": "1190",
+      "nombre_item_1": "Café & Té <grande> > &amp;"
+    }
+  }
+}

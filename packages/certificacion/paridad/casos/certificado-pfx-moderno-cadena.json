@@ -1,0 +1,8 @@
+{
+  "descripcion": ".pfx moderno con hoja + CA intermedia + CA raíz: orden de la cadena que arma openssl_pkcs12_read",
+  "operacion": "certificado",
+  "entrada": {
+    "archivo": "cert-moderno-cadena.pfx",
+    "clave": "clave-de-prueba"
+  }
+}

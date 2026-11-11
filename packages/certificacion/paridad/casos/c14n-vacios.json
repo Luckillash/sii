@@ -1,0 +1,7 @@
+{
+  "descripcion": "Elementos vacíos (<a/>, <b></b>, con atributos, con solo blancos)",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<r xmlns=\"urn:sii:a\"><a/><b></b><c x=\"1\" y=\"2\"/><d> </d><e><f/></e></r>"
+  }
+}

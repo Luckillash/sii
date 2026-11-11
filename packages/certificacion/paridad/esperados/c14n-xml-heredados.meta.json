@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-xml-heredados",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 126,
+    "sha256": "383962f9ec5d378e36d9b17c7e41a415f7a4657b808c01786a70c66cac580b4b",
+    "marcas": {}
+}

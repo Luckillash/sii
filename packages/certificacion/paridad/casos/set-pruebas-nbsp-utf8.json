@@ -1,0 +1,7 @@
+{
+  "descripcion": "NBSP (C2 A0), U+2003 y U+FEFF en UTF-8: no son blancos para el \\s ni el trim() del PHP",
+  "operacion": "setPruebas",
+  "entrada": {
+    "texto": "CASO-1\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nArroz\t\t\t5 \t\t\t700\nPan \t\t\t2\t\t\t300\nLeche  3  900\nQueso\t\t\t 1\t\t\t4000\nHuevos\t\t\t12\t\t\t150\n\n\nCASO-2\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nHarina\t\t\t1\t\t\t1200\n\n\nOBSERVACION: \"Producto exento\"\nOBSERVACION: \"Unidad de medida en Kg\"\n\nCASO-3\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nTe  2\t\t\t500\nMate \t\t\t1\t\t\t2500\nYerba\t\t\t1\t\t\t﻿3000\nCacao\t\t\t1\t\t\t3500\n\n"
+  }
+}

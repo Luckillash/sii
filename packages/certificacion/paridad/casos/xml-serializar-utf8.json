@@ -1,0 +1,50 @@
+{
+  "descripcion": "DOMDocument('1.0', 'UTF-8') sin formatOutput: bytes UTF-8 crudos (también U+FFFE y controles), escapes de texto y atributo, árbol anidado en una sola línea",
+  "operacion": "serializarXml",
+  "entrada": {
+    "encoding": "UTF-8",
+    "documento": [
+      {
+        "pi": "estilo",
+        "datos": "href=\"x.xsl\""
+      },
+      {
+        "elemento": "Raiz",
+        "atributos": [["xmlns", "urn:x"], ["a", "é€😀\"'<>&\t\n\r\u0001\ufffe"]],
+        "hijos": [
+          {
+            "elemento": "A",
+            "valor": "é € 😀 中 \r\n\t \"' <&> \u0001\ufffe"
+          },
+          {
+            "elemento": "B",
+            "hijos": [
+              {
+                "elemento": "C",
+                "hijos": [
+                  {
+                    "elemento": "D",
+                    "valor": "1"
+                  },
+                  {
+                    "elemento": "E"
+                  }
+                ]
+              },
+              {
+                "comentario": "c"
+              },
+              {
+                "elemento": "F",
+                "valor": ""
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "comentario": "fin"
+      }
+    ]
+  }
+}

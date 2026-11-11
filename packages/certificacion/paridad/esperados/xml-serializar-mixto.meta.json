@@ -1,0 +1,8 @@
+{
+    "caso": "xml-serializar-mixto",
+    "operacion": "serializarXml",
+    "core": "1.9.1",
+    "bytes": 3628,
+    "sha256": "1e98aa91bfcf12b741e25733e6c808ef867d073a568f86f231eec4f03ca4af8d",
+    "marcas": {}
+}

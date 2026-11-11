@@ -1,0 +1,10 @@
+{
+    "caso": "rcof-set-completo",
+    "operacion": "rcof-set-completo",
+    "core": "1.9.1",
+    "bytes": 3729,
+    "sha256": "05f1aceb1e79956ce7b7b151ec82254f98a48ed17e9b9e412f2acaaea05c8c8d",
+    "marcas": {
+        "TmstFirmaEnv": "2026-09-05T10:30:01"
+    }
+}

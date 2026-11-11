@@ -1,0 +1,15 @@
+{
+  "descripcion": "<select> con la regla de SolicitudFolios::form(): la primera <option> selected; si no hay, el primer value no vacío; <option> sin value cuenta como ''; los select van después de todos los input",
+  "operacion": "formFolios",
+  "entrada": {
+    "paginas": [
+      "<form><select name=\"s\"><option value=\"1\">a<option value=\"2\" selected>b<option>c</select><select NAME=\"t\"><option>x<option value=\"9\"></select></form>",
+      "<form action=\"a\"><select name=\"s\"><optgroup label=\"g\"><option value=\"1\"><option value=\"2\" selected></optgroup></select></form>",
+      "<form action=\"a\"><select name=\"s\"><option value=\"1\">uno</option><option>dos</option></select><select name=\"v\"></select><select><option value=\"z\" selected></select></form>",
+      "<form action=\"a\"><select name=\"s\"><option value=\"\">Seleccione</option><option value=\"33\">F</option><option value=\"39\">B</option></select><input name=\"despues\" value=\"1\"></form>",
+      "<form action=\"a\"><select name=\"s\"><option value=\"1\" selected><option value=\"2\" selected></select><select name=\"s\"><option value=\"3\"></select><input name=\"s\" value=\"input\"></form>",
+      "<form action=\"a\"><select name=\"s\"><option value=\"\" selected>vacío</option><option value=\"7\">siete</option></select></form>",
+      "<form action=\"a\"><select name=\"s\"><option value=\"a&amp;b\">x</option><option value=\" con espacios \" SELECTED=\"no\">y</option></select></form>"
+    ]
+  }
+}

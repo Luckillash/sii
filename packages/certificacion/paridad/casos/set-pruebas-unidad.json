@@ -1,0 +1,7 @@
+{
+  "descripcion": "Unidad de medida para un ítem, para todos, con puntuación final, ítem inexistente y frases que no calzan",
+  "operacion": "setPruebas",
+  "entrada": {
+    "texto": "CASO-1\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nArroz\t\t\t5\t\t\t700\n\n\nOBSERVACION: \"Se debe informar en el XML Unidad de medida en Kg.\"\n\nCASO-2\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nArroz\t\t\t5\t\t\t700\nAceite\t\t\t2\t\t\t2500\n\n\nOBSERVACION: \"Para el item 2 se debe informar la unidad de medida en Lt.\"\n\nCASO-3\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nArroz\t\t\t5\t\t\t700\nPorotos\t\t\t2\t\t\t1500\nLentejas\t\t\t1\t\t\t1200\n\n\nOBSERVACION: \"Informar UNIDAD DE MEDIDA EN  kg, en todos\"\n\nCASO-4\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nArroz\t\t\t5\t\t\t700\n\n\nOBSERVACION: \"El item 1 con unidad de medida en Kg;\"\n\nCASO-5\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nArroz\t\t\t5\t\t\t700\nAceite\t\t\t2\t\t\t2500\n\n\nOBSERVACION: \"El item 7 con unidad de medida en Kg\"\n\nCASO-6\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nArroz\t\t\t5\t\t\t700\n\n\nOBSERVACION: \"Informar la unidad  de medida en Kg\"\n\nCASO-7\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nArroz\t\t\t5\t\t\t700\nAceite\t\t\t2\t\t\t2500\n\n\nOBSERVACION: \"El item 2 es exento. Unidad de medida en Un. para el item 1\"\n\n"
+  }
+}

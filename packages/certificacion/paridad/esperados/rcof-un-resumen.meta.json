@@ -1,0 +1,10 @@
+{
+    "caso": "rcof-un-resumen",
+    "operacion": "consumoFolios",
+    "core": "1.9.1",
+    "bytes": 1086,
+    "sha256": "40c5c8f6ab195731c50da3506334e28daddb86bd867a952456a1d6bec1375073",
+    "marcas": {
+        "TmstFirmaEnv": "2026-09-05T23:10:42"
+    }
+}

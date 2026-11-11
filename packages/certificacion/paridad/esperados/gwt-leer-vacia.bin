@@ -1,0 +1,7 @@
+{
+    "lecturas": [],
+    "error": {
+        "clase": "PostulacionException",
+        "mensaje": "Respuesta inesperada del servicio del SII: "
+    }
+}

@@ -1,0 +1,66 @@
+=== peticion 1 de 4 (https) ===
+POST /certBolElectDteInternet/facade HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 264
+content-type: text/x-gwt-rpc; charset=UTF-8
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; RUT_NS=11111111; DV_NS=1; WWW4SOLO=W1
+host: <https>
+origin: https://www4.sii.cl
+referer: https://www4.sii.cl/certBolElectDteInternet/
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+x-gwt-module-base: https://www4.sii.cl/certBolElectDteInternet/
+x-gwt-permutation: 0FC3D987613537E6E13E9BB93A406F13
+
+7|0|7|https://www4.sii.cl/certBolElectDteInternet/|082D0AC4BC4D75A5DF38F116C53877D4|cl.sii.sdi.diii.certBolElectDte.web.client.service.Facade|obtenerEstadoAutorizaEmp|java.lang.Integer/3438268394|java.lang.String/2004016611|0|1|2|3|4|4|5|6|5|6|5|76123456|7|5|90|0|
+=== fin de la peticion 1 ===
+=== peticion 2 de 4 (https) ===
+POST /certBolElectDteInternet/facade HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 257
+content-type: text/x-gwt-rpc; charset=UTF-8
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; RUT_NS=11111111; DV_NS=1; WWW4SOLO=W1; JSESSIONID=SESIONGWTPRUEBA01
+host: <https>
+origin: https://www4.sii.cl
+referer: https://www4.sii.cl/certBolElectDteInternet/
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+x-gwt-module-base: https://www4.sii.cl/certBolElectDteInternet/
+x-gwt-permutation: 0FC3D987613537E6E13E9BB93A406F13
+
+7|0|7|https://www4.sii.cl/certBolElectDteInternet/|082D0AC4BC4D75A5DF38F116C53877D4|cl.sii.sdi.diii.certBolElectDte.web.client.service.Facade|recuperarNombreContribuyente|java.lang.Integer/3438268394|java.lang.String/2004016611|0|1|2|3|4|2|5|6|5|76123456|7|
+=== fin de la peticion 2 ===
+=== peticion 3 de 4 (https) ===
+POST /certBolElectDteInternet/facade HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 256
+content-type: text/x-gwt-rpc; charset=UTF-8
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; RUT_NS=11111111; DV_NS=1; WWW4SOLO=W1; JSESSIONID=SESIONGWTPRUEBA01
+host: <https>
+origin: https://www4.sii.cl
+referer: https://www4.sii.cl/certBolElectDteInternet/
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+x-gwt-module-base: https://www4.sii.cl/certBolElectDteInternet/
+x-gwt-permutation: 0FC3D987613537E6E13E9BB93A406F13
+
+7|0|8|https://www4.sii.cl/certBolElectDteInternet/|082D0AC4BC4D75A5DF38F116C53877D4|cl.sii.sdi.diii.certBolElectDte.web.client.service.Facade|listarDocAutorizados|java.lang.Integer/3438268394|java.lang.String/2004016611|0|90|1|2|3|4|3|5|6|6|5|76123456|7|8|
+=== fin de la peticion 3 ===
+=== peticion 4 de 4 (https) ===
+POST /certBolElectDteInternet/facade HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 1067
+content-type: text/x-gwt-rpc; charset=UTF-8
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; RUT_NS=11111111; DV_NS=1; WWW4SOLO=W1; JSESSIONID=SESIONGWTPRUEBA01
+host: <https>
+origin: https://www4.sii.cl
+referer: https://www4.sii.cl/certBolElectDteInternet/
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+x-gwt-module-base: https://www4.sii.cl/certBolElectDteInternet/
+x-gwt-permutation: 0FC3D987613537E6E13E9BB93A406F13
+
+7|0|35|https://www4.sii.cl/certBolElectDteInternet/|082D0AC4BC4D75A5DF38F116C53877D4|cl.sii.sdi.diii.certBolElectDte.web.client.service.Facade|autorizarEmpresaBolProd|cl.sii.sdi.diii.certBolElectDte.to.PostulSegHistInsUpdTo/138688689|P91|BVE|java.lang.Integer/3438268394|0|cl.sii.sdi.diii.certBolElectDte.to.TdtEmpresaAutorizadaTo/2240026086|2|1|SII|<fecha>|software@empresa-prueba.cl|Programación Ñandú SpA|19|S|https://www.empresa-prueba.cl/boletas/consulta|java.util.ArrayList/4159755760|cl.sii.sdi.diii.certBolElectDte.to.DocumentoAutorizadoTo/493967287|java.lang.Long/4227064769|BOLETA ELECTRONICA|<fecha>|AUTORIZADO||39|N|java.lang.String/2004016611|Boleta afecta|FIN|BOLETA EXENTA ELECTRONICA|41|Boleta exenta|SOCIEDAD DE PRUEBA ÑUÑOA SPA|1|2|3|4|1|5|5|6|0|7|8|90|0|0|0|0|9|0|10|0|7|9|11|12|13|14|14|14|15|16|17|18|8|76123456|8|22222222|8|11111111|19|14|14|0|20|2|21|8|39|22|ZlFhXwA|7|23|18|0|24|25|26|27|28|8|76123456|22|F|0|29|30|22|gAAAAAAAB|31|21|8|41|22|ZlFhXwA|7|32|18|0|24|25|26|33|28|8|76123456|-12|0|29|34|22|EAAAAA|31|0|35|22|A|0|8|76123456|0|0|
+=== fin de la peticion 4 ===
+=== resultado ===
+ok {"empresa":"76123456-0","codigo":"P91","glosa":"DECLARACION EFECTUADA 11111111-1","paso":90,"porDeclarar":false,"autorizada":true}

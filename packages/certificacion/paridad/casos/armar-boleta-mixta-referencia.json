@@ -1,0 +1,39 @@
+{
+  "descripcion": "Afecto y exento juntos (caso 4 del set) con unidad de medida y referencia SET / CASO-4: el MNT del TED es el MntTotal del XML",
+  "operacion": "armar-boleta",
+  "material": "base",
+  "entrada": {
+    "ahora": "2026-09-05T12:15:30",
+    "caf": "caf-39.xml",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "59",
+    "detalles": [
+      {
+        "nombre": "item afecto 1",
+        "cantidad": 8,
+        "precio": 1590,
+        "unidad": "Kg"
+      },
+      {
+        "nombre": "item exento 2",
+        "cantidad": 2,
+        "precio": 1000,
+        "exento": true
+      }
+    ],
+    "referencia": {
+      "codigo": "SET",
+      "razon": "CASO-4"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "descripcion": "mb_convert_encoding(UTF-8 → ISO-8859-1): tildes y Ñ pasan a un byte; €, emoji, CJK y demás code points fuera de rango se vuelven un '?' cada uno",
+  "operacion": "convertirIso",
+  "entrada": {
+    "textos": [
+      "Ñandú DÍAZ áéíóú ÁÉÍÓÚ üÜ ñ ¿¡ °ª ç ß ÿ",
+      "€ 😀 中文 ‰ “comillas” — ‘x’ …",
+      "\u0080\u009f\u00a0ÿĀ",
+      "👨\u200d👩\u200d👧 🇨🇱 e\u0301",
+      "\ufffd\ufeff\uffff",
+      "a\u0000b\u0001\u007f",
+      ""
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+    "caso": "armar-boleta-exenta-41",
+    "operacion": "armar-boleta",
+    "core": "1.9.1",
+    "bytes": 4695,
+    "sha256": "d1eaf95e58a64d2542b2fe0813e12ae2abe6e9760d5aec735f9990d8f2c25ef5",
+    "marcas": {
+        "FchEmis": "2026-09-05",
+        "TSTED": "2026-09-05T11:00:00",
+        "TmstFirma": "2026-09-05T11:00:00"
+    }
+}

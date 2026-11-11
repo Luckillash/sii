@@ -1,0 +1,8 @@
+{
+  "descripcion": "REC sin GLOSA: resumen() es solo el estado",
+  "operacion": "estadoEnvio",
+  "entrada": {
+    "respuesta": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<SII:RESPUESTA xmlns:SII=\"http://www.sii.cl/XMLSchema\"><SII:RESP_HDR><TRACKID>1</TRACKID><ESTADO>REC</ESTADO></SII:RESP_HDR></SII:RESPUESTA>",
+    "trackId": "781"
+  }
+}

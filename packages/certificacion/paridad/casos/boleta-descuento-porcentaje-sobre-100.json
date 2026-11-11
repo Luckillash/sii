@@ -1,0 +1,30 @@
+{
+  "descripcion": "Porcentaje mayor que 100: se acota a 100",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-09-05T15:10:00",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "65",
+    "detalles": [
+      {
+        "nombre": "X",
+        "cantidad": 1,
+        "precio": 1000
+      }
+    ],
+    "descuento": {
+      "tipo": "porcentaje",
+      "valor": 250
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-nombre-largo",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 1252,
+    "sha256": "1163dbf34a2d1217147597e01721b4bb5062fe1966457e1e475b5edf581a9d19",
+    "marcas": {
+        "FchEmis": "2026-09-05"
+    }
+}

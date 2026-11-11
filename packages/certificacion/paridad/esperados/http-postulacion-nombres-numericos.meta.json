@@ -1,0 +1,8 @@
+{
+    "caso": "http-postulacion-nombres-numericos",
+    "operacion": "httpPostulacion",
+    "core": "1.9.1",
+    "bytes": 3514,
+    "sha256": "adafc2de61cbdeab20dcb716c8544f57dd883dc635c46fea818eb210358be059",
+    "marcas": {}
+}

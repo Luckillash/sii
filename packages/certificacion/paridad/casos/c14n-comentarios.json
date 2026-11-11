@@ -1,0 +1,8 @@
+{
+  "descripcion": "Comentarios antes y después de la raíz, en hermanos del ápice y dentro del subárbol (C14N sin comentarios)",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<?xml version=\"1.0\"?>\n<!-- antes -->\n<r><!-- hermano previo --><m>\n<!-- dentro -->\n<h>t<!--x-->u</h><!---->\n</m><!-- hermano siguiente --></r>\n<!-- después -->\n",
+    "etiqueta": "m"
+  }
+}

@@ -1,0 +1,11 @@
+=== peticion 1 de 1 (https) ===
+POST /DTEWS/QueryEstUp.jws HTTP/1.1
+content-length: 308
+content-type: text/xml; charset=utf-8
+host: <https>
+soapaction: ""
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><soapenv:Body><ns:getEstUp xmlns:ns="http://DefaultNamespace"><RutCompania>76123456</RutCompania><DvCompania>0</DvCompania><TrackId>1234567890</TrackId><Token>TOKENDEPRUEBA0001</Token></ns:getEstUp></soapenv:Body></soapenv:Envelope>
+=== fin de la peticion 1 ===
+=== resultado ===
+error

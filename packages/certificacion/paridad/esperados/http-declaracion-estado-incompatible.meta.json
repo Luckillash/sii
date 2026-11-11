@@ -1,0 +1,8 @@
+{
+    "caso": "http-declaracion-estado-incompatible",
+    "operacion": "httpDeclaracion",
+    "core": "1.9.1",
+    "bytes": 929,
+    "sha256": "1a65960d8811c5cf7c1fa3a2687032d6356cd5ccb2282d7455197412a088e3f6",
+    "marcas": {}
+}

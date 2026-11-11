@@ -1,0 +1,8 @@
+{
+    "caso": "xml-reserializar-iso-minusculas",
+    "operacion": "reserializarXml",
+    "core": "1.9.1",
+    "bytes": 97,
+    "sha256": "c1cb767d2bfec8f87ce09cc7eb047db1cd52404e4d10de0ccace950027dcbaeb",
+    "marcas": {}
+}

@@ -1,0 +1,187 @@
+{
+  "descripcion": "ConsumoFolios con la forma exacta de GeneradorConsumoFolios (xmlns, xmlns:xsi y xsi:schemaLocation como atributos, dos Resumen, rangos discontinuos y anulados)",
+  "operacion": "serializarXml",
+  "entrada": {
+    "encoding": "ISO-8859-1",
+    "formatOutput": true,
+    "documento": [
+      {
+        "elemento": "ConsumoFolios",
+        "atributos": [
+          ["xmlns", "http://www.sii.cl/SiiDte"],
+          ["xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance"],
+          ["xsi:schemaLocation", "http://www.sii.cl/SiiDte ConsumoFolio_v10.xsd"],
+          ["version", "1.0"]
+        ],
+        "hijos": [
+          {
+            "elemento": "DocumentoConsumoFolios",
+            "atributos": [["ID", "RCOF"]],
+            "hijos": [
+              {
+                "elemento": "Caratula",
+                "atributos": [["version", "1.0"]],
+                "hijos": [
+                  {
+                    "elemento": "RutEmisor",
+                    "valor": "76123456-K"
+                  },
+                  {
+                    "elemento": "RutEnvia",
+                    "valor": "11111111-1"
+                  },
+                  {
+                    "elemento": "FchResol",
+                    "valor": "2026-09-05"
+                  },
+                  {
+                    "elemento": "NroResol",
+                    "valor": "0"
+                  },
+                  {
+                    "elemento": "FchInicio",
+                    "valor": "2026-11-05"
+                  },
+                  {
+                    "elemento": "FchFinal",
+                    "valor": "2026-11-05"
+                  },
+                  {
+                    "elemento": "SecEnvio",
+                    "valor": "1"
+                  },
+                  {
+                    "elemento": "TmstFirmaEnv",
+                    "valor": "2026-11-05T10:20:30"
+                  }
+                ]
+              },
+              {
+                "elemento": "Resumen",
+                "hijos": [
+                  {
+                    "elemento": "TipoDocumento",
+                    "valor": "39"
+                  },
+                  {
+                    "elemento": "MntNeto",
+                    "valor": "8403"
+                  },
+                  {
+                    "elemento": "MntIva",
+                    "valor": "1597"
+                  },
+                  {
+                    "elemento": "TasaIVA",
+                    "valor": "19"
+                  },
+                  {
+                    "elemento": "MntExento",
+                    "valor": "1500"
+                  },
+                  {
+                    "elemento": "MntTotal",
+                    "valor": "11500"
+                  },
+                  {
+                    "elemento": "FoliosEmitidos",
+                    "valor": "5"
+                  },
+                  {
+                    "elemento": "FoliosAnulados",
+                    "valor": "1"
+                  },
+                  {
+                    "elemento": "FoliosUtilizados",
+                    "valor": "4"
+                  },
+                  {
+                    "elemento": "RangoUtilizados",
+                    "hijos": [
+                      {
+                        "elemento": "Inicial",
+                        "valor": "1"
+                      },
+                      {
+                        "elemento": "Final",
+                        "valor": "2"
+                      }
+                    ]
+                  },
+                  {
+                    "elemento": "RangoUtilizados",
+                    "hijos": [
+                      {
+                        "elemento": "Inicial",
+                        "valor": "4"
+                      },
+                      {
+                        "elemento": "Final",
+                        "valor": "5"
+                      }
+                    ]
+                  },
+                  {
+                    "elemento": "RangoAnulados",
+                    "hijos": [
+                      {
+                        "elemento": "Inicial",
+                        "valor": "3"
+                      },
+                      {
+                        "elemento": "Final",
+                        "valor": "3"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "elemento": "Resumen",
+                "hijos": [
+                  {
+                    "elemento": "TipoDocumento",
+                    "valor": "41"
+                  },
+                  {
+                    "elemento": "MntExento",
+                    "valor": "2000"
+                  },
+                  {
+                    "elemento": "MntTotal",
+                    "valor": "2000"
+                  },
+                  {
+                    "elemento": "FoliosEmitidos",
+                    "valor": "1"
+                  },
+                  {
+                    "elemento": "FoliosAnulados",
+                    "valor": "0"
+                  },
+                  {
+                    "elemento": "FoliosUtilizados",
+                    "valor": "1"
+                  },
+                  {
+                    "elemento": "RangoUtilizados",
+                    "hijos": [
+                      {
+                        "elemento": "Inicial",
+                        "valor": "10"
+                      },
+                      {
+                        "elemento": "Final",
+                        "valor": "10"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "descripcion": "RCOF firmado con firmarDte(..., \"#RCOF\"), con los montos que calcula bin/certificacion/enviar-consumo-folios.php",
+  "operacion": "consumoFolios",
+  "material": "base",
+  "entrada": {
+    "ahora": "2026-09-05T23:10:42",
+    "caratula": {
+      "rut_emisor": "76123456-0",
+      "rut_envia": "11111111-1",
+      "fch_resol": "2026-09-04",
+      "nro_resol": "0",
+      "fch_inicio": "2026-09-05",
+      "fch_final": "2026-09-05",
+      "sec_envio": 1
+    },
+    "resumenes": [
+      {
+        "tipo": "39",
+        "neto": 43831,
+        "iva": 8329,
+        "tasa_iva": "19.00",
+        "exento": 2000,
+        "total": 54160,
+        "folios_emitidos": 5,
+        "folios_anulados": 0,
+        "folios_utilizados": 5,
+        "rangos_utilizados": [
+          {
+            "inicial": 56,
+            "final": 60
+          }
+        ],
+        "rangos_anulados": []
+      }
+    ],
+    "firmar": true
+  }
+}

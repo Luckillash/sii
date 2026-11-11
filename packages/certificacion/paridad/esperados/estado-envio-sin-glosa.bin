@@ -1,0 +1,13 @@
+{
+    "trackId": "1",
+    "estado": "REC",
+    "glosa": "",
+    "informados": 0,
+    "aceptados": 0,
+    "rechazados": 0,
+    "reparos": 0,
+    "enProceso": true,
+    "procesado": false,
+    "limpio": false,
+    "resumen": "REC"
+}

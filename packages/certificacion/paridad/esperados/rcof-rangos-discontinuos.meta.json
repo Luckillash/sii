@@ -1,0 +1,10 @@
+{
+    "caso": "rcof-rangos-discontinuos",
+    "operacion": "consumoFolios",
+    "core": "1.9.1",
+    "bytes": 1326,
+    "sha256": "ab6e40d80d40bfdf2e1191c0b2afca1aca9837351eb21db2310d5cbc4bb803b5",
+    "marcas": {
+        "TmstFirmaEnv": "2026-09-05T23:10:42"
+    }
+}

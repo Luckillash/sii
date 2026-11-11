@@ -1,0 +1,13 @@
+=== peticion 1 de 1 (https2) ===
+GET /cvc_cgi/dte/of_solicita_folios HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; NETSCAPE_LIVEWIRE.rut=11111111; MAULLINSOLO=M1
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+
+=== fin de la peticion 1 ===
+=== resultado ===
+error sesion-caduca

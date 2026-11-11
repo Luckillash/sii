@@ -1,0 +1,8 @@
+{
+  "descripcion": "Blancos ASCII (espacio, \\t, \\n, \\r, VT, FF) alrededor de los valores: se quitan",
+  "operacion": "estadoEnvio",
+  "entrada": {
+    "respuesta": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<SII:RESPUESTA xmlns:SII=\"http://www.sii.cl/XMLSchema\"><SII:RESP_HDR><TRACKID>\n 1234567890 \r\n</TRACKID><ESTADO>\t\u000bEPR\f </ESTADO><GLOSA>  Envio  Procesado \n</GLOSA></SII:RESP_HDR><SII:RESP_BODY><TIPO_DOCTO>39</TIPO_DOCTO><INFORMADOS> 5\n</INFORMADOS><ACEPTADOS>\t5\t</ACEPTADOS><RECHAZADOS>\r0\u000b</RECHAZADOS><REPAROS>\f0 </REPAROS></SII:RESP_BODY></SII:RESPUESTA>",
+    "trackId": "1234567890"
+  }
+}

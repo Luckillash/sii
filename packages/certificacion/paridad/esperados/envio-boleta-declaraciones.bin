@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<EnvioBOLETA xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sii.cl/SiiDte EnvioBOLETA_v11.xsd" version="1.0">
+<SetDTE ID="SetDoc">
+<Caratula version="1.0">
+<RutEmisor>76123456-0</RutEmisor>
+<RutEnvia>11111111-1</RutEnvia>
+<RutReceptor>60803000-K</RutReceptor>
+<FchResol>2026-09-04</FchResol>
+<NroResol>0</NroResol>
+<TmstFirmaEnv>2026-09-05T10:31:15</TmstFirmaEnv>
+<SubTotDTE>
+<TpoDTE>39</TpoDTE>
+<NroDTE>4</NroDTE>
+</SubTotDTE>
+<SubTotDTE>
+<TpoDTE>41</TpoDTE>
+<NroDTE>1</NroDTE>
+</SubTotDTE>
+</Caratula>
+
+<DTE xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
+  <Documento ID="F1T39">
+    <Encabezado>
+      <IdDoc>
+        <TipoDTE>39</TipoDTE>
+        <Folio>1</Folio>
+        <FchEmis>2026-09-05</FchEmis>
+        <IndServicio>3</IndServicio>
+      </IdDoc>
+      <Emisor>
+        <RUTEmisor>76123456-0</RUTEmisor>
+        <RznSocEmisor>EMPRESA DE PRUEBA SPA</RznSocEmisor>
+        <GiroEmisor>VENTA AL POR MENOR</GiroEmisor>
+        <DirOrigen>CALLE 1</DirOrigen>
+        <CmnaOrigen>SANTIAGO</CmnaOrigen>
+      </Emisor>
+      <Receptor>
+        <RUTRecep>66666666-6</RUTRecep>
+        <RznSocRecep>Cliente General</RznSocRecep>
+      </Receptor>
+      <Totales>
+        <MntNeto>16723</MntNeto>
+        <IVA>3177</IVA>
+        <MntTotal>19900</MntTotal>
+      </Totales>
+    </Encabezado>
+    <Detalle>
+      <NroLinDet>1</NroLinDet>
+      <NmbItem>Cambio de aceite</NmbItem>
+      <QtyItem>1</QtyItem>
+      <PrcItem>19900</PrcItem>
+      <MontoItem>19900</MontoItem>
+    </Detalle>
+    <Referencia>
+      <NroLinRef>1</NroLinRef>
+      <CodRef>SET</CodRef>
+      <RazonRef>CASO-1</RazonRef>
+    </Referencia>
+  <TED version="1.0"><DD><RE>76123456-0</RE><TD>39</TD><F>1</F><FE>2026-09-05</FE><RR>66666666-6</RR><RSR>Cliente General</RSR><MNT>19900</MNT><IT1>Cambio de aceite</IT1><CAF version="1.0"><DA><RE>76123456-0</RE><RS>EMPRESA DE PRUEBA SPA</RS><TD>39</TD><RNG><D>1</D><H>100</H></RNG><FA>2026-09-01</FA><RSAPK><M>8DbQizf0nwi5/ccpzln1Mz1bgzGUIPIJnCMJxSGdtJ+XD/1fQ4c1FTh9cdVqKXlSvqp04gHJ6jrzzB7UEk6gWQ==</M><E>Aw==</E></RSAPK><IDK>100</IDK></DA><FRMA algoritmo="SHA1withRSA">eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eA==</FRMA></CAF><TSTED>2026-09-05T10:30:01</TSTED></DD><FRMT algoritmo="SHA1withRSA">lNYazGlpbH3cY74gSwcxRYrIcQ0W1faqeD+x2E9nb7e2AsEhfoIyqMz4KnDNWI0YaCsdri18F2vx3ap+LUuC+A==</FRMT></TED>
+<TmstFirma>2026-09-05T10:30:01</TmstFirma>
+</Documento>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+<SignedInfo>
+<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<Reference URI="#F1T39">
+<Transforms>
+<Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+</Transforms>
+<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<DigestValue>7LBPwcYzMwYUpk5XxwXfvM2i934=</DigestValue>
+</Reference>
+</SignedInfo>
+<SignatureValue>m8RqTL3AtxNQLt5U11VhRAd7IFLJaJWbyiWqNpbvvNtKKKqNB4Cd8HPw+dUoNI/t7kp137DMt0d9bp94Owi9TutTK4F7goo2Ed4KNdQAXbzTCOpZ0SONt9zS7Verg5kYg1i7Q9lwb2OogMJB7UnCujOeBJxcN2cVTsype66XvuNe8PFVw4AwvzlzT5QUBye8ou34SEsjCqJrIe5OP0AgYEGC6leP9r/WJsKOlm6ikKp3VulsZntpsFuHe7BhzcQ/VedHEZEtuiFaWffBpbO1KyipttcPi5LSPwwkNNdxZ9neGnCEU9lPSNSdYQFwPLUIZTXvNF9W3EkHCVmYrRC8WQ==</SignatureValue>
+<KeyInfo>
+<KeyValue>
+<RSAKeyValue>
+<Modulus>tflg6YLi3tIYPw+pC9Tvd6asaJTVI09mT3IawcvxsSXpHILMSBCGahikzqFqP7rXwzO4wkI+ZD00CG/3BTo6sUWSkZV69nSO0PPDB2OZGu5MsZKHVPckd1ys/fv3usk723nRksdmr2MES6DpfWqxUy8VIvOpDY1k4OMj03TxBYnx5DtyKBEWL88zesiPIkCyq+4q08H9pSLfYuQ3zTEEolfNTruYLkAKaD14BON7kjzVGJ6kDLeNiSN1hqspMD2fIGwVorhq7KN7yaaVDpbgQJzjZ2ErQT12NQw4hJRzEQneYEJrYrnxtQcVpGeN81kENKfEMXnQUFzk6SQfUFt5qw==</Modulus>
+<Exponent>AQAB</Exponent>
+</RSAKeyValue>
+</KeyValue>
+<X509Data>
+<X509Certificate>MIIDezCCAmOgAwIBAgIUfHA+6RtmK+GzEJs7ufLZ+t53Z18wDQYJKoZIhvcNAQELBQAwTDEaMBgGA1UEAwwRVGl0dWxhciBkZSBQcnVlYmExLjAsBgNVBAoMJU1hdGVyaWFsIGRlIHBydWViYSBjZXJ0aWZpY2FjaW9uLW5vZGUwIBcNMjYxMTA2MDEzMTIzWhgPMjEyNjEwMTMwMTMxMjNaMEwxGjAYBgNVBAMMEVRpdHVsYXIgZGUgUHJ1ZWJhMS4wLAYDVQQKDCVNYXRlcmlhbCBkZSBwcnVlYmEgY2VydGlmaWNhY2lvbi1ub2RlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtflg6YLi3tIYPw+pC9Tvd6asaJTVI09mT3IawcvxsSXpHILMSBCGahikzqFqP7rXwzO4wkI+ZD00CG/3BTo6sUWSkZV69nSO0PPDB2OZGu5MsZKHVPckd1ys/fv3usk723nRksdmr2MES6DpfWqxUy8VIvOpDY1k4OMj03TxBYnx5DtyKBEWL88zesiPIkCyq+4q08H9pSLfYuQ3zTEEolfNTruYLkAKaD14BON7kjzVGJ6kDLeNiSN1hqspMD2fIGwVorhq7KN7yaaVDpbgQJzjZ2ErQT12NQw4hJRzEQneYEJrYrnxtQcVpGeN81kENKfEMXnQUFzk6SQfUFt5qwIDAQABo1MwUTAdBgNVHQ4EFgQULRy9vn66ebHiNcLA60RZffgPP1UwHwYDVR0jBBgwFoAULRy9vn66ebHiNcLA60RZffgPP1UwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAKyHigem7SyuHNxfIF5dERoXdPAPEJlqwYG5E3PByAp5gRqMpv4+J9KImIwzC5+akZ3B/FwNo2e457HqKLt1FRTEHh9oVTvELjg8PJxeyUPwQi0+bCiwAN1CH+AArZO7UbmnegsxNkKbTBVBhBVC7G21605Ep/Pyiaa4nvErMmj/LcNY8H3PmDOJVy60lL2D1J8o52Z0NWfGclMqvERykVbr3U2A8Nf3Qv4wPYO6seBbYFCg4YbaTQyWHwzG8djn505PF9+BKRBuZ57pMGGJYOe9MTagwL3SE4KJ6l2XvOM3/1AeXkgC4eiMukL29VBarpTTN0+x/4Cf87NazV7vNxQ==</X509Certificate>
+</X509Data>
+</KeyInfo>
+</Signature></DTE>
+<DTE xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
+  <Documento ID="F2T39">
+    <Encabezado>
+      <IdDoc>
+        <TipoDTE>39</TipoDTE>
+        <Folio>2</Folio>
+        <FchEmis>2026-09-05</FchEmis>
+        <IndServicio>3</IndServicio>
+      </IdDoc>
+      <Emisor>
+        <RUTEmisor>76123456-0</RUTEmisor>
+        <RznSocEmisor>EMPRESA DE PRUEBA SPA</RznSocEmisor>
+        <GiroEmisor>VENTA AL POR MENOR</GiroEmisor>
+        <DirOrigen>CALLE 1</DirOrigen>
+        <CmnaOrigen>SANTIAGO</CmnaOrigen>
+      </Emisor>
+      <Receptor>
+        <RUTRecep>66666666-6</RUTRecep>
+        <RznSocRecep>Cliente General</RznSocRecep>
+      </Receptor>
+      <Totales>
+        <MntNeto>1714</MntNeto>
+        <IVA>326</IVA>
+        <MntTotal>2040</MntTotal>
+      </Totales>
+    </Encabezado>
+    <Detalle>
+      <NroLinDet>1</NroLinDet>
+      <NmbItem>Papel de regalo</NmbItem>
+      <QtyItem>17</QtyItem>
+      <PrcItem>120</PrcItem>
+      <MontoItem>2040</MontoItem>
+    </Detalle>
+    <Referencia>
+      <NroLinRef>1</NroLinRef>
+      <CodRef>SET</CodRef>
+      <RazonRef>CASO-2</RazonRef>
+    </Referencia>
+  <TED version="1.0"><DD><RE>76123456-0</RE><TD>39</TD><F>2</F><FE>2026-09-05</FE><RR>66666666-6</RR><RSR>Cliente General</RSR><MNT>2040</MNT><IT1>Papel de regalo</IT1><CAF version="1.0"><DA><RE>76123456-0</RE><RS>EMPRESA DE PRUEBA SPA</RS><TD>39</TD><RNG><D>1</D><H>100</H></RNG><FA>2026-09-01</FA><RSAPK><M>8DbQizf0nwi5/ccpzln1Mz1bgzGUIPIJnCMJxSGdtJ+XD/1fQ4c1FTh9cdVqKXlSvqp04gHJ6jrzzB7UEk6gWQ==</M><E>Aw==</E></RSAPK><IDK>100</IDK></DA><FRMA algoritmo="SHA1withRSA">eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eA==</FRMA></CAF><TSTED>2026-09-05T10:30:01</TSTED></DD><FRMT algoritmo="SHA1withRSA">LAH4EUuuGI0vQjFGUAU9xJSyOYqI//sxn34mAI/d1gB5PPRCPj7wrPYWq/tUiGDW76SMAmz1OqN64MsFTwyV7A==</FRMT></TED>
+<TmstFirma>2026-09-05T10:30:01</TmstFirma>
+</Documento>
+</DTE>
+
+
+<DTE xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
+  <Documento ID="F3T39">
+    <Encabezado>
+      <IdDoc>
+        <TipoDTE>39</TipoDTE>
+        <Folio>3</Folio>
+        <FchEmis>2026-09-05</FchEmis>
+        <IndServicio>3</IndServicio>
+      </IdDoc>
+      <Emisor>
+        <RUTEmisor>76123456-0</RUTEmisor>
+        <RznSocEmisor>EMPRESA DE PRUEBA SPA</RznSocEmisor>
+        <GiroEmisor>VENTA AL POR MENOR</GiroEmisor>
+        <DirOrigen>CALLE 1</DirOrigen>
+        <CmnaOrigen>SANTIAGO</CmnaOrigen>
+      </Emisor>
+      <Receptor>
+        <RUTRecep>66666666-6</RUTRecep>
+        <RznSocRecep>Cliente General</RznSocRecep>
+      </Receptor>
+      <Totales>
+        <MntNeto>3445</MntNeto>
+        <IVA>655</IVA>
+        <MntTotal>4100</MntTotal>
+      </Totales>
+    </Encabezado>
+    <Detalle>
+      <NroLinDet>1</NroLinDet>
+      <NmbItem>Sandwich</NmbItem>
+      <QtyItem>2</QtyItem>
+      <PrcItem>1500</PrcItem>
+      <MontoItem>3000</MontoItem>
+    </Detalle>
+    <Detalle>
+      <NroLinDet>2</NroLinDet>
+      <NmbItem>Bebida</NmbItem>
+      <QtyItem>2</QtyItem>
+      <PrcItem>550</PrcItem>
+      <MontoItem>1100</MontoItem>
+    </Detalle>
+    <Referencia>
+      <NroLinRef>1</NroLinRef>
+      <CodRef>SET</CodRef>
+      <RazonRef>CASO-3</RazonRef>
+    </Referencia>
+  <TED version="1.0"><DD><RE>76123456-0</RE><TD>39</TD><F>3</F><FE>2026-09-05</FE><RR>66666666-6</RR><RSR>Cliente General</RSR><MNT>4100</MNT><IT1>Sandwich</IT1><CAF version="1.0"><DA><RE>76123456-0</RE><RS>EMPRESA DE PRUEBA SPA</RS><TD>39</TD><RNG><D>1</D><H>100</H></RNG><FA>2026-09-01</FA><RSAPK><M>8DbQizf0nwi5/ccpzln1Mz1bgzGUIPIJnCMJxSGdtJ+XD/1fQ4c1FTh9cdVqKXlSvqp04gHJ6jrzzB7UEk6gWQ==</M><E>Aw==</E></RSAPK><IDK>100</IDK></DA><FRMA algoritmo="SHA1withRSA">eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eA==</FRMA></CAF><TSTED>2026-09-05T10:30:01</TSTED></DD><FRMT algoritmo="SHA1withRSA">v1u+3hsEnvDGLRmiim0zZU+0zfgi+9I/cQHqoGBfV39raFEycsa6qPnN/Gh0lFXYz3p8G8VIn1SS2ZGE9wiSzw==</FRMT></TED>
+<TmstFirma>2026-09-05T10:30:01</TmstFirma>
+</Documento>
+</DTE>
+
+
+<DTE xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
+  <Documento ID="F4T41">
+    <Encabezado>
+      <IdDoc>
+        <TipoDTE>41</TipoDTE>
+        <Folio>4</Folio>
+        <FchEmis>2026-09-05</FchEmis>
+        <IndServicio>3</IndServicio>
+      </IdDoc>
+      <Emisor>
+        <RUTEmisor>76123456-0</RUTEmisor>
+        <RznSocEmisor>DÍAZ Y MUÑOZ LTDA</RznSocEmisor>
+        <GiroEmisor>Panadería &amp; Pastelería</GiroEmisor>
+        <DirOrigen>Av. Ñuble 123</DirOrigen>
+        <CmnaOrigen>Ñuñoa</CmnaOrigen>
+      </Emisor>
+      <Receptor>
+        <RUTRecep>66666666-6</RUTRecep>
+        <RznSocRecep>José Pérez</RznSocRecep>
+      </Receptor>
+      <Totales>
+        <MntExe>2000</MntExe>
+        <MntTotal>2000</MntTotal>
+      </Totales>
+    </Encabezado>
+    <Detalle>
+      <NroLinDet>1</NroLinDet>
+      <IndExe>1</IndExe>
+      <NmbItem>Libro año 2026 (exento)</NmbItem>
+      <QtyItem>1</QtyItem>
+      <PrcItem>2000</PrcItem>
+      <MontoItem>2000</MontoItem>
+    </Detalle>
+    <Referencia>
+      <NroLinRef>1</NroLinRef>
+      <CodRef>SET</CodRef>
+      <RazonRef>CASO-4</RazonRef>
+    </Referencia>
+  <TED version="1.0"><DD><RE>76123456-0</RE><TD>41</TD><F>4</F><FE>2026-09-05</FE><RR>66666666-6</RR><RSR>José Pérez</RSR><MNT>2000</MNT><IT1>Libro año 2026 (exento)</IT1><CAF version="1.0"><DA><RE>76123456-0</RE><RS>DÍAZ Y MUÑOZ LTDA</RS><TD>41</TD><RNG><D>1</D><H>100</H></RNG><FA>2026-09-01</FA><RSAPK><M>tpj76yFbkdTTeguyemYdcEd10rbIoo89LrlapNJpJtSmxRp7uNAPoRdrw9cA5iCRKYMpELZkFEoQSJ8EVUKGdQ==</M><E>Aw==</E></RSAPK><IDK>100</IDK></DA><FRMA algoritmo="SHA1withRSA">eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eA==</FRMA></CAF><TSTED>2026-09-05T10:30:01</TSTED></DD><FRMT algoritmo="SHA1withRSA">lBJm1CnnNmkVLUd/MG6pUEUXc9fb5I7MfHPphLzsqLjC60Iv0cXSU+toXwugtz8EEdagH5TxU6SBCx2rfUt7Ww==</FRMT></TED>
+<TmstFirma>2026-09-05T10:30:01</TmstFirma>
+</Documento>
+</DTE>
+
+<DTE xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
+  <Documento ID="F5T39">
+    <Encabezado>
+      <IdDoc>
+        <TipoDTE>39</TipoDTE>
+        <Folio>5</Folio>
+        <FchEmis>2026-09-05</FchEmis>
+        <IndServicio>3</IndServicio>
+      </IdDoc>
+      <Emisor>
+        <RUTEmisor>76123456-0</RUTEmisor>
+        <RznSocEmisor>DÍAZ Y MUÑOZ LTDA</RznSocEmisor>
+        <GiroEmisor>Panadería &amp; Pastelería</GiroEmisor>
+        <DirOrigen>Av. Ñuble 123</DirOrigen>
+        <CmnaOrigen>Ñuñoa</CmnaOrigen>
+      </Emisor>
+      <Receptor>
+        <RUTRecep>66666666-6</RUTRecep>
+        <RznSocRecep>José Pérez</RznSocRecep>
+      </Receptor>
+      <Totales>
+        <MntNeto>3000</MntNeto>
+        <IVA>570</IVA>
+        <MntTotal>3570</MntTotal>
+      </Totales>
+    </Encabezado>
+    <Detalle>
+      <NroLinDet>1</NroLinDet>
+      <NmbItem>Pan amasado ñandú</NmbItem>
+      <QtyItem>3</QtyItem>
+      <PrcItem>1190</PrcItem>
+      <MontoItem>3570</MontoItem>
+    </Detalle>
+    <Referencia>
+      <NroLinRef>1</NroLinRef>
+      <CodRef>SET</CodRef>
+      <RazonRef>CASO-5</RazonRef>
+    </Referencia>
+  <TED version="1.0"><DD><RE>76123456-0</RE><TD>39</TD><F>5</F><FE>2026-09-05</FE><RR>66666666-6</RR><RSR>José Pérez</RSR><MNT>3570</MNT><IT1>Pan amasado ñandú</IT1><CAF version="1.0"><DA><RE>76123456-0</RE><RS>DÍAZ Y MUÑOZ LTDA</RS><TD>39</TD><RNG><D>101</D><H>200</H></RNG><FA>2026-09-01</FA><RSAPK><M>3cWlp2u/MYNeIZrca+fqLBB/QllIxUigjc8mQQ3mTxVKMxy2n8J93c50fUUI0Ldx6zO2hJEtjuxcVBp/Nkpy0Q==</M><E>Aw==</E></RSAPK><IDK>100</IDK></DA><FRMA algoritmo="SHA1withRSA">eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eA==</FRMA></CAF><TSTED>2026-09-05T10:30:01</TSTED></DD><FRMT algoritmo="SHA1withRSA">OvwlxKxumyW2A4cQ/wmqvGGAP4q1wc3K3R++6OlmaAV5xZy2mLHNtvejCzI9T29kWu8lW7jVHge2wd2/j84p9Q==</FRMT></TED>
+<TmstFirma>2026-09-05T10:30:01</TmstFirma>
+</Documento>
+</DTE>
+
+</SetDTE>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+<SignedInfo>
+<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<Reference URI="#SetDoc">
+<Transforms>
+<Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+</Transforms>
+<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<DigestValue>uT962VXZjKP45TK7CGAncoevyU4=</DigestValue>
+</Reference>
+</SignedInfo>
+<SignatureValue>Jb0a9t8diysHRbjFQnFApzekmkTxOB8s88YtuiiT/QAhzelomGo777T90w0fxzqcj8hSizzkoPzp7EPHd29gUWvhWY/OyXMMiUdZrosjLff1NYpglgrmqGujhD6Age0OH0qrMnbmfDxTOQjH+2c7fxV8YKZdKsytxQTaR3vVUrkVF6fU3ZMvGoaQ954o7p6pos+Cvlq1OJhJm+GjfnrYLfcGYNsXbecepmzC5voUN+9+2yG9DcH2dgUdYK78z5tj6io+urbRRpTlZIv9JE8qze9Fdi1YgahleEEts717Qn5Yl/IBAJyTq86TcUbeQilqCMFJKq5dprWh24WpsAPCLA==</SignatureValue>
+<KeyInfo>
+<KeyValue>
+<RSAKeyValue>
+<Modulus>tflg6YLi3tIYPw+pC9Tvd6asaJTVI09mT3IawcvxsSXpHILMSBCGahikzqFqP7rXwzO4wkI+ZD00CG/3BTo6sUWSkZV69nSO0PPDB2OZGu5MsZKHVPckd1ys/fv3usk723nRksdmr2MES6DpfWqxUy8VIvOpDY1k4OMj03TxBYnx5DtyKBEWL88zesiPIkCyq+4q08H9pSLfYuQ3zTEEolfNTruYLkAKaD14BON7kjzVGJ6kDLeNiSN1hqspMD2fIGwVorhq7KN7yaaVDpbgQJzjZ2ErQT12NQw4hJRzEQneYEJrYrnxtQcVpGeN81kENKfEMXnQUFzk6SQfUFt5qw==</Modulus>
+<Exponent>AQAB</Exponent>
+</RSAKeyValue>
+</KeyValue>
+<X509Data>
+<X509Certificate>MIIDezCCAmOgAwIBAgIUfHA+6RtmK+GzEJs7ufLZ+t53Z18wDQYJKoZIhvcNAQELBQAwTDEaMBgGA1UEAwwRVGl0dWxhciBkZSBQcnVlYmExLjAsBgNVBAoMJU1hdGVyaWFsIGRlIHBydWViYSBjZXJ0aWZpY2FjaW9uLW5vZGUwIBcNMjYxMTA2MDEzMTIzWhgPMjEyNjEwMTMwMTMxMjNaMEwxGjAYBgNVBAMMEVRpdHVsYXIgZGUgUHJ1ZWJhMS4wLAYDVQQKDCVNYXRlcmlhbCBkZSBwcnVlYmEgY2VydGlmaWNhY2lvbi1ub2RlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtflg6YLi3tIYPw+pC9Tvd6asaJTVI09mT3IawcvxsSXpHILMSBCGahikzqFqP7rXwzO4wkI+ZD00CG/3BTo6sUWSkZV69nSO0PPDB2OZGu5MsZKHVPckd1ys/fv3usk723nRksdmr2MES6DpfWqxUy8VIvOpDY1k4OMj03TxBYnx5DtyKBEWL88zesiPIkCyq+4q08H9pSLfYuQ3zTEEolfNTruYLkAKaD14BON7kjzVGJ6kDLeNiSN1hqspMD2fIGwVorhq7KN7yaaVDpbgQJzjZ2ErQT12NQw4hJRzEQneYEJrYrnxtQcVpGeN81kENKfEMXnQUFzk6SQfUFt5qwIDAQABo1MwUTAdBgNVHQ4EFgQULRy9vn66ebHiNcLA60RZffgPP1UwHwYDVR0jBBgwFoAULRy9vn66ebHiNcLA60RZffgPP1UwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAKyHigem7SyuHNxfIF5dERoXdPAPEJlqwYG5E3PByAp5gRqMpv4+J9KImIwzC5+akZ3B/FwNo2e457HqKLt1FRTEHh9oVTvELjg8PJxeyUPwQi0+bCiwAN1CH+AArZO7UbmnegsxNkKbTBVBhBVC7G21605Ep/Pyiaa4nvErMmj/LcNY8H3PmDOJVy60lL2D1J8o52Z0NWfGclMqvERykVbr3U2A8Nf3Qv4wPYO6seBbYFCg4YbaTQyWHwzG8djn505PF9+BKRBuZ57pMGGJYOe9MTagwL3SE4KJ6l2XvOM3/1AeXkgC4eiMukL29VBarpTTN0+x/4Cf87NazV7vNxQ==</X509Certificate>
+</X509Data>
+</KeyInfo>
+</Signature></EnvioBOLETA>

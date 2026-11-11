@@ -1,0 +1,8 @@
+{
+  "descripcion": "Orden de nombres fuera del BMP: comparación por bytes UTF-8 (U+FB00 va antes que U+1D49C, al revés que en UTF-16). @xmldom/xmldom 0.8 no parsea estos nombres: el test arma el DOM a mano",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<r xmlns:ﬀ=\"urn:p1\" xmlns:𝒜=\"urn:p2\" xmlns:é=\"urn:p3\"><e 𝒜=\"1\" ﬀ=\"2\" é=\"3\" e=\"4\" 𝒜:x=\"5\" ﬀ:x=\"6\"/></r>",
+    "etiqueta": "e"
+  }
+}

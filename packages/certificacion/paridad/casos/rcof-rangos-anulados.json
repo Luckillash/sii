@@ -1,0 +1,70 @@
+{
+  "descripcion": "Con RangoAnulados (después de los RangoUtilizados), sin la clave rangos_anulados en el 41",
+  "operacion": "consumoFolios",
+  "entrada": {
+    "ahora": "2026-09-05T23:10:42",
+    "caratula": {
+      "rut_emisor": "76123456-0",
+      "rut_envia": "11111111-1",
+      "fch_resol": "2026-09-04",
+      "nro_resol": "0",
+      "fch_inicio": "2026-09-05",
+      "fch_final": "2026-09-05",
+      "sec_envio": 1
+    },
+    "resumenes": [
+      {
+        "tipo": "39",
+        "neto": 10000,
+        "iva": 1900,
+        "tasa_iva": "19.00",
+        "exento": 0,
+        "total": 11900,
+        "folios_emitidos": 8,
+        "folios_anulados": 3,
+        "folios_utilizados": 5,
+        "rangos_utilizados": [
+          {
+            "inicial": 56,
+            "final": 57
+          },
+          {
+            "inicial": 59,
+            "final": 60
+          },
+          {
+            "inicial": 63,
+            "final": 63
+          }
+        ],
+        "rangos_anulados": [
+          {
+            "inicial": 58,
+            "final": 58
+          },
+          {
+            "inicial": 61,
+            "final": 62
+          }
+        ]
+      },
+      {
+        "tipo": "41",
+        "neto": 0,
+        "iva": 0,
+        "tasa_iva": "19.00",
+        "exento": 4000,
+        "total": 4000,
+        "folios_emitidos": 2,
+        "folios_anulados": 0,
+        "folios_utilizados": 2,
+        "rangos_utilizados": [
+          {
+            "inicial": 4,
+            "final": 5
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "@winex/certificacion-cli",
+  "version": "0.0.0",
+  "private": true,
+  "description": "CLI de certificación y producción para el SII (reemplazo de bin/ del core PHP).",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.19"
+  },
+  "bin": {
+    "sii": "./dist/main.js",
+    "sii-mcp": "./dist/mcp-main.js"
+  },
+  "scripts": {
+    "build": "tsup src/main.ts src/mcp-main.ts --format esm --target node22 --clean",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "~1.32.2",
+    "@winex/certificacion": "workspace:*",
+    "zod": "~4.6.7"
+  },
+  "devDependencies": {
+    "tsup": "^9.0.0",
+    "vitest": "^5.1.0"
+  }
+}

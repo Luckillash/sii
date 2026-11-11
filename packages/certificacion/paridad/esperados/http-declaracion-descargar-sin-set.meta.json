@@ -1,0 +1,8 @@
+{
+    "caso": "http-declaracion-descargar-sin-set",
+    "operacion": "httpDeclaracion",
+    "core": "1.9.1",
+    "bytes": 2369,
+    "sha256": "4d6f5a96440cd89df2040d19f407620878ca1dadc823c3aaf56241b7b8bf54c7",
+    "marcas": {}
+}

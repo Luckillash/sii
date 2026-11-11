@@ -1,0 +1,8 @@
+{
+    "caso": "http-dtews-token",
+    "operacion": "httpDtews",
+    "core": "1.9.1",
+    "bytes": 3900,
+    "sha256": "6ab8a744145533901559e20ede29e47040cd9411e2909053f3fe2c9cc34ffdbc",
+    "marcas": {}
+}

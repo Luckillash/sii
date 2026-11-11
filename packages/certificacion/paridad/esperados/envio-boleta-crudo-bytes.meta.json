@@ -1,0 +1,10 @@
+{
+    "caso": "envio-boleta-crudo-bytes",
+    "operacion": "envioBoleta",
+    "core": "1.9.1",
+    "bytes": 7134,
+    "sha256": "6a6ae1e2849c011df565589a2ec2e461885c541dfc405f4445bb6d451011c763",
+    "marcas": {
+        "TmstFirmaEnv": "2026-09-05T10:31:15"
+    }
+}

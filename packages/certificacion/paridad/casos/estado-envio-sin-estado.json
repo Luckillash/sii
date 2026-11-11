@@ -1,0 +1,8 @@
+{
+  "descripcion": "Sin ESTADO: error",
+  "operacion": "estadoEnvio",
+  "entrada": {
+    "respuesta": "<SII:RESPUESTA></SII:RESPUESTA>",
+    "trackId": "777"
+  }
+}

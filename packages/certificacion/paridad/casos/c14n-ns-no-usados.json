@@ -1,0 +1,8 @@
+{
+  "descripcion": "Namespaces con prefijo declarados en ancestros y no usados en el subárbol (aparecen en el ápice); prefijo redeclarado en un ancestro intermedio (gana el más cercano)",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<r xmlns:p=\"urn:p1\" xmlns:q=\"urn:q\" xmlns:sinuso=\"urn:nada\"><i xmlns:p=\"urn:p2\" xmlns=\"urn:def\"><m><h/></m></i></r>",
+    "etiqueta": "m"
+  }
+}

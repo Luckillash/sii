@@ -1,0 +1,10 @@
+{
+    "caso": "rcof-firmado",
+    "operacion": "consumoFolios",
+    "core": "1.9.1",
+    "bytes": 3729,
+    "sha256": "50f85178f3abdc5dc17b7f59223f1d442f7d90349065eaaf1085bdc5874cd7ae",
+    "marcas": {
+        "TmstFirmaEnv": "2026-09-05T23:10:42"
+    }
+}

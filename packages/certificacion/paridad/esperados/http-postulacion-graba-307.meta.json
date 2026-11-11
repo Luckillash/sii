@@ -1,0 +1,8 @@
+{
+    "caso": "http-postulacion-graba-307",
+    "operacion": "httpPostulacion",
+    "core": "1.9.1",
+    "bytes": 4336,
+    "sha256": "27b2440086631d07fd230b8347066a8bb056386456385f5d16298d9a008404b3",
+    "marcas": {}
+}

@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-exenta-con-descuento",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 1241,
+    "sha256": "80ccb2f219a3b1bcea0716710308d6d25b085d76c0475abd0c089cc5e1a94c6a",
+    "marcas": {
+        "FchEmis": "2026-09-05"
+    }
+}

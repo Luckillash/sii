@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-exenta-41",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 1321,
+    "sha256": "cd05b4b141bf64f5f9fdc1a101cf66e62e751d9c3711675ee928a673f055431e",
+    "marcas": {
+        "FchEmis": "2026-09-05"
+    }
+}

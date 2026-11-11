@@ -1,0 +1,10 @@
+{
+    "caso": "timbre-caf-utf8-tildes",
+    "operacion": "timbre",
+    "core": "1.9.1",
+    "bytes": 741,
+    "sha256": "ae42f57aa35a232e9c6007218a8558d49c6fe553d81a9217bad39d51d513f2d0",
+    "marcas": {
+        "TSTED": "2026-09-05T10:32:03"
+    }
+}

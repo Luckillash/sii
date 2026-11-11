@@ -1,0 +1,8 @@
+{
+    "caso": "http-multipart-boleta-rest",
+    "operacion": "httpMultipart",
+    "core": "1.9.1",
+    "bytes": 987,
+    "sha256": "a616fec69b05589671238fa4703d37311a9e5182f2265f5501b9e6dd3f6ba700",
+    "marcas": {}
+}

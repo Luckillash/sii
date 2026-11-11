@@ -1,0 +1,27 @@
+{
+  "descripcion": "Set de pruebas real (5 casos) de punta a punta como enviar-set-boletas.php: caf-39.xml, folios 56-60, RUT de prueba y hora fija. Bytes de EnvioBoleta::empaquetar (no del archivo del bin, pend. 1.1)",
+  "operacion": "set-completo",
+  "material": "base",
+  "entrada": {
+    "ahora": "2026-09-05T10:30:01",
+    "archivo": "data/set_pruebas/Set Prueba BE.txt",
+    "caf": "caf-39.xml",
+    "folioInicial": 56,
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "rutEnvia": "11111111-1",
+    "nroResol": "0",
+    "fchResol": "2026-09-05",
+    "fchResolRcof": "2026-09-04",
+    "secEnvio": 1
+  }
+}

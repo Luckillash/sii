@@ -1,0 +1,40 @@
+{
+  "descripcion": "DeclaracionBoletas::solicitarRevisionSet(): ingresarTrackId(rut, dv, null, \"90\", null, null, trackId)",
+  "operacion": "gwtLlamada",
+  "entrada": {
+    "base": "https://www4.sii.cl/certBolElectDteInternet/",
+    "policy": "082D0AC4BC4D75A5DF38F116C53877D4",
+    "servicio": "cl.sii.sdi.diii.certBolElectDte.web.client.service.Facade",
+    "metodo": "ingresarTrackId",
+    "parametros": [
+      {
+        "tipo": "java.lang.Integer/3438268394",
+        "pasos": [["integer", 76123456]]
+      },
+      {
+        "tipo": "java.lang.String/2004016611",
+        "pasos": [["string", "0"]]
+      },
+      {
+        "tipo": "java.lang.String/2004016611",
+        "pasos": [["string", null]]
+      },
+      {
+        "tipo": "java.lang.String/2004016611",
+        "pasos": [["string", "90"]]
+      },
+      {
+        "tipo": "java.lang.Integer/3438268394",
+        "pasos": [["integer", null]]
+      },
+      {
+        "tipo": "java.lang.String/2004016611",
+        "pasos": [["string", null]]
+      },
+      {
+        "tipo": "java.lang.String/2004016611",
+        "pasos": [["string", "1234567890"]]
+      }
+    ]
+  }
+}

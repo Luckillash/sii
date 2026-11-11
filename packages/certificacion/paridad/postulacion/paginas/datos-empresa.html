@@ -1,0 +1,50 @@
+<HTML>
+<HEAD>
+<TITLE>Datos de la Postulaci&oacute;n</TITLE>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cvc/dte/js/validadte.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function enviar(f) { if (!esValidoMail2(f.MAIL_SUP.value)) { alert("Correo no valido"); return false; } return true; }
+//-->
+</SCRIPT>
+{{META}}
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<FORM NAME="frmDatos" METHOD="POST" ACTION="pe_confirma" onSubmit="return enviar(this)">
+<INPUT TYPE="hidden" NAME="RUT_EMP" VALUE="76123456">
+<INPUT TYPE="hidden" NAME="DV_EMP" VALUE="0">
+<INPUT TYPE="hidden" NAME="RAZON_SOCIAL" VALUE="{{RAZON_SOCIAL}}">
+<INPUT TYPE="hidden" NAME="ESFAC" VALUE="N">
+{{EXTRA}}<TABLE BORDER="0" WIDTH="700">
+<TR><TD>Empresa</TD><TD>76.123.456-0 {{RAZON_SOCIAL}}</TD></TR>
+<TR><TD>RUT usuario administrador</TD>
+<TD><INPUT TYPE="text" NAME="RUT_USU" SIZE="10" MAXLENGTH="8" VALUE=""> - <INPUT TYPE="text" NAME="DV_USU" SIZE="1" MAXLENGTH="1"></TD></TR>
+<TR><TD>Correo del administrador</TD><TD><INPUT TYPE="text" NAME="MAIL_SUP" SIZE="40" VALUE="  "></TD></TR>
+<TR><TD>Correo de contacto con el SII</TD><TD><INPUT TYPE="text" NAME="MAIL_SII" SIZE="40"></TD></TR>
+<TR><TD>Correo de intercambio</TD><TD><INPUT TYPE="text" NAME="MAIL_DTE" SIZE="40"></TD></TR>
+<TR><TD>URL</TD><TD><INPUT TYPE="text" NAME="URL" SIZE="40" VALUE="www."></TD></TR>
+<TR><TD>Nombre del software</TD><TD><INPUT TYPE="text" NAME="NOM_SW" SIZE="30" MAXLENGTH="30"></TD></TR>
+<TR><TD>Tipo de software</TD><TD>
+<INPUT TYPE="radio" NAME="TIPO_SW" VALUE="P"> Propio
+<INPUT TYPE="radio" NAME="TIPO_SW" VALUE="M" CHECKED> Mercado
+</TD></TR>
+<TR><TD>Regi&oacute;n</TD><TD><SELECT NAME="REGION"><OPTION VALUE="13" SELECTED>Metropolitana</OPTION><OPTION VALUE="5">Valpara&iacute;so</OPTION></SELECT></TD></TR>
+<TR><TD>Tel&eacute;fono</TD><TD><INPUT TYPE="text" NAME="FONO" VALUE="  221234567  " DISABLED></TD></TR>
+<TR><TD COLSPAN="2"><B>Documentos</B></TD></TR>
+<TR><TD>Factura</TD><TD><INPUT TYPE="checkbox" NAME="FACT" VALUE="S" CHECKED>
+<INPUT TYPE="checkbox" NAME="NC" VALUE="S"> NC <INPUT TYPE="checkbox" NAME="ND" VALUE="S" checked> ND
+<INPUT TYPE="checkbox" NAME="SET03" VALUE="S" CHECKED> <INPUT TYPE="checkbox" NAME="SET06" VALUE="S">
+<INPUT TYPE="checkbox" NAME="SET11" VALUE="S"> <INPUT TYPE="checkbox" NAME="SET84" VALUE="S">
+<INPUT TYPE="checkbox" NAME="SET72" VALUE="S"></TD></TR>
+<TR><TD>Boleta</TD><TD><INPUT TYPE="checkbox" NAME="ESBOL" VALUE="S">
+<INPUT TYPE="checkbox" NAME="BOLELEC" VALUE="S" CHECKED> Boleta electr&oacute;nica
+<INPUT TYPE="checkbox" NAME="BOLEXEN" VALUE="S" CHECKED> Boleta exenta</TD></TR>
+<TR><TD COLSPAN="2" ALIGN="center">
+<INPUT TYPE="image" NAME="AYUDA" SRC="/cvc/dte/img/ayuda.gif">
+<INPUT TYPE="submit" NAME="GRABAR" VALUE="Confirmar Datos">
+<INPUT TYPE="reset" NAME="LIMPIAR" VALUE="Limpiar">
+</TD></TR>
+</TABLE>
+</FORM>
+</BODY>
+</HTML>

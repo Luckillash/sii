@@ -1,0 +1,7 @@
+{
+  "descripcion": "loadXML + saveXML con encoding=\"iso-8859-1\" en minúsculas, standalone=\"no\" y bytes ISO-8859-1 que no son UTF-8 válido",
+  "operacion": "reserializarXml",
+  "entrada": {
+    "xml_base64": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSIgc3RhbmRhbG9uZT0ibm8iPz48UiBhPSJEzUFaIj5DT01FUkNJQUwgRM1BWiDRdfFvYTwvUj4="
+  }
+}

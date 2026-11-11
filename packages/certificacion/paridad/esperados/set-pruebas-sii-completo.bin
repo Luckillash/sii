@@ -1,0 +1,124 @@
+{
+    "codificacion": "UTF-8",
+    "casos": [
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Cambio de aceite",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 19900,
+                    "precioTexto": "19900",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "Alineacion y balanceo",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 9900,
+                    "precioTexto": "9900",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-1"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Papel de regalo",
+                    "cantidad": 17,
+                    "cantidadTexto": "17",
+                    "cantidadTipo": "int",
+                    "precio": 120,
+                    "precioTexto": "120",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-2"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Sandwic",
+                    "cantidad": 2,
+                    "cantidadTexto": "2",
+                    "cantidadTipo": "int",
+                    "precio": 1500,
+                    "precioTexto": "1500",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "Bebida",
+                    "cantidad": 2,
+                    "cantidadTexto": "2",
+                    "cantidadTipo": "int",
+                    "precio": 550,
+                    "precioTexto": "550",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-3"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "item afecto 1",
+                    "cantidad": 8,
+                    "cantidadTexto": "8",
+                    "cantidadTipo": "int",
+                    "precio": 1590,
+                    "precioTexto": "1590",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "item exento 2",
+                    "cantidad": 2,
+                    "cantidadTexto": "2",
+                    "cantidadTipo": "int",
+                    "precio": 1000,
+                    "precioTexto": "1000",
+                    "precioTipo": "int",
+                    "exento": true
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-4"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Arroz",
+                    "cantidad": 5,
+                    "cantidadTexto": "5",
+                    "cantidadTipo": "int",
+                    "precio": 700,
+                    "precioTexto": "700",
+                    "precioTipo": "int",
+                    "unidad": "Kg"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-5"
+            }
+        }
+    ]
+}

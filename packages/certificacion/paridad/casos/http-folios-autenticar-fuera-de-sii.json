@@ -1,0 +1,18 @@
+{
+  "descripcion": "autenticar(): el login redirige fuera de sii.cl: se detiene sin seguir la redirección",
+  "operacion": "httpFolios",
+  "entrada": {
+    "accion": "autenticar",
+    "archivo": "cert-titular.pem",
+    "esperaError": true,
+    "http": {
+      "respuestas": [
+        {
+          "status": 302,
+          "cabeceras": [["Location", "https://sii.cl.example.com/robar"]],
+          "cuerpo": ""
+        }
+      ]
+    }
+  }
+}

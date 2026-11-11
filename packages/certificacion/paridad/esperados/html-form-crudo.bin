@@ -1,0 +1,11 @@
+{"action":"a","inputs":[["x",""]]}
+{"action":"a","inputs":[]}
+{"action":"a","inputs":[["x",""]]}
+{"action":"a","inputs":[["x",""]]}
+{"action":"si","inputs":[["q",""]]}
+{"action":"real","inputs":[["r",""]]}
+{"action":"si","inputs":[["q",""]]}
+{"action":"a","inputs":[["dentro",""],["x",""]]}
+{"action":"a","inputs":[["tt",""],["x",""]]}
+{"action":"a","inputs":[["x",""],["y",""]]}
+{"action":"a","inputs":[]}

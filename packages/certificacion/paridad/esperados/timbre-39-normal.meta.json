@@ -1,0 +1,10 @@
+{
+    "caso": "timbre-39-normal",
+    "operacion": "timbre",
+    "core": "1.9.1",
+    "bytes": 741,
+    "sha256": "b32a829b33fc68a0de07176c7fdb059259f0df1d0c32bf39770d954a749cb414",
+    "marcas": {
+        "TSTED": "2026-09-05T10:30:01"
+    }
+}

@@ -1,0 +1,44 @@
+{
+    "lecturas": [
+        {
+            "objeto": {
+                "@tipo": "java.util.ArrayList/4159755760",
+                "elementos": [
+                    {
+                        "@tipo": "java.lang.Long/4227064769",
+                        "valor": "9007199254740993"
+                    },
+                    {
+                        "@tipo": "java.lang.Long/4227064769",
+                        "valor": "-1"
+                    },
+                    {
+                        "@tipo": "java.lang.Long/4227064769",
+                        "valor": "-9223372036854775808"
+                    },
+                    {
+                        "@tipo": "java.lang.Long/4227064769",
+                        "valor": "9223372036854775807"
+                    },
+                    {
+                        "@tipo": "java.lang.Long/4227064769",
+                        "valor": "1"
+                    },
+                    {
+                        "@tipo": "java.lang.Long/4227064769",
+                        "valor": "123"
+                    },
+                    {
+                        "@tipo": "java.lang.Long/4227064769",
+                        "valor": "-9007199254740993"
+                    },
+                    {
+                        "@tipo": "java.lang.Long/4227064769",
+                        "valor": "0"
+                    }
+                ]
+            }
+        }
+    ],
+    "error": null
+}

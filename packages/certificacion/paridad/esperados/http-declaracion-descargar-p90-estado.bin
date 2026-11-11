@@ -1,0 +1,34 @@
+=== peticion 1 de 2 (https) ===
+POST /certBolElectDteInternet/facade HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 265
+content-type: text/x-gwt-rpc; charset=UTF-8
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; RUT_NS=11111111; DV_NS=1; WWW4SOLO=W1
+host: <https>
+origin: https://www4.sii.cl
+referer: https://www4.sii.cl/certBolElectDteInternet/
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+x-gwt-module-base: https://www4.sii.cl/certBolElectDteInternet/
+x-gwt-permutation: 0FC3D987613537E6E13E9BB93A406F13
+
+7|0|9|https://www4.sii.cl/certBolElectDteInternet/|082D0AC4BC4D75A5DF38F116C53877D4|cl.sii.sdi.diii.certBolElectDte.web.client.service.Facade|obtenerPostulacionSeg|java.lang.Integer/3438268394|java.lang.String/2004016611|0|90|P90|1|2|3|4|4|5|6|6|6|5|76123456|7|8|9|
+=== fin de la peticion 1 ===
+=== peticion 2 de 2 (https) ===
+POST /certBolElectDteInternet/facade HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 264
+content-type: text/x-gwt-rpc; charset=UTF-8
+cookie: TOKEN=TOKENDEPRUEBAAUT2000; RUT_NS=11111111; DV_NS=1; WWW4SOLO=W1
+host: <https>
+origin: https://www4.sii.cl
+referer: https://www4.sii.cl/certBolElectDteInternet/
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+x-gwt-module-base: https://www4.sii.cl/certBolElectDteInternet/
+x-gwt-permutation: 0FC3D987613537E6E13E9BB93A406F13
+
+7|0|7|https://www4.sii.cl/certBolElectDteInternet/|082D0AC4BC4D75A5DF38F116C53877D4|cl.sii.sdi.diii.certBolElectDte.web.client.service.Facade|obtenerEstadoAutorizaEmp|java.lang.Integer/3438268394|java.lang.String/2004016611|0|1|2|3|4|4|5|6|5|6|5|76123456|7|5|90|0|
+=== fin de la peticion 2 ===
+=== resultado ===
+error postulacion

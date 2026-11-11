@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-utf8-fuera-latin1",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 60,
+    "sha256": "03e9dde9b9979d15edba504dc33792ccf0ba1dee950441623b1ec3adce0ca9cd",
+    "marcas": {}
+}

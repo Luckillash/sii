@@ -1,0 +1,8 @@
+{
+  "descripcion": "Redeclaraciones en descendientes: iguales al ancestro (se omiten), distintas (se emiten) y vuelta al valor original (se emite de nuevo)",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<r xmlns=\"urn:a\" xmlns:p=\"urn:p\"><m xmlns=\"urn:a\" xmlns:p=\"urn:p\"><a xmlns=\"urn:a\" xmlns:p=\"urn:p\"><b xmlns=\"urn:b\" xmlns:p=\"urn:p2\"><c xmlns=\"urn:a\" xmlns:p=\"urn:p\"><p:d xmlns:p=\"urn:p\"/></c></b></a></m></r>",
+    "etiqueta": "m"
+  }
+}

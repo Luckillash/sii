@@ -1,0 +1,18 @@
+{
+  "descripcion": "Caracteres fuera de ISO-8859-1 en RSR e IT1: cada code point pasa a ?",
+  "operacion": "timbre",
+  "entrada": {
+    "caf": "caf-39.xml",
+    "ahora": "2026-09-05T10:36:07",
+    "datos": {
+      "rut_emisor": "76123456-0",
+      "tipo_dte": "39",
+      "folio": "5",
+      "fecha": "2026-09-05",
+      "rut_receptor": "66666666-6",
+      "razon_social_receptor": "Señor € 中文 😀",
+      "monto_total": "1190",
+      "nombre_item_1": "Œuvre ✓ ‘comillas’ “dobles”"
+    }
+  }
+}

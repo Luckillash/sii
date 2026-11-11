@@ -1,0 +1,55 @@
+{
+  "descripcion": "Porcentaje decimal (33.3 %) sobre varias líneas: resto de varios pesos",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-09-05T14:30:00",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "63",
+    "detalles": [
+      {
+        "nombre": "A",
+        "cantidad": 1,
+        "precio": 101
+      },
+      {
+        "nombre": "B",
+        "cantidad": 1,
+        "precio": 103
+      },
+      {
+        "nombre": "C",
+        "cantidad": 1,
+        "precio": 107
+      },
+      {
+        "nombre": "D",
+        "cantidad": 1,
+        "precio": 109
+      },
+      {
+        "nombre": "E",
+        "cantidad": 1,
+        "precio": 113
+      },
+      {
+        "nombre": "F",
+        "cantidad": 2,
+        "precio": 1
+      }
+    ],
+    "descuento": {
+      "tipo": "porcentaje",
+      "valor": 33.3
+    }
+  }
+}

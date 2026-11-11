@@ -1,0 +1,8 @@
+{
+  "descripcion": "Estado REC (recibido): en proceso",
+  "operacion": "estadoEnvio",
+  "entrada": {
+    "respuesta": "<?xml version=\"1.0\" encoding=\"utf-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soapenv:Body><ns1:getEstUpResponse soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:ns1=\"http://DefaultNamespace\"><getEstUpReturn xsi:type=\"xsd:string\">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;\n&lt;SII:RESPUESTA xmlns:SII=&quot;http://www.sii.cl/XMLSchema&quot;&gt;&lt;SII:RESP_HDR&gt;&lt;RUTCOMPANIA&gt;76123456&lt;/RUTCOMPANIA&gt;&lt;DVCOMPANIA&gt;0&lt;/DVCOMPANIA&gt;&lt;TRACKID&gt;1234567890&lt;/TRACKID&gt;&lt;ESTADO&gt;REC&lt;/ESTADO&gt;&lt;GLOSA&gt;Envio Recibido&lt;/GLOSA&gt;&lt;NUM_ATENCION&gt;123456 ( 2026/09/15 10:00:00)&lt;/NUM_ATENCION&gt;&lt;/SII:RESP_HDR&gt;&lt;/SII:RESPUESTA&gt;</getEstUpReturn></ns1:getEstUpResponse></soapenv:Body></soapenv:Envelope>",
+    "trackId": "1234567890"
+  }
+}

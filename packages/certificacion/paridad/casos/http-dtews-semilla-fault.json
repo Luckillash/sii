@@ -1,0 +1,17 @@
+{
+  "descripcion": "getToken() cuando CrSeed responde un fault SOAP con HTTP 500: una sola petición y los dos clientes lanzan",
+  "operacion": "httpDtews",
+  "entrada": {
+    "accion": "getToken",
+    "esperaError": true,
+    "http": {
+      "respuestas": [
+        {
+          "status": 500,
+          "cabeceras": [["Content-Type", "text/xml;charset=utf-8"]],
+          "cuerpo": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"><soapenv:Body><soapenv:Fault><faultcode>soapenv:Server.userException</faultcode><faultstring>java.lang.NullPointerException</faultstring></soapenv:Fault></soapenv:Body></soapenv:Envelope>"
+        }
+      ]
+    }
+  }
+}

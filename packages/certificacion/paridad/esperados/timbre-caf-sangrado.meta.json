@@ -1,0 +1,10 @@
+{
+    "caso": "timbre-caf-sangrado",
+    "operacion": "timbre",
+    "core": "1.9.1",
+    "bytes": 1260,
+    "sha256": "782bae093f1a016cd210d1cbf0e22b3899b06478a5b75f26a7f91c2fda7f9e20",
+    "marcas": {
+        "TSTED": "2026-09-05T10:33:04"
+    }
+}

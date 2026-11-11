@@ -1,0 +1,24 @@
+{
+    "lecturas": [
+        {
+            "objeto": {
+                "@tipo": "cl.sii.sdi.diii.certBolElectDte.to.EstadoAutorizaTo/1011533792",
+                "campos": [
+                    [
+                        "S",
+                        "P90"
+                    ],
+                    [
+                        "S",
+                        "90"
+                    ],
+                    [
+                        "S",
+                        "PENDIENTE DECLARACION DE CUMPLIMIENTO"
+                    ]
+                ]
+            }
+        }
+    ],
+    "error": null
+}

@@ -1,0 +1,36 @@
+{
+  "descripcion": "Boleta exenta con descuento: no hay afecto, el descuento no se aplica; tipo numérico",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-09-05T16:30:00",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "69",
+    "tipo_dte": 41,
+    "detalles": [
+      {
+        "nombre": "Libro",
+        "cantidad": 1,
+        "precio": 5000,
+        "exento": true
+      }
+    ],
+    "referencia": {
+      "codigo": "SET",
+      "razon": "CASO-5"
+    },
+    "descuento": {
+      "tipo": "monto",
+      "valor": 1000
+    }
+  }
+}

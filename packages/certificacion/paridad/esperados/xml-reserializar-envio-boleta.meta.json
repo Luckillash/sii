@@ -1,0 +1,8 @@
+{
+    "caso": "xml-reserializar-envio-boleta",
+    "operacion": "reserializarXml",
+    "core": "1.9.1",
+    "bytes": 6751,
+    "sha256": "4620724bebe5e4dc72f496bbbdc8c2c7caa4f5f8ae4a8154ee771c12d3db13a9",
+    "marcas": {}
+}

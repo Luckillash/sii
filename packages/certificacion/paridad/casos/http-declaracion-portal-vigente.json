@@ -1,0 +1,49 @@
+{
+  "descripcion": "verificarPortal(): el .cache.html trae todo (sin sesión ni cookies)",
+  "operacion": "httpDeclaracion",
+  "entrada": {
+    "accion": "verificarPortal",
+    "sesion": [
+      {
+        "name": "TOKEN",
+        "value": "TOKENDEPRUEBAAUT2000",
+        "domain": "sii.cl",
+        "host_only": false
+      },
+      {
+        "name": "RUT_NS",
+        "value": "11111111",
+        "domain": "sii.cl",
+        "host_only": false
+      },
+      {
+        "name": "DV_NS",
+        "value": "1",
+        "domain": "sii.cl",
+        "host_only": false
+      },
+      {
+        "name": "MAULLINSOLO",
+        "value": "M1",
+        "domain": "maullin.sii.cl",
+        "host_only": true
+      },
+      {
+        "name": "WWW4SOLO",
+        "value": "W1",
+        "domain": "www4.sii.cl",
+        "host_only": true
+      }
+    ],
+    "rutEmpresa": "76123456-0",
+    "http": {
+      "respuestas": [
+        {
+          "status": 200,
+          "cabeceras": [["Content-Type", "text/html"]],
+          "cuerpo": "<html><head><script>var $gwt_version = \"2.8.2\"; var $strongName = '0FC3D987613537E6E13E9BB93A406F13';\nfunction Kj(){Kj=Dk;Lj=new Ok(Mk(),'082D0AC4BC4D75A5DF38F116C53877D4')}\nfunction Pj(){return 'cl.sii.sdi.diii.certBolElectDte.web.client.service.Facade'}\nZn(a,'cl.sii.sdi.diii.certBolElectDte.to.EstadoAutorizaTo/1011533792');\nZn(a,'cl.sii.sdi.diii.certBolElectDte.to.PostulSegHistInsUpdTo/138688689');\nZn(a,'cl.sii.sdi.diii.certBolElectDte.to.TdtEmpresaAutorizadaTo/2240026086');\nZn(a,'cl.sii.sdi.diii.certBolElectDte.to.DocumentoAutorizadoTo/493967287');\nfunction Wq(a){return Mk()+'DownloadFileServlet?rutEmpresa='+a.b}\nfunction obt(a,b){Hm(a,'obtenerEstadoAutorizaEmp',b)}\nfunction rec(a,b){Hm(a,'recuperarNombreContribuyente',b)}\nfunction lis(a,b){Hm(a,'listarDocAutorizados',b)}\nfunction aut(a,b){Hm(a,'autorizarEmpresaBolProd',b)}\nfunction rec(a,b){Hm(a,'recuperarNroActividadesVigAfecIva',b)}\nfunction ing(a,b){Hm(a,'ingresarTrackId',b)}\nfunction obt(a,b){Hm(a,'obtenerPostulacionSeg',b)}</script></head><body></body></html>\n"
+        }
+      ]
+    }
+  }
+}

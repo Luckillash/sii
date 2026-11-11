@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ConsumoFolios xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sii.cl/SiiDte ConsumoFolio_v10.xsd" version="1.0">
+  <DocumentoConsumoFolios ID="RCOF">
+    <Caratula version="1.0">
+      <RutEmisor>76123456-K</RutEmisor>
+      <RutEnvia>11111111-1</RutEnvia>
+      <FchResol>2026-09-05</FchResol>
+      <NroResol>0</NroResol>
+      <FchInicio>2026-11-05</FchInicio>
+      <FchFinal>2026-11-05</FchFinal>
+      <SecEnvio>1</SecEnvio>
+      <TmstFirmaEnv>2026-11-05T10:20:30</TmstFirmaEnv>
+    </Caratula>
+    <Resumen>
+      <TipoDocumento>39</TipoDocumento>
+      <MntNeto>8403</MntNeto>
+      <MntIva>1597</MntIva>
+      <TasaIVA>19</TasaIVA>
+      <MntExento>1500</MntExento>
+      <MntTotal>11500</MntTotal>
+      <FoliosEmitidos>5</FoliosEmitidos>
+      <FoliosAnulados>1</FoliosAnulados>
+      <FoliosUtilizados>4</FoliosUtilizados>
+      <RangoUtilizados>
+        <Inicial>1</Inicial>
+        <Final>2</Final>
+      </RangoUtilizados>
+      <RangoUtilizados>
+        <Inicial>4</Inicial>
+        <Final>5</Final>
+      </RangoUtilizados>
+      <RangoAnulados>
+        <Inicial>3</Inicial>
+        <Final>3</Final>
+      </RangoAnulados>
+    </Resumen>
+    <Resumen>
+      <TipoDocumento>41</TipoDocumento>
+      <MntExento>2000</MntExento>
+      <MntTotal>2000</MntTotal>
+      <FoliosEmitidos>1</FoliosEmitidos>
+      <FoliosAnulados>0</FoliosAnulados>
+      <FoliosUtilizados>1</FoliosUtilizados>
+      <RangoUtilizados>
+        <Inicial>10</Inicial>
+        <Final>10</Final>
+      </RangoUtilizados>
+    </Resumen>
+  </DocumentoConsumoFolios>
+</ConsumoFolios>

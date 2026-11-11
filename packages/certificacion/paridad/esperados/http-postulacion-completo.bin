@@ -1,0 +1,80 @@
+=== peticion 1 de 6 (https) ===
+POST /cgi_AUT2000/CAutInicio.cgi?https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios HTTP/1.1
+# tls cliente: sha256 16de499f938f95ff6229336d00f4144372728eaae46da89b67c604ed0f3f0629 (3 en la cadena)
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 76
+content-type: application/x-www-form-urlencoded
+host: <https>
+origin: https://zeusr.sii.cl
+referer: https://zeusr.sii.cl/AUT2000/InicioAutenticacion/IngresoCertificado.html?https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+referencia=https%3A%2F%2Fmaullin.sii.cl%2Fcvc_cgi%2Fdte%2Fof_solicita_folios
+=== fin de la peticion 1 ===
+=== peticion 2 de 6 (https2) ===
+POST /cvc_cgi/dte/pe_ingrut HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 27
+content-type: application/x-www-form-urlencoded
+cookie: NETSCAPE_LIVEWIRE.rut=11111111; NETSCAPE_LIVEWIRE.dv=1; NETSCAPE_LIVEWIRE.clave=CLAVEDEPRUEBA; TOKEN=TOKENDEPRUEBAAUT2000; CSESSIONID=SESIONDEPRUEBA
+host: <https2>
+referer: https://maullin.sii.cl/cvc/dte/pe_condiciones.html
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+ACEPTAR=Aceptar+Condiciones
+=== fin de la peticion 2 ===
+=== peticion 3 de 6 (https2) ===
+GET /cvc_cgi/dte/pe_ingrut?paso=2 HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+cookie: NETSCAPE_LIVEWIRE.rut=11111111; NETSCAPE_LIVEWIRE.dv=1; NETSCAPE_LIVEWIRE.clave=CLAVEDEPRUEBA; TOKEN=TOKENDEPRUEBAAUT2000; CSESSIONID=SESIONDEPRUEBA; JSESSIONID=MAULLINPE00
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/pe_ingrut
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+
+=== fin de la peticion 3 ===
+=== peticion 4 de 6 (https2) ===
+POST /cvc_cgi/dte/pe_datos_empresa HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 36
+content-type: application/x-www-form-urlencoded
+cookie: NETSCAPE_LIVEWIRE.rut=11111111; NETSCAPE_LIVEWIRE.dv=1; NETSCAPE_LIVEWIRE.clave=CLAVEDEPRUEBA; TOKEN=TOKENDEPRUEBAAUT2000; CSESSIONID=SESIONDEPRUEBA; JSESSIONID=MAULLINPE01
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/pe_ingrut
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+RUT_EMP=76123456&DV_EMP=0&OPCION=BOL
+=== fin de la peticion 4 ===
+=== peticion 5 de 6 (https2) ===
+POST /cvc_cgi/dte/pe_confirma HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 312
+content-type: application/x-www-form-urlencoded
+cookie: NETSCAPE_LIVEWIRE.rut=11111111; NETSCAPE_LIVEWIRE.dv=1; NETSCAPE_LIVEWIRE.clave=CLAVEDEPRUEBA; TOKEN=TOKENDEPRUEBAAUT2000; CSESSIONID=SESIONDEPRUEBA; JSESSIONID=MAULLINPE01
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/pe_datos_empresa
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+RUT_EMP=76123456&DV_EMP=0&RAZON_SOCIAL=COMERCIAL+DE+PRUEBA+LIMITADA&RUT_USU=11111111&DV_USU=1&MAIL_SUP=admin%40empresa-prueba.cl&MAIL_SII=contacto%40empresa-prueba.cl&MAIL_DTE=dte%40empresa-prueba.cl&URL=www.empresa-prueba.cl&NOM_SW=Software+de+Prueba&TIPO_SW=M&BOLELEC=S&ESBOL=S&BOLEXEN=S&GRABAR=Confirmar+Datos
+=== fin de la peticion 5 ===
+=== peticion 6 de 6 (https2) ===
+POST /cvc_cgi/dte/pe_graba_postulacion HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 316
+content-type: application/x-www-form-urlencoded
+cookie: NETSCAPE_LIVEWIRE.rut=11111111; NETSCAPE_LIVEWIRE.dv=1; NETSCAPE_LIVEWIRE.clave=CLAVEDEPRUEBA; TOKEN=TOKENDEPRUEBAAUT2000; CSESSIONID=SESIONDEPRUEBA; JSESSIONID=MAULLINPE01
+host: <https2>
+referer: https://maullin.sii.cl/cvc_cgi/dte/pe_confirma
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+RUT_EMP=76123456&DV_EMP=0&RUT_USU=11111111&DV_USU=1&MAIL_SUP=ADMIN%40EMPRESA-PRUEBA.CL&MAIL_SII=contacto%40empresa-prueba.cl&MAIL_DTE=dte%40empresa-prueba.cl&URL=www.empresa-prueba.cl&NOM_SW=Software+de+Prueba&ESBOL=S&BOLELEC=S&BOLEXEN=S&ESFAC=N&RAZON_SOCIAL=COMERCIAL+DE+PRUEBA+LIMITADA&CONF=Confirmar+Postulaci%F3n
+=== fin de la peticion 6 ===
+=== resultado ===
+ok {"empresa":"76123456-0","avisos":[],"mensaje":"Postulación Sr. Contribuyente: La postulación de la empresa 76.123.456-0 a Boleta Electrónica HA SIDO ACEPTADA. Desde ahora puede ingresar al ambiente de certificación — revise su correo <dte@empresa-prueba.cl>."}
+cookies [{"name":"NETSCAPE_LIVEWIRE.rut","value":"11111111","domain":"sii.cl","host_only":false},{"name":"NETSCAPE_LIVEWIRE.dv","value":"1","domain":"sii.cl","host_only":false},{"name":"NETSCAPE_LIVEWIRE.clave","value":"CLAVEDEPRUEBA","domain":"sii.cl","host_only":false},{"name":"TOKEN","value":"TOKENDEPRUEBAAUT2000","domain":"sii.cl","host_only":false},{"name":"CSESSIONID","value":"SESIONDEPRUEBA","domain":"sii.cl","host_only":false},{"name":"JSESSIONID","value":"MAULLINPE01","domain":"maullin.sii.cl","host_only":true}]

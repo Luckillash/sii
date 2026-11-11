@@ -1,0 +1,36 @@
+{
+  "name": "@winex/certificacion",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Integración con el SII de Chile: firma electrónica, timbre (TED/CAF) y emisión de Boleta Electrónica. Port a Node.js de winex/certificacion.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.19"
+  },
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@xmldom/xmldom": "^0.8.15",
+    "node-forge": "1.4.3",
+    "undici": "~8.12.3"
+  },
+  "devDependencies": {
+    "@types/node-forge": "1.3.14",
+    "tsup": "^9.0.0",
+    "vitest": "^5.1.0"
+  }
+}

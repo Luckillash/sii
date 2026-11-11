@@ -1,0 +1,27 @@
+{
+  "descripcion": "Boleta afecta (39) de un ítem, con receptor con razón social",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-09-05T10:30:01",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "56",
+    "tipo_dte": "39",
+    "detalles": [
+      {
+        "nombre": "Producto de prueba",
+        "cantidad": 1,
+        "precio": 1190
+      }
+    ]
+  }
+}

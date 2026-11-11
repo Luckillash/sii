@@ -1,0 +1,18 @@
+{
+  "descripcion": "mb_check_encoding UTF-8 estricto y, si falla, asumir ISO-8859-1 (Timbre, SolicitudFolios): UTF-8 válido con tildes; ISO-8859-1 (DÍAZ); byte suelto 0xD1; surrogate codificado; sobrelargo; mayor que U+10FFFF; BOM + texto; no-carácter U+FFFE; truncado; CAF ISO con declaración",
+  "operacion": "decodificarTexto",
+  "entrada": {
+    "bytes_base64": [
+      "w5FhbmTDuiBEw41BWiDigqwg8J+YgA==",
+      "RM1BWiDRdfFvYQ==",
+      "QdE=",
+      "Ye2ggGI=",
+      "wIA=",
+      "9JCAgA==",
+      "77u/eA==",
+      "77++",
+      "4oI=",
+      "PD94bWwgdmVyc2lvbj0iMS4wIj8+PFJTPkNPTUVSQ0lBTCBEzUFaPC9SUz4="
+    ]
+  }
+}

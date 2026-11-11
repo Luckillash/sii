@@ -1,0 +1,8 @@
+{
+    "caso": "http-postulacion-avisos",
+    "operacion": "httpPostulacion",
+    "core": "1.9.1",
+    "bytes": 4938,
+    "sha256": "d7798151830c05033a76e4f7f94b12ba1e2d35ac4e4c929b860c6df0b99954d1",
+    "marcas": {}
+}

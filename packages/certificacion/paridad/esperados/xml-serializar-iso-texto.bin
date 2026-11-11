@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Raiz>
+  <Tildes>Ñandú DÍAZ áéíóú ü ¿¡ °ª ÿ</Tildes>
+  <FueraIso>&#8364; &#128512; &#20013;&#25991; &#8220;x&#8221; &#8212; &#8230; &#256;</FueraIso>
+  <Simbolos>&lt;a&gt; &amp; "comillas" 'simples' &gt; ]]&gt;</Simbolos>
+  <Blancos>a	b
+c&#13;d&#13;
+e </Blancos>
+  <SoloBlancos>  </SoloBlancos>
+  <Vacio/>
+  <SinValor/>
+  <Control>x€Ÿy</Control>
+  <RefDecimal>café &#8364; &#128512;</RefDecimal>
+  <RefHex>é&#8364;&#128512;A</RefHex>
+  <RefHexMayuscula>X42;z</RefHexMayuscula>
+  <RefCero>ab</RefCero>
+  <RefCr>a&#13;b
+c	d</RefCr>
+  <RefFueraDeRango>d</RefFueraDeRango>
+  <RefDigitoInvalido>a;c ZZ;b</RefDigitoInvalido>
+  <RefSinPuntoYComa>a</RefSinPuntoYComa>
+  <Predefinidas>&lt;&gt;"'&amp;amp;</Predefinidas>
+  <AmpersandSuelto/>
+  <AmpersandPegado/>
+  <EntidadConEspacio>a & b; c</EntidadConEspacio>
+  <EntidadDesconocida>x&foo;y</EntidadDesconocida>
+  <EntidadYSuelto>x&e;</EntidadYSuelto>
+  <EntidadVacia>a</EntidadVacia>
+  <NulCorta>antes</NulCorta>
+  <Nombre.Con-Guion_y:Prefijo>n</Nombre.Con-Guion_y:Prefijo>
+</Raiz>

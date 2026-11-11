@@ -1,0 +1,10 @@
+{
+    "caso": "timbre-fuera-iso",
+    "operacion": "timbre",
+    "core": "1.9.1",
+    "bytes": 747,
+    "sha256": "4e7de97812cc301ed706db415744bedb52efba6d6f9736f57c550e7ac7ec29c0",
+    "marcas": {
+        "TSTED": "2026-09-05T10:36:07"
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-xmlns-vacio-apice",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 51,
+    "sha256": "6400d0d89029780f316db588463e88067f27d44fad439444729cf62bd4690a5a",
+    "marcas": {}
+}

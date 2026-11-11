@@ -1,0 +1,8 @@
+{
+  "descripcion": "Atributos con tab/salto literales (normalizados a espacio), referencias &#9; &#10; &#13;, comillas, < > & y comilla simple como delimitador",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<r>\n<e a=\"x&#9;y&#10;z&#13;w&#13;&#10;v\" b=\"lit\ttab\nnl\r\ncrlf\rcr\" c='com\"illa &apos;s' d=\"&lt;&gt;&amp;&quot;&apos;\" e=\"  dos  espacios  \" f=\"\"/>\n</r>",
+    "etiqueta": "e"
+  }
+}

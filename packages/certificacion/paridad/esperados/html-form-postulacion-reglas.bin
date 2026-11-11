@@ -1,0 +1,6 @@
+{"action":"pe_confirma","inputs":[["RUT_EMP","76123456"],["DV_EMP","0"],["RAZON_SOCIAL","X"],["ESFAC","N"],["RUT_USU",""],["DV_USU",""],["MAIL_SUP",""],["MAIL_SII",""],["MAIL_DTE",""],["URL","www."],["NOM_SW",""],["TIPO_SW","M"],["FACT","S"],["ND","S"],["SET03","S"],["BOLELEC","S"],["BOLEXEN","S"]]}
+{"action":"a","inputs":[["t1","uno"],["t2","dos"],["c1","S"],["r","2"]]}
+{"action":"b","inputs":[["h"," h "]]}
+{"action":"c","inputs":[["dup","3"],["otro","2"],["5","cinco"],["05","cero cinco"]]}
+{"sinForm":true}
+{"action":"d","inputs":[["A","1"]]}

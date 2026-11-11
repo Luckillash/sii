@@ -1,0 +1,24 @@
+{
+  "descripcion": "valor() con algo que no es un objeto leído: PostulacionException",
+  "operacion": "gwtLlamada",
+  "entrada": {
+    "base": "https://www4.sii.cl/certBolElectDteInternet/",
+    "policy": "082D0AC4BC4D75A5DF38F116C53877D4",
+    "servicio": "cl.sii.sdi.diii.certBolElectDte.web.client.service.Facade",
+    "metodo": "metodoValor",
+    "parametros": [
+      {
+        "tipo": "java.lang.String/2004016611",
+        "pasos": [
+          ["string", "antes"],
+          [
+            "valor",
+            {
+              "foo": 1
+            }
+          ]
+        ]
+      }
+    ]
+  }
+}

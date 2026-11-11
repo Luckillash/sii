@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-montos-grandes",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 1438,
+    "sha256": "16a8306269a15983d01df6d73673bd7d87a5cadd5cf4704b0911027b3e7ff015",
+    "marcas": {
+        "FchEmis": "2026-09-05"
+    }
+}

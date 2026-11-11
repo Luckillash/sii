@@ -1,0 +1,8 @@
+{
+    "caso": "http-declaracion-descargar",
+    "operacion": "httpDeclaracion",
+    "core": "1.9.1",
+    "bytes": 2774,
+    "sha256": "4b7293ebe391f462c1461fca121819446fc28eac80aef2be100b28a593c1da5a",
+    "marcas": {}
+}

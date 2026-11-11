@@ -1,0 +1,8 @@
+{
+    "caso": "xml-reserializar-dte",
+    "operacion": "reserializarXml",
+    "core": "1.9.1",
+    "bytes": 2723,
+    "sha256": "d9888f84130709b5508405a0348eda047c5445589f15b1c12dd3be1b5da44a2a",
+    "marcas": {}
+}

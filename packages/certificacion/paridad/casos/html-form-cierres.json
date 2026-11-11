@@ -1,0 +1,26 @@
+{
+  "descripcion": "Cierres automáticos de libxml alrededor del <form>: etiquetas que lo cierran al abrir (otro <form>), cierres de elementos de afuera (</div>, </b>, </center>, </body>) y elementos que el <form> cierra al abrir (<p>, <ul>, <h1>)",
+  "operacion": "formFolios",
+  "entrada": {
+    "paginas": [
+      "<form action=\"a\"><input name=\"x\"><form action=\"b\"><input name=\"y\"></form><input name=\"z\"></form>",
+      "<p><form action=\"a\"><input name=\"x\"></p><input name=\"y\"></form>",
+      "<ul><li><form action=\"a\"><input name=\"x\"><li><input name=\"y\"></ul><input name=\"z\">",
+      "<h1><form action=\"a\"><input name=\"x\"></h1><input name=\"y\">",
+      "<div><form action=\"a\"><input name=\"x\"></div><input name=\"y\"></form>",
+      "<div><form action=\"a\"></div><input name=\"y\"></form>",
+      "<b><form action=\"a\"><input name=\"x\"></b><input name=\"y\"></form>",
+      "<span><form action=\"a\"><input name=\"x\"></span><input name=\"y\"></form>",
+      "<center><form action=\"a\"><input name=\"x\"></center><input name=\"y\">",
+      "<form action=\"a\"><input name=\"x\"></body><input name=\"y\"></html><input name=\"z\">",
+      "<html><body><body><form action=\"a\"><input name=\"x\"></body><input name=\"y\"></form></body></html>",
+      "<form action=\"a\"/><input name=\"x\">",
+      "<form action=\"a\"><select name=\"s\"><option value=\"1\"></form><input name=\"y\">",
+      "<form action=\"a\"><p><input name=\"x\"></form><input name=\"y\">",
+      "<form action=\"a\"><dl><dt><input name=\"x\"><dd><input name=\"y\"></dl></form><input name=\"z\">",
+      "<html><head><form action=\"h\"><input name=\"q\"></head><body><form action=\"b\"></form></body></html>",
+      "sin formulario <b>aquí</b>",
+      "<!-- <form action=\"comentado\"> --><p>nada"
+    ]
+  }
+}

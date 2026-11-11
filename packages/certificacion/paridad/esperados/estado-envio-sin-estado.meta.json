@@ -1,0 +1,8 @@
+{
+    "caso": "estado-envio-sin-estado",
+    "operacion": "estadoEnvio",
+    "core": "1.9.1",
+    "bytes": 129,
+    "sha256": "a5d764e50c6015b0c4c23c7dcafc498fbeb9ae1094ea20ad9ec2b011a6673eae",
+    "marcas": {}
+}

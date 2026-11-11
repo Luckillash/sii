@@ -1,0 +1,17 @@
+winex/certificacion
+Copyright 2026 Meniaz (William Menares)
+
+Integracion con el SII de Chile: firma electronica, timbre (TED/CAF) y
+emision de Boleta Electronica.
+
+Este producto incluye los esquemas XSD publicados por el Servicio de
+Impuestos Internos (SII) en data/schemas/ y el texto del Set de Pruebas
+de data/set_pruebas/, que pertenecen al SII y se redistribuyen solo como
+material de referencia.
+
+----------------------------------------------------------------------
+
+certificacion-node
+Port a Node.js/TypeScript de winex/certificacion v1.9.1. Obra derivada
+bajo Apache-2.0: los archivos portados indican que derivan de
+winex/certificacion y que fueron modificados.

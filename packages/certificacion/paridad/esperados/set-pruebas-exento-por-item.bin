@@ -1,0 +1,153 @@
+{
+    "codificacion": "UTF-8",
+    "casos": [
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "item afecto 1",
+                    "cantidad": 8,
+                    "cantidadTexto": "8",
+                    "cantidadTipo": "int",
+                    "precio": 1590,
+                    "precioTexto": "1590",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "item exento 2",
+                    "cantidad": 2,
+                    "cantidadTexto": "2",
+                    "cantidadTipo": "int",
+                    "precio": 1000,
+                    "precioTexto": "1000",
+                    "precioTipo": "int",
+                    "exento": true
+                },
+                {
+                    "nombre": "item afecto 3",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 500,
+                    "precioTexto": "500",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-1"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "uno",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 100,
+                    "precioTexto": "100",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "dos",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 200,
+                    "precioTexto": "200",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-2"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "uno",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 100,
+                    "precioTexto": "100",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "dos",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 200,
+                    "precioTexto": "200",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-3"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "uno",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 100,
+                    "precioTexto": "100",
+                    "precioTipo": "int",
+                    "exento": true
+                },
+                {
+                    "nombre": "dos",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 200,
+                    "precioTexto": "200",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-4"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "uno",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 100,
+                    "precioTexto": "100",
+                    "precioTipo": "int",
+                    "exento": true
+                },
+                {
+                    "nombre": "dos",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 200,
+                    "precioTexto": "200",
+                    "precioTipo": "int",
+                    "exento": true
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-5"
+            }
+        }
+    ]
+}

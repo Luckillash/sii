@@ -1,0 +1,8 @@
+{
+    "caso": "http-dtews-semilla-fault",
+    "operacion": "httpDtews",
+    "core": "1.9.1",
+    "bytes": 357,
+    "sha256": "1c3b0be3e1967d883fcb1d7ec0d256bf42656cf92130dad2635b209de9731786",
+    "marcas": {}
+}

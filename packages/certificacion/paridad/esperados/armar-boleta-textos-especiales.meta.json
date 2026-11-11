@@ -1,0 +1,12 @@
+{
+    "caso": "armar-boleta-textos-especiales",
+    "operacion": "armar-boleta",
+    "core": "1.9.1",
+    "bytes": 5165,
+    "sha256": "1b1ebaa84b58000c7b2f24c8dfe536657188ed559307e67d82790757e1de7538",
+    "marcas": {
+        "FchEmis": "2026-09-05",
+        "TSTED": "2026-09-05T18:30:00",
+        "TmstFirma": "2026-09-05T18:30:00"
+    }
+}

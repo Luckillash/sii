@@ -1,0 +1,8 @@
+{
+    "caso": "gwt-llamada-listar-doc-autorizados",
+    "operacion": "gwtLlamada",
+    "core": "1.9.1",
+    "bytes": 256,
+    "sha256": "f226181e9d5f7fe3b182702ede1904943444c8c79bf2806b06f8c0c6bccb1cd8",
+    "marcas": {}
+}

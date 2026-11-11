@@ -1,0 +1,7 @@
+{
+  "descripcion": "U+0085 y U+2028 no son fin de línea en XML 1.0 (libxml los conserva; xmldom por defecto usa XML 1.1 y los vuelve \n): byte 0x85 en un documento ISO-8859-1, en texto, atributo, comentario y CDATA, junto a \r\n y \r",
+  "operacion": "reserializarXml",
+  "entrada": {
+    "xml_base64": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iSVNPLTg4NTktMSI/Pg0KPFIgYT0ieIV5DQqFeiI+DQp1bm+FZG9zDYV0cmVzDQqFPCEtLSBjhQ0KIC0tPjwhW0NEQVRBW4UNCl1dPjwvUj4="
+  }
+}

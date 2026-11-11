@@ -1,0 +1,8 @@
+{
+    "caso": "xml-escapar-xml1-sustituir",
+    "operacion": "escaparXml",
+    "core": "1.9.1",
+    "bytes": 240,
+    "sha256": "13e81f8b2fa6beb112581c3af243ca79b1429422a04af3631e35b9f15ec79ca5",
+    "marcas": {}
+}

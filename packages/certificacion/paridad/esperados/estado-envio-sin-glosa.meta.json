@@ -1,0 +1,8 @@
+{
+    "caso": "estado-envio-sin-glosa",
+    "operacion": "estadoEnvio",
+    "core": "1.9.1",
+    "bytes": 231,
+    "sha256": "6d0f3c26a5ef912a8a99f0a8747e28ec62a23f96f8bc7cd9b72c305590d07802",
+    "marcas": {}
+}

@@ -1,0 +1,114 @@
+{
+  "descripcion": "createElement($nombre, $valor) en un DOMDocument ISO-8859-1 con formatOutput: tildes, fuera de ISO-8859-1 (&#N;), escapes de texto, \\r \\t \\n, valor vacío y cómo libxml interpreta las referencias del valor (& suelto, &#233;, &amp;, &foo;...)",
+  "operacion": "serializarXml",
+  "entrada": {
+    "encoding": "ISO-8859-1",
+    "formatOutput": true,
+    "documento": [
+      {
+        "elemento": "Raiz",
+        "hijos": [
+          {
+            "elemento": "Tildes",
+            "valor": "Ñandú DÍAZ áéíóú ü ¿¡ °ª ÿ"
+          },
+          {
+            "elemento": "FueraIso",
+            "valor": "€ 😀 中文 “x” — … Ā"
+          },
+          {
+            "elemento": "Simbolos",
+            "valor": "&lt;a&gt; &amp; \"comillas\" 'simples' > ]]>"
+          },
+          {
+            "elemento": "Blancos",
+            "valor": "a\tb\nc\rd\r\ne "
+          },
+          {
+            "elemento": "SoloBlancos",
+            "valor": "  "
+          },
+          {
+            "elemento": "Vacio",
+            "valor": ""
+          },
+          {
+            "elemento": "SinValor"
+          },
+          {
+            "elemento": "Control",
+            "valor": "x\u0001\u007f\u0080\u009fy"
+          },
+          {
+            "elemento": "RefDecimal",
+            "valor": "caf&#233; &#8364; &#128512;"
+          },
+          {
+            "elemento": "RefHex",
+            "valor": "&#xE9;&#x20AC;&#x1F600;&#x41;"
+          },
+          {
+            "elemento": "RefHexMayuscula",
+            "valor": "&#X42;z"
+          },
+          {
+            "elemento": "RefCero",
+            "valor": "a&#0;b"
+          },
+          {
+            "elemento": "RefCr",
+            "valor": "a&#13;b&#10;c&#9;d"
+          },
+          {
+            "elemento": "RefFueraDeRango",
+            "valor": "&#x110000;d"
+          },
+          {
+            "elemento": "RefDigitoInvalido",
+            "valor": "&#12a;c &#xZZ;b"
+          },
+          {
+            "elemento": "RefSinPuntoYComa",
+            "valor": "a&#65"
+          },
+          {
+            "elemento": "Predefinidas",
+            "valor": "&lt;&gt;&quot;&apos;&amp;amp;"
+          },
+          {
+            "elemento": "AmpersandSuelto",
+            "valor": "a & b"
+          },
+          {
+            "elemento": "AmpersandPegado",
+            "valor": "a&b c"
+          },
+          {
+            "elemento": "EntidadConEspacio",
+            "valor": "a & b; c"
+          },
+          {
+            "elemento": "EntidadDesconocida",
+            "valor": "x&foo;y"
+          },
+          {
+            "elemento": "EntidadYSuelto",
+            "valor": "x&e;y&z"
+          },
+          {
+            "elemento": "EntidadVacia",
+            "valor": "&;a"
+          },
+          {
+            "elemento": "NulCorta",
+            "valor": "antes\u0000despues"
+          },
+          {
+            "elemento": "Nombre.Con-Guion_y:Prefijo",
+            "valor": "n"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+    "caso": "set-completo",
+    "operacion": "set-completo",
+    "core": "1.9.1",
+    "bytes": 26833,
+    "sha256": "432da51c00cdcc647778175d6b0c6fce50de281e215a39c47267c0f8bc63add5",
+    "marcas": {
+        "FchEmis": "2026-09-05",
+        "TSTED": "2026-09-05T10:30:01",
+        "TmstFirma": "2026-09-05T10:30:01",
+        "TmstFirmaEnv": "2026-09-05T10:30:01"
+    }
+}

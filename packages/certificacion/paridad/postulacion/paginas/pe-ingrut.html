@@ -1,0 +1,27 @@
+<HTML>
+<HEAD>
+<TITLE>Postulaci&oacute;n a Boleta Electr&oacute;nica</TITLE>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function valida(f) {
+  if (f.RUT_EMP.value == "" || f.DV_EMP.value == "") { alert("Debe ingresar el RUT de la empresa"); return false; }
+  return true;
+}
+//-->
+</SCRIPT>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<FONT FACE="Arial" SIZE="2"><B>Postulaci&oacute;n a Boleta Electr&oacute;nica - Ambiente de Certificaci&oacute;n</B></FONT>
+<FORM NAME="frmRut" METHOD="POST" ACTION="pe_datos_empresa" onSubmit="return valida(this)">
+<TABLE BORDER="0" WIDTH="600">
+<TR><TD>RUT de la empresa:</TD>
+<TD><INPUT TYPE="text" NAME="RUT_EMP" SIZE="10" MAXLENGTH="8"> - <INPUT TYPE="text" NAME="DV_EMP" SIZE="1" MAXLENGTH="1"></TD></TR>
+<INPUT TYPE="hidden" NAME="OPCION" VALUE="BOL">
+<TR><TD COLSPAN="2" ALIGN="center">
+<INPUT TYPE="submit" NAME="ACEPTAR" VALUE="Continuar">
+<INPUT TYPE="reset" NAME="LIMPIAR" VALUE="Limpiar">
+</TD></TR>
+</TABLE>
+</FORM>
+</BODY>
+</HTML>

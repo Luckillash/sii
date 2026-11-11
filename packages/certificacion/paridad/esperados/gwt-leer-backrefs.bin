@@ -1,0 +1,31 @@
+{
+    "lecturas": [
+        {
+            "objeto": {
+                "@tipo": "java.util.ArrayList/4159755760",
+                "elementos": [
+                    {
+                        "@tipo": "java.lang.Integer/3438268394",
+                        "valor": 7
+                    },
+                    {
+                        "@tipo": "java.lang.Integer/3438268394",
+                        "valor": 7
+                    },
+                    {
+                        "@tipo": "java.lang.String/2004016611",
+                        "valor": "hola"
+                    },
+                    {
+                        "@tipo": "java.lang.String/2004016611",
+                        "valor": "hola"
+                    }
+                ]
+            }
+        },
+        {
+            "string": "hola"
+        }
+    ],
+    "error": null
+}

@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-ns-no-usados",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 87,
+    "sha256": "fbe99cde40ad52ce0aed72193e2c93fba6719d67f7218c7787cb64045a8e6a1a",
+    "marcas": {}
+}

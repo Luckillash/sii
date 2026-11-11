@@ -1,0 +1,8 @@
+{
+  "descripcion": "El set del SII con tipoDte 41: el tipo se propaga a todos los casos",
+  "operacion": "setPruebas",
+  "entrada": {
+    "archivo": "data/set_pruebas/Set Prueba BE.txt",
+    "tipoDte": "41"
+  }
+}

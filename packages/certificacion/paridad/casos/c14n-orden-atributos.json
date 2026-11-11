@@ -1,0 +1,8 @@
+{
+  "descripcion": "Orden de atributos (sin namespace primero; luego por URI del namespace y nombre local) y de declaraciones (por defecto primero, luego por prefijo)",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<r xmlns:zz=\"urn:a\" xmlns:b=\"urn:b\" xmlns:a=\"urn:z\" xmlns=\"urn:d\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><e z=\"1\" a=\"2\" b:y=\"3\" a:x=\"4\" b:a=\"5\" xml:lang=\"es\" M=\"6\" zz:k=\"7\" xsi:type=\"t\" _=\"8\" A=\"9\"/></r>",
+    "etiqueta": "e"
+  }
+}

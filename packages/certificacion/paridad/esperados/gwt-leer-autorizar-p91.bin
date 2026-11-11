@@ -1,0 +1,193 @@
+{
+    "lecturas": [
+        {
+            "objeto": {
+                "@tipo": "cl.sii.sdi.diii.certBolElectDte.to.PostulSegHistInsUpdTo/138688689",
+                "campos": [
+                    [
+                        "S",
+                        "P91"
+                    ],
+                    [
+                        "O",
+                        null
+                    ],
+                    [
+                        "S",
+                        "BVE"
+                    ],
+                    [
+                        "O",
+                        {
+                            "@tipo": "java.lang.Integer/3438268394",
+                            "valor": 90
+                        }
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "O",
+                        null
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "S",
+                        "0"
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "O",
+                        {
+                            "@tipo": "cl.sii.sdi.diii.certBolElectDte.to.TdtEmpresaAutorizadaTo/2240026086",
+                            "campos": [
+                                [
+                                    "B",
+                                    0
+                                ],
+                                [
+                                    "S",
+                                    "BVE"
+                                ],
+                                [
+                                    "S",
+                                    "0"
+                                ],
+                                [
+                                    "S",
+                                    "1"
+                                ],
+                                [
+                                    "S",
+                                    "2"
+                                ],
+                                [
+                                    "S",
+                                    "SII"
+                                ],
+                                [
+                                    "S",
+                                    "07-11-2026"
+                                ],
+                                [
+                                    "S",
+                                    "07-11-2026"
+                                ],
+                                [
+                                    "S",
+                                    "07-11-2026"
+                                ],
+                                [
+                                    "S",
+                                    "contacto@proveedor-prueba.cl"
+                                ],
+                                [
+                                    "S",
+                                    "Proveedor de Prueba SpA"
+                                ],
+                                [
+                                    "S",
+                                    "19"
+                                ],
+                                [
+                                    "S",
+                                    "S"
+                                ],
+                                [
+                                    "O",
+                                    {
+                                        "@tipo": "java.lang.Integer/3438268394",
+                                        "valor": 76123456
+                                    }
+                                ],
+                                [
+                                    "O",
+                                    {
+                                        "@tipo": "java.lang.Integer/3438268394",
+                                        "valor": 11111111
+                                    }
+                                ],
+                                [
+                                    "O",
+                                    {
+                                        "@tipo": "java.lang.Integer/3438268394",
+                                        "valor": 22222222
+                                    }
+                                ],
+                                [
+                                    "S",
+                                    "https://proveedor-prueba.cl/consulta"
+                                ]
+                            ]
+                        }
+                    ],
+                    [
+                        "S",
+                        "07-11-2026"
+                    ],
+                    [
+                        "S",
+                        "07-11-2026"
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "O",
+                        {
+                            "@tipo": "java.util.ArrayList/4159755760",
+                            "elementos": []
+                        }
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "S",
+                        "EMPRESA DE PRUEBA SPA"
+                    ],
+                    [
+                        "O",
+                        {
+                            "@tipo": "java.lang.Long/4227064769",
+                            "valor": "0"
+                        }
+                    ],
+                    [
+                        "O",
+                        null
+                    ],
+                    [
+                        "O",
+                        {
+                            "@tipo": "java.lang.Integer/3438268394",
+                            "valor": 76123456
+                        }
+                    ],
+                    [
+                        "O",
+                        null
+                    ],
+                    [
+                        "S",
+                        "DECLARACION EFECTUADA"
+                    ]
+                ]
+            }
+        }
+    ],
+    "error": null
+}

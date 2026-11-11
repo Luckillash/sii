@@ -1,0 +1,14 @@
+{
+  "descripcion": "Back-references a un Integer y a un String ya leídos (copias), y un string de la tabla reutilizado",
+  "operacion": "gwtLeer",
+  "entrada": {
+    "respuesta": "//OK[4,-3,4,3,-2,7,2,4,1,[\"java.util.ArrayList/4159755760\",\"java.lang.Integer/3438268394\",\"java.lang.String/2004016611\",\"hola\"],0,7]",
+    "esquemas": {
+      "cl.sii.sdi.diii.certBolElectDte.to.EstadoAutorizaTo/1011533792": "SSS",
+      "cl.sii.sdi.diii.certBolElectDte.to.PostulSegHistInsUpdTo/138688689": "SOSOSSOSSSOSSSOSSOOOOS",
+      "cl.sii.sdi.diii.certBolElectDte.to.TdtEmpresaAutorizadaTo/2240026086": "BSSSSSSSSSSSSOOOS",
+      "cl.sii.sdi.diii.certBolElectDte.to.DocumentoAutorizadoTo/493967287": "OOSSSSSSSSSOOOOOS"
+    },
+    "lecturas": ["objeto", "string"]
+  }
+}

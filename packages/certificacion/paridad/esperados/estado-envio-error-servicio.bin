@@ -1,0 +1,13 @@
+{
+    "trackId": "42",
+    "estado": "-11",
+    "glosa": "ERROR: TRACKID NO EXISTE",
+    "informados": 0,
+    "aceptados": 0,
+    "rechazados": 0,
+    "reparos": 0,
+    "enProceso": false,
+    "procesado": false,
+    "limpio": false,
+    "resumen": "-11 ERROR: TRACKID NO EXISTE"
+}

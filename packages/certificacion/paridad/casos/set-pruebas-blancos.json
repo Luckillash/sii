@@ -1,0 +1,7 @@
+{
+  "descripcion": "Tabs, solo espacios, CRLF, \\r suelto, VT/FF como separador, FF final (no lo quita trim), NUL inicial, encabezados y líneas de 2 o 4 columnas",
+  "operacion": "setPruebas",
+  "entrada": {
+    "texto": "Texto antes del primer caso\r\nCASO-1   \r\n\r\n==========\r\n\r\nITEM          CANTIDAD      PRECIO\r\nCambio de aceite      1      19900\r\nAlineacion y balanceo \t\t\t1\t\t\t9900\r\r\nItem especial    2    300\r\nLavado\u000b\f3\t\t4500\r\nEncerado\t\t1\t\t5000\f\r\n\u0000Pulido\u0000\t\t1\t\t2500\r\nSolo dos columnas\t\t3\r\nCuatro\t\tcolumnas\t\t1\t\t200\r\nColumna  vacia\t\t  \t\t1\r\n   Sangria   \t1\t3000   \r\r\r\nObservacion\t\t1\t\t100\r\n\r\n\r\nCASO-2\r\n=====\r\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\r\nPapel de regalo\t\t\t17\t\t\t120\r\n"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "descripcion": "RCOF del set de pruebas real como enviar-consumo-folios.php: montos con la fórmula del bin a partir del set, folios 56-60, firmado con #RCOF",
+  "operacion": "rcof-set-completo",
+  "material": "base",
+  "entrada": {
+    "ahora": "2026-09-05T10:30:01",
+    "archivo": "data/set_pruebas/Set Prueba BE.txt",
+    "caf": "caf-39.xml",
+    "folioInicial": 56,
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "rutEnvia": "11111111-1",
+    "nroResol": "0",
+    "fchResol": "2026-09-05",
+    "fchResolRcof": "2026-09-04",
+    "secEnvio": 1
+  }
+}

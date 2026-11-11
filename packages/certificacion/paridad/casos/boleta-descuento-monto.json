@@ -1,0 +1,35 @@
+{
+  "descripcion": "Descuento global en monto (2500) repartido a prorrata",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-09-05T13:30:00",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "61",
+    "detalles": [
+      {
+        "nombre": "A",
+        "cantidad": 1,
+        "precio": 10000
+      },
+      {
+        "nombre": "B",
+        "cantidad": 1,
+        "precio": 5000
+      }
+    ],
+    "descuento": {
+      "tipo": "monto",
+      "valor": 2500
+    }
+  }
+}

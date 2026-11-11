@@ -1,0 +1,8 @@
+{
+    "caso": "http-folios-no-autorizado",
+    "operacion": "httpFolios",
+    "core": "1.9.1",
+    "bytes": 1114,
+    "sha256": "3052cf67c5194bc17cec358c869266eea09b0130f08284034a5898dd451d2e2a",
+    "marcas": {}
+}

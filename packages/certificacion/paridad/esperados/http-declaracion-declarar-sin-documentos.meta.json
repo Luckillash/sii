@@ -1,0 +1,8 @@
+{
+    "caso": "http-declaracion-declarar-sin-documentos",
+    "operacion": "httpDeclaracion",
+    "core": "1.9.1",
+    "bytes": 2700,
+    "sha256": "0ea2bd7cba221df576731b1226523a0898b0191dda896d3b4a66664613cbdb07",
+    "marcas": {}
+}

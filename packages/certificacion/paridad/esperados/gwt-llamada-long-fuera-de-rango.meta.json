@@ -1,0 +1,10 @@
+{
+    "caso": "gwt-llamada-long-fuera-de-rango",
+    "operacion": "gwtLlamada",
+    "core": "1.9.1",
+    "bytes": 205,
+    "sha256": "643772396f4cf0447c98a3374f163238d4827fdc04580b2decea118af2f2e178",
+    "marcas": {
+        "longsSaturados": "9223372036854775808"
+    }
+}

@@ -1,0 +1,41 @@
+{
+  "descripcion": "declarar(): la sesión no trae RUT_NS/DV_NS → SesionCaduca sin peticiones",
+  "operacion": "httpDeclaracion",
+  "entrada": {
+    "accion": "declarar",
+    "sesion": [
+      {
+        "name": "TOKEN",
+        "value": "TOKENDEPRUEBAAUT2000",
+        "domain": "sii.cl",
+        "host_only": false
+      },
+      {
+        "name": "MAULLINSOLO",
+        "value": "M1",
+        "domain": "maullin.sii.cl",
+        "host_only": true
+      },
+      {
+        "name": "WWW4SOLO",
+        "value": "W1",
+        "domain": "www4.sii.cl",
+        "host_only": true
+      }
+    ],
+    "datos": {
+      "rutEmpresa": "76123456-0",
+      "linkConsulta": "https://www.empresa-prueba.cl/boletas/consulta",
+      "rutProveedor": "22222222-2",
+      "nombreProveedor": "Programación Ñandú SpA",
+      "correoProveedor": "software@empresa-prueba.cl"
+    },
+    "esperaError": true,
+    "http": {
+      "respuestas": [],
+      "normalizar": {
+        "fechasGwt": true
+      }
+    }
+  }
+}

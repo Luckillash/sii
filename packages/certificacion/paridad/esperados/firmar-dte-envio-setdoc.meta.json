@@ -1,0 +1,8 @@
+{
+    "caso": "firmar-dte-envio-setdoc",
+    "operacion": "firmarDte",
+    "core": "1.9.1",
+    "bytes": 12635,
+    "sha256": "5394d1a547cdea5130f09be7925d128e78bd951a2f770b771d5c735ed5ea6ac1",
+    "marcas": {}
+}

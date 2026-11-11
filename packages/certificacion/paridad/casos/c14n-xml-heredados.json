@@ -1,0 +1,8 @@
+{
+  "descripcion": "xml:lang, xml:space y xml:base en ancestros: C14N 1.0 los hereda al ápice (gana el más cercano)",
+  "operacion": "c14n",
+  "entrada": {
+    "xml": "<r xml:lang=\"es\" xml:space=\"preserve\" xml:base=\"http://a/b/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><m xml:lang=\"en\"><a xml:space=\"default\">x</a><b z=\"1\">y</b></m></r>",
+    "etiqueta": "b"
+  }
+}

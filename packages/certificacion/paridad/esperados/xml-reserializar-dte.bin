@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<DTE xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
+  <Documento ID="F1234T39">
+    <Encabezado>
+      <IdDoc>
+        <TipoDTE>39</TipoDTE>
+        <Folio>1234</Folio>
+        <FchEmis>2026-11-05</FchEmis>
+        <IndServicio>3</IndServicio>
+      </IdDoc>
+      <Emisor>
+        <RUTEmisor>76123456-K</RUTEmisor>
+        <RznSocEmisor>Comercial Ñandú &amp; Díaz &lt;Hnos.&gt; "Ltda." &#8364;</RznSocEmisor>
+        <GiroEmisor>Venta de artículos 'gourmet'</GiroEmisor>
+        <DirOrigen>Av. Libertador 1234, Of. 5°</DirOrigen>
+        <CmnaOrigen>Ñuñoa</CmnaOrigen>
+      </Emisor>
+      <Receptor>
+        <RUTRecep>66666666-6</RUTRecep>
+        <RznSocRecep>José Pérez &amp; Cía. &#128512;</RznSocRecep>
+      </Receptor>
+      <Totales>
+        <MntNeto>9664</MntNeto>
+        <IVA>1836</IVA>
+        <MntTotal>11500</MntTotal>
+      </Totales>
+    </Encabezado>
+    <Detalle>
+      <NroLinDet>1</NroLinDet>
+      <NmbItem>Cuaderno "Torre" &amp; lápiz &lt;HB&gt;</NmbItem>
+      <QtyItem>2</QtyItem>
+      <PrcItem>5750</PrcItem>
+      <MontoItem>11500</MontoItem>
+    </Detalle>
+    <Referencia>
+      <NroLinRef>1</NroLinRef>
+      <CodRef>SET</CodRef>
+      <RazonRef>CASO-1</RazonRef>
+    </Referencia>
+  <TED version="1.0"><DD><RE>76123456-K</RE><TD>39</TD><F>1234</F><FE>2026-11-05</FE><RR>66666666-6</RR><RSR>José Pérez &amp; Cía.</RSR><MNT>11500</MNT><IT1>Cuaderno "Torre" &amp; lápiz &lt;HB&gt;</IT1><CAF version="1.0"><DA><RE>76123456-K</RE><RS>COMERCIAL ÑANDÚ DÍAZ</RS><TD>39</TD><RNG><D>1</D><H>5000</H></RNG><FA>2026-09-05</FA><RSAPK><M>AbCd==</M><E>Aw==</E></RSAPK><IDK>100</IDK></DA><FRMA algoritmo="SHA1withRSA">ZmlybWE=</FRMA></CAF><TSTED>2026-11-05T10:20:30</TSTED></DD><FRMT algoritmo="SHA1withRSA">ZnJtdA==</FRMT></TED>
+<TmstFirma>2026-11-05T10:20:30</TmstFirma>
+</Documento>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+<SignedInfo>
+<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<Reference URI="#F1234T39">
+<Transforms>
+<Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+</Transforms>
+<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<DigestValue>q1w2e3r4t5y6u7i8o9p0a1s2d3f=</DigestValue>
+</Reference>
+</SignedInfo>
+<SignatureValue>QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo=</SignatureValue>
+<KeyInfo>
+<KeyValue>
+<RSAKeyValue>
+<Modulus>MTIzNDU2Nzg5MA==</Modulus>
+<Exponent>AQAB</Exponent>
+</RSAKeyValue>
+</KeyValue>
+<X509Data>
+<X509Certificate>TUlJQ2VydGlmaWNhZG9EZVBydWViYQ==</X509Certificate>
+</X509Data>
+</KeyInfo>
+</Signature></DTE>

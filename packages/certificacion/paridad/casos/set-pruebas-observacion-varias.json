@@ -1,0 +1,7 @@
+{
+  "descripcion": "Solo cuenta la primera OBSERVACION con comillas, aunque abarque varias líneas",
+  "operacion": "setPruebas",
+  "entrada": {
+    "texto": "CASO-1\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nuno\t\t\t1\t\t\t100\ndos\t\t\t1\t\t\t200\n\nOBSERVACION: sin comillas, item 1 exento\nOBSERVACION: \"El item 2\nes exento.\"\nOBSERVACION: \"El item 1 es exento. Unidad de medida en Kg\"\n\n"
+  }
+}

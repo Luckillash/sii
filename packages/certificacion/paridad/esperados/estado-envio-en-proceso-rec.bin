@@ -1,0 +1,13 @@
+{
+    "trackId": "1234567890",
+    "estado": "REC",
+    "glosa": "Envio Recibido",
+    "informados": 0,
+    "aceptados": 0,
+    "rechazados": 0,
+    "reparos": 0,
+    "enProceso": true,
+    "procesado": false,
+    "limpio": false,
+    "resumen": "REC Envio Recibido"
+}

@@ -1,0 +1,8 @@
+{
+  "descripcion": "PEM con el certificado antes de la llave, la CA intermedia repetida y la CA raíz: cadena y deduplicación de toPem",
+  "operacion": "certificado",
+  "entrada": {
+    "archivo": "cert-cadena.pem",
+    "clave": ""
+  }
+}

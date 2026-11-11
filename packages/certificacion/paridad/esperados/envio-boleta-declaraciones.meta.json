@@ -1,0 +1,10 @@
+{
+    "caso": "envio-boleta-declaraciones",
+    "operacion": "envioBoleta",
+    "core": "1.9.1",
+    "bytes": 15867,
+    "sha256": "be2c4f7cb951fbf3808a477f054d5e15c62d67deb9610019c5572f820c5338d9",
+    "marcas": {
+        "TmstFirmaEnv": "2026-09-05T10:31:15"
+    }
+}

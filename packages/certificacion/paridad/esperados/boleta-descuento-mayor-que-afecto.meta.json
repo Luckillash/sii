@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-descuento-mayor-que-afecto",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 1544,
+    "sha256": "4d45fa6c6d02c79aac62655bd614edf6b15995320b43a3799da351c8ee3caddc",
+    "marcas": {
+        "FchEmis": "2026-09-05"
+    }
+}

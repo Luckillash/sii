@@ -1,0 +1,13 @@
+{
+    "trackId": "1234567890",
+    "estado": "RCH",
+    "glosa": "Rechazado por Error en Schema",
+    "informados": 0,
+    "aceptados": 0,
+    "rechazados": 0,
+    "reparos": 0,
+    "enProceso": false,
+    "procesado": false,
+    "limpio": false,
+    "resumen": "RCH Rechazado por Error en Schema"
+}

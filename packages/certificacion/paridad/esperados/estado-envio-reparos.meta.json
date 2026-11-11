@@ -1,0 +1,8 @@
+{
+    "caso": "estado-envio-reparos",
+    "operacion": "estadoEnvio",
+    "core": "1.9.1",
+    "bytes": 327,
+    "sha256": "2414a26c5a4af164ae7eee1877bf44219d77824c0e33e99393b57f6ef42d248c",
+    "marcas": {}
+}

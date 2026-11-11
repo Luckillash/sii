@@ -1,0 +1,10 @@
+{
+    "caso": "rcof-varios-resumenes",
+    "operacion": "consumoFolios",
+    "core": "1.9.1",
+    "bytes": 1451,
+    "sha256": "9967c4ba329bbccb9b4367c480aff8525cfdb6a7dad6fa4dcc6ddc4d788b53e2",
+    "marcas": {
+        "TmstFirmaEnv": "2026-09-05T23:10:42"
+    }
+}

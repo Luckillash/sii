@@ -1,0 +1,11 @@
+{
+    "lecturas": [
+        {
+            "string": "aAé\n\t\r\u0000\"\\/bcq\u0012\u0004😀ñ"
+        },
+        {
+            "string": "\u0000\u0000fin\\"
+        }
+    ],
+    "error": null
+}

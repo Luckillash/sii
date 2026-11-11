@@ -1,0 +1,16 @@
+=== peticion 1 de 1 (https) ===
+POST /cgi_AUT2000/CAutInicio.cgi?https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios HTTP/1.1
+# tls cliente: sha256 16de499f938f95ff6229336d00f4144372728eaae46da89b67c604ed0f3f0629 (1 en la cadena)
+accept: */*
+accept-encoding: <codificaciones>
+content-length: 76
+content-type: application/x-www-form-urlencoded
+host: <https>
+origin: https://zeusr.sii.cl
+referer: https://zeusr.sii.cl/AUT2000/InicioAutenticacion/IngresoCertificado.html?https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+referencia=https%3A%2F%2Fmaullin.sii.cl%2Fcvc_cgi%2Fdte%2Fof_solicita_folios
+=== fin de la peticion 1 ===
+=== resultado ===
+error solicitud

@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-envio-signedinfo",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 610,
+    "sha256": "8865ddd97c227ee4f59657cdc004eed811bd117e00aa157e0fe7f8cb0c11b967",
+    "marcas": {}
+}

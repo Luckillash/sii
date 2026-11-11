@@ -1,0 +1,8 @@
+{
+    "caso": "http-postulacion-sin-exenta",
+    "operacion": "httpPostulacion",
+    "core": "1.9.1",
+    "bytes": 3469,
+    "sha256": "c186ed8ffffaef6dd39507a5618507f05abb52a8f06181df1de39589153b4e7a",
+    "marcas": {}
+}

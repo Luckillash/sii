@@ -1,0 +1,8 @@
+{
+    "caso": "http-dtews-estado",
+    "operacion": "httpDtews",
+    "core": "1.9.1",
+    "bytes": 602,
+    "sha256": "5a0d511ca17d97429ce01ad45bf7ba41e0e34910764155a12f40904b2845359e",
+    "marcas": {}
+}

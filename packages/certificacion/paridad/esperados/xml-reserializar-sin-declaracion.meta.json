@@ -1,0 +1,8 @@
+{
+    "caso": "xml-reserializar-sin-declaracion",
+    "operacion": "reserializarXml",
+    "core": "1.9.1",
+    "bytes": 163,
+    "sha256": "25d9cc7bf4194bd0f756b9ae253dc8a46c1200bf525c0a4c1b21305c7175295a",
+    "marcas": {}
+}

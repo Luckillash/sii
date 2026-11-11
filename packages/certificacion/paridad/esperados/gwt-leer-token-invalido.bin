@@ -1,0 +1,7 @@
+{
+    "lecturas": [],
+    "error": {
+        "clase": "PostulacionException",
+        "mensaje": "Respuesta GWT del SII mal formada."
+    }
+}

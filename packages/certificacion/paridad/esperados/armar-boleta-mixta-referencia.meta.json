@@ -1,0 +1,12 @@
+{
+    "caso": "armar-boleta-mixta-referencia",
+    "operacion": "armar-boleta",
+    "core": "1.9.1",
+    "bytes": 4921,
+    "sha256": "7f03284d164bd4e0ed070d2fec70f080090ebfa2739dd5b789e9b0ad0026f4eb",
+    "marcas": {
+        "FchEmis": "2026-09-05",
+        "TSTED": "2026-09-05T12:15:30",
+        "TmstFirma": "2026-09-05T12:15:30"
+    }
+}

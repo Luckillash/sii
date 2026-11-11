@@ -1,0 +1,10 @@
+{
+    "caso": "gwt-leer-div-long-numero-saturado",
+    "operacion": "gwtLeer",
+    "core": "1.9.1",
+    "bytes": 206,
+    "sha256": "cf0e800e5d7e56abd230d192304244573d1d8569a3a58d86df1a8ee23fd92aad",
+    "marcas": {
+        "numerosInexactos": "99999999999999999999"
+    }
+}

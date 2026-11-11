@@ -1,0 +1,11 @@
+=== peticion 1 de 1 (https) ===
+POST /DTEWS/CrSeed.jws HTTP/1.1
+content-length: 151
+content-type: text/xml; charset=utf-8
+host: <https>
+soapaction: ""
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><soapenv:Header/><soapenv:Body><getSeed/></soapenv:Body></soapenv:Envelope>
+=== fin de la peticion 1 ===
+=== resultado ===
+error

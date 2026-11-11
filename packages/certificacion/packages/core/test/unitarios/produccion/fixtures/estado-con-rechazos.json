@@ -1,0 +1,36 @@
+{
+  "rut_emisor": "76543210-3",
+  "rut_envia": "11111111-1",
+  "trackid": 1234567891,
+  "fecha_recepcion": "2026-11-06 11:00:00",
+  "estado": "EPR",
+  "estadistica": [
+    { "tipo": 39, "informados": 4, "aceptados": 2, "rechazados": 1, "reparos": 1 },
+    { "tipo": 41, "informados": 1, "aceptados": 1, "rechazados": 0, "reparos": 0 }
+  ],
+  "detalle_rep_rech": [
+    {
+      "tipo": 39,
+      "folio": 57,
+      "estado": "RCH",
+      "descripcion": "Rechazado",
+      "error": [
+        {
+          "seccion": "DTE",
+          "linea": 12,
+          "nivel": 1,
+          "codigo": 302,
+          "descripcion": "Monto Total No Cuadra",
+          "detalle": "MntTotal distinto de la suma de los ítems"
+        }
+      ]
+    },
+    {
+      "tipo": 39,
+      "folio": "58",
+      "estado": "RPR",
+      "descripcion": "Aceptado con Reparos",
+      "error": null
+    }
+  ]
+}

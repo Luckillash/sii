@@ -1,0 +1,8 @@
+{
+  "descripcion": "firmarSemilla con una semilla numérica normal (12 dígitos, como las del SII)",
+  "operacion": "firmarSemilla",
+  "material": "base",
+  "entrada": {
+    "semilla": "123456789012"
+  }
+}

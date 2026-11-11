@@ -1,0 +1,63 @@
+{
+  "descripcion": "Cantidades y precios decimales (1.5, 0.333, 1/3, 5.055 × 100 que pre-redondea, 0.285, 1e-5, 0.1+0.2, 1234.5678901234567 con más de 14 cifras)",
+  "operacion": "generar-boleta",
+  "entrada": {
+    "ahora": "2026-09-05T18:00:00",
+    "emisor": {
+      "rut": "76123456-0",
+      "razon_social": "EMPRESA DE PRUEBA SPA",
+      "giro": "ACTIVIDADES DE CONSULTORIA DE INFORMATICA",
+      "direccion": "CALLE 123",
+      "comuna": "SANTIAGO"
+    },
+    "receptor": {
+      "rut": "66666666-6",
+      "razon_social": "Cliente General"
+    },
+    "folio": "73",
+    "detalles": [
+      {
+        "nombre": "Queso",
+        "cantidad": 1.5,
+        "precio": 8990,
+        "unidad": "Kg"
+      },
+      {
+        "nombre": "Jamón",
+        "cantidad": 0.333,
+        "precio": 12990.5
+      },
+      {
+        "nombre": "Tercio",
+        "cantidad": 0.3333333333333333,
+        "precio": 1000
+      },
+      {
+        "nombre": "Preredondeo",
+        "cantidad": 5.055,
+        "precio": 100
+      },
+      {
+        "nombre": "Gramos",
+        "cantidad": 1000,
+        "precio": 0.285
+      },
+      {
+        "nombre": "Mínimo",
+        "cantidad": 0.00001,
+        "precio": 49999,
+        "exento": true
+      },
+      {
+        "nombre": "Suma",
+        "cantidad": 2,
+        "precio": 0.30000000000000004
+      },
+      {
+        "nombre": "Precisión 14",
+        "cantidad": 1,
+        "precio": 1234.5678901234567
+      }
+    ]
+  }
+}

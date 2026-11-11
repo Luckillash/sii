@@ -1,0 +1,77 @@
+{
+    "codificacion": "UTF-8",
+    "casos": [
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "uno",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 100,
+                    "precioTexto": "100",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-01"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "cuatro",
+                    "cantidad": 4,
+                    "cantidadTexto": "4",
+                    "cantidadTipo": "int",
+                    "precio": 400,
+                    "precioTexto": "400",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-4"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "cinco",
+                    "cantidad": 5,
+                    "cantidadTexto": "5",
+                    "cantidadTipo": "int",
+                    "precio": 500,
+                    "precioTexto": "500",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-5"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "seis",
+                    "cantidad": 6,
+                    "cantidadTexto": "6",
+                    "cantidadTipo": "int",
+                    "precio": 600,
+                    "precioTexto": "600",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-6"
+            }
+        }
+    ]
+}

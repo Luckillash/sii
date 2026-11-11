@@ -1,0 +1,10 @@
+{"action":"a","inputs":[["x",""]]}
+{"action":"a","inputs":[["x",""],["y",""],["z",""]]}
+{"action":"a","inputs":[["x",""],["y",""],["z",""]]}
+{"action":"a","inputs":[["x",""]]}
+{"action":"a","inputs":[["x",""]]}
+{"action":"of_x","inputs":[["A","1"],["B","2"]]}
+{"action":"a","inputs":[["x",""],["y",""]]}
+{"action":"a","inputs":[["y",""],["z",""]]}
+{"action":"a","inputs":[["x",""],["y",""]]}
+{"action":"a","inputs":[["x",""]]}

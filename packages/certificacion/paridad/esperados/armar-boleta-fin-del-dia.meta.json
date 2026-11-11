@@ -1,0 +1,12 @@
+{
+    "caso": "armar-boleta-fin-del-dia",
+    "operacion": "armar-boleta",
+    "core": "1.9.1",
+    "bytes": 4504,
+    "sha256": "3ed93994a4a749511a5623336df16ae4726b90650fc9e90b1fa9d1aab705d2d5",
+    "marcas": {
+        "FchEmis": "2026-09-05",
+        "TSTED": "2026-09-05T23:59:59",
+        "TmstFirma": "2026-09-05T23:59:59"
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "caso": "estado-envio-sin-trackid",
+    "operacion": "estadoEnvio",
+    "core": "1.9.1",
+    "bytes": 319,
+    "sha256": "1060325f60e34b6ed30c3138084f12580864ddbe2372ee34536271025dd1d1c4",
+    "marcas": {}
+}

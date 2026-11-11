@@ -1,0 +1,20 @@
+{
+  "descripcion": "autenticar(): el SII no entrega TOKEN (certificado rechazado): los dos lanzan",
+  "operacion": "httpFolios",
+  "entrada": {
+    "accion": "autenticar",
+    "archivo": "cert-titular.pem",
+    "esperaError": true,
+    "http": {
+      "respuestas": [
+        {
+          "status": 200,
+          "cabeceras": [["Content-Type", "text/html; charset=ISO-8859-1"]],
+          "cuerpo": {
+            "base64": "PEhUTUw+CjxIRUFEPjxUSVRMRT5FcnJvciBkZSBhdXRlbnRpY2FjaSZvYWN1dGU7bjwvVElUTEU+PC9IRUFEPgo8Qk9EWT4KPEZPTlQgRkFDRT0iQXJpYWwiIFNJWkU9IjIiPgpFbCBjZXJ0aWZpY2FkbyBkaWdpdGFsIHByZXNlbnRhZG8gbm8gZXN0JmFhY3V0ZTsgcmVnaXN0cmFkbyBvIHNlIGVuY3VlbnRyYSByZXZvY2Fkby4KPEJSPkVsIGMmb2FjdXRlO2RpZ28gZGUgZXN0ZSBtZW5zYWplIGVzIDAxLjAxLjIxNS41MDAuNzA5LjIxCjwvRk9OVD4KPC9CT0RZPgo8L0hUTUw+Cg=="
+          }
+        }
+      ]
+    }
+  }
+}

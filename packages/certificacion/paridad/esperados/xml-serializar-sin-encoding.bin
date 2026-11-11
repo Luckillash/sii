@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!-- comentario é € -->
+<Raíz xmlns="urn:é" a="&#xE9;&#x20AC;&#x1F600;&quot;'&lt;&gt;&amp;&#9;&#10;&#13; x" control="xy" noCaracter="a&#xEF;&#xBF;&#xBE;b&#xEF;&#xBF;�" noCaracterAlFinal="a&#xEF;&#xBF;�">
+  <Texto>&#xE9; &#x20AC; &#x1F600; &#x4E2D; a&#xD;b	c
+d "'&gt; &amp;</Texto>
+  <Del>xy</Del>
+  <Ref>&#xE9;&#xD;</Ref>
+  <Mixto><![CDATA[é€]]><?pí é?></Mixto>
+  <Ñ/>
+</Raíz>

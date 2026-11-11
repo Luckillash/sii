@@ -1,0 +1,8 @@
+{
+    "caso": "http-declaracion-estado-sesion-caducada",
+    "operacion": "httpDeclaracion",
+    "core": "1.9.1",
+    "bytes": 931,
+    "sha256": "8419b9ecf3a9107ccd569955f7ec1990b6e9439ee249be88e7e16289c19397d1",
+    "marcas": {}
+}

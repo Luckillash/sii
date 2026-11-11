@@ -1,0 +1,106 @@
+{
+    "lecturas": [
+        {
+            "esNulo": false
+        },
+        {
+            "objeto": {
+                "@tipo": "cl.sii.sdi.diii.certBolElectDte.to.PostulSegHistInsUpdTo/138688689",
+                "campos": [
+                    [
+                        "S",
+                        "P90"
+                    ],
+                    [
+                        "O",
+                        null
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "O",
+                        null
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "O",
+                        null
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "O",
+                        null
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "O",
+                        null
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "S",
+                        null
+                    ],
+                    [
+                        "O",
+                        null
+                    ],
+                    [
+                        "O",
+                        null
+                    ],
+                    [
+                        "O",
+                        null
+                    ],
+                    [
+                        "O",
+                        null
+                    ],
+                    [
+                        "S",
+                        null
+                    ]
+                ]
+            }
+        },
+        {
+            "esNulo": false
+        }
+    ],
+    "error": null
+}

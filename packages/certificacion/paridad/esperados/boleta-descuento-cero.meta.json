@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-descuento-cero",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 1109,
+    "sha256": "8a2dbbcc5f3b32448c5745bb6b9b365e15128e85a2cae40b9c29b2c1e1060237",
+    "marcas": {
+        "FchEmis": "2026-09-05"
+    }
+}

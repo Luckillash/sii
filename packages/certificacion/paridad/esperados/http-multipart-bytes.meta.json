@@ -1,0 +1,8 @@
+{
+    "caso": "http-multipart-bytes",
+    "operacion": "httpMultipart",
+    "core": "1.9.1",
+    "bytes": 1199,
+    "sha256": "57c116574148e240d7d329b2bc5c4e5ef0e97ab551b51e8679efc892181e4dea",
+    "marcas": {}
+}

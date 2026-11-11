@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-descuento-porcentaje",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 1379,
+    "sha256": "abdaa1db4964b9c4852b21404701636a1857f68fd2a088ec2db913583d129a13",
+    "marcas": {
+        "FchEmis": "2026-09-05"
+    }
+}

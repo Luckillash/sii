@@ -1,0 +1,11 @@
+=== peticion 1 de 1 (https) ===
+GET /certBolElectDteInternet/0FC3D987613537E6E13E9BB93A406F13.cache.html HTTP/1.1
+accept: */*
+accept-encoding: <codificaciones>
+host: <https>
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36
+
+
+=== fin de la peticion 1 ===
+=== resultado ===
+ok []

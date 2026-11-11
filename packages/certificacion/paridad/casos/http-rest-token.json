@@ -1,0 +1,20 @@
+{
+  "descripcion": "solicitarToken(): GET de la semilla y POST de la semilla firmada (application/xml) al host de autenticación",
+  "operacion": "httpRest",
+  "material": "base",
+  "entrada": {
+    "accion": "solicitarToken",
+    "http": {
+      "respuestas": [
+        {
+          "cabeceras": [["Content-Type", "text/xml;charset=UTF-8"]],
+          "cuerpo": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><SII:RESPUESTA xmlns:SII=\"http://www.sii.cl/XMLSchema\"><SII:RESP_BODY><SEMILLA>012345678901</SEMILLA></SII:RESP_BODY><SII:RESP_HDR><ESTADO>00</ESTADO></SII:RESP_HDR></SII:RESPUESTA>"
+        },
+        {
+          "cabeceras": [["Content-Type", "text/xml;charset=UTF-8"]],
+          "cuerpo": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><SII:RESPUESTA xmlns:SII=\"http://www.sii.cl/XMLSchema\"><SII:RESP_BODY><TOKEN>TOKENDEPRUEBA0003</TOKEN></SII:RESP_BODY><SII:RESP_HDR><ESTADO>00</ESTADO><GLOSA>Token Creado</GLOSA></SII:RESP_HDR></SII:RESPUESTA>"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- prólogo -->
+<?pi con  espacios ?>
+<?vacia?>
+<?vacia-con-espacio ?>
+<R xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sii.cl/SiiDte" xmlns:p="urn:a&#38;b" b="x&quot;y" a="1" c="t n r z &#9;&#10;&#13; '&gt;&lt;&amp;" p:d="Ñ">
+  <a/>
+  <b>Ñandú &#8364; &#128512; é &amp; &lt; &gt; " ' &gt; ' " 
+ x
+</b>
+  <c>&#13;
+&#13;	</c><![CDATA[ <&> ]]> é ]]&gt;<d><!-- comentario
+ con salto --></d>
+  <e attr="v"/><f> </f><g><?t?><?u ?><?v x  y ?></g>
+  <h><![CDATA[]]></h><i>texto<j/>mixto</i>
+</R>
+<!-- epílogo -->
+<?fin?>

@@ -1,0 +1,8 @@
+{
+  "descripcion": "ESTADO con NUL inicial y GLOSA vacía: resumen() con trim() de PHP",
+  "operacion": "estadoEnvio",
+  "entrada": {
+    "respuesta": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<SII:RESPUESTA xmlns:SII=\"http://www.sii.cl/XMLSchema\"><SII:RESP_HDR><ESTADO>\u0000REC</ESTADO><GLOSA></GLOSA></SII:RESP_HDR></SII:RESPUESTA>",
+    "trackId": "780"
+  }
+}

@@ -1,0 +1,8 @@
+{
+    "caso": "http-rest-consumo-folios",
+    "operacion": "httpRest",
+    "core": "1.9.1",
+    "bytes": 4493,
+    "sha256": "7c39f11538af477ad38d168011c7cfe63e7c8b9e359dbbc46248303c616f4cb6",
+    "marcas": {}
+}

@@ -1,0 +1,226 @@
+{
+  "descripcion": "DTE con la forma exacta de GeneradorBoleta (DOMDocument ISO-8859-1 + formatOutput, valores libres pasados por htmlspecialchars ENT_XML1 ISO-8859-1, con tildes, &, <, comillas y caracteres fuera de ISO-8859-1)",
+  "operacion": "serializarXml",
+  "entrada": {
+    "encoding": "ISO-8859-1",
+    "formatOutput": true,
+    "documento": [
+      {
+        "elemento": "DTE",
+        "atributos": [
+          ["version", "1.0"],
+          ["xmlns", "http://www.sii.cl/SiiDte"],
+          ["xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance"]
+        ],
+        "hijos": [
+          {
+            "elemento": "Documento",
+            "atributos": [["ID", "F1234T39"]],
+            "hijos": [
+              {
+                "elemento": "Encabezado",
+                "hijos": [
+                  {
+                    "elemento": "IdDoc",
+                    "hijos": [
+                      {
+                        "elemento": "TipoDTE",
+                        "valor": "39"
+                      },
+                      {
+                        "elemento": "Folio",
+                        "valor": "1234"
+                      },
+                      {
+                        "elemento": "FchEmis",
+                        "valor": "2026-11-05"
+                      },
+                      {
+                        "elemento": "IndServicio",
+                        "valor": "3"
+                      }
+                    ]
+                  },
+                  {
+                    "elemento": "Emisor",
+                    "hijos": [
+                      {
+                        "elemento": "RUTEmisor",
+                        "valor": "76123456-K"
+                      },
+                      {
+                        "elemento": "RznSocEmisor",
+                        "valor": "Comercial Ñandú & Díaz <Hnos.> \"Ltda.\" €",
+                        "escapar": "xml1-iso-8859-1"
+                      },
+                      {
+                        "elemento": "GiroEmisor",
+                        "valor": "Venta de artículos de librería y café 'gourmet'",
+                        "escapar": "xml1-iso-8859-1"
+                      },
+                      {
+                        "elemento": "DirOrigen",
+                        "valor": "Av. Libertador B. O'Higgins 1234, Of. 5°",
+                        "escapar": "xml1-iso-8859-1"
+                      },
+                      {
+                        "elemento": "CmnaOrigen",
+                        "valor": "Ñuñoa",
+                        "escapar": "xml1-iso-8859-1"
+                      }
+                    ]
+                  },
+                  {
+                    "elemento": "Receptor",
+                    "hijos": [
+                      {
+                        "elemento": "RUTRecep",
+                        "valor": "66666666-6"
+                      },
+                      {
+                        "elemento": "RznSocRecep",
+                        "valor": "José Pérez & Cía. 😀",
+                        "escapar": "xml1-iso-8859-1"
+                      }
+                    ]
+                  },
+                  {
+                    "elemento": "Totales",
+                    "hijos": [
+                      {
+                        "elemento": "MntNeto",
+                        "valor": "8403"
+                      },
+                      {
+                        "elemento": "MntExe",
+                        "valor": "1500"
+                      },
+                      {
+                        "elemento": "IVA",
+                        "valor": "1597"
+                      },
+                      {
+                        "elemento": "MntTotal",
+                        "valor": "11500"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "elemento": "Detalle",
+                "hijos": [
+                  {
+                    "elemento": "NroLinDet",
+                    "valor": "1"
+                  },
+                  {
+                    "elemento": "NmbItem",
+                    "valor": "Cuaderno universitario 100 hojas \"Torre\" & lápiz <HB>",
+                    "escapar": "xml1-iso-8859-1"
+                  },
+                  {
+                    "elemento": "QtyItem",
+                    "valor": "2"
+                  },
+                  {
+                    "elemento": "UnmdItem",
+                    "valor": "Unid",
+                    "escapar": "xml1-iso-8859-1"
+                  },
+                  {
+                    "elemento": "PrcItem",
+                    "valor": "3500"
+                  },
+                  {
+                    "elemento": "DescuentoMonto",
+                    "valor": "500"
+                  },
+                  {
+                    "elemento": "MontoItem",
+                    "valor": "6500"
+                  }
+                ]
+              },
+              {
+                "elemento": "Detalle",
+                "hijos": [
+                  {
+                    "elemento": "NroLinDet",
+                    "valor": "2"
+                  },
+                  {
+                    "elemento": "NmbItem",
+                    "valor": "Café de grano 250 g – tostado «medio»",
+                    "escapar": "xml1-iso-8859-1"
+                  },
+                  {
+                    "elemento": "QtyItem",
+                    "valor": "1"
+                  },
+                  {
+                    "elemento": "PrcItem",
+                    "valor": "3500"
+                  },
+                  {
+                    "elemento": "MontoItem",
+                    "valor": "3500"
+                  }
+                ]
+              },
+              {
+                "elemento": "Detalle",
+                "hijos": [
+                  {
+                    "elemento": "NroLinDet",
+                    "valor": "3"
+                  },
+                  {
+                    "elemento": "IndExe",
+                    "valor": "1"
+                  },
+                  {
+                    "elemento": "NmbItem",
+                    "valor": "Servicio exento",
+                    "escapar": "xml1-iso-8859-1"
+                  },
+                  {
+                    "elemento": "QtyItem",
+                    "valor": "1.5"
+                  },
+                  {
+                    "elemento": "PrcItem",
+                    "valor": "1000"
+                  },
+                  {
+                    "elemento": "MontoItem",
+                    "valor": "1500"
+                  }
+                ]
+              },
+              {
+                "elemento": "Referencia",
+                "hijos": [
+                  {
+                    "elemento": "NroLinRef",
+                    "valor": "1"
+                  },
+                  {
+                    "elemento": "CodRef",
+                    "valor": "SET",
+                    "escapar": "xml1-iso-8859-1"
+                  },
+                  {
+                    "elemento": "RazonRef",
+                    "valor": "CASO-1 & ajuste <prueba>",
+                    "escapar": "xml1-iso-8859-1"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

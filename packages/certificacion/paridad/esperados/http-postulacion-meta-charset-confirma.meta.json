@@ -1,0 +1,8 @@
+{
+    "caso": "http-postulacion-meta-charset-confirma",
+    "operacion": "httpPostulacion",
+    "core": "1.9.1",
+    "bytes": 1983,
+    "sha256": "d82e0cb62fe369f18e4146fc24aa97a4b535e6fa53823bfc80fac58298f6e61b",
+    "marcas": {}
+}

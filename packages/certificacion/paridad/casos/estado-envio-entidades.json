@@ -1,0 +1,8 @@
+{
+  "descripcion": "Entidades en la GLOSA: XML, numéricas válidas e inválidas, HTML que no decodifica y una sola pasada",
+  "operacion": "estadoEnvio",
+  "entrada": {
+    "respuesta": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<SII:RESPUESTA xmlns:SII=\"http://www.sii.cl/XMLSchema\"><SII:RESP_HDR><RUTCOMPANIA>76123456</RUTCOMPANIA><DVCOMPANIA>0</DVCOMPANIA><TRACKID>1234567890</TRACKID><ESTADO>RCH</ESTADO><GLOSA>a&amp;amp;b &amp;lt;x&amp;gt; &nbsp; &eacute; &#233;&#xE9;&#XC9; &#x0x41; &#x0X42; &#0; &#xD800; &#xFFFE; &#1114111; &#1114112; &#65 &AMP; &Amp; &apos;&#39;&quot;&#34; &#x; &#9;&#10;&#13; &#00065; &#99999999999999999999; &#x00x41; &#x0x; &constructor; &toString; &#128512;</GLOSA><NUM_ATENCION>123456 ( 2026/09/15 10:00:00)</NUM_ATENCION></SII:RESP_HDR></SII:RESPUESTA>",
+    "trackId": "1234567890"
+  }
+}

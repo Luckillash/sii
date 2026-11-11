@@ -1,0 +1,8 @@
+{
+    "caso": "certificado-pfx-moderno",
+    "operacion": "certificado",
+    "core": "1.9.1",
+    "bytes": 7712,
+    "sha256": "af01e3af8d36c427617780f5d7e6359a86947aff83e7a7caa657bd6f6be3f528",
+    "marcas": {}
+}

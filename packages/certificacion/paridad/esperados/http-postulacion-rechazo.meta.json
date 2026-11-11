@@ -1,0 +1,8 @@
+{
+    "caso": "http-postulacion-rechazo",
+    "operacion": "httpPostulacion",
+    "core": "1.9.1",
+    "bytes": 1116,
+    "sha256": "7030e8c9518c6dfeee6d1835b5dd691198158aa6d6746266bec7872bbed11c40",
+    "marcas": {}
+}

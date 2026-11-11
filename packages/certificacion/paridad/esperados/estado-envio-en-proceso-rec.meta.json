@@ -1,0 +1,8 @@
+{
+    "caso": "estado-envio-en-proceso-rec",
+    "operacion": "estadoEnvio",
+    "core": "1.9.1",
+    "bytes": 269,
+    "sha256": "bb2a2fa9279b64750cbd80a4b2b219ddcff04d8f2fc007fcb005048354205049",
+    "marcas": {}
+}

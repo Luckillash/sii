@@ -1,0 +1,13 @@
+{
+    "trackId": "557",
+    "estado": "EPR",
+    "glosa": "ok",
+    "informados": 1,
+    "aceptados": 1,
+    "rechazados": 0,
+    "reparos": 0,
+    "enProceso": false,
+    "procesado": true,
+    "limpio": true,
+    "resumen": "EPR ok: 1 informados, 1 aceptados, 0 rechazados, 0 con reparos"
+}

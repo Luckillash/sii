@@ -1,0 +1,7 @@
+{
+  "descripcion": "loadXML + saveXML de un documento UTF-8 sin declaración: sale <?xml version=\"1.0\"?> y lo no ASCII de texto y atributos como &#xHEX; (\\r como &#xD;)",
+  "operacion": "reserializarXml",
+  "entrada": {
+    "xml": "<R a=\"é€😀 &#13; &#9;\" xmlns=\"urn:é\"><!-- é --><b>é € 😀 中 &#13; ok</b><![CDATA[é]]><c/></R>"
+  }
+}

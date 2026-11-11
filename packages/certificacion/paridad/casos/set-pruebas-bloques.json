@@ -1,0 +1,7 @@
+{
+  "descripcion": "CASO-01 con cero, separador === con blancos al final y CASO sin === (ambos se pierden: el caso anterior termina en el primero y el segundo no corta nada), CASO-N en medio de una línea, línea en blanco entre CASO y === y caso al final sin salto",
+  "operacion": "setPruebas",
+  "entrada": {
+    "texto": "CASO-01\n=========\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\nuno\t\t\t1\t\t\t100\n\nCASO-2\n=====   \n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\ndos\t\t\t2\t\t\t200\n\nCASO-3\n\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\ntres\t\t\t3\t\t\t300\n\nVer el CASO-4\n====\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\ncuatro\t\t\t4\t\t\t400\n\nCASO-5\n\n\n=====\nItem\t\t\t\t\tCantidad\tPrecio Unitario con IVA\ncinco\t\t\t5\t\t\t500\nCASO-6\n=\nseis\t\t6\t\t600"
+  }
+}

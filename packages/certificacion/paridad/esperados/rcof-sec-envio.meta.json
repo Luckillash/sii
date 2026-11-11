@@ -1,0 +1,10 @@
+{
+    "caso": "rcof-sec-envio",
+    "operacion": "consumoFolios",
+    "core": "1.9.1",
+    "bytes": 1087,
+    "sha256": "683476a9025792cccca96e51ac59f8ad329e6e3e05c65b2beb558c36b86df37d",
+    "marcas": {
+        "TmstFirmaEnv": "2026-09-05T23:10:42"
+    }
+}

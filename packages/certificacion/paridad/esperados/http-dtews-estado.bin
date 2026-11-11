@@ -1,0 +1,11 @@
+=== peticion 1 de 1 (https) ===
+POST /DTEWS/QueryEstUp.jws HTTP/1.1
+content-length: 322
+content-type: text/xml; charset=utf-8
+host: <https>
+soapaction: ""
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><soapenv:Body><ns:getEstUp xmlns:ns="http://DefaultNamespace"><RutCompania>76000006</RutCompania><DvCompania>K</DvCompania><TrackId>0123456789</TrackId><Token>A&amp;B&lt;C&gt;D&quot;E&#039;F</Token></ns:getEstUp></soapenv:Body></soapenv:Envelope>
+=== fin de la peticion 1 ===
+=== resultado ===
+EPR Envio Procesado: 5 informados, 4 aceptados, 1 rechazados, 0 con reparos

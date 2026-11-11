@@ -1,0 +1,8 @@
+{
+    "caso": "http-postulacion-confirma-bolexen",
+    "operacion": "httpPostulacion",
+    "core": "1.9.1",
+    "bytes": 1956,
+    "sha256": "00767ade8e1ad177f3bf16f1e9d29c4f1b67af02158b2c65b29b528afcad8c22",
+    "marcas": {}
+}

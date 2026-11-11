@@ -1,0 +1,16 @@
+{
+  "descripcion": "mb_strlen y mb_substr(0, 40) por code points (como el IT1 del TED): multibyte y emoji justo en el borde no se parten",
+  "operacion": "truncarTexto",
+  "entrada": {
+    "largo": 40,
+    "textos": [
+      "Servicio de mantención de equipos Ñuñoa y alrededores",
+      "123456789012345678901234567890123456789😀😀",
+      "1234567890123456789012345678901234567890😀",
+      "€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€",
+      "👨\u200d👩\u200d👧👨\u200d👩\u200d👧👨\u200d👩\u200d👧👨\u200d👩\u200d👧👨\u200d👩\u200d👧👨\u200d👩\u200d👧👨\u200d👩\u200d👧👨\u200d👩\u200d👧👨\u200d👩\u200d👧👨\u200d👩\u200d👧👨\u200d👩\u200d👧",
+      "corto",
+      ""
+    ]
+  }
+}

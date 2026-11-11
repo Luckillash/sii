@@ -1,0 +1,8 @@
+{
+    "caso": "http-folios-sesion-caducada",
+    "operacion": "httpFolios",
+    "core": "1.9.1",
+    "bytes": 478,
+    "sha256": "d68fad1c6296e98f9d7268e3b62331bf4cefa02fb10b8e9406a2e4e4b7d9ac32",
+    "marcas": {}
+}

@@ -1,0 +1,50 @@
+{
+  "descripcion": "Campos de texto con tildes, Ñ y caracteres fuera de Latin-1 (cURL los manda en UTF-8, tal cual), un campo vacío, un archivo sin tipo (application/octet-stream) y una query con escapes",
+  "operacion": "httpMultipart",
+  "entrada": {
+    "origen": "https",
+    "ruta": "/subir?empresa=Pe%C3%B1a&modo=prueba",
+    "cabeceras": ["Cookie: TOKEN=TOKENDEPRUEBA0003"],
+    "campos": [
+      {
+        "nombre": "rutSender",
+        "valor": "33333333"
+      },
+      {
+        "nombre": "dvSender",
+        "valor": "k"
+      },
+      {
+        "nombre": "rutCompany",
+        "valor": "76123456"
+      },
+      {
+        "nombre": "dvCompany",
+        "valor": "0"
+      },
+      {
+        "nombre": "glosa",
+        "valor": "Peña, Ñuñoa y Viña del Mar: «artículos» € ✓"
+      },
+      {
+        "nombre": "vacio",
+        "valor": ""
+      },
+      {
+        "nombre": "archivo",
+        "archivo": {
+          "texto": "Contenido UTF-8: año ñandú\n"
+        },
+        "nombreArchivo": "notas.txt"
+      }
+    ],
+    "http": {
+      "respuestas": [
+        {
+          "status": 200,
+          "cuerpo": "ok"
+        }
+      ]
+    }
+  }
+}

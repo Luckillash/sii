@@ -1,0 +1,12 @@
+{"texto":"a < b y c > d","recortado":"a < b y c > d","stripTags":"a < b y c > d","entidades":"a < b y c > d","marcadores":[],"aviso":"a < b y c > d"}
+{"texto":"enlace negrita","recortado":"enlace negrita","stripTags":"enlace negrita","entidades":"<a href=\"x>y\">enlace</a> <b title='1>2'>negrita</b>","marcadores":[],"aviso":"enlace negrita"}
+{"texto":"fin","recortado":"fin","stripTags":" fin","entidades":"<p <b>anidado</b>> fin","marcadores":[],"aviso":"fin"}
+{"texto":"antes despues","recortado":"antes despues","stripTags":"antes despues ","entidades":"antes<!-- comentario > con > --> despues <!-- sin cerrar","marcadores":[],"aviso":"antes despues"}
+{"texto":"texto y d","recortado":"texto y d","stripTags":"texto  y d","entidades":"<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">texto <!x> y <!-- a --b> c -->d","marcadores":[],"aviso":"texto y d"}
+{"texto":"codigo ?> fin","recortado":"codigo ?> fin","stripTags":" codigo ?> fin","entidades":"<?php echo \"?>\"; if (a(b)) { ?> codigo ?> fin","marcadores":[],"aviso":"codigo ?> fin"}
+{"texto":"xcontenido","recortado":"xcontenido","stripTags":"xcontenido ","entidades":"x<?xml version=\"1.0\"?><raiz>contenido</raiz> <?xml al comienzo ?>","marcadores":[],"aviso":"xcontenido"}
+{"texto":"texto","recortado":"texto","stripTags":"texto ","entidades":"texto <sin cerrar","marcadores":[],"aviso":"texto"}
+{"texto":"uno dos tressin cierre","recortado":"uno dos tressin cier","stripTags":"unoalert(\"hola\")dosp{}tressin cierre","entidades":"uno<script type=\"text/javascript\">alert(\"<b>hola</b>\")</script>dos<STYLE>p{}</style>tres<script>sin cierre","marcadores":[],"aviso":"uno dos tressin cierre"}
+{"texto":"c","recortado":"c","stripTags":"abc","entidades":"<SCRIPT>a</Script >b</sCrIpT>c","marcadores":[],"aviso":"c"}
+{"texto":"nulx","recortado":"nulx","stripTags":"nulx","entidades":"\u0000nul<\u0000b>x","marcadores":[],"aviso":"nulx"}
+{"texto":"saltolinea","recortado":"saltolinea","stripTags":"saltolinea","entidades":"<a\n href=\"1\">salto</a><br/>linea","marcadores":[],"aviso":"saltolinea"}

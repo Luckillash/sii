@@ -1,0 +1,10 @@
+{
+    "caso": "timbre-41-caf-iso",
+    "operacion": "timbre",
+    "core": "1.9.1",
+    "bytes": 733,
+    "sha256": "4d01124bef9685f60339840dec61271ef38ce9df456032464960d11f010e3e8c",
+    "marcas": {
+        "TSTED": "2026-09-05T10:31:02"
+    }
+}

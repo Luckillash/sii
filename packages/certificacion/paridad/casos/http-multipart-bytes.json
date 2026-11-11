@@ -1,0 +1,45 @@
+{
+  "descripcion": "Archivo binario (los 256 bytes dos veces, CRLF y guiones como los del boundary) en el campo archivo: cURL lo manda sin tocar",
+  "operacion": "httpMultipart",
+  "entrada": {
+    "origen": "https",
+    "ruta": "/cgi_dte/UPL/DTEUpload",
+    "cabeceras": ["Cookie: TOKEN=TOKENDEPRUEBA0004", "Expect:"],
+    "campos": [
+      {
+        "nombre": "rutSender",
+        "valor": "11111111"
+      },
+      {
+        "nombre": "dvSender",
+        "valor": "1"
+      },
+      {
+        "nombre": "rutCompany",
+        "valor": "76123456"
+      },
+      {
+        "nombre": "dvCompany",
+        "valor": "0"
+      },
+      {
+        "nombre": "archivo",
+        "archivo": {
+          "base64": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w0KLS0NCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQoAAQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyAhIiMkJSYnKCkqKywtLi8wMTIzNDU2Nzg5Ojs8PT4/QEFCQ0RFRkdISUpLTE1OT1BRUlNUVVZXWFlaW1xdXl9gYWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXp7fH1+f4CBgoOEhYaHiImKi4yNjo+QkZKTlJWWl5iZmpucnZ6foKGio6SlpqeoqaqrrK2ur7CxsrO0tba3uLm6u7y9vr/AwcLDxMXGx8jJysvMzc7P0NHS09TV1tfY2drb3N3e3+Dh4uPk5ebn6Onq6+zt7u/w8fLz9PX29/j5+vv8/f7/"
+        },
+        "nombreArchivo": "binario.xml",
+        "contentType": "text/xml"
+      }
+    ],
+    "http": {
+      "respuestas": [
+        {
+          "status": 200,
+          "cuerpo": {
+            "base64": "PFRSQUNLSUQ+MTwvVFJBQ0tJRD4="
+          }
+        }
+      ]
+    }
+  }
+}

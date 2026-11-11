@@ -1,0 +1,10 @@
+{
+    "caso": "boleta-descuento-negativo",
+    "operacion": "generar-boleta",
+    "core": "1.9.1",
+    "bytes": 1109,
+    "sha256": "2fa914931e266f1cc4d01f137bd00599c4d3ffe2a3d5d70a7b5b3cf1bfc9dbd5",
+    "marcas": {
+        "FchEmis": "2026-09-05"
+    }
+}

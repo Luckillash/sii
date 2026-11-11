@@ -1,0 +1,184 @@
+{
+    "codificacion": "UTF-8",
+    "casos": [
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Arroz",
+                    "cantidad": 5,
+                    "cantidadTexto": "5",
+                    "cantidadTipo": "int",
+                    "precio": 700,
+                    "precioTexto": "700",
+                    "precioTipo": "int",
+                    "unidad": "Kg"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-1"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Arroz",
+                    "cantidad": 5,
+                    "cantidadTexto": "5",
+                    "cantidadTipo": "int",
+                    "precio": 700,
+                    "precioTexto": "700",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "Aceite",
+                    "cantidad": 2,
+                    "cantidadTexto": "2",
+                    "cantidadTipo": "int",
+                    "precio": 2500,
+                    "precioTexto": "2500",
+                    "precioTipo": "int",
+                    "unidad": "Lt"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-2"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Arroz",
+                    "cantidad": 5,
+                    "cantidadTexto": "5",
+                    "cantidadTipo": "int",
+                    "precio": 700,
+                    "precioTexto": "700",
+                    "precioTipo": "int",
+                    "unidad": "kg"
+                },
+                {
+                    "nombre": "Porotos",
+                    "cantidad": 2,
+                    "cantidadTexto": "2",
+                    "cantidadTipo": "int",
+                    "precio": 1500,
+                    "precioTexto": "1500",
+                    "precioTipo": "int",
+                    "unidad": "kg"
+                },
+                {
+                    "nombre": "Lentejas",
+                    "cantidad": 1,
+                    "cantidadTexto": "1",
+                    "cantidadTipo": "int",
+                    "precio": 1200,
+                    "precioTexto": "1200",
+                    "precioTipo": "int",
+                    "unidad": "kg"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-3"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Arroz",
+                    "cantidad": 5,
+                    "cantidadTexto": "5",
+                    "cantidadTipo": "int",
+                    "precio": 700,
+                    "precioTexto": "700",
+                    "precioTipo": "int",
+                    "unidad": "Kg"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-4"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Arroz",
+                    "cantidad": 5,
+                    "cantidadTexto": "5",
+                    "cantidadTipo": "int",
+                    "precio": 700,
+                    "precioTexto": "700",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "Aceite",
+                    "cantidad": 2,
+                    "cantidadTexto": "2",
+                    "cantidadTipo": "int",
+                    "precio": 2500,
+                    "precioTexto": "2500",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-5"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Arroz",
+                    "cantidad": 5,
+                    "cantidadTexto": "5",
+                    "cantidadTipo": "int",
+                    "precio": 700,
+                    "precioTexto": "700",
+                    "precioTipo": "int"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-6"
+            }
+        },
+        {
+            "tipo": "39",
+            "detalles": [
+                {
+                    "nombre": "Arroz",
+                    "cantidad": 5,
+                    "cantidadTexto": "5",
+                    "cantidadTipo": "int",
+                    "precio": 700,
+                    "precioTexto": "700",
+                    "precioTipo": "int"
+                },
+                {
+                    "nombre": "Aceite",
+                    "cantidad": 2,
+                    "cantidadTexto": "2",
+                    "cantidadTipo": "int",
+                    "precio": 2500,
+                    "precioTexto": "2500",
+                    "precioTipo": "int",
+                    "exento": true,
+                    "unidad": "Un"
+                }
+            ],
+            "referencia": {
+                "codigo": "SET",
+                "razon": "CASO-7"
+            }
+        }
+    ]
+}

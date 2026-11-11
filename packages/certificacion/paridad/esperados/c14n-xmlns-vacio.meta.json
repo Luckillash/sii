@@ -1,0 +1,8 @@
+{
+    "caso": "c14n-xmlns-vacio",
+    "operacion": "c14n",
+    "core": "1.9.1",
+    "bytes": 81,
+    "sha256": "6b0b4a41225cbc9f482fc599652e85c6341b48dccfd0bc6c9c2402cd1482e582",
+    "marcas": {}
+}

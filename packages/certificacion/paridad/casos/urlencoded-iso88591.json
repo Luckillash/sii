@@ -1,0 +1,15 @@
+{
+  "descripcion": "Los mismos valores convertidos a ISO-8859-1 antes de codificar, como PostulacionSii::enviar() (lo que no cabe queda en ?)",
+  "operacion": "httpBuildQuery",
+  "entrada": {
+    "iso88591": true,
+    "campos": [
+      ["razon", "Comercial Díaz & Peña Ltda."],
+      ["giro", "Venta de artículos para el ñandú"],
+      ["ciudad", "Viña del Mar"],
+      ["ACEPTAR", "Confirmar Postulación"],
+      ["fuera", "€ “comillas” ✓ 😀"],
+      ["latin1", "¿¡ºª°±µ ÁÉÍÓÚÜÑ áéíóúüñ ÿ"]
+    ]
+  }
+}

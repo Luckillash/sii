@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Raiz xmlns="http://www.sii.cl/SiiDte" version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sii.cl/SiiDte EnvioBOLETA_v11.xsd" especiales="a&amp;b&lt;c&gt;d&quot;e'f &amp;amp; &amp;#233;" blancos="t&#9;n&#10;r&#13;crlf&#13;&#10; fin" tildes="Ñandú DÍAZ &#8364; &#128512; &#20013;" control="x€y" vacio="">
+  <NsConComillas xmlns='a"b&c<d>é&#8364;'/>
+  <NsConAmbas xmlns="a&quot;b'c"/>
+  <NsSoloSimple xmlns="a'b"/>
+  <Orden xmlns="urn:d" z="1" a="2" xmlns:p="urn:p" p:x="3">texto</Orden>
+</Raiz>

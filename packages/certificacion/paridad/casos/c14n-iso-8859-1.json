@@ -1,0 +1,8 @@
+{
+  "descripcion": "Documento ISO-8859-1 declarado con tildes, ñ, símbolos Latin-1, NBSP y los bytes 0x80 y 0x85 (C1: en ISO-8859-1 son U+0080 y U+0085, no € ni salto)",
+  "operacion": "c14n",
+  "entrada": {
+    "xmlBase64": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iSVNPLTg4NTktMSI/Pgo8UmHteiB4bWxucz0iaHR0cDovL3d3dy5zaWkuY2wvU2lpRHRlIj4KPFNl8WFsIGF0cmlidXRvPSLRYW5k+iCrY2Hx8267ILC6ob8goOHp7fP6/CI+wXJib2wsIHBpbmf8aW5vLCC/cXXpPyCx1/cggHyFfP88L1Nl8WFsPgo8L1Jh7Xo+",
+    "etiqueta": "Señal"
+  }
+}
