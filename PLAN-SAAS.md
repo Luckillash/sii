@@ -20,7 +20,7 @@ Leyenda: ✅ listo · 🟡 en parte · ⬜ pendiente. Se actualiza al terminar c
 
 | Fase | Estado | Nota |
 |---|---|---|
-| 0. Fundaciones y prueba de conectividad | 🟡 | **Criterio de aceptación cumplido** (2026-11-11: token de apicert desde Vercel `gru1`, guardado cifrado en `tokens_sii`). Falta: conectar Sentry y probar su depuración, y retirar el spike |
+| 0. Fundaciones y prueba de conectividad | 🟡 | **Criterio de aceptación cumplido** (2026-11-11: token de apicert desde Vercel `gru1`, guardado cifrado en `tokens_sii`); spike del SII retirado. Pendiente: conectar Sentry y probar su depuración (`/api/spike/sentry`) |
 | 1. Design system en Next.js | ⬜ | |
 | 2. Autenticación, organizaciones y equipo | ⬜ | |
 | 3. Empresas, certificados y resoluciones | ⬜ | |

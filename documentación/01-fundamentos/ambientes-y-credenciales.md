@@ -108,25 +108,19 @@ La lista completa está en `apps/web/.env.example` y en PLAN-SAAS §5. En el Saa
 `SII_CERT_*` ni `SII_CAF_*` como en la CLI: certificados y CAF son de cada empresa y viven
 en Vault.
 
-## Spike de conectividad (Fase 0, temporal)
+## Spike de conectividad (Fase 0, retirado)
 
-`GET /api/spike/sii` con `Authorization: Bearer $SPIKE_TOKEN` prueba desde la función de
-Vercel: handshake TLS (con y sin certificado de cliente) y un GET a los 5 hosts de
-certificación, y luego pide un token a `apicert` y lo guarda cifrado en `tokens_sii`
-(criterio de aceptación de la Fase 0). `?nuevo=1` fuerza un token nuevo. Sin
-`SPIKE_TOKEN` la ruta responde 404.
+Durante la Fase 0 existió la ruta `GET /api/spike/sii`: desde la función de Vercel hacía
+handshake TLS (con y sin certificado de cliente) y un GET a los 5 hosts de certificación,
+y pedía un token a `apicert` que guardaba cifrado en `tokens_sii` con
+`TokenStoreSupabase`. Cumplió el criterio de aceptación el 2026-11-11 (resultados arriba,
+en «Dónde corre lo que habla con el SII») y se retiró del código junto con
+`src/server/spike/conectividad.ts` y las variables `SPIKE_CERT_PFX_BASE64`,
+`SPIKE_CERT_PASS` y `SPIKE_RUT_EMPRESA`.
 
-Aunque corre en un deploy *Preview*, la fila queda en `tokens_sii` de la base de
-producción (es la única). Es un token de certificación del SII, vence en 50 minutos y la
-limpieza horaria de la Fase 4 lo borra; mientras tanto se puede borrar a mano.
+Lo que quedó de él y sí se usa: `src/server/cifrado.ts` (AES-256-GCM),
+`src/server/sii/token-store-supabase.ts` y el cliente tipado
+`src/server/supabase/service.ts`, que la capa SII de la Fase 4 reutiliza. Para repetir la
+prueba de red desde un equipo: `pnpm humo:tls`.
 
-| Variable (solo Preview, *sensitive*) | Contenido |
-|---|---|
-| `SPIKE_TOKEN` | Bearer de las rutas `/api/spike/*` (≥ 32 caracteres) |
-| `SPIKE_CERT_PFX_BASE64` | `.pfx` de prueba en base64 |
-| `SPIKE_CERT_PASS` | clave del `.pfx` |
-| `SPIKE_RUT_EMPRESA` | RUT de la empresa para el token (`76543210-3`) |
-
-La respuesta nunca incluye la llave, la clave, el token ni el RUT del certificado (el CN
-pasa por `ocultarRut`). Al cerrar la Fase 0 se borran `src/app/api/spike/`,
-`src/server/spike/` y las cuatro variables.
+Sigue temporalmente `/api/spike/sentry` (Bearer `SPIKE_TOKEN`), hasta probar Sentry.

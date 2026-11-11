@@ -69,8 +69,9 @@ solo si hace falta. Para probar también TLS mutuo, crear `packages/certificacio
 Resultado del 2026-11-10 desde una red local en Chile (sin certificado): los 5 hosts
 responden con TLS 1.2/1.3, certificados de servidor válidos y **sin relajaciones**.
 
-La versión desde Vercel es la ruta temporal `/api/spike/sii` (ver
-[ambientes-y-credenciales](../01-fundamentos/ambientes-y-credenciales.md#spike-de-conectividad-fase-0-temporal)).
+La misma prueba se hizo desde Vercel `gru1` en la Fase 0, con token incluido (ver
+[ambientes-y-credenciales](../01-fundamentos/ambientes-y-credenciales.md#spike-de-conectividad-fase-0-retirado));
+esa ruta ya se retiró.
 
 ## CLI `sii`
 
@@ -99,8 +100,7 @@ conectado a `Luckillash/sii`:
 | Deployment Protection | Vercel Authentication en *Preview* |
 | Variables de sistema | expuestas (Sentry usa `NEXT_PUBLIC_VERCEL_ENV` y el SHA del commit) |
 
-Los deploys *Preview* piden iniciar sesión en Vercel. Para llamarlos con `curl` (rutas del
-spike) se usa el secreto de *Protection Bypass for Automation* (Settings → Deployment
+Los deploys *Preview* piden iniciar sesión en Vercel. Para llamarlos con `curl` se usa el secreto de *Protection Bypass for Automation* (Settings → Deployment
 Protection) en la cabecera `x-vercel-protection-bypass`.
 
 Variables cargadas: `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` (clave
