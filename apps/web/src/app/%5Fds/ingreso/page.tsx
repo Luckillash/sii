@@ -1,9 +1,13 @@
 import Link from 'next/link';
 import { Boton, Campo, clasesBoton, Input, LayoutIngreso } from '@/components/timbre';
+import { metadataDs, soloDesarrollo } from '../solo-desarrollo';
 import estilos from './ingreso.module.css';
 
 // Pantalla de ejemplo de LayoutIngreso (plantilla «Ingreso»). Sin lógica de Auth (Fase 2).
+export const metadata = metadataDs;
+
 export default function DemoLayoutIngreso() {
+  soloDesarrollo();
   return (
     <LayoutIngreso>
       <div className={estilos.titulos}>

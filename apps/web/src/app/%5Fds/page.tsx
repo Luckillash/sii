@@ -21,6 +21,7 @@ import {
 import { DemoCampoRut, DemoCampos, DemoDialogo, DemoTablaDTE } from './Demos';
 import estilos from './ds.module.css';
 import { SelectorTema } from './SelectorTema';
+import { metadataDs, soloDesarrollo } from './solo-desarrollo';
 
 const ESTADOS: EstadoDte[] = [
   'borrador',
@@ -66,7 +67,10 @@ function FilaMonto({ etiqueta, children }: { etiqueta: string; children: ReactNo
   );
 }
 
+export const metadata = metadataDs;
+
 export default function CatalogoDs() {
+  soloDesarrollo();
   return (
     <main className={estilos.catalogo}>
       <header className={estilos.cabecera}>

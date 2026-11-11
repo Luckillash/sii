@@ -21,7 +21,7 @@ Leyenda: ✅ listo · 🟡 en parte · ⬜ pendiente. Se actualiza al terminar c
 | Fase | Estado | Nota |
 |---|---|---|
 | 0. Fundaciones y prueba de conectividad | 🟡 | **Criterio de aceptación cumplido** (2026-11-11: token de apicert desde Vercel `gru1`, guardado cifrado en `tokens_sii`); spike del SII retirado. Pendiente: conectar Sentry y probar su depuración (`/api/spike/sentry`) |
-| 1. Design system en Next.js | ✅ | 2026-11-11: tokens generados, 8 componentes (+ `incierto`, D3), 11 de soporte, 2 layouts, `/_ds` y axe sin violaciones en claro/oscuro/móvil. Pendiente fuera de la app: agregar `incierto` al artifact del design system |
+| 1. Design system en Next.js | ✅ | 2026-11-11: tokens generados, 8 componentes (+ `incierto`, D3), 11 de soporte, 2 layouts, `/_ds` y axe sin violaciones en claro/oscuro/móvil. Deploy `F1` (c307194) verificado en producción con `e2e/despliegue.spec.ts`. Pendiente fuera de la app: agregar `incierto` al artifact del design system |
 | 2. Autenticación, organizaciones y equipo | ⬜ | |
 | 3. Empresas, certificados y resoluciones | ⬜ | |
 | 4. Capa de servicio SII (backend) | ⬜ | Núcleo técnico del producto |

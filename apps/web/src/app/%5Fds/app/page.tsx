@@ -13,10 +13,14 @@ import {
   TipoDTE,
 } from '@/components/timbre';
 import { DemoTablaDTE } from '../Demos';
+import { metadataDs, soloDesarrollo } from '../solo-desarrollo';
 import estilos from './app.module.css';
 
 // Pantalla de ejemplo de LayoutApp, con la composición de «Documentos emitidos».
+export const metadata = metadataDs;
+
 export default function DemoLayoutApp() {
+  soloDesarrollo();
   return (
     <LayoutApp
       org="demo"

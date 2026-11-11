@@ -98,8 +98,10 @@ El estado se agregó en la app; falta reflejarlo en el artifact del design syste
 - Foco visible con `--focus-ring`, selección de `TablaDTE` con teclado, `Dialogo` devuelve el foco y cierra con Escape, `CampoRut` formatea y avisa un dígito malo.
 - Guarda capturas por componente en `apps/web/test-results/capturas/` para compararlas con los `preview.html`.
 
+**Contra un deploy** (solo lectura, no toca el SII): `E2E_URL=https://<deploy> pnpm --filter web test:e2e` corre solo `e2e/despliegue.spec.ts`, sin levantar servidor. Comprueba que la portada carga con código 200, sin errores de consola y sin violaciones de axe; que los tokens y las fuentes Plex llegan en claro y oscuro; que `/_ds` responde 404; y que la portada no desborda en móvil.
+
 ## Trampas
 
 - Una carpeta `_ds` en App Router es **privada** (no genera ruta): por eso la carpeta se llama `%5Fds`.
-- `next dev` deja tipos en `.next/dev/types` que no calzan con los del build para `%5Fds`; el script `build` de `apps/web` los borra antes de compilar.
+- `%5Fds` **no tiene `layout.tsx`**: `next dev` tipa el layout de una carpeta `%5F…` como `"/%5Fds"` y `next build` como `"/_ds"`, y como `tsconfig.json` incluye los dos directorios de tipos (`.next/types` y `.next/dev/types`), el typecheck falla. Cada página llama a `soloDesarrollo()` y exporta `metadataDs` (`%5Fds/solo-desarrollo.ts`).
 - Un componente `'use client'` no puede recibir funciones desde un Server Component (p. ej. `onSeleccionar` de `TablaDTE`): la página que lo usa con callbacks debe ser cliente o envolverlo.
