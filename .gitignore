@@ -1,0 +1,29 @@
+# Dependencias y builds
+node_modules/
+dist/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Entorno local: nunca versionar secretos
+.env
+.env.*
+!.env.example
+
+# Vercel / Supabase / Sentry locales
+.vercel/
+supabase/.branches/
+supabase/.temp/
+.env.sentry-build-plugin
+
+# Material sensible del SII: certificados (.pfx) y CAF (traen la llave RSASK)
+*.pfx
+*.p12
+/data/
+
+# Editor / SO
+.DS_Store
+Thumbs.db
+.claude/settings.local.json

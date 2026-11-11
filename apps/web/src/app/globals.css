@@ -1,0 +1,27 @@
+/* Provisorio hasta la Fase 1, que genera tokens.css desde el design system «Timbre». */
+:root {
+  color-scheme: light dark;
+  --surface: #fbfaf7;
+  --text: #1c1b19;
+  --text-muted: #5f5b53;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: #161513;
+    --text: #ecebe7;
+    --text-muted: #a8a49b;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--text);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  line-height: 1.5;
+}

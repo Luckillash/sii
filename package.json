@@ -1,0 +1,29 @@
+{
+  "name": "timbre",
+  "private": true,
+  "description": "SaaS de emisión de documentos tributarios electrónicos (SII) sobre @winex/certificacion.",
+  "type": "module",
+  "packageManager": "pnpm@12.18.0",
+  "engines": {
+    "node": ">=22.19"
+  },
+  "scripts": {
+    "build:libreria": "pnpm --filter @winex/certificacion build",
+    "build": "pnpm build:libreria && pnpm --filter web build",
+    "dev": "pnpm build:libreria && pnpm --filter web dev",
+    "lint": "biome check . && pnpm lint:libreria",
+    "lint:libreria": "biome check packages/certificacion --config-path=packages/certificacion",
+    "format": "biome check --write .",
+    "typecheck": "pnpm build:libreria && pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "test:web": "pnpm --filter web test",
+    "humo:tls": "pnpm --dir packages/certificacion humo:tls",
+    "db:tipos": "sh scripts/tipos-supabase.sh"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.5",
+    "@types/node": "^24.0.0",
+    "supabase": "3.1.0",
+    "typescript": "~6.0.3"
+  }
+}

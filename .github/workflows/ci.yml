@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: Lint, tipos, tests y build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint (app)
+        run: pnpm exec biome ci .
+
+      - name: Lint (librería, con su propia configuración)
+        run: pnpm exec biome ci packages/certificacion --config-path=packages/certificacion
+
+      - name: Typecheck (compila la librería primero)
+        run: pnpm typecheck
+
+      # ~1.900 tests de la librería (unitarios + paridad contra los esperados
+      # versionados en packages/certificacion/paridad) y los de la app.
+      - name: Tests
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+
+  base-de-datos:
+    name: Supabase (migraciones, lint, pgTAP, tipos)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 3.1.0
+
+      # Base efímera con las migraciones de supabase/migrations y seed.sql.
+      - name: Levantar Supabase local
+        run: supabase start -x studio,imgproxy,mailpit,edge-runtime,logflare,vector,supavisor
+
+      - name: Lint del esquema
+        run: supabase db lint --level error --fail-on error
+
+      - name: Pruebas pgTAP
+        run: supabase test db
+
+      - name: Tipos generados al día
+        run: |
+          supabase gen types typescript --local --schema public > /tmp/tipos.ts
+          if ! diff -q /tmp/tipos.ts apps/web/src/server/supabase/tipos.ts > /dev/null; then
+            echo "::error::apps/web/src/server/supabase/tipos.ts está desfasado. Ejecuta 'pnpm db:tipos' y versiona el resultado."
+            diff /tmp/tipos.ts apps/web/src/server/supabase/tipos.ts | head -50
+            exit 1
+          fi

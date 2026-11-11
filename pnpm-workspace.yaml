@@ -1,0 +1,12 @@
+# packages/certificacion es un git subtree del monorepo certificacion-node: se
+# incluyen sus paquetes uno a uno y NO la carpeta raíz (su package.json corre
+# `pnpm -r`, que dentro de este workspace recorrería también la app).
+packages:
+  - apps/*
+  - packages/certificacion/packages/*
+  - packages/certificacion/apps/*
+
+allowBuilds:
+  esbuild: true
+  supabase: true
+  '@sentry/cli': true
