@@ -22,7 +22,7 @@ Valores de la columna Estado: **Listo**, **En parte** o Pendiente. Se actualiza 
 |---|---|---|
 | 0. Fundaciones y prueba de conectividad | **Listo** | **Criterio de aceptación cumplido** (2026-11-11: token de apicert desde Vercel `gru1`, guardado cifrado en `tokens_sii`); spike del SII retirado. 2026-11-12: Sentry conectado (proyecto `luckillash/timbre-web`), variables en Vercel (solo *Production*) y error real de prueba verificado en producción: release del commit, *source maps* legibles y secretos depurados (también en spans, con `beforeSendSpan`). Rutas de prueba retiradas |
 | 1. Design system en Next.js | **Listo** | 2026-11-11: tokens generados, 8 componentes (+ `incierto`, D3), 11 de soporte, 2 layouts, `/_ds` y axe sin violaciones en claro/oscuro/móvil. Deploy `F1` (c307194) verificado en producción con `e2e/despliegue.spec.ts`. 2026-11-12: `incierto` agregado también al artifact del design system y a su copia en `design-system/timbre/` |
-| 2. Autenticación, organizaciones y equipo | Pendiente | |
+| 2. Autenticación, organizaciones y equipo | **En parte** | 2026-11-12: código listo (ingreso, crear cuenta, recuperar/restablecer, `proxy.ts`, callback, onboarding, `[org]`, equipo, invitaciones, Turnstile y Resend opcionales); lint, typecheck, Vitest, build y e2e sin escritura en verde. Simulación de roles en SQL con `rollback` (`rls-fase2-tenancy.sql`): 47/47. Migraciones `0003_preferencias` y `0004_cupo_sin_suscripcion` aplicadas y verificadas (13/13); tipos regenerados sin diferencias. Pendientes en la Fase 2 (§7) |
 | 3. Empresas, certificados y resoluciones | Pendiente | |
 | 4. Capa de servicio SII (backend) | Pendiente | Núcleo técnico del producto |
 | 5. Certificación ante el SII (boleta) | Pendiente | |
@@ -132,7 +132,7 @@ timbre/
 │   ├── migrations/0001_esquema_inicial.sql   ← supabase_saas_sii.sql tal cual
 │   ├── migrations/00NN_*.sql                 cambios posteriores (nunca editar 0001)
 │   └── verificaciones/                        SQL de solo lectura por migración (se corre en producción)
-├── scripts/  generar-tokens.ts · tipos-supabase.sh
+├── scripts/  generar-tokens.ts · tipos-supabase.ts
 └── documentación/                    la carpeta actual, completada fase a fase
 ```
 
@@ -250,13 +250,14 @@ cada empresa y viven en Vault.
 | Migración | Fase | Contenido |
 |---|---|---|
 | `0002_extensiones_cron` | 0 | `pg_cron` y `pg_net` (el `cron_token` se crea a mano en Vault) |
-| `0003_realtime_operaciones` | 4 | Agregar `operaciones_sii` y `solicitudes_folios` a `supabase_realtime` |
-| `0004_bloqueos_sii` | 4 | RPC `bloquear_certificado(uuid)` con `pg_try_advisory_xact_lock` para serializar sesiones AUT2000 por certificado (el SII frena el re-login, error `01.01.215.500.771.52`) |
-| `0005_preferencias` | 2 | `perfiles.tema`, `perfiles.ultima_organizacion`, `perfiles.ultima_empresa` |
-| `0006_notificaciones` | 8 | Tabla `notificaciones` (tipo, clave de deduplicación, enviado_en) para alertas por correo |
-| `0007_planes_comerciales` | 10 | Grilla de planes definitiva (D5) |
-| `0008_pagos` | 10 | `pagos` y `eventos_pasarela` (idempotencia de webhooks de la pasarela) |
-| `0009_indices_fk` | 13 (o antes, con volumen) | Índices `concurrently` para las FK sin índice que reporta *Advisors* (sobre todo `organizacion_id`, que filtran las políticas RLS); una migración por índice o sin transacción |
+| `0003_preferencias` | 2 | **Aplicada** (2026-11-12): `perfiles.tema`, `perfiles.ultima_organizacion`, `perfiles.ultima_empresa` y RPC `ver_invitacion(token)` (anon) para `/invitacion/[token]`. Verificación: `supabase/verificaciones/0003_preferencias.sql` |
+| `0004_cupo_sin_suscripcion` | 2 | **Aplicada** (2026-11-12): `exigir_cupo_usuarios` rechaza si no hay suscripción vigente (una organización `morosa` o `cancelada` aceptaba miembros sin tope; lo detectó `supabase/verificaciones/rls-fase2-tenancy.sql`). Verificación: `supabase/verificaciones/0004_cupo_sin_suscripcion.sql` |
+| `0005_realtime_operaciones` | 4 | Agregar `operaciones_sii` y `solicitudes_folios` a `supabase_realtime` |
+| `0006_bloqueos_sii` | 4 | RPC `bloquear_certificado(uuid)` con `pg_try_advisory_xact_lock` para serializar sesiones AUT2000 por certificado (el SII frena el re-login, error `01.01.215.500.771.52`) |
+| `0007_notificaciones` | 8 | Tabla `notificaciones` (tipo, clave de deduplicación, enviado_en) para alertas por correo |
+| `0008_planes_comerciales` | 10 | Grilla de planes definitiva (D5) |
+| `0009_pagos` | 10 | `pagos` y `eventos_pasarela` (idempotencia de webhooks de la pasarela) |
+| `0010_indices_fk` | 13 (o antes, con volumen) | Índices `concurrently` para las FK sin índice que reporta *Advisors* (sobre todo `organizacion_id`, que filtran las políticas RLS); una migración por índice o sin transacción |
 | `00NN_dte_factura` | 14 | Tipos 33/34/52/56/61, columnas de receptor (giro, dirección, comuna), forma de pago, vencimiento, tabla `documento_referencias`, documentos recibidos, RCV |
 
 Cada migración trae su verificación de solo lectura en `supabase/verificaciones/`. Los números son provisorios: el
@@ -300,6 +301,16 @@ Cada fase termina con: código en `main` con lint, typecheck y tests en verde (l
 
 **Criterio:** dos usuarios de organizaciones distintas no ven datos del otro (prueba e2e con dos organizaciones de prueba + simulación de roles en SQL con `rollback`); un `lector` no puede crear borradores.
 
+**Pendientes** (el código está listo; Turnstile y Resend son opcionales en el código y se activan al cargar las claves):
+
+- [ ] **Supabase Auth (panel):** Site URL `https://timbre-livid.vercel.app`; Redirect URLs `https://timbre-livid.vercel.app/auth/callback**` y `http://localhost:3000/auth/callback**`; «Confirm email» activo; contraseña mínima 8; plantillas de correo traducidas al tono Timbre con enlaces `token_hash` (`{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email|magiclink|recovery`).
+- [ ] **Resend:** cuenta, dominio verificado (SPF, DKIM, DMARC), SMTP personalizado de Supabase Auth apuntando a Resend, y `RESEND_API_KEY` + `CORREO_REMITENTE` en `.env.local` y Vercel (*Production*). Probar el correo real de invitación.
+- [ ] **Turnstile:** sitio en Cloudflare; `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY` en Vercel (*Production*); desplegar **antes** de activar el captcha en Supabase Auth (*Bot and abuse protection*), o todo Auth falla con `captcha_failed`.
+- [ ] **Deploy** a *Production* (commit y push a `main`) y humo de las rutas nuevas.
+- [ ] **e2e con dos organizaciones reales en *Production*** (escribe en la base; requiere autorización y borrar los datos de prueba al terminar): crear cuenta y organización, invitar, aceptar con el correo correcto y con otro, cambiar rol, quitar, salir, último propietario, cupo del plan y aislamiento entre las dos organizaciones.
+- [ ] Volver a correr `supabase/verificaciones/rls-fase2-tenancy.sql` para activar las comprobaciones 48–51 de `ver_invitacion` y sumar una para `0004` (organización `morosa` que no acepta miembros).
+- [ ] Más adelante: reenviar la IP real a Supabase Auth (`sb-forwarded-for`, requiere clave `sb_secret`) para que los límites por IP no vean solo la IP de Vercel.
+
 ### Fase 3 — Empresas, certificados y resoluciones
 
 1. CRUD de empresas (RUT con `CampoRut`, razón social ≤ 100, giro ≤ 80 sin abreviaciones, dirección ≤ 70, comuna ≤ 20, correo de intercambio con la regla `correo_sii`). `tg_limite_empresas` aplica el plan.
@@ -325,7 +336,7 @@ El corazón técnico. Todo en `apps/web/src/server/sii/`, `server-only`, runtime
 | `almacen.ts` | Sube XML (ISO-8859-1, `Buffer` tal cual) y PDF a Storage; URLs firmadas |
 | `errores.ts` | Mensajes para el usuario según el design system: qué pasó y qué hacer; el detalle técnico queda en `operaciones_sii.detalle` |
 
-Migraciones `0002` y `0003`. Pruebas con `TransporteFalso` de la librería (sin red) para
+Migraciones `realtime_operaciones` y `bloqueos_sii` (§6). Pruebas con `TransporteFalso` de la librería (sin red) para
 cada traducción de error, y una prueba de integración opcional contra certificación.
 
 **Criterio:** `ejecutarOperacion` cubre los 8 resultados con pruebas; ningún token o cookie aparece en `operaciones_sii`, logs ni Sentry (prueba que busca patrones).
@@ -397,7 +408,7 @@ Flujo del servidor (`emitirDocumento`):
 3. `/[org]/documentos` según la plantilla: filtros (período, tipo, estado, búsqueda) en la URL, `TablaDTE` paginada en el servidor, panel de detalle con acciones (descargar XML y PDF, consultar estado en el SII, reenviar al receptor). «Anular con nota de crédito» queda oculto hasta la Fase 14.
 4. `/[org]/envios/[id]`: carátula, Track ID, bitácora de consultas, rechazos y reparos con sus errores (`seccion`, `linea`, `codigo`, `descripcion`), mostrando el XML solo como detalle.
 5. Realtime: los badges `EstadoDTE` cambian solos.
-6. Alertas por correo con `notificaciones` (migración `0005`): rechazo, incierto, certificado por vencer.
+6. Alertas por correo con `notificaciones` (migración `notificaciones`, §6): rechazo, incierto, certificado por vencer.
 
 **Criterio:** un envío pasa de `enviado` a `aceptado` en la UI sin recargar, y un rechazo muestra el error del SII con el texto del design system.
 

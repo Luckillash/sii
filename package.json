@@ -18,7 +18,7 @@
     "test": "pnpm -r test",
     "test:web": "pnpm --filter web test",
     "humo:tls": "cd packages/certificacion && node scripts/humo-tls.ts",
-    "db:tipos": "sh scripts/tipos-supabase.sh"
+    "db:tipos": "node scripts/tipos-supabase.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.5",

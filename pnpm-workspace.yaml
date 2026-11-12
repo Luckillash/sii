@@ -3,6 +3,7 @@
 # `pnpm -r`, que dentro de este workspace recorrería también la app).
 packages:
   - apps/*
+  - packages/correos
   - packages/certificacion/packages/*
   - packages/certificacion/apps/*
 

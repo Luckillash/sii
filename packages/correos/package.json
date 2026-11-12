@@ -1,0 +1,19 @@
+{
+  "name": "@timbre/correos",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Plantillas de correo de Timbre: HTML con estilos en línea tomados de los tokens del design system, más su versión en texto plano.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "~6.0.3",
+    "vitest": "^5.1.0"
+  }
+}

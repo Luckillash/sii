@@ -1205,6 +1205,9 @@ export type Database = {
           id: string
           nombre: string | null
           rut: string | null
+          tema: string
+          ultima_empresa: string | null
+          ultima_organizacion: string | null
         }
         Insert: {
           actualizado_en?: string
@@ -1213,6 +1216,9 @@ export type Database = {
           id: string
           nombre?: string | null
           rut?: string | null
+          tema?: string
+          ultima_empresa?: string | null
+          ultima_organizacion?: string | null
         }
         Update: {
           actualizado_en?: string
@@ -1221,8 +1227,26 @@ export type Database = {
           id?: string
           nombre?: string | null
           rut?: string | null
+          tema?: string
+          ultima_empresa?: string | null
+          ultima_organizacion?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "perfiles_ultima_empresa_fkey"
+            columns: ["ultima_empresa"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "perfiles_ultima_organizacion_fkey"
+            columns: ["ultima_organizacion"]
+            isOneToOne: false
+            referencedRelation: "organizaciones"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       planes: {
         Row: {
@@ -2464,6 +2488,15 @@ export type Database = {
         }[]
       }
       uuid_o_nulo: { Args: { p_texto: string }; Returns: string }
+      ver_invitacion: {
+        Args: { p_token: string }
+        Returns: {
+          correo: string
+          expira_en: string
+          organizacion_nombre: string
+          rol: Database["public"]["Enums"]["rol_miembro"]
+        }[]
+      }
     }
     Enums: {
       ambiente_sii: "certificacion" | "produccion"

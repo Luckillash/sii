@@ -1,0 +1,153 @@
+/* Piezas comunes de las páginas de /[org]: cabecera, títulos, tarjetas de sección. */
+
+.cabecera {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.titulo {
+  font-size: var(--text-display-size);
+  line-height: var(--text-display-line);
+  font-weight: var(--text-display-weight);
+  letter-spacing: var(--text-display-tracking);
+}
+
+.subtitulo {
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}
+
+.nota {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+.texto {
+  color: var(--ink-muted);
+  max-width: 64ch;
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 720px;
+}
+
+.lista {
+  margin: 0;
+  padding-left: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  color: var(--ink-muted);
+}
+
+/* Barra superior del contenido: acciones de la cuenta (cerrar sesión). */
+.barra {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: calc(-1 * var(--space-3));
+}
+
+.barraCorreo {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+  overflow-wrap: anywhere;
+}
+
+/* Selector de organización (en el lugar de la tarjeta de empresa del menú). */
+.organizacion {
+  margin: 0 var(--space-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.organizacionFija {
+  padding: 10px var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.resumen {
+  padding: 10px var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  list-style: none;
+}
+
+.resumen::-webkit-details-marker {
+  display: none;
+}
+
+.resumenTextos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.etiquetaOrganizacion {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+.nombreOrganizacion {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--text-label-weight);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.icono {
+  flex: none;
+  color: var(--ink-muted);
+}
+
+.opciones {
+  margin: 0;
+  padding: var(--space-1);
+  list-style: none;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.opcion {
+  padding: 6px var(--space-2);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.opcion:hover {
+  background: var(--surface-sunken);
+  color: var(--ink);
+}
+
+.opcion[aria-current="true"] {
+  background: var(--sello-soft);
+}
+
+.opcionRol {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}

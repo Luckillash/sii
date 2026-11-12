@@ -1,0 +1,92 @@
+.seccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.subtitulo {
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}
+
+.nota {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  color: var(--ink-muted);
+}
+
+.bloque {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.avisos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.avisos:empty {
+  display: none;
+}
+
+.formularioInvitar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.formularioInvitar > * {
+  flex: 1 1 220px;
+}
+
+/* El botón se alinea con los controles (debajo de la etiqueta). */
+.enviar {
+  flex: 0 0 auto;
+  margin-top: 26px;
+}
+
+.enlace {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.enlaceCampo {
+  width: 100%;
+}
+
+.enlaceAcciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.tu {
+  color: var(--ink-muted);
+}
+
+.correoCelda {
+  overflow-wrap: anywhere;
+}
+
+.selectRol {
+  min-width: 160px;
+}
+
+.vencida {
+  font-family: var(--font-sans);
+  color: var(--aviso);
+  font-weight: 500;
+}
+
+.accionesFila {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-1);
+}

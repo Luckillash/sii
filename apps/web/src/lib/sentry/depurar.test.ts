@@ -115,6 +115,25 @@ describe('depurarBreadcrumb', () => {
 });
 
 describe('depurarTexto', () => {
+  it('filtra el token de invitación en rutas, en ?siguiente= y en ?invitacion=', () => {
+    const token = 'f'.repeat(64);
+    const casos = [
+      `https://app.timbre.cl/invitacion/${token}`,
+      `/invitacion/${token}?x=1`,
+      `/ingresar?siguiente=%2Finvitacion%2F${token}`,
+      `/ingresar?siguiente=/invitacion/${token}`,
+      `/bienvenida?invitacion=${token}`,
+      `GET /invitacion/${token} 200`,
+    ];
+    for (const caso of casos) {
+      const depurado = depurarTexto(caso);
+      expect(depurado, caso).not.toContain(token);
+      expect(depurado, caso).toContain(FILTRADO);
+    }
+    // La ruta sin token (p. ej. el nombre de la transacción) queda legible.
+    expect(depurarTexto('/invitacion/[token]')).toBe(`/invitacion/${FILTRADO}`);
+  });
+
   it('no toca textos sin secretos', () => {
     const texto = 'Boleta 39 folio 1520 aceptada por el SII (Track ID 123456).';
     expect(depurarTexto(texto)).toBe(texto);

@@ -24,7 +24,14 @@ const PATRONES_TEXTO: readonly [RegExp, string][] = [
   // JWT (por ejemplo, claves de Supabase).
   [/\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b/g, FILTRADO],
   // Parámetros de query con nombre sensible (?token=..., &clave=...).
-  [/([?&](?:token|clave|password|secret|secreto|api_key|apikey|key)=)[^&#\s]+/gi, `$1${FILTRADO}`],
+  [
+    /([?&](?:token|clave|password|secret|secreto|api_key|apikey|key|invitacion)=)[^&#\s]+/gi,
+    `$1${FILTRADO}`,
+  ],
+  // Token de invitación en la ruta (`/invitacion/<token>`), también codificado dentro de
+  // `?siguiente=%2Finvitacion%2F<token>`.
+  [/(\/invitacion\/)[^/?#&\s"']+/gi, `$1${FILTRADO}`],
+  [/(%2Finvitacion%2F)[^&#%\s"']+/gi, `$1${FILTRADO}`],
 ];
 
 const PROFUNDIDAD_MAXIMA = 12;

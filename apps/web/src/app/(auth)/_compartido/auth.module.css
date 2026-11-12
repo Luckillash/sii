@@ -1,0 +1,100 @@
+/* Pantallas de acceso (plantilla «Ingreso»). */
+
+.titulos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.titulo {
+  margin: 0;
+  font-size: var(--text-display-size);
+  line-height: var(--text-display-line);
+  font-weight: var(--text-display-weight);
+  letter-spacing: var(--text-display-tracking);
+}
+
+.nota {
+  margin: 0;
+  color: var(--ink-muted);
+}
+
+.notaPequena {
+  margin: 0;
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.botonGrande {
+  height: 44px;
+  font-size: 15px;
+}
+
+.enlace {
+  font-weight: 500;
+}
+
+/* «¿Aún no tienes cuenta?» entre dos líneas. */
+.separador {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink-muted);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+}
+
+.separador::before,
+.separador::after {
+  content: "";
+  flex-grow: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* Campo de contraseña con el botón de mostrar/ocultar adentro. */
+.envolturaClave {
+  position: relative;
+  display: flex;
+}
+
+.inputClave {
+  width: 100%;
+  padding-right: 44px;
+}
+
+.botonClave {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  bottom: 2px;
+  width: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition:
+    color var(--duracion-rapida),
+    box-shadow var(--duracion-rapida);
+}
+
+.botonClave:hover {
+  color: var(--ink);
+}
+
+.botonClave:focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: var(--focus-ring);
+}
