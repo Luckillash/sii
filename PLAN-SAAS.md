@@ -303,7 +303,9 @@ Cada fase termina con: código en `main` con lint, typecheck y tests en verde (l
 
 **Pendientes** (el código está listo; Turnstile y Resend son opcionales en el código y se activan al cargar las claves):
 
-- [ ] **Supabase Auth (panel):** Site URL `https://timbre-livid.vercel.app`; Redirect URLs `https://timbre-livid.vercel.app/auth/callback**` y `http://localhost:3000/auth/callback**`; «Confirm email» activo; contraseña mínima 8; plantillas de correo traducidas al tono Timbre con enlaces `token_hash` (`{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email|magiclink|recovery`).
+- [x] **Dominio** `boleteame.dev` en Vercel (DNS de Vercel) y `NEXT_PUBLIC_APP_URL=https://boleteame.dev` en *Production* (2026-11-12). `timbre-livid.vercel.app` sigue activo.
+- [x] **Supabase Auth, URL Configuration** (2026-11-12): Site URL `https://boleteame.dev`; Redirect URLs `https://boleteame.dev/auth/callback**`, `http://localhost:3000/auth/callback**` y, transitoriamente, `https://timbre-livid.vercel.app/auth/callback**`.
+- [ ] **Supabase Auth (panel), resto:** «Confirm email» activo; contraseña mínima 8; plantillas de correo traducidas al tono Timbre con enlaces `token_hash` (`{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email|magiclink|recovery`).
 - [ ] **Resend:** cuenta, dominio verificado (SPF, DKIM, DMARC), SMTP personalizado de Supabase Auth apuntando a Resend, y `RESEND_API_KEY` + `CORREO_REMITENTE` en `.env.local` y Vercel (*Production*). Probar el correo real de invitación.
 - [ ] **Turnstile:** sitio en Cloudflare; `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY` en Vercel (*Production*); desplegar **antes** de activar el captcha en Supabase Auth (*Bot and abuse protection*), o todo Auth falla con `captcha_failed`.
 - [ ] **Deploy** a *Production* (commit y push a `main`) y humo de las rutas nuevas.
