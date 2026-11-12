@@ -132,7 +132,7 @@ ruta:
 select cron.schedule(
   'seguimiento-envios', '*/5 * * * *',
   $$ select net.http_post(
-       url     := 'https://<dominio>/api/cron/seguimiento',
+       url     := 'https://boleteame.dev/api/cron/seguimiento',
        headers := jsonb_build_object('Authorization', 'Bearer ' ||
                     (select decrypted_secret from vault.decrypted_secrets where name = 'cron_token'))
      ); $$

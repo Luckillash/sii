@@ -99,10 +99,14 @@ conectado a `Luckillash/sii`. **Solo se trabaja en *Production*:** no se usan de
 | Región de funciones | `gru1` (también en `apps/web/vercel.json`) |
 | Install / Build | los de `apps/web/vercel.json`: `pnpm install --frozen-lockfile` y `pnpm --dir ../.. build` |
 | Variables de sistema | expuestas (Sentry usa `NEXT_PUBLIC_VERCEL_ENV` y el SHA del commit) |
+| Dominios | `boleteame.dev` (principal, DNS en Vercel); `www.boleteame.dev` redirige con 308 al apex; `timbre-livid.vercel.app` sigue activo |
 
 Variables cargadas: `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` (clave
 publicable `sb_publishable_…`), en *Production* y *Development*. El resto (Supabase
-`service_role`, SII, cron y Sentry) va solo en *Production*; las secretas se cargan a mano en el
+`service_role`, SII, cron, Sentry y `NEXT_PUBLIC_APP_URL=https://boleteame.dev`) va solo en
+*Production*. `NEXT_PUBLIC_APP_URL` se incrusta al compilar: si cambia, hay que volver a
+desplegar, y la ruta `<NEXT_PUBLIC_APP_URL>/auth/callback**` debe estar en las *Redirect URLs*
+de Supabase Auth; las secretas se cargan a mano en el
 panel como *Sensitive* (ver
 [ambientes-y-credenciales](../01-fundamentos/ambientes-y-credenciales.md)).
 

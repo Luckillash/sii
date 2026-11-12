@@ -192,7 +192,7 @@ para no compartir estado entre usuarios en el servidor.
 
 - Proyecto con raíz `apps/web`, comando de build `pnpm --dir ../.. build` (compila la librería y luego la app; ver `apps/web/vercel.json`).
 - **Solo se trabaja en *Production*:** no se usan deploys de *Preview* ni ramas; cada push a `main` despliega directo a producción. Las variables de entorno se cargan solo en *Production* (las públicas de Supabase también en *Development*, para `vercel env pull`). Los cron de `pg_cron` apuntan a la URL de *Production*.
-- Dominio: `app.<dominio>` para la aplicación y el apex para el sitio público (o todo en uno; ver D6). DNS de Resend (SPF, DKIM, DMARC) en el mismo dominio.
+- Dominio: `boleteame.dev` (apex, DNS en Vercel); `www.boleteame.dev` redirige con 308 al apex. Sitio público y app en el mismo dominio (D6). DNS de Resend (SPF, DKIM, DMARC) en el mismo dominio.
 - Firewall de Vercel: regla de *rate limiting* para `/api/v1/*` y para las rutas de autenticación.
 - Fluid compute activo; revisar los límites de `maxDuration` del plan (Hobby 300 s, Pro hasta 800 s) al configurar.
 
@@ -238,7 +238,7 @@ para no compartir estado entre usuarios en el servidor.
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | público / servidor | la secreta también va en Supabase Auth |
 | `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` | público / build | |
 | `PAGOS_*` | servidor | según D4 |
-| `NEXT_PUBLIC_APP_URL` | público | enlaces en correos |
+| `NEXT_PUBLIC_APP_URL` | público | enlaces en correos; `https://boleteame.dev` en *Production*, `http://localhost:3000` en local |
 
 No hay variables `SII_CERT_*` ni `SII_CAF_*` como en la CLI: en el SaaS esos datos son de
 cada empresa y viven en Vault.
@@ -303,7 +303,7 @@ Cada fase termina con: código en `main` con lint, typecheck y tests en verde (l
 
 **Pendientes** (el código está listo; Turnstile y Resend son opcionales en el código y se activan al cargar las claves):
 
-- [x] **Dominio** `boleteame.dev` en Vercel (DNS de Vercel) y `NEXT_PUBLIC_APP_URL=https://boleteame.dev` en *Production* (2026-11-12). `timbre-livid.vercel.app` sigue activo.
+- [x] **Dominio** `boleteame.dev` en Vercel (DNS de Vercel), `www` con redirección 308 al apex, y `NEXT_PUBLIC_APP_URL=https://boleteame.dev` en *Production* (2026-11-12). `timbre-livid.vercel.app` sigue activo.
 - [x] **Supabase Auth, URL Configuration** (2026-11-12): Site URL `https://boleteame.dev`; Redirect URLs `https://boleteame.dev/auth/callback**`, `http://localhost:3000/auth/callback**` y, transitoriamente, `https://timbre-livid.vercel.app/auth/callback**`.
 - [ ] **Supabase Auth (panel), resto:** «Confirm email» activo; contraseña mínima 8; plantillas de correo traducidas al tono Timbre con enlaces `token_hash` (`{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email|magiclink|recovery`).
 - [ ] **Resend:** cuenta, dominio verificado (SPF, DKIM, DMARC), SMTP personalizado de Supabase Auth apuntando a Resend, y `RESEND_API_KEY` + `CORREO_REMITENTE` en `.env.local` y Vercel (*Production*). Probar el correo real de invitación.
@@ -499,9 +499,9 @@ certificación:
 | D3 | Nombre y tono del estado `incierto` en `EstadoDTE` | «Por verificar», tono `aviso`, glifo de interrogación; agregarlo al design system. **Aplicada en la Fase 1** (app) y reflejada en el artifact el 2026-11-12 |
 | D4 | Pasarela de pagos | **Flow** (suscripciones recurrentes en CLP, ya tienes su MCP); Transbank Oneclick como alternativa |
 | D5 | Grilla de planes y precios | Unificar la landing (Pyme / Contador / API) con `planes`; «Contador» = varias empresas por organización |
-| D6 | Dominio | Sitio público y app en el mismo dominio (`/` y `/[org]`) para compartir sesión y simplificar; subdominio si se separa el marketing |
+| D6 | Dominio | Sitio público y app en el mismo dominio (`/` y `/[org]`) para compartir sesión y simplificar; subdominio si se separa el marketing. **Dominio asignado el 2026-11-12: `boleteame.dev`** |
 | D7 | Canal de envío por defecto | REST para emisión (pangal/rahue); SOAP DTEUpload como respaldo configurable por empresa |
-| D8 | Nombre del producto | «Timbre», como en el design system (verificar disponibilidad de marca y dominio) |
+| D8 | Nombre del producto | «Timbre», como en el design system (verificar disponibilidad de marca y dominio). **Pendiente:** el dominio asignado es `boleteame.dev`; decidir si el producto pasa a llamarse «Boleteame» o se queda como «Timbre» (afecta textos, plantillas de correo y `CORREO_REMITENTE`) |
 
 ---
 
