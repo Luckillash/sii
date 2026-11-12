@@ -15,7 +15,9 @@ export function opcionesSentry() {
     sendDefaultPii: false,
     tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1,
     beforeSend: depurarEvento,
-    beforeSendTransaction: depurarEvento,
+    // Con el traceLifecycle 'stream' (el predeterminado del SDK 11) las trazas salen
+    // como spans sueltos y beforeSendTransaction no se llama: se depura cada span.
+    beforeSendSpan: depurarEvento,
     beforeBreadcrumb: depurarBreadcrumb,
   };
 }

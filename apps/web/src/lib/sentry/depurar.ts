@@ -1,7 +1,7 @@
 // Depuración de eventos antes de enviarlos a Sentry (PLAN-SAAS §4.8, principio 5).
 //
 // Regla: ningún token, clave, cookie, .pfx, llave de CAF (RSASK), secreto o API key
-// sale hacia Sentry. Se aplica en beforeSend, beforeSendTransaction y
+// sale hacia Sentry. Se aplica en beforeSend, beforeSendSpan y
 // beforeBreadcrumb del navegador, del servidor y del edge.
 
 export const FILTRADO = '[Filtrado]';

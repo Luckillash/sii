@@ -123,4 +123,5 @@ Lo que quedó de él y sí se usa: `src/server/cifrado.ts` (AES-256-GCM),
 `src/server/supabase/service.ts`, que la capa SII de la Fase 4 reutiliza. Para repetir la
 prueba de red desde un equipo: `pnpm humo:tls`.
 
-Sigue temporalmente `/api/spike/sentry` (Bearer `SPIKE_TOKEN`), hasta probar Sentry.
+La ruta `/api/spike/sentry` (Bearer `SPIKE_TOKEN`) se usó para probar la depuración de
+Sentry y se retiró el 2026-11-12, junto con `src/server/spike/autorizar.ts` y `SPIKE_TOKEN`.

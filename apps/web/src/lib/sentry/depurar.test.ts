@@ -74,6 +74,30 @@ describe('depurarEvento', () => {
     const salida = depurarEvento({ extra });
     expect(salida.extra.token).toBe(FILTRADO);
   });
+
+  it('depura los atributos de un span (beforeSendSpan)', () => {
+    const span = {
+      trace_id: 'a'.repeat(32),
+      span_id: 'b'.repeat(16),
+      name: 'GET /api/sii?token=ABCDEF123456TOKENSII',
+      start_timestamp: 1,
+      status: 'ok' as const,
+      is_segment: true,
+      attributes: {
+        'http.request.header.authorization': `Bearer ${JWT}`,
+        'http.request.header.cookie': 'sb-access=abc',
+        'url.full': 'https://palena.sii.cl/x?clave=clave-del-pfx',
+        'db.statement': 'select 1',
+        folio: 1520,
+      },
+    };
+    const salida = depurarEvento(span);
+    const json = JSON.stringify(salida);
+    for (const prohibido of PROHIBIDOS) expect(json).not.toContain(prohibido);
+    expect(salida.attributes['db.statement']).toBe('select 1');
+    expect(salida.attributes.folio).toBe(1520);
+    expect(salida.trace_id).toBe('a'.repeat(32));
+  });
 });
 
 describe('depurarBreadcrumb', () => {

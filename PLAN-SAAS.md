@@ -20,7 +20,7 @@ Valores de la columna Estado: **Listo**, **En parte** o Pendiente. Se actualiza 
 
 | Fase | Estado | Nota |
 |---|---|---|
-| 0. Fundaciones y prueba de conectividad | **En parte** | **Criterio de aceptación cumplido** (2026-11-11: token de apicert desde Vercel `gru1`, guardado cifrado en `tokens_sii`); spike del SII retirado. Pendiente: conectar Sentry y probar su depuración (`/api/spike/sentry`) |
+| 0. Fundaciones y prueba de conectividad | **En parte** | **Criterio de aceptación cumplido** (2026-11-11: token de apicert desde Vercel `gru1`, guardado cifrado en `tokens_sii`); spike del SII retirado. Sentry conectado (proyecto `luckillash/timbre-web`) y depuración probada en local el 2026-11-12. Pendiente: variables de Sentry en Vercel |
 | 1. Design system en Next.js | **Listo** | 2026-11-11: tokens generados, 8 componentes (+ `incierto`, D3), 11 de soporte, 2 layouts, `/_ds` y axe sin violaciones en claro/oscuro/móvil. Deploy `F1` (c307194) verificado en producción con `e2e/despliegue.spec.ts`. 2026-11-12: `incierto` agregado también al artifact del design system y a su copia en `design-system/timbre/` |
 | 2. Autenticación, organizaciones y equipo | Pendiente | |
 | 3. Empresas, certificados y resoluciones | Pendiente | |
@@ -218,7 +218,7 @@ para no compartir estado entre usuarios en el servidor.
 ### 4.8 Sentry
 
 - `@sentry/nextjs` con `instrumentation.ts`, `instrumentation-client.ts`, `onRequestError` y `global-error.tsx`; *source maps* subidos en el build de Vercel; túnel en `/api/monitoring` para que los bloqueadores no lo frenen.
-- **Depuración obligatoria en `beforeSend` y `beforeSendTransaction`:** quitar cabeceras `Authorization` y `Cookie`, cuerpos de peticiones, y cualquier campo `token`, `clave`, `pfx`, `cookies`, `secreto`, `RSASK`, `api_key`. Prueba automática que lo verifica.
+- **Depuración obligatoria en `beforeSend` y `beforeSendSpan`:** quitar cabeceras `Authorization` y `Cookie`, cuerpos de peticiones, y cualquier campo `token`, `clave`, `pfx`, `cookies`, `secreto`, `RSASK`, `api_key`. Prueba automática que lo verifica.
 - Etiquetas: `organizacion`, `empresa`, `ambiente`, `operacion_sii`, `resultado`. Usuario solo por id.
 - *Cron monitors* para seguimiento, webhooks y alertas; alerta si un cron no corre.
 - Alertas: tasa de `transporte` (código 4) por host del SII, cualquier `incierto` (código 6), cualquier `verificacion_fallida` (código 7), y errores 5xx de la API pública.

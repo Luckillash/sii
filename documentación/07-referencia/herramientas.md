@@ -110,7 +110,11 @@ panel como *Sensitive* (ver
 
 ## Sentry
 
-Ruta temporal `/api/spike/sentry` (Bearer `SPIKE_TOKEN`): envía un error con secretos
-**falsos** en el evento. En Sentry, ningún campo debe mostrar el valor falso; todos deben
-decir `[Filtrado]`. La depuración vive en `apps/web/src/lib/sentry/depurar.ts` y tiene
-pruebas en `depurar.test.ts`.
+Proyecto `luckillash/timbre-web` (plataforma `javascript-nextjs`). La app lee
+`NEXT_PUBLIC_SENTRY_DSN`; sin DSN, Sentry queda apagado. El build usa `SENTRY_ORG`,
+`SENTRY_PROJECT` y `SENTRY_AUTH_TOKEN` para subir los source maps.
+
+La depuración vive en `apps/web/src/lib/sentry/depurar.ts` (en `beforeSend`,
+`beforeSendSpan` y `beforeBreadcrumb`) y tiene pruebas en `depurar.test.ts`. Se comprobó
+el 2026-11-12 con un error real con secretos **falsos** (ruta `/api/spike/sentry`, ya
+retirada): en Sentry todos aparecieron como `[Filtrado]`.
