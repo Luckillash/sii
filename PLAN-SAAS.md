@@ -20,7 +20,7 @@ Valores de la columna Estado: **Listo**, **En parte** o Pendiente. Se actualiza 
 
 | Fase | Estado | Nota |
 |---|---|---|
-| 0. Fundaciones y prueba de conectividad | **En parte** | **Criterio de aceptación cumplido** (2026-11-11: token de apicert desde Vercel `gru1`, guardado cifrado en `tokens_sii`); spike del SII retirado. Sentry conectado (proyecto `luckillash/timbre-web`) y depuración probada en local el 2026-11-12. Pendiente: variables de Sentry en Vercel |
+| 0. Fundaciones y prueba de conectividad | **Listo** | **Criterio de aceptación cumplido** (2026-11-11: token de apicert desde Vercel `gru1`, guardado cifrado en `tokens_sii`); spike del SII retirado. 2026-11-12: Sentry conectado (proyecto `luckillash/timbre-web`), variables en Vercel (solo *Production*) y error real de prueba verificado en producción: release del commit, *source maps* legibles y secretos depurados (también en spans, con `beforeSendSpan`). Rutas de prueba retiradas |
 | 1. Design system en Next.js | **Listo** | 2026-11-11: tokens generados, 8 componentes (+ `incierto`, D3), 11 de soporte, 2 layouts, `/_ds` y axe sin violaciones en claro/oscuro/móvil. Deploy `F1` (c307194) verificado en producción con `e2e/despliegue.spec.ts`. 2026-11-12: `incierto` agregado también al artifact del design system y a su copia en `design-system/timbre/` |
 | 2. Autenticación, organizaciones y equipo | Pendiente | |
 | 3. Empresas, certificados y resoluciones | Pendiente | |
