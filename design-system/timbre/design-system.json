@@ -13,5 +13,5 @@
   "assetGroups": {},
   "blobs": {},
   "docs": { "sections": [] },
-  "lastChange": { "by": "Claude", "at": "2026-11-10T19:40:00Z", "via": "Claude", "note": "Primera versión: tokens, manual de marca y ocho componentes para DTE." }
+  "lastChange": { "by": "Lucas", "at": "2026-11-12T12:00:00Z", "via": "Claude Code", "note": "EstadoDTE: estado incierto («Por verificar», tono aviso, glifo de interrogación), decisión D3." }
 }

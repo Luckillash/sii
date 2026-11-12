@@ -23,6 +23,7 @@
     reparos: [['circle', { cx: 8, cy: 8, r: 5.5 }], ['path', { d: 'M8 5v3.6' }], ['circle', { cx: 8, cy: 10.8, r: 0.6, fill: 'currentColor' }]],
     rechazado: [['circle', { cx: 8, cy: 8, r: 5.5 }], ['path', { d: 'M6 6l4 4M10 6l-4 4' }]],
     anulado: [['circle', { cx: 8, cy: 8, r: 5.5 }], ['path', { d: 'M4.2 11.8l7.6-7.6' }]],
+    incierto: [['circle', { cx: 8, cy: 8, r: 5.5 }], ['path', { d: 'M6.4 6.4a1.7 1.7 0 0 1 3.3.5c0 1.1-1.7 1.4-1.7 2.3' }], ['circle', { cx: 8, cy: 11, r: 0.6, fill: 'currentColor' }]],
     info: [['circle', { cx: 8, cy: 8, r: 5.5 }], ['path', { d: 'M8 7.2v3.8' }], ['circle', { cx: 8, cy: 5.2, r: 0.6, fill: 'currentColor' }]]
   };
   function Glifo(props) {
@@ -52,7 +53,8 @@
     aceptado: { texto: 'Aceptado', tono: 'exito' },
     reparos: { texto: 'Aceptado con reparos', tono: 'aviso' },
     rechazado: { texto: 'Rechazado', tono: 'error' },
-    anulado: { texto: 'Anulado', tono: 'neutro' }
+    anulado: { texto: 'Anulado', tono: 'neutro' },
+    incierto: { texto: 'Por verificar', tono: 'aviso' }
   };
   function EstadoDTE(props) {
     var clave = ESTADOS[props.estado] ? props.estado : 'borrador';

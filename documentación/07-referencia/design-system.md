@@ -87,7 +87,7 @@ Un envío sin Track ID no se sabe si llegó al SII (`estado_documento = 'inciert
 - Palabra **«Por verificar»**, tono `aviso`, glifo de signo de interrogación.
 - Nunca ofrece «Reenviar»: va acompañado de una `Alerta` `aviso` que pide revisar el estado en el SII antes de volver a enviar (principio 3 del plan).
 
-El estado se agregó en la app; falta reflejarlo en el artifact del design system para que ambas fuentes coincidan.
+El estado está en la app y en el design system (artifact y copia en `design-system/timbre/`, 2026-11-12): `EstadoDTE` lo lista con su glifo, `index.d.ts` lo incluye en `EstadoDte` y el manual de marca lo nombra entre los estados.
 
 ## Accesibilidad y verificación
 

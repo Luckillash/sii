@@ -4,7 +4,7 @@ Timbre es una plataforma SaaS para emitir, firmar y enviar documentos tributario
 
 - Escribe en español de Chile, en segunda persona con **tú**, frases cortas y verbos concretos: «Emitir factura», «Reenviar al SII», «Descargar PDF». Nunca «¡Genial!», nunca signos de exclamación, nunca emoji.
 - Usa los nombres oficiales del SII tal como aparecen en la normativa: *Factura electrónica*, *Nota de crédito electrónica*, *Guía de despacho electrónica*, *Código de Autorización de Folios (CAF)*, *Track ID*, *Libro de Compras y Ventas*. No inventes sinónimos («invoice», «comprobante») para lo que ya tiene nombre legal.
-- Los estados del documento son siempre estas palabras, en este orden de vida: **Borrador → Firmado → Enviado → Aceptado / Aceptado con reparos / Rechazado**, más **Anulado** cuando una nota de crédito lo deja sin efecto. Son el componente `EstadoDTE`; no escribas variantes («Aprobado», «OK», «Error»).
+- Los estados del documento son siempre estas palabras, en este orden de vida: **Borrador → Firmado → Enviado → Aceptado / Aceptado con reparos / Rechazado**, más **Anulado** cuando una nota de crédito lo deja sin efecto y **Por verificar** cuando un envío salió sin Track ID y no se sabe si llegó al SII. Son el componente `EstadoDTE`; no escribas variantes («Aprobado», «OK», «Error»).
 - Un mensaje de error dice qué pasó y qué hacer: «El SII rechazó el documento: el RUT del receptor no existe. Corrígelo y vuelve a emitir.» No culpes al usuario ni muestres el XML crudo como mensaje principal; ofrécelo como detalle.
 - Mayúscula solo al inicio de frase y en nombres propios (*Servicio de Impuestos Internos*, siglas *SII*, *DTE*, *CAF*, *IVA*). Botones y títulos en tipo oración: «Cargar certificado digital», no «Cargar Certificado Digital».
 - Formatos chilenos siempre: montos `$ 1.190.000` (punto de miles, sin decimales en CLP), RUT `76.354.771-K` con puntos y guion, fechas `10-11-2026`, horas en 24 h. El componente `Monto` y el `CampoRut` ya los aplican.
@@ -15,7 +15,7 @@ Timbre es una plataforma SaaS para emitir, firmar y enviar documentos tributario
 - Texto en `ink`; metadatos y etiquetas de columna en `ink-muted`. Ambos son legibles sobre las tres superficies y sobre `sello-soft`, en los dos temas.
 - `sello` es el único color de acción: botón primario, fila seleccionada, enlaces (`link` es su alias). Una pantalla tiene una sola acción en `sello` relleno; el resto son botones secundarios. Sobre un relleno `sello` el texto es `on-sello`, nunca blanco literal (en el tema oscuro es tinta oscura).
 - `ocre` es acento de identidad (portada, ilustraciones, el marcador del folio actual). No es texto ni significa un estado; encima va `on-ocre`.
-- Los estados usan pares texto/fondo: `exito`/`exito-soft` para Aceptado, `aviso`/`aviso-soft` para Aceptado con reparos y vencimientos, `error`/`error-soft` para Rechazado y validaciones, `info`/`info-soft` para Enviado. Un estado lleva siempre su palabra y su glifo, nunca solo el color: así lo distingue quien no ve rojo y verde.
+- Los estados usan pares texto/fondo: `exito`/`exito-soft` para Aceptado, `aviso`/`aviso-soft` para Aceptado con reparos, Por verificar y vencimientos, `error`/`error-soft` para Rechazado y validaciones, `info`/`info-soft` para Enviado. Un estado lleva siempre su palabra y su glifo, nunca solo el color: así lo distingue quien no ve rojo y verde.
 - Los bordes de controles son `line-strong` (3:1 sobre las superficies); `line` es solo para filetes decorativos entre filas.
 
 ## Tipografía
@@ -39,7 +39,7 @@ Timbre es una plataforma SaaS para emitir, firmar y enviar documentos tributario
 ## Iconografía
 
 - No hay set de íconos propio todavía. Usa **Lucide** (código abierto) a 16px dentro de texto y 20px en navegación, trazo 1.5px, en `currentColor`. Sin íconos rellenos ni a color.
-- Los glifos de estado (círculo, reloj, check, signo de exclamación, cruz) vienen dibujados dentro de `EstadoDTE` y `Alerta`; no los dupliques al lado.
+- Los glifos de estado (círculo, reloj, check, signo de exclamación, signo de interrogación, cruz) vienen dibujados dentro de `EstadoDTE` y `Alerta`; no los dupliques al lado.
 - Logotipo: aún no existe una marca gráfica. Escribe «Timbre» en IBM Plex Sans 600 en `ink`. No dibujes un logotipo aproximado ni uses el logo del SII o del Gobierno de Chile como si fuera propio.
 
 ## Componentes

@@ -1,6 +1,6 @@
 import type * as React from 'react';
 
-export type EstadoDte = 'borrador' | 'firmado' | 'enviado' | 'aceptado' | 'reparos' | 'rechazado' | 'anulado';
+export type EstadoDte = 'borrador' | 'firmado' | 'enviado' | 'aceptado' | 'reparos' | 'rechazado' | 'anulado' | 'incierto';
 export type CodigoDte = 33 | 34 | 39 | 41 | 43 | 46 | 52 | 56 | 61 | 110 | 111 | 112;
 export type Tono = 'info' | 'exito' | 'aviso' | 'error';
 
