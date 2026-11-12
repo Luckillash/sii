@@ -85,6 +85,7 @@ El cliente `service_role` vive solo en `apps/web/src/server/supabase/service.ts`
 | Token del SII (REST/SOAP) | `tokens_sii.token_cifrado` | AES-256-GCM en la app con `SII_TOKENS_KEY` |
 | Cookies AUT2000 | `sesiones_sii.cookies_cifradas` | AES-256-GCM en la app con `SII_TOKENS_KEY` |
 | `SII_TOKENS_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `CRON_SECRET` | variables de entorno de Vercel (*sensitive*) | `process.env`, validadas en `src/server/env.ts` |
+| `TURNSTILE_SECRET_KEY` | variable de entorno de Vercel (*sensitive*) **y** Supabase Auth → *Attack Protection* | `siteverify` en `src/server/turnstile.ts` (invitación, contacto); Supabase la usa para validar `captchaToken` en Auth |
 | `cron_token` | Supabase Vault | `pg_cron` lo envía como Bearer a `/api/cron/*` (igual a `CRON_SECRET`) |
 
 ### Cifrado de tokens y cookies

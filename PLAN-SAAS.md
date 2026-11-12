@@ -211,7 +211,7 @@ para no compartir estado entre usuarios en el servidor.
 
 ### 4.7 Turnstile
 
-- **Supabase Auth trae soporte nativo de captcha con Turnstile:** se activa en *Auth → Bot and abuse protection* con la clave secreta, y el cliente pasa `options.captchaToken` en `signUp`, `signInWithPassword`, `resetPasswordForEmail` y `signInWithOtp`. Sin endpoints propios de verificación.
+- **Supabase Auth trae soporte nativo de captcha con Turnstile:** se activa en *Authentication → Attack Protection* (antes *Bot and abuse protection*) con la clave secreta, y el cliente pasa `options.captchaToken` en `signUp`, `signInWithPassword`, `resetPasswordForEmail` y `signInWithOtp`. Sin endpoints propios de verificación.
 - Turnstile verificado en el servidor (`siteverify`) para formularios que no pasan por Auth: contacto/ventas del sitio público y aceptación de invitaciones.
 - Widget en modo *managed*, con tema según `data-theme`, y mensaje de error con el tono del design system.
 
@@ -235,7 +235,7 @@ para no compartir estado entre usuarios en el servidor.
 | `SII_TOKENS_KEY` | servidor, *sensitive* | 32 bytes base64; AES-256-GCM de tokens y cookies |
 | `CRON_SECRET` | servidor, *sensitive* | mismo valor que `cron_token` en Vault |
 | `RESEND_API_KEY`, `CORREO_REMITENTE` | servidor | |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | público / servidor | la secreta también va en Supabase Auth |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | público / servidor, *sensitive* | la secreta también va en Supabase Auth (*Attack Protection*); la pública se incrusta al compilar |
 | `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` | público / build | |
 | `PAGOS_*` | servidor | según D4 |
 | `NEXT_PUBLIC_APP_URL` | público | enlaces en correos; `https://boleteame.dev` en *Production*, `http://localhost:3000` en local |
@@ -313,7 +313,7 @@ Cada fase termina con: código en `main` con lint, typecheck y tests en verde (l
   - [x] Dos API keys de Resend de solo envío restringidas a `mail.boleteame.dev`: `sii-supabase-auth` (SMTP de Supabase) y la de la app (`RESEND_API_KEY` en `.env.local` y Vercel *Production*, *Sensitive*).
   - [x] SMTP de Supabase Auth: `smtp.resend.com:465`, usuario `resend`, remitente `Timbre <no-responder@mail.boleteame.dev>`. *Rate Limits*: 30 correos/h y 60 s entre correos a un mismo usuario (suficiente antes del lanzamiento).
   - [x] Correos de Auth probados (2026-11-12, dev local contra producción, destinatario de prueba `delivered@resend.dev`): confirmación y recuperación **Delivered** en Resend con las plantillas Timbre; sus enlaces verifican el token y llevan a `/bienvenida` y `/restablecer`. Queda a propósito la cuenta de prueba `delivered@resend.dev` (confirmada, con perfil, sin organización): no borrarla.
-- [ ] **Turnstile:** sitio en Cloudflare; `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY` en Vercel (*Production*); desplegar **antes** de activar el captcha en Supabase Auth (*Bot and abuse protection*), o todo Auth falla con `captcha_failed`.
+- [x] **Turnstile** (2026-11-12): widget en Cloudflare (modo *Managed*); `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY` (*Sensitive*) en `.env.local` y Vercel (*Production*); deploy `219d8fe` con la site key en el bundle y el widget en `/ingresar`, `/crear-cuenta` y `/recuperar` («¡Operación exitosa!»). **Después** se activó el captcha en Supabase Auth (*Attack Protection*, Turnstile, misma clave secreta). Verificado: `/auth/v1/recover` sin token → 400 `captcha_failed`; recuperación desde `/recuperar` con token (Server Action desde Vercel) → 200 `user_recovery_requested`. Si Auth empieza a fallar con `captcha_failed`, desactivar el captcha en Supabase lo revierte al instante, sin redesplegar. Hostnames del widget: `boleteame.dev` y `localhost` (para desarrollo local contra producción, con las mismas claves en `.env.local`).
 - [x] **Deploy** a *Production* (commit y push a `main`) y humo de las rutas nuevas (2026-11-12, `daa781d`, READY): `/ingresar`, `/crear-cuenta`, `/recuperar`, `/restablecer` e `/invitacion/…` responden 200; `/auth/callback` sin token o con token inválido → `/ingresar?error=enlace`; `/bienvenida` sin sesión → `/ingresar`; `/_ds` 404. Sin errores de runtime. Recuperación real en producción con `delivered@resend.dev`: correo *Delivered* con el enlace normal (`/auth/callback?siguiente=/restablecer&token_hash=…&type=recovery`) que termina en `/restablecer`.
 - [ ] **e2e con dos organizaciones reales en *Production*** (escribe en la base; requiere autorización y borrar los datos de prueba al terminar): crear cuenta y organización, invitar (confirmar que el correo real de invitación llega por Resend desde `no-responder@mail.boleteame.dev` y que su enlace abre `/invitacion/…`), aceptar con el correo correcto y con otro, cambiar rol, quitar, salir, último propietario, cupo del plan y aislamiento entre las dos organizaciones.
 - [ ] Volver a correr `supabase/verificaciones/rls-fase2-tenancy.sql` para activar las comprobaciones 48–51 de `ver_invitacion` y sumar una para `0004` (organización `morosa` que no acepta miembros).

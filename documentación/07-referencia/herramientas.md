@@ -1,7 +1,7 @@
 ---
 title: "Herramientas"
 description: "Supabase CLI, CLI sii, XSD del SII y utilidades de verificación."
-keywords: [pnpm, scripts, biome, vitest, supabase cli, vercel cli, humo:tls, sii, subtree, db:tipos]
+keywords: [pnpm, scripts, biome, vitest, supabase cli, vercel cli, humo:tls, sii, subtree, db:tipos, turnstile, captcha]
 related: ["09-libreria/cli-sii.md", "08-esquema-supabase/despliegue.md", "05-pruebas/probar-el-esquema.md"]
 source: ["certificacion-node/docs/cli.md", "package.json"]
 ---
@@ -103,12 +103,41 @@ conectado a `Luckillash/sii`. **Solo se trabaja en *Production*:** no se usan de
 
 Variables cargadas: `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` (clave
 publicable `sb_publishable_…`), en *Production* y *Development*. El resto (Supabase
-`service_role`, SII, cron, Sentry y `NEXT_PUBLIC_APP_URL=https://boleteame.dev`) va solo en
-*Production*. `NEXT_PUBLIC_APP_URL` se incrusta al compilar: si cambia, hay que volver a
+`service_role`, SII, cron, Sentry, Resend, Turnstile y `NEXT_PUBLIC_APP_URL=https://boleteame.dev`)
+va solo en *Production*. Las `NEXT_PUBLIC_*` (`NEXT_PUBLIC_APP_URL`,
+`NEXT_PUBLIC_TURNSTILE_SITE_KEY`) se incrustan al compilar: si cambian, hay que volver a
 desplegar, y la ruta `<NEXT_PUBLIC_APP_URL>/auth/callback**` debe estar en las *Redirect URLs*
 de Supabase Auth; las secretas se cargan a mano en el
 panel como *Sensitive* (ver
 [ambientes-y-credenciales](../01-fundamentos/ambientes-y-credenciales.md)).
+
+## Turnstile
+
+Widget de Cloudflare Turnstile en modo *Managed*, con hostnames `boleteame.dev` y
+`localhost`. Un dominio que no esté en la lista no carga el widget y, con el captcha activo,
+no puede ingresar, crear cuenta ni recuperar contraseña (por ejemplo,
+`timbre-livid.vercel.app` mientras no se agregue).
+
+| Pieza | Dónde |
+|---|---|
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Vercel *Production* y `.env.local`; se incrusta al compilar |
+| `TURNSTILE_SECRET_KEY` | Vercel *Production* (*Sensitive*), `.env.local` y Supabase → Authentication → *Attack Protection* |
+| Widget | `apps/web/src/components/turnstile/Turnstile.tsx`; sin site key no se muestra y los formularios no lo exigen |
+| Verificación propia | `apps/web/src/server/turnstile.ts` (`siteverify`), solo invitación y contacto; sin clave secreta devuelve `ok` |
+
+Formularios de Auth (ingresar, crear cuenta, recuperar, enlace mágico): el token va en
+`options.captchaToken` y lo valida Supabase. `restablecer` no lo pide (`updateUser` ya
+tiene sesión).
+
+**Orden para activarlo o rotar claves:** claves en Vercel → deploy → comprobar el widget en
+`/ingresar` → recién entonces la clave secreta en Supabase *Attack Protection*. Al revés,
+todo Auth falla con `captcha_failed`. Para revertir, desactivar el captcha en Supabase:
+el efecto es inmediato y no requiere deploy.
+
+Verificado el 2026-11-12 (deploy `219d8fe`): `POST /auth/v1/recover` sin token →
+400 `captcha_failed`; recuperación desde `/recuperar` con el widget resuelto → 200
+(`user_recovery_requested` en los logs de Auth). El token llega a Supabase desde la Server
+Action en Vercel, con otra IP que el navegador, y Supabase lo acepta igual.
 
 ## Sentry
 
