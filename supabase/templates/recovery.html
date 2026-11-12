@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>Restablece tu contraseña de Timbre</title>
+</head>
+<body style="margin:0;padding:0;background:#f6f5f0">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">Pediste restablecer la contraseña de la cuenta {{ .Email }}. Abre el enlace y elige una nueva.</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0;padding:0;background:#f6f5f0">
+<tr><td align="center" style="padding:32px 16px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px">
+<tr><td style="font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;font-size:20px;line-height:28px;font-weight:600;color:#0b5f5a;padding:0 4px 16px">Timbre</td></tr>
+<tr><td style="background:#ffffff;border:1px solid #dcd9cf;border-radius:6px;padding:32px 28px"><h1 style="margin:0 0 16px;font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;font-size:22px;line-height:28px;font-weight:600;color:#16201f">Restablece tu contraseña</h1>
+<p style="margin:0 0 16px;font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;font-size:15px;line-height:22px;color:#16201f">Pediste restablecer la contraseña de la cuenta {{ .Email }}. Abre el enlace y elige una nueva.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 24px"><tr><td style="border-radius:6px;background:#0b5f5a"><a href="{{ if eq .RedirectTo .SiteURL }}{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&amp;type=recovery{{ else }}{{ .RedirectTo }}&amp;token_hash={{ .TokenHash }}&amp;type=recovery{{ end }}" style="display:inline-block;padding:12px 20px;font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;font-size:15px;line-height:20px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:6px" target="_blank" rel="noopener">Elegir una contraseña nueva</a></td></tr></table>
+<p style="margin:0 0 12px;font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;font-size:13px;line-height:18px;color:#565e5b">Si el botón no funciona, copia este enlace en tu navegador:</p>
+<p style="margin:0 0 16px;padding:8px 12px;background:#ecebe3;border-radius:3px;font-family:'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;font-size:12px;line-height:18px;color:#16201f;word-break:break-all">{{ if eq .RedirectTo .SiteURL }}{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&amp;type=recovery{{ else }}{{ .RedirectTo }}&amp;token_hash={{ .TokenHash }}&amp;type=recovery{{ end }}</p>
+<p style="margin:0 0 12px;font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;font-size:13px;line-height:18px;color:#565e5b">El enlace sirve una sola vez y vence en 1 hora. Si venció, pide otro en «¿Olvidaste tu contraseña?».</p>
+<p style="margin:0 0 12px;font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;font-size:13px;line-height:18px;color:#565e5b">Si no lo pediste, ignora este correo: tu contraseña actual sigue funcionando.</p></td></tr>
+<tr><td style="padding:16px 4px 0;font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;font-size:12px;line-height:16px;color:#565e5b">Timbre · Boletas electrónicas y certificación ante el SII.</td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>
