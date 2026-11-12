@@ -49,8 +49,8 @@ equivocado.
 ## La base de datos: una sola, en producción
 
 Hay **un solo** proyecto de Supabase (`rbrntkztzijaxsnpgpqn`, en la nube) y es producción.
-No hay base local, ramas ni base de pruebas: el desarrollo local y los deploys *Preview* y
-*Production* de Vercel usan ese mismo proyecto
+No hay base local, ramas ni base de pruebas: el desarrollo local y los deploys de
+*Production* de Vercel usan ese mismo proyecto (en Vercel no se usa *Preview*)
 ([despliegue](../08-esquema-supabase/despliegue.md)).
 
 Son dos ejes distintos que no hay que confundir:

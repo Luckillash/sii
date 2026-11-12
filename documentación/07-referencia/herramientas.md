@@ -89,7 +89,8 @@ Detalle de comandos y códigos de salida (0–7, equivalentes a `resultado_opera
 ## Vercel
 
 Proyecto `timbre` (`prj_XEe4L2I60TLJVAI6Ass5y3G6VlFu`, equipo «Lucas' projects»),
-conectado a `Luckillash/sii`:
+conectado a `Luckillash/sii`. **Solo se trabaja en *Production*:** no se usan deploys de
+*Preview* ni ramas; cada push a `main` despliega directo a producción.
 
 | Ajuste | Valor |
 |---|---|
@@ -97,14 +98,11 @@ conectado a `Luckillash/sii`:
 | Framework / Node | Next.js / 24.x |
 | Región de funciones | `gru1` (también en `apps/web/vercel.json`) |
 | Install / Build | los de `apps/web/vercel.json`: `pnpm install --frozen-lockfile` y `pnpm --dir ../.. build` |
-| Deployment Protection | Vercel Authentication en *Preview* |
 | Variables de sistema | expuestas (Sentry usa `NEXT_PUBLIC_VERCEL_ENV` y el SHA del commit) |
 
-Los deploys *Preview* piden iniciar sesión en Vercel. Para llamarlos con `curl` se usa el secreto de *Protection Bypass for Automation* (Settings → Deployment
-Protection) en la cabecera `x-vercel-protection-bypass`.
-
 Variables cargadas: `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` (clave
-publicable `sb_publishable_…`), en los tres entornos. Las secretas se cargan a mano en el
+publicable `sb_publishable_…`), en *Production* y *Development*. El resto (Supabase
+`service_role`, SII, cron y Sentry) va solo en *Production*; las secretas se cargan a mano en el
 panel como *Sensitive* (ver
 [ambientes-y-credenciales](../01-fundamentos/ambientes-y-credenciales.md)).
 

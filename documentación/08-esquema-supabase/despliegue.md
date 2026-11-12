@@ -16,7 +16,7 @@ source: ["supabase_saas_sii.sql (cabecera, opcional pg_cron)", "PLAN-SAAS.md §4
 |---|---|
 | Existe **un solo** proyecto: `rbrntkztzijaxsnpgpqn` (`sa-east-1`, Postgres 17) | No hay base local (`supabase start`), ni ramas de Supabase, ni base de pruebas |
 | Ese proyecto **es producción** desde el primer día | Cada migración se aplica directo sobre datos reales; no hay `db reset` ni `seed.sql` |
-| Desarrollo local, *Preview* y *Production* de Vercel apuntan al mismo proyecto | Lo que se escribe desde un equipo o un deploy de preview queda en la base real |
+| Desarrollo local y *Production* de Vercel apuntan al mismo proyecto (no se usa *Preview*) | Lo que se escribe desde un equipo queda en la base real |
 
 **«Producción» de la base no es el ambiente del SII.** La base es una sola, pero guarda datos
 de los dos ambientes del SII: `certificacion` (maullin/apicert/pangal, IDK 100) y
@@ -125,8 +125,7 @@ select vault.create_secret('<valor>', 'cron_token', 'Bearer para /api/cron/*');
 ## Tareas programadas
 
 `pg_cron` + `pg_net` llaman a rutas Node.js de Vercel, no a Edge Functions (la librería es
-solo Node). Siempre a la URL de **Production** de Vercel: un deploy de preview no debe
-recibir los cron. Cada `cron.schedule` se agrega en una migración de la fase que crea su
+solo Node). Siempre a la URL de **Production** de Vercel, el único entorno que se usa. Cada `cron.schedule` se agrega en una migración de la fase que crea su
 ruta:
 
 ```sql
