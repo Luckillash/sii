@@ -1,7 +1,7 @@
 ---
 title: "Trampas conocidas"
 description: "Comportamientos no obvios del SII, de la librería y del esquema."
-keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna]
+keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna, ad_empresa1, ad_empresa2, Actualización de datos del contribuyente, representante legal, no está autorizado para operar en esta modalidad, verificar_autorizacion, ConsultaAutorizacion, situación tributaria de terceros, STC, stc/noauthz, getConsultaData, timbrajes, documentos autorizados, reCAPTCHA, SituacionTributaria]
 related: ["08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md"]
 source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/"]
 ---
@@ -273,6 +273,64 @@ source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas
   funciona sin proceso (no depende de la 0009): lo crea en `borrador` con service_role solo después de que
   el SII respondió (una falla no deja fila). El proceso creado así no tiene datos de
   postulación: el paso 1 sigue pidiendo guardarlos antes de postular.
+
+### Datos de la empresa autorizada en el SII (`ad_empresa`, prevista)
+
+Validado en producción el 2026-11-13, en solo lectura y con el certificado del piloto; el
+código todavía no existe (PLAN-SAAS, Fase 5, «Verificar autorización en el SII»).
+
+- **Hay una página del SII que sí distingue «autorizada» de «nunca postuló».** El asistente
+  «Actualización de datos del contribuyente» (`palena.sii.cl/cvc_cgi/dte/ad_empresa1`, con
+  `RUT_EMP` y `DV_EMP` → `POST ad_empresa2`, misma sesión AUT2000 que los folios) muestra
+  la fecha de autorización, la fecha y el número de la resolución (80 del 22-08-2014 para
+  el piloto, autorizado el 06-11-2026), además del nombre del software, tres correos y la
+  URL.
+- **Solo responde si el titular del certificado es representante legal.** El SII revisa
+  primero la representación y después la autorización. A un no representante le responde
+  siempre «Usted no está registrado en la empresa Rut … como Representante Legal…», esté
+  autorizada la empresa o no (comprobado con 90749000-9, que lo está, y con 11111111-1 y
+  12345678-5, que no). No sirve para consultar cualquier RUT, y el representante
+  electrónico de `empresa_certificados` no basta.
+- **«No está autorizado para operar en esta modalidad»** salió solo con el RUT del titular y
+  un DV erróneo (20630500-3). Falta comprobarlo con una empresa real, representada y sin
+  autorizar.
+- **«Esta modalidad» es software de mercado, no necesariamente boleta.** Falta comprobar
+  qué responde para una empresa certificada solo para factura: podría darla por autorizada
+  para boletas.
+- **`ad_empresa2` trae un formulario que actualiza datos** (botones `MOD_EMP` / `MOD_USU`,
+  campos ocultos `ORDEN`, `PAGINA`, `RUT_EMP`, `DV_EMP`). La consulta nunca lo envía: solo
+  lee la página.
+- **La página trae datos personales.** No se guardan correos, URL ni nombre del software, y
+  el HTML no va a logs, Sentry ni `operaciones_sii.detalle`.
+- **Es latin1 con entidades HTML** (`Raz&oacute;n Social`, `Fecha Autorizaci&oacute;n`):
+  hay que decodificarla antes de comparar textos. Las fechas vienen como `dd-mm-aaaa`.
+
+### Situación tributaria de terceros (STC, fuente de apoyo prevista)
+
+Validado el 2026-11-13 con 2 consultas públicas; el código todavía no existe (PLAN-SAAS,
+Fase 5, «Fuente de apoyo: situación tributaria de terceros»).
+
+- **«Documentos autorizados» no es lo que la empresa puede emitir.** La tabla sale del
+  campo `timbrajes` de `POST www2.sii.cl/app/stc/recurso/v1/consulta/getConsultaData/`
+  (`{ rut, dv, reAction: "consultaSTC", reToken }`): es el historial de timbraje. Hay una
+  fila por tipo con folios timbrados alguna vez, incluidos los de papel. El piloto
+  (20630500-2) solo muestra `0039 Boleta Electronica`, aunque también está autorizado para
+  la 41: nunca timbró boletas exentas.
+- **La certificación de boleta no habilita factura.** Es lo que se esperaba ver en el STC del
+  piloto, pero la factura (33, 34, 56, 61…) tiene su propia certificación (H3 del plan,
+  Fase 14), y además solo aparecería después de timbrar folios de ese tipo.
+- **Evidencia en un solo sentido.** `0039`/`0041` prueban autorización para boletas, para
+  cualquier RUT y sin certificado. Que falten no prueba nada (empresa recién certificada).
+- **Formato crudo:** `codigo` con ceros a la izquierda (`"0039"`), `descripcion` con espacios
+  de relleno, `fechaTimbraje` es **solo el año** del último timbraje, `folioFinal` es texto
+  con espacios a la izquierda (`"         5"`) y `folionicial` (así, con la errata) viene
+  `null`.
+- **reCAPTCHA Enterprise v3 apagado, por ahora.** `GET /app/stc/recurso/v1/recaptcha/key`
+  respondía `{ "enable": false, "key": … }` y con eso la SPA manda `reToken: " "`. Si el SII
+  lo enciende, la consulta se omite (`stc = 'no_disponible'`): no se intenta resolver el
+  captcha y nada depende de ella.
+- **La respuesta trae datos de terceros** (nombre, giros, observaciones, actividades). Solo
+  se usa `timbrajes`; el resto no se guarda ni se registra.
 
 ### Ensayo y confirmación
 

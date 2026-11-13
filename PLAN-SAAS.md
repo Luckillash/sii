@@ -25,7 +25,7 @@ Valores de la columna Estado: **Listo**, **En parte** o Pendiente. Se actualiza 
 | 2. Autenticación, organizaciones y equipo | **Listo** | **Criterio de aceptación cumplido** (2026-11-13: e2e con dos organizaciones reales en *Production*, con aislamiento en la UI y en SQL; `rls-fase2-tenancy.sql` en producción 1–51 y 53 `ok`, incluida la 21 «un lector no puede crear borradores»; correos reales de invitación *Delivered* por Resend desde `no-responder@mail.boleteame.dev` y con enlace a `/invitacion/…`). 2026-11-12: código listo (ingreso, crear cuenta, recuperar/restablecer, `proxy.ts`, callback, onboarding, `[org]`, equipo, invitaciones); lint, typecheck, Vitest, build y e2e sin escritura en verde. Migraciones `0003_preferencias` y `0004_cupo_sin_suscripcion` aplicadas y verificadas (13/13). En *Production*: dominio `boleteame.dev`, Supabase Auth con plantillas Boletéame y SMTP de Resend, Turnstile, IP real reenviada a Auth y claves legadas desactivadas. La revocación inmediata de sesiones baneadas pasó a las Fases 4 y 13 |
 | 3. Empresas, certificados y resoluciones | **Listo** | **Criterio de aceptación cumplido** (2026-11-13: `.pfx` real de IDOK en *Production*: fila en `certificados`, 2 secretos en Vault, RUT extraído del certificado, sin rastros en logs ni Sentry). Código (empresas con resoluciones, certificados `.pfx` a Vault con `registrar_certificado`, asociación empresa ↔ certificado, avisos de vencimiento en el Tablero); lint, typecheck, Vitest (301), stylelint y build en verde; `documentación/` de la fase completa. Migración `0005_certificados_resoluciones` aplicada y verificada (15/15) y simulación de roles `rls-fase3-empresas.sql` 43/43; tipos regenerados. Deploy `b4d799c` verificado en *Production* |
 | 4. Capa de servicio SII (backend) | **Listo** | **Criterio de aceptación cumplido** (2026-11-13: 8 resultados y búsqueda de patrones de secretos en pruebas; prueba manual contra certificación con el certificado real en verde: token REST auditado en `operaciones_sii` sin secretos, caché en `tokens_sii` y bloqueo con arriendo por PostgREST). Deploy `2fbc739` verificado en *Production*. Código listo en `server/sii/` (`credenciales`, `sesiones`, `bloqueos`, `transporte`, `operacion`, `almacen`, `errores`); **criterio cubierto en pruebas** (8 resultados de `ejecutarOperacion` y búsqueda de patrones de secretos en `operaciones_sii`, Sentry y consola). Typecheck, Vitest (452), Biome, stylelint y build en verde; `documentación/` de la fase completa; carrera de doble timbraje cerrada con índice único. Migraciones `0006_realtime_operaciones` y `0007_bloqueos_sii` **aplicadas** en producción (verificaciones 9/9 y 14/14, simulación 21/21) y tipos regenerados sin diferencias |
-| 5. Certificación ante el SII (boleta) | **En parte** | 2026-11-13: desplegado y verificado en *Production* (`0d27c20`). Asistente `/[org]/certificacion` con los 5 pasos, ensayo + `Dialogo` antes de cada operación ⚠️ y Realtime; `server/certificacion/` sobre la capa SII de la Fase 4; correo de cambio de etapa; empresas autorizadas fuera de Boletéame (resolución de producción → «Autorizada fuera de Boletéame», con la empresa del piloto ya marcada). Typecheck, Vitest (586), Biome, stylelint y build en verde; `documentación/` de la fase completa. Migraciones `0008_certificacion` y `0009_autorizacion_externa` **aplicadas** (10/10 y 16/16; 9/9 y 12/12; tipos sin diferencias). **Pendiente, por decisión del usuario:** el criterio de aceptación contra el SII de certificación, que requiere otra empresa de prueba (ver Pendientes de la fase) |
+| 5. Certificación ante el SII (boleta) | **En parte** | 2026-11-13: desplegado y verificado en *Production* (`0d27c20`). Asistente `/[org]/certificacion` con los 5 pasos, ensayo + `Dialogo` antes de cada operación ⚠️ y Realtime; `server/certificacion/` sobre la capa SII de la Fase 4; correo de cambio de etapa; empresas autorizadas fuera de Boletéame (resolución de producción → «Autorizada fuera de Boletéame», con la empresa del piloto ya marcada). Typecheck, Vitest (586), Biome, stylelint y build en verde; `documentación/` de la fase completa. Migraciones `0008_certificacion` y `0009_autorizacion_externa` **aplicadas** (10/10 y 16/16; 9/9 y 12/12; tipos sin diferencias). **Pendiente, por decisión del usuario:** el criterio de aceptación contra el SII de certificación, que requiere otra empresa de prueba (ver Pendientes de la fase). **Prevista, sin código:** «Verificar autorización en el SII» con la página «Actualización de datos del contribuyente» (`ad_empresa1/2` de palena), validada en producción el 2026-11-13 en solo lectura: si el titular del certificado es representante legal, el SII confirma la autorización y entrega la resolución de producción. La consulta pública de situación tributaria (STC, timbrajes) queda como fuente de apoyo (ver «Verificar autorización en el SII» en la Fase 5; migración `0010_verificar_autorizacion`) |
 | 6. Folios (CAF) | Pendiente | |
 | 7. Emisión de boletas | Pendiente | |
 | 8. Seguimiento de envíos y documentos | Pendiente | |
@@ -259,10 +259,11 @@ Solo claves API nuevas, y `env.ts` rechaza las demás por prefijo. Las legadas (
 | `0007_bloqueos_sii` | 4 | **Aplicada** (2026-11-13, verificación 14/14 y simulación 21/21): bloqueo **con arriendo** por certificado y ambiente para serializar sesiones AUT2000 (el SII frena el re-login, error `01.01.215.500.771.52`): tabla `bloqueos_sii` y RPC `tomar_bloqueo_certificado` / `liberar_bloqueo_certificado` (solo service_role). Reemplaza al `bloquear_certificado` con `pg_try_advisory_xact_lock` que proponía el plan: ese bloqueo se suelta al terminar la transacción de la RPC (cada llamada de PostgREST es una) y no serializa nada entre peticiones; uno de sesión se filtraría con el pool. Incluye el índice único parcial `operaciones_sii_efecto_global_en_curso`, que impide dos `solicitar_folios`/`postular`/`declarar` confirmadas en curso a la vez por empresa y ambiente. Verificación: `supabase/verificaciones/0007_bloqueos_sii.sql` (14); comportamiento: `rls-fase4-bloqueos.sql` (21, con `rollback`) |
 | `0008_certificacion` | 5 | **Aplicada** (2026-11-13, verificación 10/10 y simulación 16/16): RPC `registrar_caf` (XML del CAF a Vault + fila en `cafs` + solicitud `timbrada`, en una transacción; idempotente; la reutiliza la Fase 6) y `guardar_set_pruebas` (reemplaza los casos y deja el proceso en `set_descargado`, junto). Solo service_role; sin tablas ni políticas. Verificación: `supabase/verificaciones/0008_certificacion.sql` (10); simulación: `rls-fase5-certificacion.sql` (16, con `rollback`). En PGlite 10/10 y 16/16 |
 | `0009_autorizacion_externa` | 5 | **Aplicada** (2026-11-13, verificación 9/9 y simulación 12/12): trigger en `resoluciones` que, con una resolución de producción vigente, marca `empresas.autorizada_produccion` (empresas certificadas fuera de Boletéame: el SII les responde «sin trámite», no P91). Nunca desmarca. Verificación: `supabase/verificaciones/0009_autorizacion_externa.sql` (9); simulación: `rls-fase5-autorizacion-externa.sql` (12, con `rollback`). En PGlite 9/9 y 12/12 |
-| `0010_notificaciones` | 8 | Tabla `notificaciones` (tipo, clave de deduplicación, enviado_en) para alertas por correo |
-| `0011_planes_comerciales` | 10 | Grilla de planes definitiva (D5) |
-| `0012_pagos` | 10 | `pagos` y `eventos_pasarela` (idempotencia de webhooks de la pasarela) |
-| `0013_indices_fk` | 13 (o antes, con volumen) | Índices `concurrently` para las FK sin índice que reporta *Advisors* (sobre todo `organizacion_id`, que filtran las políticas RLS); una migración por índice o sin transacción |
+| `0010_verificar_autorizacion` | 5 | **Prevista** (decisión del usuario 2026-11-13): agrega el valor `verificar_autorizacion` (🔁, lectura) al enum `operacion_sii`, para auditar la consulta de `ad_empresa` (Fase 5, «Verificar autorización en el SII»). Solo eso: `alter type … add value` no se puede usar en la misma transacción que lo agrega. Sin tablas ni políticas nuevas (la resolución se registra con lo que ya existe y la marca la pone el trigger de la 0009). Verificación: `supabase/verificaciones/0010_verificar_autorizacion.sql` |
+| `0011_notificaciones` | 8 | Tabla `notificaciones` (tipo, clave de deduplicación, enviado_en) para alertas por correo |
+| `0012_planes_comerciales` | 10 | Grilla de planes definitiva (D5) |
+| `0013_pagos` | 10 | `pagos` y `eventos_pasarela` (idempotencia de webhooks de la pasarela) |
+| `0014_indices_fk` | 13 (o antes, con volumen) | Índices `concurrently` para las FK sin índice que reporta *Advisors* (sobre todo `organizacion_id`, que filtran las políticas RLS); una migración por índice o sin transacción |
 | `00NN_dte_factura` | 14 | Tipos 33/34/52/56/61, columnas de receptor (giro, dirección, comuna), forma de pago, vencimiento, tabla `documento_referencias`, documentos recibidos, RCV |
 
 Cada migración trae su verificación de solo lectura en `supabase/verificaciones/`. Los números son provisorios: el
@@ -425,6 +426,178 @@ proceso de boleta que implementa la librería:
 - [x] **Empresas autorizadas fuera de Boletéame** (decisión del usuario 2026-11-13, «caso (a)»): el SII no distingue «autorizada» de «nunca postuló» (ambas sin trámite), así que registrar una resolución de producción vigente marca la empresa como autorizada (trigger, migración `0009_autorizacion_externa`); el asistente lo muestra como «Autorizada fuera de Boletéame» y bloquea postular, descargar set, folios, envío, revisión y declaración; «Consultar estado en el SII» disponible desde el paso 1 (crea el proceso solo después de que el SII responde). Código listo sin desplegar (2026-11-13): trigger `trg_50_resolucion_autoriza_produccion` (nunca desmarca; idempotente; con ajuste de datos para resoluciones ya cargadas), candado `cargarEmpresaPorCertificar` en las 6 acciones (ensayo y confirmada, sin fila en `operaciones_sii`), `VistaAsistente.autorizacionExterna` y `resolucionProduccion`, aviso en Configuración → resoluciones. En PGlite: verificación 0009 9/9, simulación `rls-fase5-autorizacion-externa.sql` 12/12, y las de las Fases 3 y 5 siguen 43/43 y 16/16. Typecheck, Vitest (586), Biome, stylelint y build en verde. 0009 aplicada en producción el 2026-11-13 (21:05 UTC): verificación 9/9, simulación 12/12 con limpieza en 0, tipos sin diferencias, Advisors sin avisos nuevos. Deploy `581d124` READY. Resolución de producción de la empresa del piloto (20630500-2) registrada con `registrar_resolucion` como service_role: n.º 80 del 22-08-2014; el trigger la marcó `autorizada_produccion` y `autorizada_en` se fijó en la fecha real de autorización (06-11-2026); sin proceso de certificación creado. En *Production* (Chrome, sesión del propietario) `/servicio/certificacion` muestra «Autorizada fuera de Boletéame» con la resolución, sin pasos ni acciones; sin errores de consola ni de runtime en Vercel. Detalle menor visto y corregido (deploy `0d27c20`, verificado en *Production*: la sección ya no aparece para la empresa del piloto y Vercel sin errores de runtime): la columna lateral mostraba «Aún no hay folios de certificación. Se piden en el paso 3» y «La resolución de certificación se registra al postular» a una empresa autorizada; ahora, si la empresa está autorizada (P91 o fuera de Boletéame), esas indicaciones no aparecen y la sección «Folios de certificación» solo se muestra si tiene CAF o resolución de certificación.
 - [ ] Criterio de aceptación contra el SII de certificación — **pendiente por decisión del usuario (2026-11-13)**: hace falta otra empresa de prueba (certificado cuyo titular sea su representante legal), porque la única de producción ya está autorizada. Recorrido: postular → descargar set → solicitar folios → enviar set (EPR limpio) → solicitar revisión → P90 → declarar → P91, comparando las filas con las que deja la CLI y que ninguna fila, log ni Sentry tenga secretos.
 
+#### Verificar autorización en el SII (prevista, sin código)
+
+Decisión del usuario (2026-11-13): reemplazar, cuando se pueda, el registro manual de la
+resolución de producción (migración 0009) por una consulta al SII. El asistente
+«Actualización de datos del contribuyente» del portal de producción
+(`https://palena.sii.cl/cvc_cgi/dte/ad_empresa1` → `ad_empresa2`, con sesión AUT2000) dice
+si la empresa está autorizada para emitir con software de mercado y con qué resolución.
+
+**Validación** (2026-11-13, producción, solo lectura): script con
+`SolicitudFolios.autenticar` de la librería y el certificado del piloto; 3 logins; nunca se
+envió el formulario de actualización.
+
+| RUT consultado | Respuesta de `ad_empresa2` |
+|---|---|
+| Empresa autorizada que el titular representa (20630500-2) | «Antecedentes del Contribuyente registrados»: RUT, razón social, fecha de autorización (06-11-2026), fecha de resolución (22-08-2014), resolución (80), nombre del software, tres correos de contacto y URL. Trae un formulario con los botones `MOD_EMP` / `MOD_USU`, que actualizan los datos: **no se envía nunca** |
+| Empresa que el titular no representa, autorizada (90749000-9) o no (11111111-1, 12345678-5) | «Usted no está registrado en la empresa Rut … como Representante Legal, por lo que no podrá Actualizar los datos del Contribuyente.» |
+| RUT del titular con el DV malo (20630500-3) | «No ha sido posible completar su solicitud. Esto debido a que el Contribuyente no está autorizado para operar en esta modalidad.» |
+
+Qué se concluye:
+
+- **El SII revisa primero la representación legal y después la autorización.** Sin
+  representación la respuesta es la misma, esté o no autorizada la empresa: no sirve para
+  consultar cualquier RUT. El reporte original decía que un no representante de una empresa
+  no certificada recibe «no autorizado»; no se reprodujo.
+- **Con representación legal resuelve lo que «sin trámite» no distingue** (autorizada o
+  nunca postuló) y trae `NroResol` / `FchResol` sin que el usuario los escriba. Es la misma
+  página de la que se sacó a mano el 80 / 2014-08-22 del piloto
+  (`packages/certificacion/docs/validaciones.md`).
+- **Exige representante legal en el SII.** No basta el representante electrónico
+  (`empresa_certificados.representante`) ni un usuario autorizado: en ese caso se vuelve al
+  registro manual de la 0009.
+- **Sin validar: boleta frente a factura.** La página habla de «esta modalidad» (software de
+  mercado), no de boleta. La fecha de autorización del piloto coincide con su certificación
+  de boleta (2026-11-06), pero falta una empresa certificada solo para factura con que
+  comparar. Si una así aparece como autorizada, la marca sería falsa para boletas. La
+  mitigación es la misma que la de la 0009: el SII rechaza igual los envíos de producción.
+- **La página trae datos personales** (correos, URL, nombre del software): no se guardan
+  ni se registran, y el HTML nunca va a logs ni a Sentry.
+
+**Fuente de apoyo: situación tributaria de terceros (STC).** La consulta pública
+<https://www2.sii.cl/stc/noauthz> es una SPA. Por detrás llama a
+`POST https://www2.sii.cl/app/stc/recurso/v1/consulta/getConsultaData/` con
+`{ rut, dv, reAction: "consultaSTC", reToken }`, sin login ni certificado. Usa reCAPTCHA
+Enterprise v3, pero `GET /app/stc/recurso/v1/recaptcha/key` respondía `enable: false` y la
+consulta funcionaba con `reToken: " "`. La tabla «Documentos autorizados» sale del campo
+`timbrajes` (`codigo`, `descripcion`, `fechaTimbraje` = año del último timbraje,
+`folioFinal` = último folio timbrado): es el **historial de timbraje**, no las
+autorizaciones. Validado el 2026-11-13 con 2 consultas:
+
+| RUT | `timbrajes` |
+|---|---|
+| 20630500-2 (piloto, certificado solo en boleta) | solo `0039 Boleta Electronica`, año 2026, folio final 5, que es el CAF de producción 1–5 |
+| 90749000-9 | 25 tipos: papel (30, 35, 50…), electrónicos 33, 34, 46, 52, 56, 61, 110–112, libros |
+
+- **Un tipo aparece solo cuando ya se le timbraron folios.** La boleta exenta (41) del piloto
+  no aparece porque nunca se le pidieron folios. Tampoco aparece la factura: la
+  certificación de boleta solo autoriza 39/41, y la factura tiene la suya (H3, Fase 14).
+- **`0039` o `0041` en `timbrajes` prueba que la empresa está autorizada para boletas**,
+  porque el SII no timbra folios de producción de esos tipos sin autorización. Sirve para
+  **cualquier RUT**, sin representación legal.
+- **Que falten no prueba nada**: una empresa recién certificada no tiene timbrajes (el
+  piloto no los tuvo entre el 06-11 y el 10-11).
+- **No resuelve la duda de boleta frente a factura en `ad_empresa`**: para una empresa
+  solo-factura no hay representación con la que consultar `ad_empresa`.
+- **Es frágil**: el SII puede encender el captcha cuando quiera. Por eso solo apoya y nunca
+  es requisito. Tampoco se intenta resolver el captcha.
+- La respuesta trae mucho más (nombre, giros, observaciones, actividades): solo se usa
+  `timbrajes`.
+
+**Diseño:**
+
+1. **Librería** (principio 4: la app no reimplementa nada). Clase `ConsultaAutorizacion` en
+   `packages/certificacion/packages/core`, junto a `SolicitudFolios` (usa la misma sesión
+   AUT2000). Solo producción (`palena.sii.cl`). `consultar(sesion, rut)` devuelve
+   `{ tipo: 'autorizada', rut, razonSocial, fechaAutorizacion, resolucion: { numero, fecha } }`,
+   `{ tipo: 'sin_representacion' }` o `{ tipo: 'no_autorizada' }`. Candados:
+   - solo `GET ad_empresa1` y `POST ad_empresa2`, con `RUT_EMP`, `DV_EMP` y `ACEPTAR`, por
+     https al host del ambiente;
+   - nunca envía un formulario de `ad_empresa2`, porque ese actualiza los datos;
+   - el RUT de la respuesta tiene que ser el pedido;
+   - una página que no reconoce lanza un error de verificación (código 7), sin copiar el
+     HTML.
+
+   Pruebas con páginas grabadas (sin los correos) en `paridad/`. CLI
+   `sii produccion autorizacion [rut]` (🔁, sin `--confirmar`) y herramienta MCP
+   `produccion_autorizacion`.
+
+   Para el STC, la clase `SituacionTributaria` (sin sesión ni certificado, solo
+   `www2.sii.cl` por https). `timbrajes(rut)` devuelve `{ tipo: 'ok', timbrajes: [{ tipoDte,
+   ultimoAnio, folioFinal }] }`, con los números ya limpios (`"0039"` → 39, el folio sin los
+   espacios de relleno), o `{ tipo: 'captcha' }` si `recaptcha/key` dice `enable: true`;
+   en ese caso no consulta. Descarta el resto de la respuesta y lanza un error de
+   verificación (7) si cambia la forma. CLI `sii util situacion-tributaria <rut>` y
+   herramienta MCP `util_situacion_tributaria`.
+2. **Migración `0010_verificar_autorizacion`**: el valor `verificar_autorizacion` en
+   `operacion_sii` (§6). No entra en `OPERACIONES_QUE_GRABAN` ni en
+   `OPERACIONES_EFECTO_GLOBAL`.
+3. **App**: `verificarAutorizacion(ctx)` en `server/certificacion/autorizacion.ts` (Server
+   Action `verificarAutorizacion`, propietario o administrador). Es 🔁 y no tiene ensayo,
+   igual que `consultarEstadoDeclaracion`. La fila de `operaciones_sii` va con
+   `ambiente = 'produccion'` (el resto del asistente usa `certificacion`). Usa el
+   certificado predeterminado y la sesión de producción con `conBloqueoCertificado` +
+   `conSesionReutilizada` (el SII frena el re-login). Según la respuesta:
+   - `autorizada`: registra la resolución de producción con el número y la fecha del SII.
+     Si ya hay una vigente igual, no hace nada; si es distinta, la del SII queda vigente y
+     la anterior pasa al historial. El trigger de la 0009 marca `autorizada_produccion`. Si
+     la empresa no estaba autorizada, fija `autorizada_en` en la fecha de autorización del
+     SII (service_role). Mensaje: «El SII confirma que la empresa está autorizada desde el
+     06-11-2026 (Resolución n.º 80 del 22-08-2014)».
+   - `sin_representacion`: no cambia nada. «El titular del certificado no figura como
+     representante legal de la empresa en el SII, así que no pudimos verificar la
+     autorización. Si la empresa ya está certificada, registra su resolución de
+     producción.»
+   - `no_autorizada`: no cambia nada (la marca nunca se quita). «El SII indica que la
+     empresa no está autorizada para emitir con software propio: certifícala con el
+     asistente.» Si ya estaba marcada por una resolución registrada a mano, muestra un
+     aviso para revisarla.
+   - **STC, en la misma operación** (una fila, sin otro valor del enum): después de
+     `ad_empresa`, y con cualquier respuesta, se consultan los timbrajes. Su resultado
+     nunca bloquea ni cambia lo de arriba, solo el mensaje:
+     - `autorizada` y timbrajes 39/41: «… y ya timbró folios de boleta electrónica».
+     - `autorizada` sin timbrajes 39/41: la marca se pone igual, con un aviso: «El SII
+       todavía no registra folios de boleta timbrados. Si la empresa se certificó solo para
+       factura, no podrá emitir boletas.»
+     - `sin_representacion` y timbrajes 39/41: no se marca (el STC no trae la resolución).
+       «El SII registra folios de boleta electrónica timbrados (el último en <año>): la
+       empresa ya emite boletas. Registra su resolución de producción.»
+     - STC con captcha, error o sin timbrajes: no cambia nada.
+   - `detalle`: `respuesta` (uno de los tres tipos) y, si está autorizada, `nro_resol`,
+     `fch_resol` y `fecha_autorizacion`; además `stc` (`boleta`, `sin_boleta` o
+     `no_disponible`) y, con `boleta`, `stc_ultimo_anio`. Nunca correos, URL ni nombre del
+     software, ni nada más del STC.
+4. **UI**: en el paso 1, «Verificar autorización en el SII» es la primera opción para una
+   empresa que ya está certificada, antes de registrar la resolución a mano. También se
+   ofrece después de un «sin trámite» y en *Configuración → Empresas → Resoluciones*
+   («Traer del SII»). No tiene el candado `empresa_autorizada`: es de lectura y sirve para
+   actualizar la resolución.
+5. **Otros usos del STC, solo si hacen falta** (no comprometidos; cada uno se decide con el
+   usuario). Como no exige certificado, puede ir donde `ad_empresa` no llega:
+   - **Alta de la empresa** (Fase 3, antes de subir el certificado): una pista en el
+     formulario si la empresa ya timbró boletas electrónicas («parece que ya emite boletas
+     electrónicas: no hace falta certificarla»), sin marcar nada.
+   - **Folios** (Fase 6): comparar `folioFinal` de 39/41 con los CAF registrados, para
+     avisar que hay folios timbrados fuera de Boletéame (otro software) antes del primer
+     timbraje.
+   - **Facturas** (Fase 14): la misma evidencia para 33, 34, 56 y 61.
+
+   Si se activa alguno, se usa la misma clase de la librería, se registra en
+   `operaciones_sii` como parte de la operación que lo origina y se respetan las mismas
+   reglas: nunca es requisito y con captcha se omite.
+
+**Pendientes:**
+
+- [ ] Validar con una empresa certificada solo para factura si la respuesta distingue
+  boleta de factura. Si no la distingue, decidir con el usuario si la marca automática se
+  queda o si la consulta solo propone la resolución.
+- [ ] Librería: `ConsultaAutorizacion` y `SituacionTributaria`, CLI, MCP y pruebas con
+  páginas y respuestas grabadas (también `enable: true` en `recaptcha/key` y una forma de
+  respuesta desconocida).
+- [ ] Migración `0010_verificar_autorizacion` aplicada y verificada; tipos regenerados.
+- [ ] App y UI con pruebas (Supabase falso y doble de la librería): los tres tipos de
+  respuesta de `ad_empresa` combinados con `boleta` / `sin_boleta` / `no_disponible` del
+  STC, página desconocida, RUT distinto, sin certificado, y ninguna fila con secretos ni
+  correos.
+- [ ] Prueba real en *Production* con la empresa del piloto. Como ya está marcada, todo
+  tiene que quedar igual (misma resolución), con una fila `verificar_autorizacion` en `ok`
+  y `stc = 'boleta'`.
+- [ ] Documentación: pasar de «prevista» a hecha
+  (`documentación/02-guias/certificacion-empresa.md`, `07-referencia/trampas-conocidas.md`,
+  `03-api-reference/servicios-sii.md`, `indice-operaciones.md` y
+  `04-objetos/objetos-auditoria-e-integraciones.md`).
+
 Decisiones tomadas en la fase (detalle en `documentación/07-referencia/trampas-conocidas.md`, «Fase 5»): el ensayo nunca sale al SII ni deja filas (la simulación de folios contra el SII queda para la Fase 6); el paso 3 son dos operaciones confirmables (solicitar folios y enviar el set) para no pasar `maxDuration`; el set va por REST (D7); `enviar_set` tiene su propio bloqueo por incierto (`bloqueoEnvioSet`) porque no es de efecto global; `postular` registra la resolución de certificación (número 0, fecha de la postulación en Chile) si falta; P91 no descarga set; un set ilegible no avanza la etapa; un rechazo sin Track ID anula los folios y un Track ID que no se pudo guardar es incierto; `declarar` exige `por_declarar` (consultar antes el estado).
 
 ### Fase 6 — Folios (CAF)
@@ -432,6 +605,7 @@ Decisiones tomadas en la fase (detalle en `documentación/07-referencia/trampas-
 1. Vista `/[org]/folios`: un `MedidorFolios` por tipo y ambiente (`v_folios_disponibles`), historial de CAF y de `solicitudes_folios`.
 2. **Solicitar folios** con `SolicitudFolios` (asistente `of_*`): ensayo (`simulada`) y confirmación (`timbrada`). `folio_inicial` solo si el SII lo pide (primer timbraje). Requiere certificado de representante electrónico.
 3. **Estado `incierta`:** bloquear el reintento y guiar para bajar el CAF desde «Folios ya autorizados» del SII.
+4. *(Opcional, si hace falta; Fase 5, «Otros usos del STC»)*: avisar si el STC muestra folios de 39/41 timbrados más allá de los CAF registrados (folios de otro software).
 4. **Subir un CAF** existente (XML): validar IDK (100/300) contra el ambiente, RUT y tipo; el XML completo (con `RSASK`) va a Vault.
 5. Anular folios no usados (`folios_anulados`, administradores).
 6. Alerta `folios.por_agotarse` (correo + webhook) al cruzar el 15 %; el botón de emitir se deshabilita si el CAF se agotó, como pide la guía del `MedidorFolios`.
@@ -537,7 +711,7 @@ certificación:
 - Generador y armador de DTE 33, 34, 52, 56 y 61 (con referencias), y sobre `EnvioDTE` por DTEUpload.
 - Intercambio entre contribuyentes (recepción, acuse de recibo, aceptación/reclamo), documentos recibidos.
 - Registro de Compras y Ventas.
-- Certificación de factura: set, simulación, intercambio y muestras de impresión (los 6 pasos de la plantilla).
+- Certificación de factura: set, simulación, intercambio y muestras de impresión (los 6 pasos de la plantilla). Es aparte de la de boleta: certificarse en boleta no habilita factura (el STC del piloto solo muestra `0039`). Para empresas ya autorizadas fuera de Boletéame, los timbrajes 33/34/56/61 del STC sirven de evidencia (Fase 5, «Otros usos del STC»).
 - Migración `00NN_dte_factura` y activación de los ítems ocultos del menú y de «Anular con nota de crédito».
 
 ---
@@ -579,6 +753,8 @@ certificación:
 | Re-login AUT2000 frenado por el SII | Reutilizar `sesiones_sii` y bloqueo por certificado (migración `bloqueos_sii`) |
 | Doble envío tras un resultado incierto | Bloqueo de reintento en UI y API; guía para revisar en el SII |
 | Fuga de secretos (pfx, tokens, CAF) | Vault, cifrado AES-GCM, `server-only`, depuración en Sentry con prueba automática |
+| `ad_empresa` (verificar autorización) da por autorizada para boletas a una empresa certificada solo para factura | Validarlo antes de activar la marca automática (Fase 5); el STC avisa cuando no hay timbrajes de boleta; si la marca es falsa, el SII rechaza igual los envíos de producción; la consulta nunca quita una marca |
+| El SII enciende el reCAPTCHA de la consulta de situación tributaria (STC) | Solo es fuente de apoyo: con `enable: true` se omite (`stc = 'no_disponible'`) y nada depende de ella; no se intenta resolver el captcha |
 | Cambios del portal del SII (GWT, formularios `of_*`) | `verificar_portal` antes de operar; alertas de código 7; la librería tiene pruebas de paridad para ajustar rápido |
 | Una sola base (producción) para desarrollo y *Production*: un error de desarrollo o una migración mala toca datos reales | Migraciones aditivas con `db push --dry-run` y respaldo previo; verificación de solo lectura después; pruebas de escritura solo dentro de `begin … rollback`; organizaciones de prueba identificadas y borradas al terminar; PITR (Fase 13) |
 | Expectativa de factura por las plantillas | Ocultar lo no soportado y textos del sitio honestos sobre el alcance |

@@ -34,6 +34,7 @@ emisor ve la página (`leerAsistente`) pero no las acciones. Detalle en
 | `consultarEstadoDeclaracion(ctx)` | `consultarEstadoDeclaracion` | 🔁 | no | `estado_declaracion` | proceso (código, glosa, paso; el trigger mueve P90/P91); si no existe, lo crea en `borrador` (service_role) tras la respuesta del SII. Disponible desde `borrador` |
 | `declarar(ctx, { confirmada })` | `declarar` | ⚠️ | sí | `verificar_portal` + `declarar` | proceso (`declarada_en`, estado SII) |
 | `marcarRevisada(ctx, operacionId)` | `marcarRevisada` | no | — | — | `operaciones_sii.detalle.revisada_en` (vía `marcarInciertaRevisada`) |
+| `verificarAutorizacion(ctx)` (**prevista**, sin código) | `verificarAutorizacion` | 🔁 (producción) | no | `verificar_autorizacion` (migración 0010) | si el SII la da por autorizada: `resoluciones` de producción (el trigger de la 0009 marca la empresa) y `empresas.autorizada_en` con la fecha del SII (service_role); si no, nada ([guía](../02-guias/certificacion-empresa.md#verificar-la-autorización-en-el-sii-prevista)) |
 
 `ctx` es `ContextoCertificacion` (`organizacionId`, `empresaId`, `usuarioId`), armado por la
 Server Action desde la membresía verificada. Todas devuelven `ResultadoPaso`

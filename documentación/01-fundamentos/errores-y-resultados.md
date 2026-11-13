@@ -201,7 +201,8 @@ tampoco registra nada). Solo las confirmadas pasan por `ejecutarOperacion`
 `OPERACIONES_QUE_GRABAN` (⚠️): `postular`, `descargar_set`, `solicitar_folios`,
 `enviar_set`, `solicitar_revision`, `declarar`, `enviar_rcof`, `emitir`. El resto del
 enum `operacion_sii` (`autenticar`, `obtener_token`, `estado_envio`, `verificar_portal`,
-`estado_declaracion`, `consultar_envio`, `seguimiento`) es de lectura 🔁.
+`estado_declaracion`, `consultar_envio`, `seguimiento`) es de lectura 🔁. También lo será
+`verificar_autorizacion`, previsto en la migración `0010_verificar_autorizacion`.
 
 ## `getUser()` antes de las operaciones ⚠️
 

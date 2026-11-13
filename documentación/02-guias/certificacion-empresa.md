@@ -1,7 +1,7 @@
 ---
 title: "Certificación de la empresa ante el SII"
 description: "El asistente de la Fase 5: los 5 pasos visibles y las 8 etapas de procesos_certificacion, qué hace cada acción en el SII y en la base, ensayo y confirmación, operaciones inciertas y cómo revisarlas, roles, avisos y actualización en vivo."
-keywords: [certificación, asistente, /certificacion, server/certificacion, ResultadoPaso, ResumenEnsayo, ensayo, confirmada, Dialogo, PASOS, ETAPAS, pasoDeEtapa, estadoPaso, postular, guardarDatosPostulacion, ASCII imprimible, verificar_portal, descargarSet, solicitarFoliosSet, enviarSet, consultarEstadoSet, solicitarRevision, consultarEstadoDeclaracion, declarar, guardarDatosDeclaracion, marcarRevisada, bloqueoEnvioSet, incierto, Marcar como revisada, comoRevisar, P90, P91, autorizada_produccion, resolución número 0, puedeAdministrar, lector, emisor, EnVivo, Realtime, correoCertificacion, Idempotency-Key, certificacion.actualizada, maxDuration, autorizada fuera de Boletéame, autorizacionExterna, resolucionProduccion, tipoAutorizacion, ErrorEmpresaAutorizada, empresa_autorizada, cargarEmpresaPorCertificar, sin trámite, resolución de producción, tg_resolucion_autoriza_produccion, 0009]
+keywords: [certificación, asistente, /certificacion, server/certificacion, ResultadoPaso, ResumenEnsayo, ensayo, confirmada, Dialogo, PASOS, ETAPAS, pasoDeEtapa, estadoPaso, postular, guardarDatosPostulacion, ASCII imprimible, verificar_portal, descargarSet, solicitarFoliosSet, enviarSet, consultarEstadoSet, solicitarRevision, consultarEstadoDeclaracion, declarar, guardarDatosDeclaracion, marcarRevisada, bloqueoEnvioSet, incierto, Marcar como revisada, comoRevisar, P90, P91, autorizada_produccion, resolución número 0, puedeAdministrar, lector, emisor, EnVivo, Realtime, correoCertificacion, Idempotency-Key, certificacion.actualizada, maxDuration, autorizada fuera de Boletéame, autorizacionExterna, resolucionProduccion, tipoAutorizacion, ErrorEmpresaAutorizada, empresa_autorizada, cargarEmpresaPorCertificar, sin trámite, resolución de producción, tg_resolucion_autoriza_produccion, 0009, verificar autorización, verificarAutorizacion, verificar_autorizacion, ad_empresa, representante legal, 0010, STC, situación tributaria, timbrajes]
 related: ["05-pruebas/set-de-pruebas.md", "02-guias/folios-caf.md", "04-objetos/objetos-certificacion.md", "03-api-reference/indice-operaciones.md", "03-api-reference/servicios-sii.md", "01-fundamentos/errores-y-resultados.md", "03-api-reference/rpc-backend.md", "07-referencia/trampas-conocidas.md"]
 source: ["supabase_saas_sii.sql §12", "certificacion-node/docs/postulacion.md", "certificacion-node/docs/certificacion.md", "PLAN-SAAS.md Fase 5", "apps/web/src/server/certificacion/", "apps/web/src/lib/certificacion.ts", "apps/web/src/app/[org]/certificacion/", "packages/correos/src/certificacion.ts", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql"]
 ---
@@ -19,7 +19,9 @@ Una empresa que ya se certificó **fuera de Boletéame** no recorre los pasos: r
 resolución de producción y el asistente la muestra como «Autorizada fuera de Boletéame»
 ([abajo](#empresa-autorizada-fuera-de-boletéame)). Eso usa la migración
 `0009_autorizacion_externa`, aplicada en producción el 2026-11-13
-([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0009)).
+([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0009)). Está prevista una
+consulta al SII que traiga esa resolución sola cuando el titular del certificado es
+representante legal ([abajo](#verificar-la-autorización-en-el-sii-prevista)).
 
 La app no reimplementa nada de la librería `@winex/certificacion` (principio 4): cada
 acción tiene paridad con un comando `sii certificacion …` de la CLI y solo agrega
@@ -78,6 +80,36 @@ Por eso (decisión del usuario, 2026-11-13):
    (enlace a las resoluciones de la empresa) en vez de postular. Con «sin trámite» en
    `borrador`, la consulta responde «El SII no tiene una certificación en curso para la
    empresa» y explica los dos caminos.
+
+### Verificar la autorización en el SII (prevista)
+
+**Estado: prevista, sin código** (decisión del usuario 2026-11-13; PLAN-SAAS, Fase 5,
+«Verificar autorización en el SII»). Sirve para no tener que escribir la resolución a mano.
+
+La página «Actualización de datos del contribuyente» del portal de producción
+(`ad_empresa1` / `ad_empresa2` en `palena.sii.cl`) confirma la autorización y entrega el
+número y la fecha de la resolución, **pero solo si el titular del certificado es
+representante legal de la empresa en el SII**
+([trampas](../07-referencia/trampas-conocidas.md#datos-de-la-empresa-autorizada-en-el-sii-ad_empresa-prevista)).
+Cómo se va a usar:
+
+- **Acción** «Verificar autorización en el SII» 🔁, sin ensayo: en el paso 1 (primera
+  opción para una empresa que ya está certificada), después de un «sin trámite» y en
+  *Configuración → Empresas → Resoluciones* («Traer del SII»). No tiene el candado
+  `empresa_autorizada`.
+- **Autorizada:** registra la resolución de producción del SII, y el trigger de la 0009 marca
+  la empresa. `autorizada_en` queda con la fecha de autorización que informa el SII.
+- **Titular sin representación legal:** no cambia nada y ofrece el registro manual de arriba.
+- **No autorizada:** no cambia nada (la marca nunca se quita) y ofrece certificarla.
+- **Apoyo del STC** (consulta pública de situación tributaria, sin certificado): en la misma
+  operación se miran los timbrajes. Si hay de boleta (39/41), se confirma; si la empresa
+  está autorizada pero no hay, se avisa que podría estar certificada solo para factura; si
+  el titular no es representante y hay timbrajes de boleta, se le dice que la empresa ya
+  emite boletas y que registre su resolución. Nunca marca ni bloquea, y con captcha se
+  omite ([trampas](../07-referencia/trampas-conocidas.md#situación-tributaria-de-terceros-stc-fuente-de-apoyo-prevista)).
+- **Auditoría:** `operacion_sii = 'verificar_autorizacion'` (migración `0010`, prevista), con
+  `ambiente = 'produccion'`. No guarda correos, URL ni nombre del software.
+- **Sin validar:** si una empresa certificada solo para factura aparece como autorizada.
 
 ## Roles
 

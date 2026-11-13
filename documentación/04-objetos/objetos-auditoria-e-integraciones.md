@@ -68,6 +68,7 @@ organización, empresa, operación, ambiente, `confirmada = true` y
 | `enviar_rcof` 🕰️ | ⚠️ sí | no |
 | `emitir` | ⚠️ sí | no aquí: por documento (`envios.incierto`, Fase 7) |
 | `consultar_envio`, `seguimiento` | 🔁 no | no |
+| `verificar_autorizacion` (**previsto**, migración `0010_verificar_autorizacion`) | 🔁 no | no |
 
 ### Qué guarda la capa en `detalle`
 
@@ -110,6 +111,7 @@ llegan por Realtime: no pongas ahí nada que un lector no deba ver.
 | `solicitar_revision` | `track_id` | — |
 | `estado_declaracion` | `codigo_estado`, `paso` | — |
 | `declarar` | `codigo_estado` | — |
+| `verificar_autorizacion` (**prevista**; la única con `ambiente = 'produccion'`) | `respuesta` (`autorizada`, `sin_representacion` o `no_autorizada`); si está autorizada, `nro_resol`, `fch_resol` y `fecha_autorizacion`; del STC, `stc` (`boleta`, `sin_boleta` o `no_disponible`) y, con `boleta`, `stc_ultimo_anio`. Nunca correos, URL ni nombre del software, ni otros datos del STC | — |
 
 Los ensayos del asistente no dejan fila
 ([guía](../02-guias/certificacion-empresa.md#ensayo-y-confirmación)).

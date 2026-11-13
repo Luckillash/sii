@@ -1,7 +1,7 @@
 ---
 title: "Servicios del SII que usa el backend"
 description: "Endpoints REST, SOAP, AUT2000, asistentes y portal GWT, con el método de la librería y la operación de auditoría; cómo los llama la capa SII."
-keywords: [servicios del SII, REST, SOAP, DTEWS, AUT2000, asistente, portal, ClienteBoletaRest, ClienteDtews, SolicitudFolios, PostulacionSii, TokenStore, SesionSii, operacion_sii, canal_sii, ejecutarOperacion, conBloqueoCertificado, conSesionReutilizada, crearTransporte, DeclaracionBoletas, verificarPortal, descargarSetPruebas, solicitarRevisionSet, declarar, enviarBoleta, consultarEnvio, www4, FABRICAS_SII, asistente de certificación]
+keywords: [servicios del SII, REST, SOAP, DTEWS, AUT2000, asistente, portal, ClienteBoletaRest, ClienteDtews, SolicitudFolios, PostulacionSii, TokenStore, SesionSii, operacion_sii, canal_sii, ejecutarOperacion, conBloqueoCertificado, conSesionReutilizada, crearTransporte, DeclaracionBoletas, verificarPortal, descargarSetPruebas, solicitarRevisionSet, declarar, enviarBoleta, consultarEnvio, www4, FABRICAS_SII, asistente de certificación, ad_empresa, ConsultaAutorizacion, verificar_autorizacion, STC, getConsultaData, SituacionTributaria, timbrajes]
 related: ["01-fundamentos/ambientes-y-credenciales.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md", "09-libreria/mapeo-libreria-tablas.md", "04-objetos/objetos-auditoria-e-integraciones.md"]
 source: ["certificacion-node/docs/canales.md", "certificacion-node/docs/folios.md", "certificacion-node/docs/postulacion.md", "apps/web/src/server/sii/", "apps/web/src/server/certificacion/"]
 ---
@@ -37,7 +37,7 @@ autentica:
 ## Asistente de certificación (Fase 5)
 
 Lo que llama `apps/web/src/server/certificacion/`, siempre en el ambiente
-`certificacion`. Los clientes de la librería se crean por fábrica en
+`certificacion` (salvo `verificarAutorizacion`, prevista, que consulta producción). Los clientes de la librería se crean por fábrica en
 `dependencias.ts` (`FABRICAS_SII`), uno por operación y con el transporte de esa
 invocación. Las que usan sesión AUT2000 la abren con `PostulacionSii.autenticar` o
 `SolicitudFolios.autenticar` (el mismo login; la sesión sirve para maullin y www4) dentro
@@ -54,6 +54,8 @@ de `conBloqueoCertificado` + `conSesionReutilizada` (`conSesionSii` de `comun.ts
 | `solicitarRevision` | `www4.sii.cl` | `DeclaracionBoletas.solicitarRevisionSet(sesion, rut, trackId)` | `solicitar_revision` | ⚠️ | `SetSinDescargarError` (5): la app le agrega qué hacer (descargar un set nuevo y enviarlo) |
 | `consultarEstadoDeclaracion` | `www4.sii.cl` | `DeclaracionBoletas.estado(sesion, rut)` | `estado_declaracion` | 🔁 (sin ensayo) | — |
 | `declarar` | `www4.sii.cl` | `DeclaracionBoletas.declarar(sesion, DatosDeclaracion)` (solo en P90) | `declarar` | ⚠️ (efecto global; deja la empresa autorizada) | `DeclaracionInciertaError` (6): consultar el estado antes de repetir; `ErrorPostulacion` si no está en P90 (5) |
+| `verificarAutorizacion` (**prevista**, sin código) | `palena.sii.cl` (`cvc_cgi/dte/ad_empresa1` → `ad_empresa2`), **producción** | `ConsultaAutorizacion.consultar(sesion, rut)` (por agregar a la librería; sesión de `SolicitudFolios.autenticar` en producción) | `verificar_autorizacion` (migración 0010, prevista), `ambiente = 'produccion'` | 🔁 (sin ensayo; nunca envía el formulario de actualización de `ad_empresa2`) | página que no reconoce o RUT distinto → verificación fallida (7). Solo responde si el titular es representante legal ([trampas](../07-referencia/trampas-conocidas.md#datos-de-la-empresa-autorizada-en-el-sii-ad_empresa-prevista)) |
+| (dentro de `verificarAutorizacion`, **prevista**) | `www2.sii.cl` (`/app/stc/recurso/v1/recaptcha/key` y `/consulta/getConsultaData/`, públicos, sin login ni certificado) | `SituacionTributaria.timbrajes(rut)` (por agregar a la librería) | la misma fila `verificar_autorizacion` (`detalle.stc`) | 🔁 (solo apoyo) | captcha encendido → `{ tipo: 'captcha' }`, se omite; forma desconocida → verificación (7), que la app trata como `stc = 'no_disponible'` sin fallar la operación ([trampas](../07-referencia/trampas-conocidas.md#situación-tributaria-de-terceros-stc-fuente-de-apoyo-prevista)) |
 
 - **Ensayo sin red.** Con `confirmada: false` ninguna de estas acciones sale al SII ni
   inserta filas en `operaciones_sii` (ni `verificar_portal`): validan datos, empresa,

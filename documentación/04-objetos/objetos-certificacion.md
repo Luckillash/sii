@@ -107,6 +107,9 @@ esa etapa.
   muestra «Autorizada fuera de Boletéame» en lugar de los pasos. Ese trigger no crea ni
   mueve el proceso
   ([guía](../02-guias/certificacion-empresa.md#empresa-autorizada-fuera-de-boletéame)).
+  Está previsto que esa resolución la registre también `verificarAutorizacion` con lo que
+  responde el SII, sin cambiar esta regla
+  ([guía](../02-guias/certificacion-empresa.md#verificar-la-autorización-en-el-sii-prevista)).
 
 ### Lo que devuelve `leerAsistente` (`VistaAsistente`)
 

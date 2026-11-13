@@ -410,3 +410,41 @@ receptor genérico, folios 2–5 (`data/piloto/boleta-<folio>.json`).
 
 **Resultado: OK.** El CAF de producción 1–5 quedó usado completo. El seguimiento diario
 automático sigue hasta el 2026-11-24.
+
+### Datos de la empresa autorizada: `ad_empresa` (2026-11-13)
+
+Consulta de solo lectura a la página «Actualización de datos del contribuyente» de
+producción, con el certificado del `.env` y un script de prueba (no es un comando de la
+CLI). El script hace `SolicitudFolios.autenticar` en producción, `GET
+palena.sii.cl/cvc_cgi/dte/ad_empresa1` y `POST ad_empresa2` con `RUT_EMP`, `DV_EMP` y
+`ACEPTAR`. Hubo 3 logins y nunca se envió el formulario de actualización que muestra
+`ad_empresa2`.
+
+| RUT | Respuesta |
+|---|---|
+| 20630500-2 (la empresa del `.env`) | Antecedentes registrados: autorización 06-11-2026, resolución **80 del 22-08-2014** (igual a `SII_PRODUCCION_NRO_RESOL` / `SII_PRODUCCION_FCH_RESOL`), nombre del software, correos y URL |
+| 90749000-9, 11111111-1, 12345678-5 | «Usted no está registrado en la empresa Rut … como Representante Legal…» |
+| 20630500-3 (DV erróneo) | «… el Contribuyente no está autorizado para operar en esta modalidad.» |
+
+**Resultado: OK.** La página confirma la autorización y la resolución de producción, pero
+solo cuando el titular del certificado es representante legal. Sin representación, la
+respuesta no dice nada de la autorización. Su uso en el SaaS está en
+`PLAN-SAAS.md` (Fase 5, «Verificar autorización en el SII»).
+
+### Situación tributaria de terceros: timbrajes (2026-11-13)
+
+Consulta pública, sin certificado, con `curl`. Primero `GET
+www2.sii.cl/app/stc/recurso/v1/recaptcha/key`, que respondió `enable: false`. Después
+`POST /app/stc/recurso/v1/consulta/getConsultaData/` con
+`{ rut, dv, reAction: "consultaSTC", reToken: " " }`, que respondió 200 con
+`captchaInvalido: false`.
+
+| RUT | `timbrajes` |
+|---|---|
+| 20630500-2 (la empresa del `.env`) | solo `0039 Boleta Electronica`, año 2026, `folioFinal` 5 (el CAF de producción 1–5) |
+| 90749000-9 | 25 tipos, de papel y electrónicos (33, 34, 46, 52, 56, 61, 110–112) |
+
+**Resultado: OK.** «Documentos autorizados» es el historial de timbraje, no la lista de
+autorizaciones: la empresa del `.env` está certificada solo en boleta, y la 41 no aparece
+porque nunca se timbró. Su uso en el SaaS está en `PLAN-SAAS.md` (Fase 5, «Fuente de
+apoyo: situación tributaria de terceros»).
