@@ -101,9 +101,9 @@ conectado a `Luckillash/sii`. **Solo se trabaja en *Production*:** no se usan de
 | Variables de sistema | expuestas (Sentry usa `NEXT_PUBLIC_VERCEL_ENV` y el SHA del commit) |
 | Dominios | `boleteame.dev` (principal, DNS en Vercel); `www.boleteame.dev` redirige con 308 al apex; `timbre-livid.vercel.app` sigue activo |
 
-Variables cargadas: `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` (clave
+Variables cargadas: `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (clave
 publicable `sb_publishable_…`), en *Production* y *Development*. El resto (Supabase
-`service_role`, SII, cron, Sentry, Resend, Turnstile y `NEXT_PUBLIC_APP_URL=https://boleteame.dev`)
+`SUPABASE_SECRET_KEY` `sb_secret_…`, SII, cron, Sentry, Resend, Turnstile y `NEXT_PUBLIC_APP_URL=https://boleteame.dev`)
 va solo en *Production*. Las `NEXT_PUBLIC_*` (`NEXT_PUBLIC_APP_URL`,
 `NEXT_PUBLIC_TURNSTILE_SITE_KEY`) se incrustan al compilar: si cambian, hay que volver a
 desplegar, y la ruta `<NEXT_PUBLIC_APP_URL>/auth/callback**` debe estar en las *Redirect URLs*

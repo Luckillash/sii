@@ -1,10 +1,14 @@
 'use server';
 
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { destinoSeguro } from '@/lib/redireccion';
 import { RUTA_BIENVENIDA } from '@/lib/rutas';
 import { envAuth } from '@/server/env';
-import { clienteServidor } from '@/server/supabase/servidor';
+import { clienteAuth, clienteServidor } from '@/server/supabase/servidor';
+import type { Database } from '@/server/supabase/tipos';
+import { ipCliente, verificarTurnstile } from '@/server/turnstile';
 import {
   type ContextoAuth,
   type ErrorAuth,
@@ -22,13 +26,17 @@ import {
 } from './_compartido/esquemas';
 import type { EstadoAuth } from './_compartido/estado';
 
-// Server Actions de las pantallas de acceso (PLAN-SAAS Fase 2). Corren con el cliente
-// de sesión (`clienteServidor()`), que escribe las cookies de la sesión y del
-// verificador PKCE. Cada una valida con zod aunque el formulario ya lo haya hecho.
+// Server Actions de las pantallas de acceso (PLAN-SAAS Fase 2). Ingresar, crear cuenta
+// y recuperar usan `clienteAuth()`, que reenvía la IP real a Auth si hay
+// SUPABASE_SECRET_KEY; restablecer usa el cliente de sesión. Ambos escriben las cookies
+// de la sesión y del verificador PKCE. Cada una valida con zod aunque el formulario ya
+// lo haya hecho.
 //
-// El token de Turnstile llega en `captchaToken` y va en `options.captchaToken`: lo
-// verifica Supabase Auth (captcha nativo, PLAN-SAAS §4.7). Si el captcha no está
-// activado en Supabase, Auth lo ignora.
+// El token de Turnstile llega en `captchaToken` (ver `prepararAuth`):
+// - con la clave publicable va en `options.captchaToken` y lo verifica Supabase Auth (captcha
+//   nativo, PLAN-SAAS §4.7);
+// - con la clave secreta Auth omite el captcha, así que se verifica aquí con
+//   `siteverify` y no se reenvía (es de un solo uso).
 //
 // Nunca se registran correos, contraseñas ni tokens: solo el código del error.
 
@@ -39,6 +47,25 @@ function texto(datos: FormData, campo: string): string {
 
 function captcha(datos: FormData): string | undefined {
   return texto(datos, 'captchaToken') || undefined;
+}
+
+type AuthPreparado =
+  | { ok: true; supabase: SupabaseClient<Database>; captchaToken: string | undefined }
+  | { ok: false; estado: EstadoAuth };
+
+/**
+ * Cliente de Auth para una acción con captcha y el `captchaToken` que hay que pasarle.
+ * Con la clave secreta verifica Turnstile aquí (Auth no lo haría) y devuelve
+ * `captchaToken: undefined`; sin ella devuelve el token para que lo verifique Auth.
+ */
+async function prepararAuth(datos: FormData): Promise<AuthPreparado> {
+  const { supabase, conClaveSecreta } = await clienteAuth({ exigeCaptcha: true });
+  const token = captcha(datos);
+  if (!conClaveSecreta) return { ok: true, supabase, captchaToken: token };
+
+  const verificacion = await verificarTurnstile(token, ipCliente(await headers()));
+  if (!verificacion.ok) return { ok: false, estado: { mensaje: verificacion.motivo } };
+  return { ok: true, supabase, captchaToken: undefined };
 }
 
 /** `${NEXT_PUBLIC_APP_URL}/auth/callback?siguiente=…` para los enlaces de los correos. */
@@ -71,13 +98,14 @@ function estadoDeExcepcion(error: unknown, contexto: ContextoAuth): EstadoAuth {
  */
 export async function ingresar(_previo: EstadoAuth, datos: FormData): Promise<EstadoAuth> {
   const siguiente = destinoSeguro(texto(datos, 'siguiente'));
-  const captchaToken = captcha(datos);
 
   if (texto(datos, 'modo') === 'enlace') {
     const v = validar(esquemaEnlace, leerCampos(datos, ['correo']));
     if (!v.ok) return { errores: v.errores };
     try {
-      const supabase = await clienteServidor();
+      const auth = await prepararAuth(datos);
+      if (!auth.ok) return auth.estado;
+      const { supabase, captchaToken } = auth;
       const { error } = await supabase.auth.signInWithOtp({
         email: v.datos.correo,
         options: { shouldCreateUser: false, emailRedirectTo: urlCallback(siguiente), captchaToken },
@@ -98,7 +126,9 @@ export async function ingresar(_previo: EstadoAuth, datos: FormData): Promise<Es
   const v = validar(esquemaIngresar, leerCampos(datos, ['correo', 'clave']));
   if (!v.ok) return { errores: v.errores };
   try {
-    const supabase = await clienteServidor();
+    const auth = await prepararAuth(datos);
+    if (!auth.ok) return auth.estado;
+    const { supabase, captchaToken } = auth;
     const { error } = await supabase.auth.signInWithPassword({
       email: v.datos.correo,
       password: v.datos.clave,
@@ -126,14 +156,16 @@ export async function crearCuenta(_previo: EstadoAuth, datos: FormData): Promise
 
   let conSesion = false;
   try {
-    const supabase = await clienteServidor();
+    const auth = await prepararAuth(datos);
+    if (!auth.ok) return auth.estado;
+    const { supabase, captchaToken } = auth;
     const { data, error } = await supabase.auth.signUp({
       email: v.datos.correo,
       password: v.datos.clave,
       options: {
         data: { nombre: v.datos.nombre },
         emailRedirectTo: urlCallback(siguiente),
-        captchaToken: captcha(datos),
+        captchaToken,
       },
     });
     if (error) {
@@ -156,11 +188,13 @@ export async function recuperar(_previo: EstadoAuth, datos: FormData): Promise<E
   const v = validar(esquemaRecuperar, leerCampos(datos, ['correo']));
   if (!v.ok) return { errores: v.errores };
   try {
-    const supabase = await clienteServidor();
+    const auth = await prepararAuth(datos);
+    if (!auth.ok) return auth.estado;
+    const { supabase, captchaToken } = auth;
     const { error } = await supabase.auth.resetPasswordForEmail(v.datos.correo, {
       // En el flujo PKCE el tipo no viaja en el enlace: el callback necesita `siguiente`.
       redirectTo: urlCallback('/restablecer'),
-      captchaToken: captcha(datos),
+      captchaToken,
     });
     if (error) {
       const visible = errorVisibleAlEnviarCorreo(error, 'recuperar');

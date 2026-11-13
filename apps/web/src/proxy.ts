@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
 import { decidirRuta } from '@/lib/rutas';
-import { envSupabasePublico } from '@/server/env';
+import { configClienteAuth } from '@/server/supabase/clave-auth';
 import type { Database } from '@/server/supabase/tipos';
 
 // Proxy (ex middleware, Next 16; va en `src/` porque la app está en `src/app`).
@@ -22,31 +22,31 @@ export async function proxy(request: NextRequest) {
 
   // Sin cookie de sesión no hay nada que refrescar ni validar: se ahorra la llamada.
   if (tieneCookieDeSesion(request)) {
-    const env = envSupabasePublico();
-    const supabase = createServerClient<Database>(
-      env.NEXT_PUBLIC_SUPABASE_URL,
-      env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll();
-          },
-          setAll(porEscribir, cabeceras) {
-            // Los RSC de esta petición leen las cookies de la petición: se actualizan ahí
-            // y en la respuesta que llega al navegador.
-            for (const { name, value } of porEscribir) request.cookies.set(name, value);
-            respuesta = NextResponse.next({ request });
-            for (const { name, value, options } of porEscribir) {
-              respuesta.cookies.set(name, value, options);
-            }
-            // Cache-Control: private, no-store… para que ninguna caché comparta la sesión.
-            for (const [clave, valor] of Object.entries(cabeceras)) {
-              respuesta.headers.set(clave, valor);
-            }
-          },
+    // Este cliente solo llama a `auth.getClaims()` (que refresca el token si venció):
+    // con SUPABASE_SECRET_KEY reenvía la IP real para que el límite de refrescos por IP
+    // no lo compartan todas las personas. Nunca usarlo para datos (ver clave-auth.ts).
+    const config = configClienteAuth(request.headers);
+    const supabase = createServerClient<Database>(config.url, config.clave, {
+      global: { headers: config.cabeceras },
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(porEscribir, cabeceras) {
+          // Los RSC de esta petición leen las cookies de la petición: se actualizan ahí
+          // y en la respuesta que llega al navegador.
+          for (const { name, value } of porEscribir) request.cookies.set(name, value);
+          respuesta = NextResponse.next({ request });
+          for (const { name, value, options } of porEscribir) {
+            respuesta.cookies.set(name, value, options);
+          }
+          // Cache-Control: private, no-store… para que ninguna caché comparta la sesión.
+          for (const [clave, valor] of Object.entries(cabeceras)) {
+            respuesta.headers.set(clave, valor);
+          }
         },
       },
-    );
+    });
 
     // Nada entre createServerClient y getClaims (recomendación de @supabase/ssr).
     // getClaims valida el JWT (firma con JWKS o, con clave simétrica, contra Auth) y

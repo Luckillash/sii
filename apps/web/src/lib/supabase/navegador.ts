@@ -3,7 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/server/supabase/tipos';
 
 // Cliente de Supabase para componentes cliente ('use client'): solo claves públicas
-// (URL y anon), la sesión vive en cookies que comparte con el servidor. Para Auth en
+// (URL y clave publicable `sb_publishable_…`), la sesión vive en cookies que comparte con el servidor. Para Auth en
 // el navegador (signIn, signUp con captchaToken, resetPasswordForEmail) y Realtime.
 // Las lecturas de datos van por RSC con `clienteServidor()`.
 //
@@ -18,10 +18,10 @@ export function clienteNavegador(): SupabaseClient<Database> {
 
   // Acceso literal a process.env.NEXT_PUBLIC_*: Next solo reemplaza así en el bundle.
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const clave = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !clave) {
+  const clave = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !clave?.startsWith('sb_publishable_')) {
     throw new Error(
-      'Configuración incompleta (Supabase público): revisa NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY.',
+      'Configuración incompleta (Supabase público): revisa NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.',
     );
   }
 

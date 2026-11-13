@@ -4,15 +4,25 @@ import { z } from 'zod';
 // Variables de entorno del servidor (PLAN-SAAS §5). Se validan al usarlas, no al
 // importar el módulo, para que `next build` funcione sin secretos.
 
-const esquemaSupabase = z.object({
-  NEXT_PUBLIC_SUPABASE_URL: z.url(),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(20),
+// Solo claves API nuevas de Supabase: las legadas (JWT `anon` / `service_role`) se
+// retiran en 2027. Se exige el prefijo para que una clave legada no pase por error.
+//   sb_publishable_…  rol `anon` sin sesión, `authenticated` con la sesión del usuario
+//   sb_secret_…       rol `service_role` (salta RLS); solo en el servidor
+const clavePublicable = z.string().startsWith('sb_publishable_').min(20);
+const claveSecreta = z.string().startsWith('sb_secret_').min(20);
+
+const esquemaSupabaseSecreta = z.object({
+  SUPABASE_SECRET_KEY: claveSecreta,
 });
 
-// Lo mínimo para hablar con Supabase Auth con la sesión del usuario (clave anon).
+const esquemaSupabase = esquemaSupabaseSecreta.extend({
+  NEXT_PUBLIC_SUPABASE_URL: z.url(),
+});
+
+// Lo mínimo para hablar con Supabase con la sesión del usuario (clave publicable).
 const esquemaSupabasePublico = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.url(),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(20),
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: clavePublicable,
 });
 
 const esquemaAuth = esquemaSupabasePublico.extend({
@@ -45,14 +55,23 @@ function opcional<T extends z.ZodType>(esquema: T): z.infer<T> | null {
   return resultado.success ? resultado.data : null;
 }
 
+/** URL y clave secreta: solo `server/supabase/service.ts`. */
 export const envSupabase = () => validar(esquemaSupabase, 'Supabase');
 
 /**
- * URL y clave anon de Supabase. La usan el proxy y `clienteServidor()`: no exigen
+ * URL y clave publicable de Supabase. La usan el proxy y `clienteServidor()`: no exigen
  * NEXT_PUBLIC_APP_URL para que una variable de enlaces que falte no tumbe todas las
  * páginas.
  */
 export const envSupabasePublico = () => validar(esquemaSupabasePublico, 'Supabase público');
+
+/**
+ * La misma clave secreta, para las llamadas a Auth que reenvían la IP real
+ * (`server/supabase/clave-auth.ts`). `null` si falta: Auth se llama con la clave
+ * publicable y ve la IP de Vercel, pero las páginas de acceso no se caen.
+ */
+export const envSupabaseSecreta = (): z.infer<typeof esquemaSupabaseSecreta> | null =>
+  opcional(esquemaSupabaseSecreta);
 
 /**
  * Supabase Auth más la URL pública de la app, que arma los enlaces de los correos de

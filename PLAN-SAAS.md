@@ -230,8 +230,10 @@ para no compartir estado entre usuarios en el servidor.
 
 | Variable | Dónde | Nota |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | público | |
-| `SUPABASE_SERVICE_ROLE_KEY` | servidor, *sensitive* | solo `server/supabase/service.ts` |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | público | clave `sb_publishable_…` |
+| `SUPABASE_SECRET_KEY` | servidor, *sensitive* | clave `sb_secret_…`; `server/supabase/service.ts` (service_role) y `server/supabase/clave-auth.ts` (reenvía la IP real a Auth con `sb-forwarded-for`; esos clientes nunca para datos) |
+
+Solo claves API nuevas: las legadas (`anon` / `service_role`, JWT `eyJ…`) se retiran en 2027 y `env.ts` las rechaza por prefijo. Los JWT de sesión ya se firman con claves asimétricas (ES256, JWKS).
 | `SII_TOKENS_KEY` | servidor, *sensitive* | 32 bytes base64; AES-256-GCM de tokens y cookies |
 | `CRON_SECRET` | servidor, *sensitive* | mismo valor que `cron_token` en Vault |
 | `RESEND_API_KEY`, `CORREO_REMITENTE` | servidor | |
@@ -321,6 +323,12 @@ Cada fase termina con: código en `main` con lint, typecheck y tests en verde (l
   - [ ] Ver en Outlook que llegaron los correos de invitación a `+e2e-a2` y `+e2e-b1` desde `no-responder@mail.boleteame.dev` y que su enlace abre `/invitacion/…`. Ahora mostrará «La invitación venció, ya se usó o no existe», porque las invitaciones se borraron; basta con que abra esa página.
 - [x] Volver a correr `supabase/verificaciones/rls-fase2-tenancy.sql` para activar las comprobaciones 48–51 de `ver_invitacion` y sumar una para `0004` (organización `morosa` que no acepta miembros). 2026-11-12: comprobación 53 agregada (A queda `morosa` con cupo libre y una invitación válida; `aceptar_invitacion` rechaza con «La organización no tiene una suscripción vigente»). Corrida en producción: 1–51 y 53 con `ok = true`, sin omitidas; el `rollback` no dejó usuarios ni organizaciones de prueba.
 - [ ] Más adelante: reenviar la IP real a Supabase Auth (`sb-forwarded-for`, requiere clave `sb_secret`) para que los límites por IP no vean solo la IP de Vercel.
+  - [x] Código (2026-11-12, sin desplegar): `server/supabase/clave-auth.ts` + `clienteAuth()` en `servidor.ts`. Ingresar, crear cuenta, recuperar, `/auth/callback` y el refresco del proxy llaman a Auth con `SUPABASE_SECRET_KEY` y `sb-forwarded-for` = primer valor de `x-forwarded-for`. Sin la clave, o sin IP, usan la publicable. Dos cuidados: (1) con credenciales de administrador Auth **omite el captcha** (`verifyCaptcha` en supabase/auth), así que esas acciones verifican Turnstile en la app (`siteverify`) y no reenvían el token; si la app no tiene `TURNSTILE_SECRET_KEY`, las acciones con captcha siguen con la publicable; (2) sin sesión, la Data API correría como service_role, así que esos clientes son **solo** para `supabase.auth.*` (los datos siguen con `clienteServidor()`). Pruebas en `clave-auth.test.ts`.
+  - [x] Solo claves API nuevas (2026-11-12, sin desplegar; las legadas se retiran en 2027): `NEXT_PUBLIC_SUPABASE_ANON_KEY` → `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` y `SUPABASE_SERVICE_ROLE_KEY` → `SUPABASE_SECRET_KEY` (una sola clave secreta para `service.ts` y el reenvío de IP). `env.ts` y el cliente del navegador exigen los prefijos `sb_publishable_` / `sb_secret_`. En `.env.local` ya eran claves nuevas: solo se renombraron.
+  - [ ] Supabase (panel): activar *IP Address Forwarding* en *Authentication → Rate Limits*.
+  - [ ] Vercel (*Production*): crear `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` y `SUPABASE_SECRET_KEY` (*Sensitive*) **antes** del deploy (sin ellas todas las páginas fallan con «Configuración incompleta»); deploy; luego borrar `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY`.
+  - [ ] Verificar: `POST /auth/v1/token?grant_type=password` con la clave secreta, sin `captcha_token` y con credenciales falsas → `invalid_credentials` (no `captcha_failed`); ingreso, recuperación y enlace del correo en `boleteame.dev`; Turnstile inválido en `/ingresar` → mensaje de verificación; logs de Auth con la IP del cliente, no la de Vercel. Revertir = *Instant Rollback* en Vercel.
+  - [ ] Ensayo del retiro: desactivar las claves legadas en *Settings → API Keys* (reversible) y repetir el humo.
 
 ### Fase 3 — Empresas, certificados y resoluciones
 

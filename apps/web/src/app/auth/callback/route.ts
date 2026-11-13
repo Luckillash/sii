@@ -1,7 +1,7 @@
 import type { EmailOtpType } from '@supabase/supabase-js';
 import { type NextRequest, NextResponse } from 'next/server';
 import { destinoSeguro } from '@/lib/redireccion';
-import { clienteServidor } from '@/server/supabase/servidor';
+import { clienteAuth } from '@/server/supabase/servidor';
 
 // Destino de los enlaces de los correos de Supabase Auth (PLAN-SAAS §3.1).
 //
@@ -43,7 +43,9 @@ export async function GET(request: NextRequest) {
   const fallo = () => ir('/ingresar?error=enlace');
 
   try {
-    const supabase = await clienteServidor();
+    // Solo auth.*: reenvía la IP real (límite de verificaciones por IP). Ni verifyOtp ni
+    // el canje PKCE piden captcha.
+    const { supabase } = await clienteAuth();
 
     if (tokenHash && esTipoOtp(tipo)) {
       const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: tipo });
