@@ -1,7 +1,7 @@
 ---
 title: "Probar el esquema (RLS, triggers, cuotas)"
 description: "Cómo verificar el esquema y simular roles en la única base (producción) sin dejar rastro."
-keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp, 0006_realtime_operaciones.sql, 0007_bloqueos_sii.sql, rls-fase4-bloqueos.sql, bloqueos_sii, arriendo]
+keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp, 0006_realtime_operaciones.sql, 0007_bloqueos_sii.sql, rls-fase4-bloqueos.sql, bloqueos_sii, arriendo, 0008_certificacion.sql, rls-fase5-certificacion.sql, registrar_caf, guardar_set_pruebas, CAF de mentira]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "08-esquema-supabase/despliegue.md"]
 source: ["supabase_saas_sii.sql §15 §17", "supabase/verificaciones/", "supabase/verificaciones/rls-fase2-tenancy.sql"]
 ---
@@ -25,6 +25,7 @@ comprobación con `ok = true/false` y, si falla, el `detalle`. No escribe nada.
 | `0005_certificados_resoluciones.sql` | 15 comprobaciones: las 3 funciones con su firma, nombres de parámetros, `plpgsql`, `security definer` solo en `registrar_certificado`, `search_path` vacío; `registrar_certificado` solo para `service_role`; las otras dos para `authenticated` y `service_role`, no `anon`; `certificados` sin políticas de escritura; `trg_borrar_secretos`; herencia de `organizacion_id`; privilegios que necesitan las funciones invoker; índices parciales; migración registrada. Aplicada el 2026-11-13: 15/15 `ok` |
 | `0006_realtime_operaciones.sql` | 9 comprobaciones: `supabase_realtime` existe y publica `insert`/`update`/`delete`; `operaciones_sii` y `solicitudes_folios` están en ella; las tres de la 0001 siguen publicadas; RLS activo; política `lectura` (`select`, `authenticated`, `es_miembro(organizacion_id)`); `select` para `authenticated`; nada para `anon`; *replica identity* por defecto; migración registrada. Aplicada el 2026-11-13: 9/9 `ok` (antes de migrar daba 7/9) |
 | `0007_bloqueos_sii.sql` | 14 comprobaciones: `bloqueos_sii` con sus 5 columnas y tipos; PK `(certificado_id, ambiente)`; FK a `certificados` en cascada; RLS activo sin políticas; nada para `anon`/`authenticated`; las 2 funciones con su firma y `boolean`; nombres de parámetros (los que usa `bloqueos.ts`); `plpgsql`, `security definer`, `search_path` vacío; solo `service_role` las ejecuta; el `insert … on conflict` con la condición del arriendo; migración registrada; el índice único y válido `operaciones_sii_efecto_global_en_curso` sobre `(empresa_id, operacion, ambiente)`; su predicado (`en_curso`, `confirmada` y exactamente `solicitar_folios`, `postular`, `declarar`, como `OPERACIONES_EFECTO_GLOBAL`). Aplicada el 2026-11-13: 14/14 `ok` (antes de migrar daba todo `false`) |
+| `0008_certificacion.sql` | 10 comprobaciones: `registrar_caf` y `guardar_set_pruebas` existen con su firma (`to_regprocedure`); devuelven `uuid` e `integer`; nombres de parámetros (los que usa `server/certificacion` al llamar por RPC); `plpgsql`, `security definer`, `search_path` vacío; `service_role` las ejecuta; `authenticated`, `anon` y `PUBLIC` no; cuerpos (Vault con `guardar_secreto` tras `for no key update`, idempotencia por `folio_hasta`, `unique_violation`, filtro por organización; borrado e inserción de casos, `set_descargado`, `envio_set_id = null`); migración registrada como `0008`. Aplicada el 2026-11-13 ([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0008)): 10/10 `ok` (antes de migrar daba todo `false`) |
 
 Se ejecuta pegándolo en el SQL Editor o con el MCP `execute_sql`. Cada migración nueva trae
 el suyo.
@@ -213,7 +214,51 @@ Corrida en producción el 2026-11-13, después de aplicar la 0006 y la 0007: 21/
 el `rollback`, la consulta de limpieza dio todo en 0 (organizaciones, certificados,
 empresas, bloqueos y operaciones).
 
-## 6. Lo que no se prueba con SQL
+## 6. Simulación de las RPC de la Fase 5 (`rls-fase5-certificacion.sql`)
+
+`supabase/verificaciones/rls-fase5-certificacion.sql` prueba las dos RPC de la migración
+0008: el XML del CAF entra a Vault y su fila a `cafs` en la misma transacción (con la
+solicitud de folios enlazada y `timbrada`); repetir el mismo CAF devuelve el mismo id sin
+crear otro secreto; un CAF inválido se rechaza sin dejar secretos huérfanos; el set de
+pruebas se reemplaza completo junto con el proceso; y nada de esto lo ejecutan
+`authenticated` ni `anon`. **Requiere la migración 0008 aplicada** (en producción desde el
+2026-11-13): sin ella se detiene con `42883` y la transacción se descarta completa, sin
+resultados.
+
+Mismo patrón que las de las Fases 2 a 4 (`set local role` por rol, `pg_temp.registrar`,
+parámetros locales `prueba.*`, `rollback` final), pero **sin usuarios**: como `postgres`
+crea dos organizaciones (`zz-prueba-certificacion-fase5` y `…-otra`), dos empresas de la
+primera (RUT `11111111-1` y `22222222-2`), un proceso en `postulada` y una solicitud de
+folios por empresa. Los «CAF» son un texto de prueba
+(`<AUTORIZACION><CAF>de mentira</CAF><RSASK>llave-de-mentira</RSASK></AUTORIZACION>`), no
+un CAF del SII, y sus secretos en Vault los deshace el `rollback`. De Vault solo cuenta
+secretos por descripción (`caf:11111111-1:%`) y comprueba con un booleano que el secreto
+trae `<RSASK>`: el contenido no sale del script.
+
+| # | Grupo | Comprobaciones |
+|---|---|---|
+| 1 | Preparación | organizaciones, empresas, proceso y solicitudes, sin CAF ni secretos |
+| 2–5 | `registrar_caf` (como `service_role`) | crea la fila (`activo`, `siguiente_folio = folio_desde`) y un secreto; el secreto guarda el XML completo y la fila apunta a él; la solicitud queda `timbrada` con el rango y el `caf_id`, y el CAF la enlaza; el mismo CAF otra vez devuelve el mismo id sin secreto nuevo |
+| 6–10 | `registrar_caf` que falla | mismo `folio_desde` con otro rango (`23505`); otro RUT emisor, IDK de producción en certificación y solicitud de otra empresa (`22023`); empresa de otra organización (`P0002`). Ninguno deja secretos |
+| 11–14 | `guardar_set_pruebas` (como `service_role`) | guarda 5 casos y deja el proceso en `set_descargado` con texto, correo y fecha; un set nuevo reemplaza los casos (3, con `referencia_codigo = 'SET'` por defecto) y conserva el correo; casos inválidos (sin detalles) dan `22023` y los anteriores siguen; en `por_declarar` no reemplaza (`22023`) |
+| 15–16 | `authenticated` y `anon` | no ejecutan ninguna de las dos (`42501`) y no quedó ningún secreto de más |
+
+Cómo correrlo: el archivo **completo**, tal cual, con el MCP `execute_sql` o en el SQL
+Editor (como `postgres`); nunca por partes ni cambiando el `rollback` por `commit`. Debe dar
+16/16 con `ok = true`. Después, la consulta de control del encabezado en 0:
+
+```sql
+select
+  (select count(*) from public.organizaciones where slug like 'zz-prueba-certificacion-fase5%') as organizaciones,
+  (select count(*) from public.empresas where razon_social like 'Empresa de prueba fase 5%') as empresas,
+  (select count(*) from vault.secrets where description like 'caf:11111111-1:%') as secretos;
+```
+
+Corrida en producción el 2026-11-13, después de aplicar la 0008
+([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0008)): 16/16 `ok`; tras
+el `rollback`, la consulta de limpieza dio todo en 0 (organizaciones, empresas y secretos).
+
+## 7. Lo que no se prueba con SQL
 
 El aislamiento entre organizaciones y los permisos por rol también se prueban de punta a
 punta con la app (Fase 2): dos usuarios de organizaciones distintas, cada uno con su

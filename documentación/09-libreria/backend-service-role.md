@@ -302,4 +302,23 @@ límite de re-login de AUT2000.
   `largo_token` queda `[Filtrado]`): es a propósito, preferimos perder un dato a guardar una
   credencial. Para datos así, usa nombres sin esas palabras.
 
-<!-- TODO (Fases 6–8 y 11): workers y cron (seguimiento, webhooks), guardado del CAF en Vault, uso desde la API pública (apiKeyId). -->
+## Quién usa la capa: el asistente de certificación (Fase 5)
+
+`apps/web/src/server/certificacion/` es el primer consumidor de esta capa. No la
+reemplaza: cada acción confirmada pasa por `ejecutarOperacion` (`ejecutar` de `comun.ts`,
+con `ambiente: 'certificacion'`), abre la sesión AUT2000 con `conBloqueoCertificado` +
+`conSesionReutilizada` (`conSesionSii`), crea el transporte con `await using`, carga el
+certificado con `crearCredenciales` y sube los XML con `AlmacenDocumentos`. Lo que agrega:
+
+- **Dependencias inyectables** (`dependencias.ts`, `resolverDependencias()`): clientes de
+  Supabase, reloj, transporte, credenciales, sesiones, `TokenStore`, fábricas de los
+  clientes de la librería (`FABRICAS_SII`) y correo. Se arman en cada llamada, nunca en
+  una variable de módulo; las pruebas reemplazan lo que necesitan.
+- **Ensayo sin `ejecutarOperacion`**: con `confirmada: false` no hay fila ni salida al SII.
+- **Bloqueo propio de `enviar_set`** (`bloqueoEnvioSet`), que no es de efecto global.
+- **Guardado del CAF en Vault** con la RPC `registrar_caf` (migración 0008,
+  aplicada el 2026-11-13).
+
+Detalle en [certificación de la empresa](../02-guias/certificacion-empresa.md).
+
+<!-- TODO (Fases 6–8 y 11): workers y cron (seguimiento, webhooks), CAF de producción, uso desde la API pública (apiKeyId). -->

@@ -100,7 +100,7 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
 | `envio_rechazos` | — | S | S | S | S | SIUD |
 | `rcof` 🕰️ | — | S | S | S | S | SIUD |
 | `procesos_certificacion` | — | S | S | SIUD ¹¹ | SIUD ¹¹ | SIUD |
-| `set_pruebas_casos` | — | S | S | S | S | SIUD |
+| `set_pruebas_casos` | — | S | S | S ¹⁸ | S ¹⁸ | SIUD |
 
 ### Auditoría e integraciones
 
@@ -160,6 +160,16 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
     no la toca directo: solo por `tomar_bloqueo_certificado` /
     `liberar_bloqueo_certificado` (solo `service_role`)
     ([RPC del backend](rpc-backend.md#tomar_bloqueo_certificado-y-liberar_bloqueo_certificado-migración-0007)).
+18. Sin políticas de escritura: ni un administrador escribe casos. El backend de la Fase 5
+    los reemplaza con `guardar_set_pruebas()` (migración 0008, aplicada el 2026-11-13; solo
+    `service_role`), los borra si el set es ilegible y les pone `documento_id` al enviar
+    el set, siempre con `service_role` filtrando por organización
+    ([RPC del backend](rpc-backend.md#guardar_set_pruebas-migración-0008)). Las columnas de
+    datos de `procesos_certificacion` sí las escribe un administrador (nota 11); `etapa`,
+    `codigo_estado_sii` y `paso_sii` solo el backend. Las fechas del SII
+    (`postulada_en`, `declarada_en`…), `glosa_estado_sii` y `envio_set_id` también las
+    escribe solo el backend, pero ningún trigger las protege: un administrador podría
+    cambiarlas con un `update` directo.
 
 `operaciones_sii` la escribe solo la capa SII con `service_role` (`ejecutarOperacion`,
 `marcarInciertaRevisada`); los miembros la leen y, con la migración 0006, reciben sus

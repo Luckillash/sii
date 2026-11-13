@@ -192,6 +192,12 @@ bloquea, para enlazar la acción «Marcar como revisada». Falta solo cuando el 
 ensayo es de quien escribe `fn` (con la librería, el equivalente a no pasar
 `--confirmar`). Toda operación ⚠️ tiene ensayo y confirmación explícita (principio 3).
 
+**El asistente de certificación (Fase 5) no usa esta columna de la tabla.** Sus ensayos no
+llaman a `ejecutarOperacion`: validan en la base y devuelven `{ tipo: 'ensayo', resumen }`
+**sin salir al SII y sin fila** en `operaciones_sii` (como la CLI sin `--confirmar`, que
+tampoco registra nada). Solo las confirmadas pasan por `ejecutarOperacion`
+([guía](../02-guias/certificacion-empresa.md#ensayo-y-confirmación)).
+
 `OPERACIONES_QUE_GRABAN` (⚠️): `postular`, `descargar_set`, `solicitar_folios`,
 `enviar_set`, `solicitar_revision`, `declarar`, `enviar_rcof`, `emitir`. El resto del
 enum `operacion_sii` (`autenticar`, `obtener_token`, `estado_envio`, `verificar_portal`,
@@ -237,6 +243,14 @@ empresas de la misma organización.
 
 `emitir` **no** se bloquea aquí: su incierto es por documento (`envios.incierto`, Fase 7).
 
+`enviar_set` (Fase 5) tampoco se bloquea aquí: lo bloquea el asistente con
+`bloqueoEnvioSet` (`server/certificacion/operaciones.ts`), que aplica la misma tabla de
+arriba (sin revisar: `incierto` o `en_curso` abandonada → `incierto_sin_revisar`;
+`en_curso` reciente → `en_curso`) al último `enviar_set` confirmado de la empresa, antes
+del ensayo y de la confirmación. No hay índice único: la carrera la cierra el bloqueo del
+certificado, dentro del cual se repite el control
+([trampa](../07-referencia/trampas-conocidas.md#envío-del-set)).
+
 El mensaje dice cómo revisar según la operación (fecha en formato `13-11-2026 14:30`):
 
 | Operación | Cómo revisar |
@@ -244,6 +258,10 @@ El mensaje dice cómo revisar según la operación (fecha en formato `13-11-2026
 | `solicitar_folios` | revisar «Folios ya autorizados» en el portal del SII y, si se timbraron, bajar el CAF desde ahí en vez de volver a pedirlos |
 | `postular` | revisar en el portal de certificación si la postulación quedó registrada |
 | `declarar` | consultar el estado de la declaración (P91 autorizada: no repetir; P90: se puede volver a declarar) |
+
+El asistente de certificación muestra además su propio texto de qué revisar por operación
+(`comoRevisar` de `app/[org]/certificacion/logica.ts`), en el aviso y en el diálogo de
+«Marcar como revisada» ([guía](../02-guias/certificacion-empresa.md#operaciones-inciertas-y-cómo-revisarlas)).
 
 ### Carrera entre dos peticiones iguales
 

@@ -2460,6 +2460,16 @@ export type Database = {
         Args: { p_descripcion?: string; p_secreto: string }
         Returns: string
       }
+      guardar_set_pruebas: {
+        Args: {
+          p_casos: Json
+          p_correo_proveedor: string
+          p_organizacion: string
+          p_proceso: string
+          p_texto: string
+        }
+        Returns: number
+      }
       leer_secreto: { Args: { p_id: string }; Returns: string }
       liberar_bloqueo_certificado: {
         Args: {
@@ -2493,6 +2503,23 @@ export type Database = {
         }
       }
       puede_emitir: { Args: { p_organizacion: string }; Returns: boolean }
+      registrar_caf: {
+        Args: {
+          p_ambiente: Database["public"]["Enums"]["ambiente_sii"]
+          p_caf_xml: string
+          p_empresa: string
+          p_fecha_autorizacion: string
+          p_folio_desde: number
+          p_folio_hasta: number
+          p_idk: number
+          p_organizacion: string
+          p_razon_social: string
+          p_rut_emisor: string
+          p_solicitud: string
+          p_tipo_dte: number
+        }
+        Returns: string
+      }
       registrar_certificado: {
         Args: {
           p_clave: string

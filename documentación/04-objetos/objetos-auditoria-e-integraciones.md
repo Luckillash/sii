@@ -61,7 +61,7 @@ organización, empresa, operación, ambiente, `confirmada = true` y
 | `postular` | ⚠️ sí | **sí** |
 | `descargar_set` | ⚠️ sí | no |
 | `solicitar_folios` | ⚠️ sí | **sí** |
-| `enviar_set` | ⚠️ sí | no |
+| `enviar_set` | ⚠️ sí | no aquí: lo bloquea el asistente con `bloqueoEnvioSet` (Fase 5), sin índice único |
 | `estado_envio`, `verificar_portal`, `estado_declaracion` | 🔁 no | no |
 | `solicitar_revision` | ⚠️ sí | no |
 | `declarar` | ⚠️ sí | **sí** |
@@ -95,6 +95,24 @@ Ejemplo de una solicitud de folios incierta, ya revisada:
 
 `detalle` y `mensaje` los ve cualquier miembro de la organización (también un lector) y
 llegan por Realtime: no pongas ahí nada que un lector no deba ver.
+
+**Lo que agrega el asistente de certificación (Fase 5)** con `agregarDetalle`, todo en
+`ambiente = 'certificacion'`:
+
+| `operacion` | Claves de `detalle` | Enlaces |
+|---|---|---|
+| `verificar_portal` | `problemas` (cantidad) y, si hay, `faltantes` | — |
+| `postular` | `avisos_sii` (cantidad) | — |
+| `descargar_set` | `codigo_estado`; `casos` o `set_ilegible: true` | — |
+| `solicitar_folios` | `cantidad`, `solicitud_id`; con CAF, `folio_desde`, `folio_hasta` | `solicitud_id` |
+| `enviar_set` | `folios` (los asignados); `track_id`, o `incierto: true`, o `folios_anulados` (cantidad) | `envio_id`; `canal = 'rest'` |
+| `estado_envio` | `estado`, `informados` | `envio_id`; `canal = 'rest'` |
+| `solicitar_revision` | `track_id` | — |
+| `estado_declaracion` | `codigo_estado`, `paso` | — |
+| `declarar` | `codigo_estado` | — |
+
+Los ensayos del asistente no dejan fila
+([guía](../02-guias/certificacion-empresa.md#ensayo-y-confirmación)).
 
 ### Ciclo de vida de una fila
 

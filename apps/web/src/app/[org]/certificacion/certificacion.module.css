@@ -1,0 +1,383 @@
+/* Asistente de certificación (Fase 5), según la plantilla Certificacion.dc.html con los
+   5 pasos de boleta (H3). */
+
+.cabeceraFila {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+
+.selectorEmpresa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.accionAlerta {
+  margin-top: var(--space-2);
+}
+
+/* Empresa, etapa y medidor de pasos. */
+.progreso {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+.medidor {
+  flex: 0 1 280px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--surface-sunken);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.medidorUso {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--sello);
+  transition: width var(--duracion-menu) ease;
+}
+
+.avisos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.avisos:empty {
+  display: none;
+}
+
+/* Pasos + columna lateral. */
+.cuerpo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  align-items: flex-start;
+}
+
+.pasos {
+  flex: 999 1 540px;
+  min-width: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.paso {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-4) 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.paso:last-child {
+  border-bottom: 0;
+}
+
+.paso_en_curso {
+  padding: 20px;
+  background: var(--sello-soft);
+}
+
+.iconoPaso {
+  flex: none;
+  margin-top: 1px;
+}
+
+.pasoCuerpo {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.pasoCabecera {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-4);
+}
+
+.pasoTitulo {
+  margin: 0;
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-line);
+  font-weight: 600;
+}
+
+.pasoEstado {
+  margin: 0;
+  font-size: var(--text-caption-size);
+  line-height: 22px;
+  font-weight: 500;
+}
+
+.paso_completo .iconoPaso,
+.paso_completo .pasoEstado {
+  color: var(--exito);
+}
+
+.paso_en_curso .iconoPaso,
+.paso_en_curso .pasoEstado {
+  color: var(--sello);
+}
+
+.paso_pendiente .iconoPaso,
+.paso_pendiente .pasoEstado {
+  color: var(--ink-muted);
+}
+
+.lateral {
+  flex: 1 1 320px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.seccionLateral {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-3);
+}
+
+.seccionLateral > a {
+  align-self: flex-start;
+}
+
+.subtitulo {
+  margin: 0;
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}
+
+/* Textos. */
+.texto {
+  margin: 0;
+  color: var(--ink);
+  max-width: 72ch;
+}
+
+.nota {
+  margin: 0;
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  color: var(--ink-muted);
+  max-width: 72ch;
+}
+
+.secundario {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.vencePronto {
+  color: var(--aviso);
+  font-weight: 500;
+}
+
+.listaAvisos {
+  margin: 0;
+  padding-left: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Datos como la tarjeta «Certificado digital» de la plantilla. */
+.datos {
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  gap: var(--space-2) var(--space-4);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+.dato {
+  display: contents;
+}
+
+.dato dt {
+  color: var(--ink-muted);
+}
+
+.dato dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Bloques y formularios. */
+.bloque {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.detalle {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.detalle > summary {
+  width: fit-content;
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: 500;
+  color: var(--link);
+  cursor: pointer;
+}
+
+.detalle[open] > summary {
+  margin-bottom: var(--space-3);
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.filaCampos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.filaCampos > * {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.casilla {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.casilla input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--sello);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Insignia de estado (mismo aspecto que EstadoDTE). */
+.insignia {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--tono-fg);
+  background: var(--tono-bg);
+}
+
+.tonoExito {
+  --tono-fg: var(--exito);
+  --tono-bg: var(--exito-soft);
+}
+
+.tonoInfo {
+  --tono-fg: var(--info);
+  --tono-bg: var(--info-soft);
+}
+
+.tonoAviso {
+  --tono-fg: var(--aviso);
+  --tono-bg: var(--aviso-soft);
+}
+
+.tonoError {
+  --tono-fg: var(--error);
+  --tono-bg: var(--error-soft);
+}
+
+/* Últimas operaciones. */
+.operaciones {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.operacion {
+  padding: var(--space-2) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-bottom: 1px solid var(--line);
+}
+
+.operacion:last-child {
+  border-bottom: 0;
+}
+
+.operacionCabecera {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+}
+
+.operacionNombre {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: 500;
+}
+
+.operacionMensaje {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.operacionAccion {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+}

@@ -1,9 +1,9 @@
 ---
 title: "RPC del backend (service_role)"
-description: "registrar_certificado, token_*, leer_secreto, tomar/liberar_bloqueo_certificado, asignar_folio, guardar_secreto, sincronizar_documentos_envio, encolar_evento, plan_vigente."
-keywords: [service_role, registrar_certificado, Vault, vault.create_secret, guardar_secreto, leer_secreto, pfx_secret_id, clave_secret_id, huella_sha256, "certificado:<huella>:pfx", 23503, 22023, 23505, 22004, "El certificado ya está registrado en la organización", "permission denied for function", token_obtener, token_guardar, token_borrar, TokenStoreSupabase, tomar_bloqueo_certificado, liberar_bloqueo_certificado, bloqueos_sii, arriendo, titular, conBloqueoCertificado, "La duración del bloqueo debe estar entre 1 y 900 segundos", migración 0007]
+description: "registrar_certificado, registrar_caf, guardar_set_pruebas, token_*, leer_secreto, tomar/liberar_bloqueo_certificado, asignar_folio, guardar_secreto, sincronizar_documentos_envio, encolar_evento, plan_vigente."
+keywords: [service_role, registrar_certificado, registrar_caf, guardar_set_pruebas, migración 0008, CAF, RSASK, "caf:<rut>", idempotente, for no key update, set_pruebas_casos, set_descargado, P0002, "La empresa no existe en la organización", "El IDK del CAF no corresponde al ambiente", "Ya hay un CAF que empieza en el folio", Vault, vault.create_secret, guardar_secreto, leer_secreto, pfx_secret_id, clave_secret_id, huella_sha256, "certificado:<huella>:pfx", 23503, 22023, 23505, 22004, "El certificado ya está registrado en la organización", "permission denied for function", token_obtener, token_guardar, token_borrar, TokenStoreSupabase, tomar_bloqueo_certificado, liberar_bloqueo_certificado, bloqueos_sii, arriendo, titular, conBloqueoCertificado, "La duración del bloqueo debe estar entre 1 y 900 segundos", migración 0007]
 related: ["09-libreria/backend-service-role.md", "08-esquema-supabase/vault-y-secretos.md", "04-objetos/objetos-empresas-y-credenciales.md", "02-guias/onboarding-organizacion.md", "01-fundamentos/autenticacion-sii.md"]
-source: ["supabase_saas_sii.sql §15 §17", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/"]
+source: ["supabase_saas_sii.sql §15 §17", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/sii/", "apps/web/src/server/certificacion/"]
 ---
 
 # RPC del backend (service_role)
@@ -132,6 +132,198 @@ registrada y, 13–14, el índice único parcial `operaciones_sii_efecto_global_
 la misma migración agrega a `operaciones_sii`) y `rls-fase4-bloqueos.sql` (21, con
 `rollback`; 17–21 son del índice). Corridas en producción el 2026-11-13: 14/14 y 21/21 `ok`
 ([cómo correrlas](../05-pruebas/probar-el-esquema.md#5-simulación-del-bloqueo-de-la-fase-4-rls-fase4-bloqueossql)).
+
+## `registrar_caf` (migración 0008)
+
+Viene en `supabase/migrations/0008_certificacion.sql`, aplicada en producción el
+2026-11-13 ([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0008)).
+En una base sin ella, `cliente.rpc('registrar_caf', …)` falla con la función inexistente
+(`PGRST202` por PostgREST; `42883` en SQL) **después** de que el SII timbró los folios: la
+solicitud queda `incierta` y la operación `incierto`.
+
+```sql
+public.registrar_caf(
+  p_organizacion       uuid,
+  p_empresa            uuid,
+  p_ambiente           public.ambiente_sii,
+  p_tipo_dte           smallint,
+  p_folio_desde        integer,
+  p_folio_hasta        integer,
+  p_fecha_autorizacion date,
+  p_idk                smallint,
+  p_rut_emisor         text,
+  p_razon_social       text,
+  p_caf_xml            text,
+  p_solicitud          uuid          -- nulo si el CAF no viene de una solicitud
+) returns uuid                       -- id de la fila de cafs
+-- plpgsql · security definer · search_path = ''
+-- revoke execute from public, anon, authenticated · grant execute to service_role
+```
+
+**Para qué:** guardar el XML **completo** del CAF (con `<RSASK>`, la llave con que se
+timbra) en Vault y crear la fila de `cafs` con el id del secreto, en una sola
+transacción; y, si se pasa `p_solicitud`, enlazar `cafs.solicitud_id` y dejar la fila de
+`solicitudes_folios` como `timbrada` con el rango y el `caf_id`. La bitácora y el CAF no
+pueden quedar desalineados: si una parte falla, se deshace todo (también el
+`vault.create_secret`).
+
+**Efectos, en orden**
+
+1. Busca la empresa por `id` **y** `organizacion_id` (si no, `P0002`).
+2. Valida, **sin tocar Vault**: XML no vacío; ambiente, tipo, fecha e IDK presentes; rango
+   `1 ≤ desde ≤ hasta`; IDK del ambiente (100 en certificación, 300 en producción, el mismo
+   candado que el `check` de `cafs` y que `SolicitudFolios`); RUT del emisor
+   (normalizado: sin puntos, mayúsculas) igual al de la empresa; si hay solicitud, que sea
+   de la organización, la empresa, el ambiente y el tipo.
+3. `for no key update` sobre la fila de la empresa: dos llamadas simultáneas para la misma
+   empresa se ordenan (la segunda ve lo que dejó la primera) en vez de crear dos secretos y
+   chocar en la llave única. `no key update` no bloquea las FK que apuntan a la empresa.
+4. Busca un CAF con la llave única de `cafs` (empresa, ambiente, tipo, `folio_desde`):
+   - **existe con el mismo `folio_hasta`** → idempotente: devuelve su id **sin crear otro
+     secreto** (un reintento tras un corte no deja secretos huérfanos); si no tenía
+     `solicitud_id`, lo enlaza;
+   - **existe con otro `folio_hasta`** → `23505`;
+   - **no existe** → `guardar_secreto(p_caf_xml, 'caf:<rut>:<ambiente>:<tipo>:<desde>-<hasta>')`
+     e `insert` en `cafs` con `siguiente_folio = folio_desde`. Un `unique_violation` en el
+     insert se relanza como `23505` y aborta la transacción completa (el secreto también se
+     deshace).
+5. Con solicitud: si ya estaba enlazada a **otro** CAF, `22023`; si no, la deja
+   `estado = 'timbrada'`, `confirmada = true`, `folio_desde`/`folio_hasta`, `caf_id` y
+   `terminado_en = coalesce(terminado_en, now())`.
+
+La descripción del secreto lleva solo datos públicos del CAF (RUT, ambiente, tipo y
+rango). Ningún mensaje de error incluye el XML: nombran el dato, nunca su valor.
+
+**Errores**
+
+| Código | Mensaje | Causa |
+|---|---|---|
+| `P0002` | `La empresa no existe en la organización` | empresa de otra organización o inexistente |
+| `22023` | `Falta el XML del CAF` | `p_caf_xml` nulo o en blanco |
+| `22023` | `Faltan el ambiente, el tipo, la fecha de autorización o el IDK del CAF` | alguno nulo |
+| `22023` | `El rango de folios del CAF no es válido` | nulo, `desde < 1` o `hasta < desde` |
+| `22023` | `El IDK del CAF no corresponde al ambiente` | IDK 300 en certificación o 100 en producción |
+| `22023` | `El CAF es de otra empresa (RUT del emisor distinto)` | `<RE>` ≠ `empresas.rut` |
+| `22023` | `La solicitud de folios no es de esta empresa, ambiente y tipo` | solicitud de otra organización, empresa, ambiente o tipo |
+| `22023` | `La solicitud de folios ya está enlazada a otro CAF` | `solicitudes_folios.caf_id` apunta a otro CAF |
+| `23505` | `Ya hay un CAF que empieza en el folio N con otro rango` | mismo `folio_desde`, otro `folio_hasta` |
+| `42501` | `permission denied for function registrar_caf` | llamada sin `service_role` |
+
+**Por qué `security definer` y solo `service_role`:** `guardar_secreto` y la tabla `cafs`
+(sin políticas de escritura) son del backend. La función no valida el XML como CAF (no
+revisa la firma del SII): eso lo hizo `SolicitudFolios` de la librería, que ya revisó IDK,
+RUT y tipo antes de devolverlo.
+
+**Cómo la llama la app** (`server/certificacion/folios.ts`, `solicitarFoliosSet`), dentro de
+`ejecutarOperacion`, después de que el SII timbró:
+
+```ts
+const datos = leerDatosCaf(caf);              // <DA>: RE, RS, TD, RNG D/H, FA, IDK; nunca la llave
+const registro = await cliente.rpc('registrar_caf', {
+  p_organizacion: ctx.organizacionId,         // de la membresía verificada
+  p_empresa: ctx.empresaId,
+  p_ambiente: 'certificacion',
+  p_tipo_dte: datos.tipoDte,
+  p_folio_desde: datos.desde,
+  p_folio_hasta: datos.hasta,
+  p_fecha_autorizacion: datos.fechaAutorizacion,
+  p_idk: datos.idk,
+  p_rut_emisor: datos.rutEmisor,
+  p_razon_social: datos.razonSocial,
+  p_caf_xml: decodificarUtf8OIso(caf),        // texto Unicode: Vault guarda texto
+  p_solicitud: solicitudId,
+});
+// cualquier falla (incluida la de leerDatosCaf) → solicitud 'incierta' + ErrorIncierto
+```
+
+El XML del CAF solo viaja a la RPC: no se registra en logs, `operaciones_sii` ni Sentry.
+Quien lo lee después es `enviarSet`, con `leer_secreto(caf_secret_id)` filtrando antes la
+fila de `cafs` por organización
+([Vault](../08-esquema-supabase/vault-y-secretos.md#caf-registrar_caf-migración-0008)).
+
+## `guardar_set_pruebas` (migración 0008)
+
+Viene en la misma `0008_certificacion.sql`, aplicada en producción el 2026-11-13. En
+una base sin ella, descargar el set termina en `error` **después** de que el SII registró
+la descarga: el usuario ve el mensaje genérico y a Sentry llega `ErrorBaseCertificacion`
+(«No se pudo guardar el set de pruebas en Supabase (código PGRST202).»).
+
+```sql
+public.guardar_set_pruebas(
+  p_organizacion     uuid,
+  p_proceso          uuid,
+  p_texto            text,           -- el .txt del set tal como lo entregó el SII
+  p_correo_proveedor text,           -- nulo = conserva el que había
+  p_casos            jsonb           -- lo que devuelve parsearSetPruebas, en snake_case
+) returns integer                    -- casos guardados
+-- plpgsql · security definer · search_path = ''
+-- revoke execute from public, anon, authenticated · grant execute to service_role
+```
+
+`p_casos` es un arreglo de objetos:
+
+```json
+[
+  {
+    "numero_caso": 1,
+    "tipo_dte": 39,
+    "detalles": [{ "nombre": "<NmbItem del caso>", "cantidad": 1, "precio": 1000, "exento": true }],
+    "referencia_codigo": "SET",
+    "referencia_razon": "CASO-1"
+  }
+]
+```
+
+**Para qué:** reemplazar los `set_pruebas_casos` del proceso y dejar el proceso en
+`set_descargado` **en una transacción**. Sin esto, una falla entre el borrado de los
+casos y la actualización del proceso dejaría el asistente con un texto de set que no calza
+con sus casos (o sin casos).
+
+**Efectos, en orden**
+
+1. Lee el proceso por `id` **y** `organizacion_id` con `for update` (si no, `P0002`).
+2. Si la etapa es `por_declarar` o `autorizada`, `22023`: un set nuevo reiniciaría la
+   certificación (la librería ya frena la descarga en P90).
+3. Valida los casos, uno por uno: arreglo no vacío; cada caso es un objeto con
+   `numero_caso` entero positivo (hasta 9 dígitos), `detalles` arreglo **no vacío**,
+   `referencia_razon` no en blanco y `tipo_dte` numérico si viene; números de caso sin
+   repetir.
+4. `delete` de todos los casos del proceso e `insert` de los nuevos (`tipo_dte` 39 si no
+   viene; `referencia_codigo` `'SET'` si viene vacío). `organizacion_id` lo hereda
+   `trg_00_organizacion` desde el proceso.
+5. `update` del proceso: `etapa = 'set_descargado'`, `set_pruebas_texto`,
+   `correo_proveedor_set = coalesce(p_correo_proveedor, correo_proveedor_set)`,
+   `set_descargado_en = now()` y **borra** `envio_set_id` y `revision_solicitada_en` (un set
+   nuevo deja sin valor los envíos hechos con el anterior).
+
+La etapa la escribe la propia función (`security definer`, `current_user = postgres`), así
+que `tg_proteger_proceso` no la frena. `tg_certificacion_autorizada` corre igual: no mueve
+la etapa (un proceso con P90/P91 ya está en `por_declarar` o más, y ahí la función
+rechaza el reemplazo), pero sí encola el webhook `certificacion.actualizada` si la etapa
+cambió.
+
+**Errores**
+
+| Código | Mensaje | Causa |
+|---|---|---|
+| `P0002` | `El proceso de certificación no existe en la organización` | proceso de otra organización o inexistente |
+| `22023` | `La empresa ya está lista para declarar o autorizada: no se reemplaza el set` | etapa ≥ `por_declarar` |
+| `22023` | `El set no trae casos` | `p_casos` nulo, no arreglo o vacío |
+| `22023` | `Un caso del set no trae número, detalles o referencia` | caso que no es objeto, número inválido, `detalles` que no es arreglo, razón en blanco o tipo no numérico |
+| `22023` | `Un caso del set no trae detalles` | `detalles` vacío |
+| `22023` | `El set trae números de caso repetidos` | dos casos con el mismo `numero_caso` |
+| `42501` | `permission denied for function guardar_set_pruebas` | llamada sin `service_role` |
+
+**Cómo la llama la app** (`server/certificacion/set.ts`, `descargarSet`): `casosJson()`
+pasa cada `CasoSetPruebas` a ese formato; `numero_caso` sale de `CASO-N` en la razón de la
+referencia (o del orden, si no calza). Si el texto no se puede leer
+(`parsearSetPruebas` lanza), la app **no** llama a esta RPC: borra los casos y guarda el
+texto con `update` directos ([set ilegible](../05-pruebas/set-de-pruebas.md#set-ilegible)).
+
+Verificación de las dos: `supabase/verificaciones/0008_certificacion.sql` (10, solo
+lectura) y `rls-fase5-certificacion.sql` (16, con `rollback`)
+([cómo correrlas](../05-pruebas/probar-el-esquema.md#6-simulación-de-las-rpc-de-la-fase-5-rls-fase5-certificacionsql)).
+Corridas en producción el 2026-11-13: 10/10 y 16/16 `ok`.
 
 ## `registrar_certificado` (migración 0005)
 

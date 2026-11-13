@@ -1,7 +1,7 @@
 ---
 title: "Esquema: despliegue"
 description: "Cómo se aplican las migraciones en la única base (Supabase en la nube, producción), requisitos (Vault, Realtime, pg_cron, pg_net) y tareas programadas."
-keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, aplicadas]
+keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, aplicadas, 0008_certificacion, registrar_caf, guardar_set_pruebas, rls-fase5-certificacion]
 related: ["02-guias/quickstart.md", "05-pruebas/probar-el-esquema.md", "08-esquema-supabase/vault-y-secretos.md"]
 source: ["supabase_saas_sii.sql (cabecera, opcional pg_cron)", "PLAN-SAAS.md §4.4 §6"]
 ---
@@ -33,7 +33,7 @@ Viven en `supabase/migrations/` con prefijo **secuencial de 4 dígitos** (no tim
 |---|---|
 | `0001_esquema_inicial.sql` | `supabase_saas_sii.sql` **byte a byte** (19 secciones: tipos, tablas, RLS, Vault, Storage, Realtime). Nunca se edita |
 | `0002_extensiones_cron.sql` | `pg_cron` (schema `pg_catalog`) y `pg_net` (schema `extensions`) |
-| `0003_…` en adelante | las previstas en PLAN-SAAS §6 |
+| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` es de la Fase 5: ver [abajo](#fase-5-migración-0008)) |
 
 Reglas, todas derivadas de que la única base es producción:
 
@@ -133,6 +133,46 @@ viejo: falla de forma controlada, sin salir al SII). Registro de lo hecho:
 5. *Advisors*: `rls_enabled_no_policy` en `bloqueos_sii` (INFO) es **esperado**, igual que en
    `tokens_sii` y `sesiones_sii`. Las dos RPC nuevas no deberían aparecer en
    `authenticated_security_definer_function_executable`: `authenticated` no las ejecuta.
+
+### Fase 5: migración 0008
+
+**Estado: aplicada en producción el 2026-11-13** (19:59 UTC) con
+`supabase db push --remote`. El código del asistente de certificación
+(`apps/web/src/server/certificacion/`) la usa. No hay prueba en PGlite: el comportamiento
+de las RPC se cubre con la simulación `rls-fase5-certificacion.sql` (paso 4) y el de la
+app, con Vitest contra un cliente falso (`apps/web/test/supabase-falso.ts`).
+
+| Migración | Contenido | Qué falla si falta |
+|---|---|---|
+| `0008_certificacion` | RPC `registrar_caf` (XML del CAF a Vault + fila de `cafs` + solicitud `timbrada`, en una transacción) y `guardar_set_pruebas` (reemplaza los casos del set y deja el proceso en `set_descargado`), las dos solo `service_role` ([contratos](../03-api-reference/rpc-backend.md#registrar_caf-migración-0008)). Solo funciones: sin tablas, columnas, políticas ni grants de tablas | **Pedir folios del set:** el SII timbra, pero `registrar_caf` no existe → el CAF no se guarda, la solicitud queda `incierta` y la operación `incierto` («Se timbraron los folios, pero no pudimos guardar el CAF…»). **Descargar el set:** el SII registra la descarga, pero `guardar_set_pruebas` no existe → la operación termina en `error` y el proceso no queda en `set_descargado`. Postular, consultar estados, pedir la revisión y declarar no la usan. Las dos fallas ocurren **después** de que el SII grabó algo |
+
+El número: el plan reservaba `0008` para `notificaciones` (Fase 8); la numeración es por
+orden de creación (PLAN-SAAS §6), así que las migraciones de las fases siguientes se
+corren un número.
+
+Es aditiva y el código que la usa no estaba desplegado, así que no había orden que cuidar
+con Vercel. Registro de lo hecho:
+
+1. Lectura de la migración completa (`supabase/migrations/0008_certificacion.sql`) y
+   revisión del respaldo (panel → *Database → Backups*).
+2. `pnpm exec supabase db push --remote=rbrntkztzijaxsnpgpqn --dry-run`: listó solo `0008`.
+3. `pnpm exec supabase db push --remote=rbrntkztzijaxsnpgpqn`: aplicada a las 19:59 UTC.
+4. Verificaciones, todas `ok = true`
+   ([cómo](../05-pruebas/probar-el-esquema.md#6-simulación-de-las-rpc-de-la-fase-5-rls-fase5-certificacionsql)):
+   - `supabase/verificaciones/0008_certificacion.sql` (solo lectura): **10/10**, con la
+     migración registrada como `0008`. Antes de migrar da todo `false` (las 10
+     comprobaciones miran las dos funciones o la migración registrada).
+   - La simulación `supabase/verificaciones/rls-fase5-certificacion.sql`: **16/16**, con
+     `rollback` (sin la 0008 se detiene con `42883` y no deja resultados). Después, su
+     consulta de limpieza del encabezado (organizaciones `zz-prueba-certificacion-fase5%`,
+     empresas `Empresa de prueba fase 5%` y secretos de Vault con descripción
+     `caf:11111111-1:%`) dio todo en 0.
+5. `pnpm db:tipos`: el resultado es idéntico a lo agregado a mano a
+   `apps/web/src/server/supabase/tipos.ts` (`registrar_caf` y `guardar_set_pruebas` en
+   `Functions`), sin diferencias.
+6. *Advisors* de seguridad: sin avisos nuevos. Las dos RPC no aparecen en
+   `authenticated_security_definer_function_executable`: no las ejecutan `anon` ni
+   `authenticated`.
 
 ## Requisitos del proyecto
 

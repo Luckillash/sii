@@ -1,9 +1,9 @@
 ---
 title: "Realtime y Storage"
 description: "Tablas publicadas en Realtime (incluida la migración 0006), bucket documentos-xml, rutas, AlmacenDocumentos, content-type y URLs firmadas."
-keywords: [Realtime, supabase_realtime, postgres_changes, replica identity, migración 0006, operaciones_sii, solicitudes_folios, documentos, envios, procesos_certificacion, RLS, Storage, documentos-xml, bucket, AlmacenDocumentos, rutaDocumento, subirXml, subirPdf, urlFirmada, createSignedUrl, MAXIMO_SEGUNDOS_URL, MAXIMO_BYTES, ErrorAlmacen, content-type, application/xml, text/xml, application/pdf, charset, ISO-8859-1, xml_path, uuid_o_nulo, storage.foldername]
+keywords: [Realtime, supabase_realtime, postgres_changes, replica identity, migración 0006, operaciones_sii, solicitudes_folios, documentos, envios, procesos_certificacion, RLS, Storage, documentos-xml, bucket, AlmacenDocumentos, rutaDocumento, subirXml, subirPdf, urlFirmada, createSignedUrl, MAXIMO_SEGUNDOS_URL, MAXIMO_BYTES, ErrorAlmacen, content-type, application/xml, text/xml, application/pdf, charset, ISO-8859-1, xml_path, uuid_o_nulo, storage.foldername, EnVivo, router.refresh, asistente de certificación, DTE-39-F, EnvioBOLETA-set]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "04-objetos/objetos-auditoria-e-integraciones.md", "09-libreria/backend-service-role.md", "03-api-reference/acceso-por-tabla.md", "07-referencia/trampas-conocidas.md"]
-source: ["supabase_saas_sii.sql §18 §19", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/verificaciones/0006_realtime_operaciones.sql", "apps/web/src/server/sii/almacen.ts"]
+source: ["supabase_saas_sii.sql §18 §19", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/verificaciones/0006_realtime_operaciones.sql", "apps/web/src/server/sii/almacen.ts", "apps/web/src/app/[org]/certificacion/EnVivo.tsx", "apps/web/src/server/certificacion/envio-set.ts"]
 ---
 
 # Realtime y Storage
@@ -80,6 +80,30 @@ El filtro reduce el tráfico; la seguridad la pone RLS (sin filtro, igual llegan
 filas de las organizaciones del usuario). Una fila `en_curso` que pasa a otro `resultado`
 llega como `UPDATE`: es la señal para mostrar el resultado sin recargar.
 
+### Asistente de certificación (Fase 5)
+
+Primer uso real de Realtime en la app: `apps/web/src/app/[org]/certificacion/EnVivo.tsx`.
+
+- Un canal `certificacion:<empresaId>` con dos `postgres_changes` (`event: '*'`):
+  `procesos_certificacion` y `operaciones_sii`, los dos con
+  `filter: empresa_id=eq.<empresaId>` (la página es de una empresa; RLS ya limita a las
+  organizaciones del usuario).
+- **No guarda las filas que llegan.** Cualquier cambio programa un `router.refresh()` con
+  400 ms de espera (junta el cambio de la operación y el del proceso en un solo refresco) y
+  el RSC vuelve a leer todo con RLS (`leerAsistente`). Así no hay dos fuentes de verdad.
+- Al reconectar (`SUBSCRIBED` después de haber estado suscrito) refresca una vez, para
+  traer lo que cambió con el canal caído. Con `CHANNEL_ERROR` o `TIMED_OUT` muestra «No
+  pudimos conectar la actualización en vivo. Recarga la página para ver el estado más
+  reciente.»
+- No escucha `envios`, `solicitudes_folios` ni `set_pruebas_casos`: sus cambios ocurren
+  dentro de una operación, y el cierre de la fila de `operaciones_sii` (que sí se escucha)
+  llega después y dispara el refresco.
+- Lo ven todos los miembros, también un lector o un emisor: la operación en curso se
+  muestra desde `operaciones_sii` («Descargando el set de pruebas desde las 14:32…»), sin
+  spinners por fila.
+- `operaciones_sii` depende de la migración 0006 (aplicada); `procesos_certificacion` está
+  publicada desde la 0001.
+
 ### Verificación
 
 `supabase/verificaciones/0006_realtime_operaciones.sql` (solo lectura, 9 comprobaciones):
@@ -122,6 +146,12 @@ representaciones impresas en PDF.
 - Lo que se guarda en `documentos.xml_path` y `envios.xml_path` es la ruta **dentro del
   bucket** (sin el prefijo `documentos-xml/`), tal como la devuelven `subirXml` y
   `subirPdf`.
+- **Set de pruebas (Fase 5, primera subida real).** `enviarSet` sube cada boleta como
+  `<org>/<empresa>/certificacion/DTE-39-F<folio>.xml` y el sobre como
+  `EnvioBOLETA-set-<envio_id>.xml`, **antes** de salir al SII, con `upsert: false` (el folio
+  y el id del envío no se repiten). Si el envío no llega a salir, los archivos quedan en
+  Storage aunque las boletas pasen a `anulado`. Con esta subida se puede confirmar lo de
+  la [trampa del `content-type`](../07-referencia/trampas-conocidas.md#errores-y-saneado).
 
 ### `AlmacenDocumentos`
 

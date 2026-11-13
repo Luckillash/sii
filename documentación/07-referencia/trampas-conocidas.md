@@ -1,9 +1,9 @@
 ---
 title: "Trampas conocidas"
 description: "Comportamientos no obvios del SII, de la librería y del esquema."
-keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta]
-related: ["08-esquema-supabase/solucion-de-problemas.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md"]
-source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/"]
+keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0]
+related: ["08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md"]
+source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/"]
 ---
 
 # Trampas conocidas
@@ -223,3 +223,130 @@ source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas
 - **Cargar las credenciales fuera de `ejecutarOperacion` pierde la auditoría.** Un
   `ErrorCredenciales` lanzado antes de entrar no deja fila en `operaciones_sii` ni pasa por
   la traducción de errores. Cárgalas dentro de `fn`.
+
+## Certificación ante el SII (Fase 5)
+
+### Migración 0008
+
+- **La migración 0008 está aplicada en producción** (2026-11-13). Síntomas si una base
+  nueva (otro proyecto, un entorno recién creado) no la tiene: las dos acciones que la usan
+  fallan **después** de que el SII grabó algo. Pedir folios del set timbra en el SII, pero
+  `registrar_caf` no existe (`PGRST202`) → la solicitud queda `incierta` y la operación
+  `incierto` («Se timbraron los folios, pero no pudimos guardar el CAF…»); descargar el set
+  registra la descarga en el SII, pero `guardar_set_pruebas` no existe → `error` y el
+  proceso no pasa a `set_descargado`. `tipos.ts` tenía las dos RPC agregadas a mano;
+  `pnpm db:tipos` dio un resultado idéntico, sin diferencias
+  ([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0008)).
+
+### Ensayo y confirmación
+
+- **En el asistente, el ensayo no sale a la red ni deja filas.** Con `confirmada: false`
+  las acciones de `server/certificacion` no llaman a `ejecutarOperacion`: validan en la
+  base y devuelven el resumen, sin fila `confirmada = false` en `operaciones_sii` y sin
+  `verificar_portal`. Es distinto de lo que hace `ejecutarOperacion` con un ensayo (inserta
+  su fila) y de la CLI, cuyo `solicitar-folios` sin `--confirmar` recorre el asistente del
+  SII hasta antes de timbrar. Consecuencia: el ensayo no puede anticipar lo que solo sabe
+  el SII (que pida folio inicial, que el portal haya cambiado, un rechazo); eso aparece al
+  confirmar.
+- **El ensayo no revisa el incierto (salvo en `enviarSet`).** El bloqueo por incierto de
+  `postular`, `solicitar_folios` y `declarar` lo aplica `ejecutarOperacion` solo a las
+  confirmadas: el ensayo puede salir bien y la confirmación volver con
+  `incierto_sin_revisar`. `enviarSet` consulta `bloqueoEnvioSet` antes del ensayo, así que
+  ahí bloquea también el ensayo.
+- **`verificar_portal` corre antes del control del incierto.** `postular` y `declarar`
+  confirmadas llaman primero a `verificarPortalAntes` (su propia fila, `confirmada = true`,
+  y un GET a www4) y recién después a `ejecutarOperacion`. Si la operación queda bloqueada
+  (incierto, en curso, sesión), la fila de `verificar_portal` queda igual. `descargarSet` y
+  `solicitarRevision` usan el mismo portal GWT pero no lo verifican antes.
+
+### Envío del set
+
+- **`enviar_set` tiene su propio bloqueo (`bloqueoEnvioSet`), no el de `ejecutarOperacion`.**
+  No está en `OPERACIONES_EFECTO_GLOBAL` (que va junto con el índice de la 0007), así que
+  `operaciones.ts` mira el último `enviar_set` confirmado de la empresa (sin `uso` ni
+  `config`) y bloquea si quedó `incierto` o `en_curso` sin `detalle.revisada_en`. Como lo
+  mira en `operaciones_sii`, «Marcar como revisada» lo desbloquea igual que a los demás.
+  **La carrera la cierra el bloqueo del certificado:** sin índice único, dos `enviarSet`
+  simultáneos pasarían los dos el control. Por eso el envío confirmado corre dentro de
+  `conBloqueoCertificado` (certificado + certificación) y repite `bloqueoEnvioSet` ya
+  adentro: el segundo no toma el bloqueo (`BloqueoOcupadoError` → `transporte`, «inténtalo
+  de nuevo») o, si entra después, ve la fila del primero. No es reentrante: dentro de
+  `enviarSet` no se abre sesión AUT2000 (va por REST). Prueba: «dos envíos simultáneos» en
+  `envio-set.test.ts`.
+- **Rechazo sin Track ID anula folios; una falla de red después de salir, no.** Si el set
+  no llega a salir (folios, armado, Storage, base o el **token**, que se pide antes de
+  marcar la salida) o el SII responde la subida con un error que no es de red, los folios
+  asignados van a `folios_anulados`, las boletas a `anulado` y `envios.error` guarda el
+  motivo. Con `ErrorTransporte` después de salir no se sabe si llegó: `envios.incierto`,
+  boletas `incierto` (por el trigger), folios sin anular y resultado `incierto`. La
+  anulación no borra los XML que ya se subieron a Storage, y si alguno de sus `update` o
+  `insert` falla solo queda un aviso en consola.
+- **Track ID sin guardar → incierto.** Si el SII devolvió Track ID pero la app no pudo
+  guardarlo (base caída, el `check` `track_id ~ '^[0-9]+$'` de `envios`, el `update` del
+  proceso), la operación queda `incierto` con el Track ID en el mensaje: «…anota el Track
+  ID y escríbenos a soporte». No reenviar: el SII ya tiene el set.
+- **Un envío incierto queda en `envio_set_id` sin cambiar la etapa.** Con `ErrorTransporte`
+  después de salir, además de `envios.incierto`, el proceso pasa a apuntar a ese envío (la
+  etapa sigue en `set_descargado`), así el paso 3 muestra «No sabemos si el set llegó al
+  SII» y `consultarEstadoSet` responde con la rama «resultado incierto». Lo que bloquea el
+  reenvío sigue siendo la fila `incierto` de `operaciones_sii` («Marcar como revisada»).
+  Un envío rechazado sin Track ID no se enlaza (sus folios se anulan).
+- **Un reenvío usa folios nuevos.** Los del envío anterior quedan usados aunque el SII
+  rechace el set; la revisión se pide con el Track ID del envío aceptado.
+- **`estado_sii` de la subida y `fecha_recepcion` se filtran.** De la respuesta de la
+  subida solo se guarda `estado_sii` si es `REC`, `SOK`, `CRT`, `FOK`, `PRD` o `EPR`; de la
+  consulta, `fecha_recepcion` solo si el SII la da con zona horaria (sin zona no se sabe el
+  instante). El JSON completo queda en `respuesta_subida` / `respuesta_estado`.
+- **`consultas_envio.error` va saneado.** Si la consulta del estado falla, se anota una fila
+  con `error`: `nombre: mensaje` pasado por `sanearTexto()` si es un `SiiError`, o solo
+  `<nombre> (sin detalle)` si no lo es (el mensaje de un error desconocido puede traer
+  cualquier cosa). Nunca la respuesta cruda.
+
+### Set y estados
+
+- **P91 no descarga el set.** `descargarSet` lee el estado de la declaración antes (y lo
+  guarda: el trigger puede dejar la empresa `autorizada`); con P91 no descarga, como la CLI
+  sin `--aunque-autorizada`. En P90 frena la librería (`ErrorPostulacion`). La RPC
+  `guardar_set_pruebas` y las validaciones previas además rechazan una etapa
+  `por_declarar` o `autorizada`.
+- **Set ilegible: no lo vuelvas a descargar.** El SII ya registró la descarga; la app guarda
+  el texto, borra los casos, deja `envio_set_id` y `revision_solicitada_en` nulos y **no
+  cambia la etapa**. Hasta una descarga legible, los pasos 3 y 4 no avanzan (sin casos ni
+  envío). El mensaje pide escribir a soporte.
+- **`ok` en `operaciones_sii` con `error` en la UI.** Set ilegible (`set_ilegible`), empresa
+  en P91 al descargar (`autorizada`) y set rechazado o con reparos al consultar
+  (`set_rechazado`, `set_con_reparos`) dejan la operación `ok`: la llamada al SII funcionó.
+  Un contador de fallas no puede basarse solo en `resultado`.
+- **Postulación en ASCII, declaración en UTF-8.** Los datos de la postulación van al
+  asistente de maullin (`charset=iso-8859-1`): con tildes la confirmación no calza y la
+  postulación no se graba, así que la app los rechaza. Los de la declaración van por
+  GWT-RPC y admiten tildes.
+- **La resolución de certificación la registra `postular`.** Número 0 y la fecha del día
+  en Chile, solo si la empresa no tiene una vigente de certificación. Si falla, la
+  postulación queda `ok` con un aviso, y `enviarSet` se niega hasta que la registres
+  (`config`).
+
+### UI del asistente
+
+- **La UI bloquea más que el backend.** Una incierta sin revisar de cualquiera de las seis
+  operaciones que graban (también `descargar_set` y `solicitar_revision`) deshabilita
+  **todas** las acciones; el backend solo bloquea `postular`, `solicitar_folios`,
+  `declarar` (por `ejecutarOperacion`) y `enviar_set` (por `bloqueoEnvioSet`).
+- **Una `en_curso` de más de 15 min es incierta también en la UI.** `operacionEnCurso()` y
+  `inciertasSinRevisar()` (`logica.ts`) usan `MINUTOS_EN_CURSO_ABANDONADA` (15, sincronizada
+  a mano con la de `server/sii/operacion.ts`, que es `server-only`): una fila abandonada de
+  una operación que graba deja de mostrarse «en curso» y aparece como «por verificar» con
+  «Marcar como revisada» (`marcarInciertaRevisada` la pasa a `incierto`). Si una función
+  muere a mitad de camino, el asistente se desbloquea a los 15 min.
+- **Un set aceptado con reparos se reenvía.** `aceptado_con_reparos` no avanza a
+  `set_aceptado` (el backend exige EPR limpio y responde `set_con_reparos`), así que el
+  paso 3 lo trata como un rechazo: «El SII aceptó el set con reparos. Revisa los reparos,
+  corrige y vuelve a enviarlo», con «Volver a enviar el set» y la consulta del estado.
+- **La vista trae las últimas 20 operaciones.** Una incierta más antigua no aparece en la
+  lista ni deshabilita botones; el backend igual la bloquea (las de efecto global y
+  `enviar_set`) y devuelve `operacionPendienteId`, con lo que el aviso de error sí ofrece
+  «Marcar como revisada».
+- **El correo de etapa es por operación y solo si la etapa cambia.** `Idempotency-Key` =
+  `certificacion/<operacionId>/<etapa>`: la misma operación no avisa dos veces la misma
+  etapa. Una consulta que no cambia la etapa no manda nada. Sin `NEXT_PUBLIC_APP_URL` no
+  se envía (aviso en consola).

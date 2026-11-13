@@ -47,7 +47,8 @@ sources: ["supabase_saas_sii.sql", "certificacion-node/docs/"]
 | `service_role` | Salta RLS: todo código que lo usa filtra por `organizacion_id`, tomado de la membresía verificada ([tenancy](01-fundamentos/tenancy-y-roles.md)) |
 | Llamadas al SII | Solo en el servidor (`server/sii/`, `server-only`, runtime Node.js) y siempre dentro de `ejecutarOperacion`: sin fila en `operaciones_sii` no se llama al SII ([contrato](09-libreria/backend-service-role.md)) |
 | Resultado | `operaciones_sii.resultado` equivale al código de salida de la CLI 0–7 ([errores](01-fundamentos/errores-y-resultados.md)) |
-| ⚠️ e incierto | Las operaciones que graban tienen ensayo y confirmación, y confirman la sesión con `getUser()`. Un `incierto` no se repite a ciegas: bloquea `solicitar_folios`, `postular` y `declarar` hasta marcarlo como revisado |
+| ⚠️ e incierto | Las operaciones que graban tienen ensayo y confirmación, y confirman la sesión con `getUser()`. Un `incierto` no se repite a ciegas: bloquea `solicitar_folios`, `postular` y `declarar` (y, en el asistente de certificación, `enviar_set`) hasta marcarlo como revisado ([errores](01-fundamentos/errores-y-resultados.md#la-regla-del-incierto)) |
+| Certificación | El asistente (`/<org>/certificacion`) muestra 5 pasos sobre las 8 etapas de `procesos_certificacion`; `por_declarar` (P90) y `autorizada` (P91) las pone un trigger, nunca la app. Su ensayo no sale al SII ni deja filas ([guía](02-guias/certificacion-empresa.md)) |
 | Secretos | .pfx, clave, CAF, tokens y cookies nunca en mensajes, logs, Sentry ni `operaciones_sii`; credenciales y transporte se crean por invocación, nunca globales ([vault](08-esquema-supabase/vault-y-secretos.md)) |
 
 ---

@@ -1,9 +1,9 @@
 ---
 title: "Esquema: Vault y secretos"
 description: "Qué secretos hay, dónde van, cómo se guardan, leen y borran, y qué se cifra fuera de la base."
-keywords: [Vault, vault.secrets, vault.decrypted_secrets, vault.create_secret, guardar_secreto, leer_secreto, registrar_certificado, tg_borrar_secretos, trg_borrar_secretos, pfx_secret_id, clave_secret_id, caf_secret_id, secreto_secret_id, cron_token, "certificado:<huella>:pfx", "certificado:<huella>:clave", depurar.ts, depurarEvento, beforeSend, beforeSendSpan, beforeBreadcrumb, server_action_form_data, "[Filtrado]", AES-256-GCM, SII_TOKENS_KEY, AAD, cifrado.ts, crearCredenciales, ErrorCredenciales, sanearTexto, sanearDetalle, detalleSeguro, contextoSesion, SesionesSupabase]
+keywords: [Vault, vault.secrets, vault.decrypted_secrets, vault.create_secret, guardar_secreto, leer_secreto, registrar_certificado, tg_borrar_secretos, trg_borrar_secretos, pfx_secret_id, clave_secret_id, caf_secret_id, secreto_secret_id, cron_token, "certificado:<huella>:pfx", "certificado:<huella>:clave", depurar.ts, depurarEvento, beforeSend, beforeSendSpan, beforeBreadcrumb, server_action_form_data, "[Filtrado]", AES-256-GCM, SII_TOKENS_KEY, AAD, cifrado.ts, crearCredenciales, ErrorCredenciales, sanearTexto, sanearDetalle, detalleSeguro, contextoSesion, SesionesSupabase, registrar_caf, "caf:<rut>", xmlCaf, migración 0008]
 related: ["01-fundamentos/ambientes-y-credenciales.md", "03-api-reference/rpc-backend.md", "04-objetos/objetos-empresas-y-credenciales.md", "02-guias/onboarding-organizacion.md"]
-source: ["supabase_saas_sii.sql §6 §7 §14 §15", "supabase/migrations/0002_extensiones_cron.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/lib/sentry/depurar.ts", "apps/web/src/server/cifrado.ts", "PLAN-SAAS.md §2 §4.4 §4.8"]
+source: ["supabase_saas_sii.sql §6 §7 §14 §15", "supabase/migrations/0002_extensiones_cron.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0008_certificacion.sql", "apps/web/src/lib/sentry/depurar.ts", "apps/web/src/server/cifrado.ts", "PLAN-SAAS.md §2 §4.4 §4.8"]
 ---
 
 # Esquema: Vault y secretos
@@ -28,7 +28,7 @@ solo como hash sha256: `invitaciones.token_hash`, `api_keys.clave_hash`.
 |---|---|---|---|---|
 | .pfx en base64 | `certificados.pfx_secret_id` | `registrar_certificado()` → `guardar_secreto()` | `certificado:<huella>:pfx` | 3 (0005) |
 | Clave del .pfx | `certificados.clave_secret_id` | ídem | `certificado:<huella>:clave` | 3 (0005) |
-| XML del CAF (con `RSASK`) | `cafs.caf_secret_id` | backend con `guardar_secreto()` | por definir | 6 |
+| XML del CAF (con `RSASK`) | `cafs.caf_secret_id` | `registrar_caf()` → `guardar_secreto()` | `caf:<rut>:<ambiente>:<tipo>:<desde>-<hasta>` | 5 (0008, aplicada el 2026-11-13) |
 | Secreto HMAC del webhook | `webhooks.secreto_secret_id` | `crear_webhook()` llama directo a `vault.create_secret` | `webhook <url>` | 11 |
 | `cron_token` | ninguna (secreto con nombre) | a mano en el SQL Editor (`0002_extensiones_cron.sql`) | `Bearer para /api/cron/*` | 0 |
 
@@ -61,13 +61,40 @@ validarlo, confirma la sesión con `getUser()`, convierte los bytes a base64 sol
 llamada y, al terminar, sobrescribe su copia con ceros (`bytes.fill(0)`). El archivo no
 se escribe en disco ni en Storage, y ni el archivo ni la clave vuelven al navegador.
 
+## CAF: `registrar_caf` (migración 0008)
+
+Mismo patrón que el certificado, para el XML del CAF (Fase 5, migración
+`0008_certificacion`, aplicada el 2026-11-13;
+[contrato](../03-api-reference/rpc-backend.md#registrar_caf-migración-0008)):
+
+1. Valida empresa (dentro de la organización), rango, IDK del ambiente, RUT del emisor y
+   la solicitud **antes** de tocar Vault.
+2. Serializa por empresa (`for no key update`) y mira si el CAF ya existe: si existe con el
+   mismo rango devuelve su id **sin crear otro secreto**.
+3. Si no existe, `guardar_secreto(xml, 'caf:<rut>:<ambiente>:<tipo>:<desde>-<hasta>')` e
+   insert en `cafs`; un `unique_violation` aborta todo y el secreto se va con la
+   transacción.
+
+La descripción lleva solo datos públicos del CAF (RUT, ambiente, tipo y rango), nunca la
+llave. El secreto guarda el XML **completo** como texto Unicode (la app lo decodifica con
+`decodificarUtf8OIso` antes de la llamada). En la app, el XML solo viaja de
+`SolicitudFolios` a la RPC: no se registra, no va a `operaciones_sii` ni a
+`solicitudes_folios.mensaje`.
+
+**Quién lo lee:** `enviarSet` (`server/certificacion/envio-set.ts`, `xmlCaf`) para timbrar
+las boletas del set: lee `caf_secret_id` de la fila de `cafs` filtrando por
+`organizacion_id` e `id` y llama a `leer_secreto`. Un error o un valor vacío → «No pudimos
+leer el CAF guardado. Vuelve a pedir folios para el set.» (`config`). El XML se usa en
+memoria con `ArmadorBoleta` y no se guarda en otro lado. La UI nunca selecciona
+`caf_secret_id`.
+
 ## Quién lee
 
 `leer_secreto(p_id)` devuelve `decrypted_secret` de `vault.decrypted_secrets`. Solo la
 ejecuta `service_role` (`revoke execute … from public, anon, authenticated` en la §17 de
-`0001`). Desde la Fase 4 la llama **un solo lugar**: `crearCredenciales()` de
-`server/sii/credenciales.ts`, que arma el `Certificado` / `FirmaElectronica` en memoria por
-invocación:
+`0001`). La llaman dos lugares: el XML del CAF lo lee `enviarSet` (arriba, Fase 5), y el
+certificado, `crearCredenciales()` de `server/sii/credenciales.ts` (Fase 4), que arma el
+`Certificado` / `FirmaElectronica` en memoria por invocación:
 
 - Lee la fila de `certificados` filtrando por `organizacion_id` e `id`; rechaza revocados
   y vencidos (según la fila) **antes** de tocar Vault.
@@ -197,5 +224,5 @@ con AAD `JSON.stringify(['sesiones_sii', certificadoId, ambiente])` (`contextoSe
 Detalle de variables y del spike en
 [ambientes y credenciales](../01-fundamentos/ambientes-y-credenciales.md#cifrado-de-tokens-y-cookies).
 
-<!-- TODO (Fase 6): guardado y lectura del XML del CAF (descripción del secreto, quién lo lee al timbrar). -->
+<!-- TODO (Fase 6): CAF de producción y carga manual de un CAF (el guardado y la lectura en certificación ya están arriba, Fase 5). -->
 <!-- TODO (Fase 11): rotación del secreto HMAC de un webhook. -->
