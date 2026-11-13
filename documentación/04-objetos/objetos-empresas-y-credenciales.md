@@ -18,7 +18,7 @@ una base sin ella, la carga de certificados, el registro de resoluciones y el ca
 predeterminado fallan con `42883` (`function … does not exist`).
 
 La Fase 4 suma una séptima tabla, `bloqueos_sii` (migración `0007_bloqueos_sii`,
-**pendiente de aplicar en producción**), y el código que escribe `sesiones_sii`.
+**aplicada en producción el 2026-11-13**), y el código que escribe `sesiones_sii`.
 
 Leyenda: ✔ obligatoria (`not null` sin default útil) · 🔒 solo `service_role`.
 
@@ -32,7 +32,7 @@ Leyenda: ✔ obligatoria (`not null` sin default útil) · 🔒 solo `service_ro
 | `empresa_certificados` | todo miembro | administradores (RLS) | `server/certificados/asociaciones.ts` y `fijar_certificado_predeterminado()` (0005), con la sesión |
 | `tokens_sii` 🔒 | solo `service_role` | solo `service_role` | `TokenStoreSupabase` sobre `token_obtener` / `token_guardar` / `token_borrar` |
 | `sesiones_sii` 🔒 | solo `service_role` | solo `service_role` | `SesionesSupabase` y `conSesionReutilizada` (`server/sii/sesiones.ts`, Fase 4) |
-| `bloqueos_sii` 🔒 | solo `service_role` | solo `service_role`, por dos RPC | `conBloqueoCertificado` (`server/sii/bloqueos.ts`) sobre `tomar_bloqueo_certificado` / `liberar_bloqueo_certificado` (migración 0007, **pendiente de aplicar**) |
+| `bloqueos_sii` 🔒 | solo `service_role` | solo `service_role`, por dos RPC | `conBloqueoCertificado` (`server/sii/bloqueos.ts`) sobre `tomar_bloqueo_certificado` / `liberar_bloqueo_certificado` (migración 0007, aplicada el 2026-11-13) |
 
 Matriz completa por rol en [acceso por tabla](../03-api-reference/acceso-por-tabla.md).
 
@@ -223,8 +223,7 @@ Lo que hace la capa
 
 ## `bloqueos_sii` 🔒
 
-Migración `0007_bloqueos_sii` (**escrita, pendiente de aplicar en producción** al
-2026-11-13). Bloqueo con arriendo por certificado y ambiente: serializa entre peticiones
+Migración `0007_bloqueos_sii` (**aplicada en producción el 2026-11-13**). Bloqueo con arriendo por certificado y ambiente: serializa entre peticiones
 las sesiones AUT2000 del SII. Mismo blindaje que `tokens_sii` y `sesiones_sii`: RLS activo
 **sin políticas** y `revoke all` a `anon` y `authenticated`. Solo se toca por
 `tomar_bloqueo_certificado` y `liberar_bloqueo_certificado`
@@ -280,6 +279,8 @@ Fase 8.
 
 Las dos requieren la 0005 aplicada. Corridas en producción el 2026-11-13: 15/15 y 43/43.
 
-- `supabase/verificaciones/0007_bloqueos_sii.sql` (solo lectura, 12) y
-  `rls-fase4-bloqueos.sql` (con `rollback`, 16): `bloqueos_sii` y sus dos RPC.
-  **Pendientes**: requieren la 0007 aplicada (antes de migrar, la 0007 da todo `false`).
+- `supabase/verificaciones/0007_bloqueos_sii.sql` (solo lectura, 14) y
+  `rls-fase4-bloqueos.sql` (con `rollback`, 21): `bloqueos_sii`, sus dos RPC y el índice
+  único de `operaciones_sii`. Requieren la 0007 aplicada (antes de migrar, la 0007 daba todo
+  `false`). Corridas en producción el 2026-11-13: 14/14 y 21/21 `ok`; después del
+  `rollback`, la consulta de limpieza dio todo en 0.

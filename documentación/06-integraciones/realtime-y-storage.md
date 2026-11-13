@@ -86,7 +86,7 @@ llega como `UPDATE`: es la señal para mostrar el resultado sin recargar.
 la publicación existe y publica `insert`, `update` y `delete`; las dos tablas están en ella;
 `documentos`, `envios` y `procesos_certificacion` siguen publicadas; RLS activo; política
 `lectura`; `select` para `authenticated`; nada para `anon`; *replica identity* por defecto;
-migración registrada como `0006`. Antes de aplicar la migración da 7/9 (fallan la 2 y la 9).
+migración registrada como `0006`. Antes de aplicar la migración daba 7/9 (fallaban la 2 y la 9); aplicada el 2026-11-13, da 9/9 `ok`.
 
 ## Storage: `documentos-xml`
 

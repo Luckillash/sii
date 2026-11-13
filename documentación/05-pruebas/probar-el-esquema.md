@@ -176,7 +176,7 @@ huellas y secretos con esas descripciones.
 `supabase/verificaciones/rls-fase4-bloqueos.sql` prueba el criterio del bloqueo con
 arriendo: dos peticiones no abren sesiones AUT2000 en paralelo con el mismo certificado y
 ambiente; y el índice único parcial de `operaciones_sii`: dos operaciones de efecto global
-iguales no quedan `en_curso` a la vez. **Requiere la migración 0007 aplicada** (aplicada en producción el 2026-11-13): sin ella se
+iguales no quedan `en_curso` a la vez. **Requiere la migración 0007 aplicada** (en producción desde el 2026-11-13): sin ella se
 detiene con `42P01` (`relation … does not exist`) o `42883` y la transacción se descarta
 completa, sin resultados.
 
