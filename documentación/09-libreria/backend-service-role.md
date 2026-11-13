@@ -288,7 +288,18 @@ límite de re-login de AUT2000.
 - `operacion.test.ts` cubre los 8 resultados y busca patrones de secretos (token, cookie,
   PEM, JWT, clave) en lo que llega a `operaciones_sii`, al registro de Sentry y a
   `console.*`.
-- Una prueba contra certificación real (token REST con un certificado real) se hace a
-  mano, nunca automática.
+- Una prueba contra certificación real se hace a mano, nunca automática:
+  `src/server/sii/integracion-certificacion.test.ts`, que se omite sin `SII_INTEGRACION=1`.
+  Con el certificado real de una empresa (Vault), corre `ejecutarOperacion('obtener_token')`
+  en certificación por REST con `TokenStoreSupabase`, comprueba que ni la fila de
+  `operaciones_sii` ni lo que recibe Sentry contienen el token, que la segunda vez sale del
+  caché (`tokens_sii` no cambia) y que el bloqueo con arriendo rechaza a un segundo titular
+  por PostgREST. Escribe en producción una fila de `operaciones_sii` por operación y el
+  token cifrado en `tokens_sii`. Desde `apps/web`, con `.env.local` completo:
+  `SII_INTEGRACION=1 SII_INTEGRACION_ORG=<uuid> SII_INTEGRACION_EMPRESA=<uuid> pnpm vitest run src/server/sii/integracion-certificacion.test.ts`.
+  Primera corrida el 2026-11-13: en verde en 7,6 s (token en 1,54 s; desde el caché, 0,74 s).
+- `sanearDetalle` filtra toda clave que contenga `token`, aunque el valor sea inocuo (p. ej.
+  `largo_token` queda `[Filtrado]`): es a propósito, preferimos perder un dato a guardar una
+  credencial. Para datos así, usa nombres sin esas palabras.
 
 <!-- TODO (Fases 6–8 y 11): workers y cron (seguimiento, webhooks), guardado del CAF en Vault, uso desde la API pública (apiKeyId). -->
