@@ -1,7 +1,7 @@
 ---
 title: "Esquema: Vault y secretos"
 description: "Qué secretos hay, dónde van, cómo se guardan, leen y borran, y qué se cifra fuera de la base."
-keywords: [Vault, vault.secrets, vault.decrypted_secrets, vault.create_secret, guardar_secreto, leer_secreto, registrar_certificado, tg_borrar_secretos, trg_borrar_secretos, pfx_secret_id, clave_secret_id, caf_secret_id, secreto_secret_id, cron_token, "certificado:<huella>:pfx", "certificado:<huella>:clave", depurar.ts, depurarEvento, beforeSend, beforeSendSpan, beforeBreadcrumb, server_action_form_data, "[Filtrado]", AES-256-GCM, SII_TOKENS_KEY, AAD, cifrado.ts]
+keywords: [Vault, vault.secrets, vault.decrypted_secrets, vault.create_secret, guardar_secreto, leer_secreto, registrar_certificado, tg_borrar_secretos, trg_borrar_secretos, pfx_secret_id, clave_secret_id, caf_secret_id, secreto_secret_id, cron_token, "certificado:<huella>:pfx", "certificado:<huella>:clave", depurar.ts, depurarEvento, beforeSend, beforeSendSpan, beforeBreadcrumb, server_action_form_data, "[Filtrado]", AES-256-GCM, SII_TOKENS_KEY, AAD, cifrado.ts, crearCredenciales, ErrorCredenciales, sanearTexto, sanearDetalle, detalleSeguro, contextoSesion, SesionesSupabase]
 related: ["01-fundamentos/ambientes-y-credenciales.md", "03-api-reference/rpc-backend.md", "04-objetos/objetos-empresas-y-credenciales.md", "02-guias/onboarding-organizacion.md"]
 source: ["supabase_saas_sii.sql §6 §7 §14 §15", "supabase/migrations/0002_extensiones_cron.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/lib/sentry/depurar.ts", "apps/web/src/server/cifrado.ts", "PLAN-SAAS.md §2 §4.4 §4.8"]
 ---
@@ -26,8 +26,8 @@ solo como hash sha256: `invitaciones.token_hash`, `api_keys.clave_hash`.
 
 | Secreto | Columna con el id | Cómo entra | Descripción en Vault | Fase |
 |---|---|---|---|---|
-| .pfx en base64 | `certificados.pfx_secret_id` | `registrar_certificado()` → `guardar_secreto()` | `certificado:<huella>:pfx` | 3 (0005 pendiente) |
-| Clave del .pfx | `certificados.clave_secret_id` | ídem | `certificado:<huella>:clave` | 3 (0005 pendiente) |
+| .pfx en base64 | `certificados.pfx_secret_id` | `registrar_certificado()` → `guardar_secreto()` | `certificado:<huella>:pfx` | 3 (0005) |
+| Clave del .pfx | `certificados.clave_secret_id` | ídem | `certificado:<huella>:clave` | 3 (0005) |
 | XML del CAF (con `RSASK`) | `cafs.caf_secret_id` | backend con `guardar_secreto()` | por definir | 6 |
 | Secreto HMAC del webhook | `webhooks.secreto_secret_id` | `crear_webhook()` llama directo a `vault.create_secret` | `webhook <url>` | 11 |
 | `cron_token` | ninguna (secreto con nombre) | a mano en el SQL Editor (`0002_extensiones_cron.sql`) | `Bearer para /api/cron/*` | 0 |
@@ -65,8 +65,23 @@ se escribe en disco ni en Storage, y ni el archivo ni la clave vuelven al navega
 
 `leer_secreto(p_id)` devuelve `decrypted_secret` de `vault.decrypted_secrets`. Solo la
 ejecuta `service_role` (`revoke execute … from public, anon, authenticated` en la §17 de
-`0001`). Hoy **ningún código la llama**: la primera será `server/sii/credenciales.ts` de
-la Fase 4, que arma el `Certificado` / `FirmaElectronica` en memoria por invocación.
+`0001`). Desde la Fase 4 la llama **un solo lugar**: `crearCredenciales()` de
+`server/sii/credenciales.ts`, que arma el `Certificado` / `FirmaElectronica` en memoria por
+invocación:
+
+- Lee la fila de `certificados` filtrando por `organizacion_id` e `id`; rechaza revocados
+  y vencidos (según la fila) **antes** de tocar Vault.
+- Pide los dos secretos en paralelo y abre el .pfx con `Certificado.desdeContenido` de la
+  librería. Nada se escribe a disco, logs ni Sentry.
+- Exige que la huella del .pfx abierto sea la `huella_sha256` de la fila (si alguien
+  cambiara un `*_secret_id`, no se firmaría con otro certificado).
+- Caché por invocación (un mapa de promesas que muere con la petición), **nunca** en una
+  variable de módulo.
+- Un error de `leer_secreto` → `ErrorCredenciales('base')` (solo el código); un secreto
+  vacío o ausente → `ErrorCredenciales('vault')` («Falta el archivo o la contraseña del
+  certificado»); un .pfx que no abre → `ilegible`. Ninguno lleva `cause`.
+
+Detalle en [contrato del backend](../09-libreria/backend-service-role.md#credencialests).
 
 - El esquema `vault` no está expuesto por la Data API (`supabase/config.toml` expone
   solo `public` y `graphql_public`).
@@ -136,6 +151,27 @@ nombre nuevo, igual queda cubierto por la regla de `server_action_form_data`; si
 mandas a Sentry por otra vía (un `captureException` con contexto propio), revisa que el
 nombre del campo calce con alguna regla.
 
+### Capa SII (`server/sii/errores.ts`)
+
+Lo que la capa SII guarda en `operaciones_sii` (`mensaje`, `detalle`), muestra al usuario o
+envía a Sentry pasa antes por sus propios saneadores, que se suman a `depurar.ts`:
+
+| Función | Qué hace |
+|---|---|
+| `sanearTexto(texto)` | aplica `depurarTexto()` de Sentry (tabla de arriba) y además quita cabeceras `Cookie:` / `Set-Cookie:` completas, pares `clave=valor` / `token: valor` / `password="…"` (claves `clave`, `contraseña`, `password`, `passwd`, `secreto`, `secret`, `token`, `api_key`, `apikey`, `authorization`, `rsask`) y tiras de 32 o más caracteres `[A-Za-z0-9+/_]` que mezclan letras y dígitos. Recorta a 1.000 caracteres |
+| `sanearDetalle(objeto)` | copia JSON (descarta funciones, símbolos y `undefined`; fechas a ISO; un objeto con ciclos o `BigInt` queda `{}`), pasa por `depurarBreadcrumb()` (misma lista de claves sensibles de Sentry), filtra además las claves que contengan `sesion`/`sesión`, `session`, `csrf`, `credencial`, `bearer`, `jwt` o `passphrase`, y sanea cada texto con `sanearTexto()` (los uuid se dejan tal cual). Hasta 6 niveles y 100 elementos por nivel |
+| `detalleSeguro(error)` | solo campos tipados de errores conocidos; **nunca** `cause`, stack ni el `message` de un error desconocido ([tabla](../01-fundamentos/errores-y-resultados.md#qué-se-guarda-de-un-error-y-qué-nunca)) |
+| copia saneada para Sentry (`operacion.ts`) | `name` y `message` por `sanearTexto()`, solo los marcos `at …` del stack, sin `cause` |
+
+Límite conocido: un secreto **corto** suelto en un texto libre (un token del SII de 12
+caracteres en medio de una frase) no calza con ningún patrón. Por eso el `message` de un
+error desconocido no se guarda ni se muestra, y `agregarDetalle()` solo debe recibir
+campos acotados ([trampa](../07-referencia/trampas-conocidas.md#errores-y-saneado)).
+
+`operacion.test.ts` lo verifica con un token, una cookie, un PEM, un JWT y una clave
+metidos en `message`, `cause`, `estado`, `glosa`, la URL de un `ErrorTransporte` y el
+detalle: ninguno aparece en las filas, en lo que se manda a Sentry ni en `console.*`.
+
 ## Tokens del SII y cookies AUT2000 (cifrado en la app)
 
 `apps/web/src/server/cifrado.ts` (`server-only`):
@@ -155,7 +191,9 @@ nombre del campo calce con alguna regla.
 
 Los tokens los guarda y lee `TokenStoreSupabase` (`server/sii/token-store-supabase.ts`)
 sobre `token_obtener` / `token_guardar` / `token_borrar`, solo con `service_role`. Las
-cookies de `sesiones_sii` las manejará `sesiones.ts` de la Fase 4 (aún sin código).
+cookies de `sesiones_sii` las maneja `SesionesSupabase` (`server/sii/sesiones.ts`, Fase 4),
+con AAD `JSON.stringify(['sesiones_sii', certificadoId, ambiente])` (`contextoSesion`)
+([autenticación](../01-fundamentos/autenticacion-sii.md)).
 Detalle de variables y del spike en
 [ambientes y credenciales](../01-fundamentos/ambientes-y-credenciales.md#cifrado-de-tokens-y-cookies).
 

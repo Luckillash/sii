@@ -155,7 +155,7 @@ Reglas para el desarrollo:
 | Secreto HMAC de cada webhook | Supabase Vault (`webhooks.secreto_secret_id`) | `leer_secreto()` con `service_role` |
 | Token del SII (REST/SOAP) | `tokens_sii.token_cifrado` | AES-256-GCM en la app con `SII_TOKENS_KEY` |
 | Cookies AUT2000 | `sesiones_sii.cookies_cifradas` | AES-256-GCM en la app con `SII_TOKENS_KEY` |
-| `SII_TOKENS_KEY`, `SUPABASE_SECRET_KEY`, `CRON_SECRET` | variables de entorno de Vercel (*sensitive*) | `process.env`, validadas en `src/server/env.ts` |
+| `SII_TOKENS_KEY`, `SUPABASE_SECRET_KEY`, `CRON_SECRET` | variables de entorno de Vercel (*sensitive*) | `process.env`; `SUPABASE_SECRET_KEY` se valida en `src/server/env.ts` y `SII_TOKENS_KEY` en `leerLlave()` de `src/server/cifrado.ts` (32 bytes en base64) |
 | `TURNSTILE_SECRET_KEY` | variable de entorno de Vercel (*sensitive*) **y** Supabase Auth → *Attack Protection* | `siteverify` en `src/server/turnstile.ts` (invitación, contacto, y los formularios de acceso cuando hay `SUPABASE_SECRET_KEY`); Supabase la usa para validar `captchaToken` en Auth |
 | `SUPABASE_SECRET_KEY` (`sb_secret_…`), segundo uso | la misma variable | `src/server/supabase/clave-auth.ts`: llamadas a `supabase.auth.*` en nombre de la persona con `sb-forwarded-for` (su IP real), para que los límites por IP de Auth no vean solo la IP de Vercel. Con esta clave Auth omite el captcha (la app verifica Turnstile) y la Data API correría como service_role: nunca usar esos clientes para datos |
 | `cron_token` | Supabase Vault | `pg_cron` lo envía como Bearer a `/api/cron/*` (igual a `CRON_SECRET`) |

@@ -44,7 +44,11 @@ sources: ["supabase_saas_sii.sql", "certificacion-node/docs/"]
 
 | Tema | Regla |
 |---|---|
-| | |
+| `service_role` | Salta RLS: todo código que lo usa filtra por `organizacion_id`, tomado de la membresía verificada ([tenancy](01-fundamentos/tenancy-y-roles.md)) |
+| Llamadas al SII | Solo en el servidor (`server/sii/`, `server-only`, runtime Node.js) y siempre dentro de `ejecutarOperacion`: sin fila en `operaciones_sii` no se llama al SII ([contrato](09-libreria/backend-service-role.md)) |
+| Resultado | `operaciones_sii.resultado` equivale al código de salida de la CLI 0–7 ([errores](01-fundamentos/errores-y-resultados.md)) |
+| ⚠️ e incierto | Las operaciones que graban tienen ensayo y confirmación, y confirman la sesión con `getUser()`. Un `incierto` no se repite a ciegas: bloquea `solicitar_folios`, `postular` y `declarar` hasta marcarlo como revisado |
+| Secretos | .pfx, clave, CAF, tokens y cookies nunca en mensajes, logs, Sentry ni `operaciones_sii`; credenciales y transporte se crean por invocación, nunca globales ([vault](08-esquema-supabase/vault-y-secretos.md)) |
 
 ---
 
@@ -54,7 +58,8 @@ sources: ["supabase_saas_sii.sql", "certificacion-node/docs/"]
 |---|---|
 | Entender qué es el SaaS y qué pieza hace cada cosa | [01-fundamentos/vision-general.md](01-fundamentos/vision-general.md) |
 | Ambientes, hosts del SII, certificado, roles y claves API de Supabase, sesiones y revocación | [01-fundamentos/ambientes-y-credenciales.md](01-fundamentos/ambientes-y-credenciales.md) |
-| Tokens del SII o sesión AUT2000 | [01-fundamentos/autenticacion-sii.md](01-fundamentos/autenticacion-sii.md) |
+| Tokens del SII, sesión AUT2000 o bloqueo por certificado | [01-fundamentos/autenticacion-sii.md](01-fundamentos/autenticacion-sii.md) |
+| **Escribir una operación con el SII** (capa `server/sii/`: credenciales, `ejecutarOperacion`, almacén) | [09-libreria/backend-service-role.md](09-libreria/backend-service-role.md) |
 | Firma XML, TED, ISO-8859-1 | [01-fundamentos/firma-y-timbre.md](01-fundamentos/firma-y-timbre.md) |
 | Organizaciones, roles y permisos | [01-fundamentos/tenancy-y-roles.md](01-fundamentos/tenancy-y-roles.md) |
 | Decidir si reintentar o interpretar un error | [01-fundamentos/errores-y-resultados.md](01-fundamentos/errores-y-resultados.md) |
@@ -93,7 +98,7 @@ sources: ["supabase_saas_sii.sql", "certificacion-node/docs/"]
 | Tablas | Archivo |
 |---|---|
 | `perfiles`, `organizaciones`, `miembros_organizacion`, `invitaciones`, `planes`, `suscripciones`, `uso_mensual` | [04-objetos/objetos-tenancy.md](04-objetos/objetos-tenancy.md) |
-| `empresas`, `resoluciones`, `certificados`, `empresa_certificados`, `tokens_sii`, `sesiones_sii`, `v_certificados_estado` | [04-objetos/objetos-empresas-y-credenciales.md](04-objetos/objetos-empresas-y-credenciales.md) |
+| `empresas`, `resoluciones`, `certificados`, `empresa_certificados`, `tokens_sii`, `sesiones_sii`, `bloqueos_sii`, `v_certificados_estado` | [04-objetos/objetos-empresas-y-credenciales.md](04-objetos/objetos-empresas-y-credenciales.md) |
 | `cafs`, `solicitudes_folios`, `folios_anulados`, `v_folios_disponibles` | [04-objetos/objetos-folios.md](04-objetos/objetos-folios.md) |
 | `documentos`, `documento_detalles`, `receptores`, `productos`, `v_ventas_diarias` | [04-objetos/objetos-documentos.md](04-objetos/objetos-documentos.md) |
 | `envios`, `envio_estadisticas`, `consultas_envio`, `envio_rechazos`, `rcof`, `v_envios_por_consultar` | [04-objetos/objetos-envios-y-rcof.md](04-objetos/objetos-envios-y-rcof.md) |
@@ -112,7 +117,7 @@ documentación/
 ├── 01-fundamentos/                    ← reglas transversales (SII + SaaS)
 │   ├── vision-general.md              piezas y módulos del esquema
 │   ├── ambientes-y-credenciales.md    certificación/producción, hosts, IDK, secretos, roles, claves, sesiones
-│   ├── autenticacion-sii.md           semilla/token, tokens_sii, AUT2000, sesiones_sii
+│   ├── autenticacion-sii.md           semilla/token, tokens_sii, AUT2000, sesiones_sii, bloqueos_sii
 │   ├── firma-y-timbre.md              XML-DSig, TED, CAF, ISO-8859-1
 │   ├── tenancy-y-roles.md             organizaciones, roles, funciones de acceso
 │   ├── errores-y-resultados.md        errores, resultado_operacion, regla del incierto

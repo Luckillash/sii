@@ -23,8 +23,8 @@ que no dependen del RLS de las tablas que tocan. Los errores llegan en `error.co
 | `crear_invitacion(p_organizacion, p_correo, p_rol)` | `authenticated` (administradores) | `text` (token, una vez) | invitación pendiente por 7 días |
 | `aceptar_invitacion(p_token)` | `authenticated` (correo que calce) | `uuid` | alta como miembro con el rol invitado |
 | `ver_invitacion(p_token)` (migración 0003) | `anon`, `authenticated` | 0 o 1 fila | ninguno (solo lectura) |
-| `registrar_resolucion(p_empresa, p_ambiente, p_numero, p_fecha)` (migración 0005, pendiente) | `authenticated` (administradores), `service_role` | `uuid` | reemplaza la resolución vigente de la empresa en ese ambiente |
-| `fijar_certificado_predeterminado(p_empresa, p_certificado)` (migración 0005, pendiente) | `authenticated` (administradores), `service_role` | `void` | deja ese certificado como el único predeterminado de la empresa |
+| `registrar_resolucion(p_empresa, p_ambiente, p_numero, p_fecha)` (migración 0005) | `authenticated` (administradores), `service_role` | `uuid` | reemplaza la resolución vigente de la empresa en ese ambiente |
+| `fijar_certificado_predeterminado(p_empresa, p_certificado)` (migración 0005) | `authenticated` (administradores), `service_role` | `void` | deja ese certificado como el único predeterminado de la empresa |
 
 `anon` no ejecuta `crear_organizacion`, `crear_invitacion`, `aceptar_invitacion`,
 `registrar_resolucion` ni `fijar_certificado_predeterminado`: recibe `42501`
@@ -196,9 +196,8 @@ if (!invitacion) {
 
 ## Empresa: resolución y certificado predeterminado (migración 0005)
 
-Las dos vienen en `supabase/migrations/0005_certificados_resoluciones.sql`, **pendiente
-de aplicar en producción**. Hasta entonces, llamarlas devuelve `42883`
-(`function … does not exist`) y la app muestra el mensaje genérico.
+Las dos vienen en `supabase/migrations/0005_certificados_resoluciones.sql`, aplicada en producción el
+2026-11-13 (verificación 15/15).
 
 A diferencia de las de arriba, son **`security invoker`**: corren con el RLS de quien
 llama, así que solo escriben si es administrador de la organización. Existen porque las

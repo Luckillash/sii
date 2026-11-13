@@ -1,9 +1,9 @@
 ---
 title: "RPC del backend (service_role)"
-description: "registrar_certificado, asignar_folio, token_*, guardar/leer_secreto, sincronizar_documentos_envio, encolar_evento, plan_vigente."
-keywords: [service_role, registrar_certificado, Vault, vault.create_secret, guardar_secreto, leer_secreto, pfx_secret_id, clave_secret_id, huella_sha256, "certificado:<huella>:pfx", 23503, 22023, 23505, "El certificado ya está registrado en la organización", "permission denied for function"]
-related: ["09-libreria/backend-service-role.md", "08-esquema-supabase/vault-y-secretos.md", "04-objetos/objetos-empresas-y-credenciales.md", "02-guias/onboarding-organizacion.md"]
-source: ["supabase_saas_sii.sql §15 §17", "supabase/migrations/0005_certificados_resoluciones.sql"]
+description: "registrar_certificado, token_*, leer_secreto, tomar/liberar_bloqueo_certificado, asignar_folio, guardar_secreto, sincronizar_documentos_envio, encolar_evento, plan_vigente."
+keywords: [service_role, registrar_certificado, Vault, vault.create_secret, guardar_secreto, leer_secreto, pfx_secret_id, clave_secret_id, huella_sha256, "certificado:<huella>:pfx", 23503, 22023, 23505, 22004, "El certificado ya está registrado en la organización", "permission denied for function", token_obtener, token_guardar, token_borrar, TokenStoreSupabase, tomar_bloqueo_certificado, liberar_bloqueo_certificado, bloqueos_sii, arriendo, titular, conBloqueoCertificado, "La duración del bloqueo debe estar entre 1 y 900 segundos", migración 0007]
+related: ["09-libreria/backend-service-role.md", "08-esquema-supabase/vault-y-secretos.md", "04-objetos/objetos-empresas-y-credenciales.md", "02-guias/onboarding-organizacion.md", "01-fundamentos/autenticacion-sii.md"]
+source: ["supabase_saas_sii.sql §15 §17", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/"]
 ---
 
 # RPC del backend (service_role)
@@ -15,12 +15,128 @@ function …`, `42501`). Se llaman con el cliente de `src/server/supabase/servic
 (`clienteServicio()`, `import 'server-only'`), que salta RLS: **quien llama filtra
 siempre por `organizacion_id`** y comprueba antes que el usuario tenga el rol necesario.
 
-<!-- TODO: redactar asignar_folio, token_obtener/token_guardar/token_borrar, guardar_secreto/leer_secreto, sincronizar_documentos_envio, encolar_evento y plan_vigente -->
+<!-- TODO: redactar asignar_folio, guardar_secreto, sincronizar_documentos_envio, encolar_evento y plan_vigente -->
+
+## `token_obtener`, `token_guardar`, `token_borrar`
+
+Vienen en la §15 de `0001`. Son el almacenamiento del `TokenStore` de la librería; las usa
+solo `TokenStoreSupabase` (`server/sii/token-store-supabase.ts`,
+[autenticación](../01-fundamentos/autenticacion-sii.md#token-del-sii-tokenstoresupabase)).
+
+```sql
+public.token_obtener(p_canal canal_sii, p_ambiente ambiente_sii, p_rut text, p_huella text)
+  returns table (token_cifrado bytea, vence_en timestamptz)        -- sql · stable · security definer
+public.token_guardar(p_canal canal_sii, p_ambiente ambiente_sii, p_rut text, p_huella text,
+                     p_token_cifrado bytea, p_vence_en timestamptz)
+  returns void                                                     -- upsert por la PK; actualizado_en = now()
+public.token_borrar(p_canal canal_sii, p_ambiente ambiente_sii, p_rut text, p_huella text)
+  returns void
+-- search_path = '' · solo service_role
+```
+
+- La clave es la de `ClaveToken`: canal, ambiente, RUT de la empresa (`76354771-K`) y huella
+  sha256 del certificado que firmó la semilla.
+- `p_token_cifrado` llega ya cifrado (AES-256-GCM con `SII_TOKENS_KEY`; por PostgREST viaja
+  como `\x<hex>`, `aBytea`). La base nunca ve el token.
+- `token_obtener` **no filtra por vigencia**: devuelve la fila aunque esté vencida y la
+  librería decide con su reloj.
+- `token_guardar` valida el RUT (dominio `rut`) y el formato de la huella (`check`) de la
+  tabla: un dato inválido falla con el error del dominio o del `check`.
+
+## `leer_secreto` (Vault)
+
+```sql
+public.leer_secreto(p_id uuid) returns text   -- decrypted_secret de vault.decrypted_secrets · solo service_role
+```
+
+Desde la Fase 4 la llama `crearCredenciales()` (`server/sii/credenciales.ts`) para el .pfx
+en base64 y su clave, por los ids `pfx_secret_id` / `clave_secret_id` de una fila de
+`certificados` **ya filtrada por organización**. Un error de la RPC se traduce a
+`ErrorCredenciales('base')`; un valor vacío o nulo, a `ErrorCredenciales('vault')`.
+Detalle en [vault y secretos](../08-esquema-supabase/vault-y-secretos.md#quién-lee).
+
+## `tomar_bloqueo_certificado` y `liberar_bloqueo_certificado` (migración 0007)
+
+Vienen en `supabase/migrations/0007_bloqueos_sii.sql`, **pendiente de aplicar en
+producción** (2026-11-13). Sin ella, `conBloqueoCertificado` falla con `ErrorBloqueo`
+(con el código de función inexistente: `PGRST202` por PostgREST, `42883` en SQL directo)
+y la operación termina en `error` sin salir al SII.
+
+```sql
+public.tomar_bloqueo_certificado(
+  p_certificado uuid,
+  p_ambiente    public.ambiente_sii,
+  p_titular     uuid,
+  p_segundos    integer
+) returns boolean
+
+public.liberar_bloqueo_certificado(
+  p_certificado uuid,
+  p_ambiente    public.ambiente_sii,
+  p_titular     uuid
+) returns boolean
+-- plpgsql · security definer · search_path = ''
+-- revoke execute from public, anon, authenticated · grant execute to service_role
+```
+
+**Para qué:** un bloqueo con arriendo por `(certificado, ambiente)` en `bloqueos_sii`, para
+que dos peticiones no abran sesiones AUT2000 en paralelo con el mismo certificado (el SII
+frena el re-login, error `01.01.215.500.771.52`). Reemplaza al `bloquear_certificado` con
+`pg_try_advisory_xact_lock` que proponía el plan, que no serializa nada a través de
+PostgREST ([por qué](../01-fundamentos/autenticacion-sii.md#por-qué-un-arriendo-y-no-advisory-locks)).
+
+**`tomar_bloqueo_certificado`.** Un solo `insert … on conflict (certificado_id, ambiente)
+do update … where b.vence_en <= now() or b.titular = excluded.titular` (atómico):
+
+| Situación | Efecto | Devuelve |
+|---|---|---|
+| No hay fila | la crea con `vence_en = now() + p_segundos` | `true` |
+| Hay fila vencida (de cualquiera) | la toma: titular nuevo, `tomado_en = now()` | `true` |
+| Hay fila del mismo titular | renueva `vence_en` y **conserva `tomado_en`** | `true` |
+| Hay fila vigente de otro titular | nada | `false` |
+
+Dos llamadas simultáneas se ordenan en el índice de la llave primaria: la segunda espera a
+que la primera termine y evalúa el `where` sobre la fila que dejó.
+
+**`liberar_bloqueo_certificado`.** Borra la fila solo si `titular = p_titular`, vencida o
+no. `true` si la borró; `false` si no había bloqueo o era de otro (p. ej. el arriendo
+venció y otro lo tomó: no se le quita).
+
+**Por qué `security definer` y solo `service_role`:** `bloqueos_sii` no tiene políticas ni
+privilegios para `anon` y `authenticated`; la capa SII llama con el cliente de servicio
+después de validar a quien pide la operación. Las funciones no revisan membresía: el
+`certificadoId` tiene que venir de un certificado cargado con `crearCredenciales()`.
+
+**Errores**
+
+| Código | Mensaje | Causa |
+|---|---|---|
+| `22004` | `Faltan el certificado, el ambiente o el titular del bloqueo` | `p_certificado`, `p_ambiente` o `p_titular` nulo (solo en `tomar_…`) |
+| `22023` | `La duración del bloqueo debe estar entre 1 y 900 segundos` | `p_segundos` nulo o fuera de 1..900 |
+| `23503` | `insert or update on table "bloqueos_sii" violates foreign key constraint …` | el certificado no existe (FK) |
+| `42501` | `permission denied for function …` | llamada sin `service_role` |
+| `42883` (SQL) / `PGRST202` (PostgREST) | `function … does not exist` / `Could not find the function … in the schema cache` | la base no tiene la 0007 |
+
+`liberar_…` con nulos no lanza: no borra nada y devuelve `false`.
+
+**Cómo la llama la app** (`server/sii/bloqueos.ts`, `conBloqueoCertificado`): titular
+`randomUUID()` por llamada, `p_segundos = 300` por defecto, reintentos cada 1 s hasta 20 s;
+libera siempre en un `finally`. `bloqueos.ts` valida 1..900 antes de llamar, así que el
+`22023` no debería verse desde la app
+([contrato](../01-fundamentos/autenticacion-sii.md#bloqueo-con-arriendo-por-certificado-bloqueosts)).
+
+Verificación: `supabase/verificaciones/0007_bloqueos_sii.sql` (14 comprobaciones de solo
+lectura: tabla, PK, FK en cascada, RLS sin políticas, privilegios, firmas, nombres de
+parámetros, `security definer`, `search_path`, condición del arriendo, migración
+registrada y, 13–14, el índice único parcial `operaciones_sii_efecto_global_en_curso` que
+la misma migración agrega a `operaciones_sii`) y `rls-fase4-bloqueos.sql` (21, con
+`rollback`; 17–21 son del índice)
+([cómo correrlas](../05-pruebas/probar-el-esquema.md#5-simulación-del-bloqueo-de-la-fase-4-rls-fase4-bloqueossql)).
 
 ## `registrar_certificado` (migración 0005)
 
-Viene en `supabase/migrations/0005_certificados_resoluciones.sql`, **pendiente de
-aplicar en producción**. Sin ella, subir un certificado en la app falla con `42883`
+Viene en `supabase/migrations/0005_certificados_resoluciones.sql`, aplicada en
+producción el 2026-11-13. Sin ella, subir un certificado en la app falla con `42883`
 (`function … does not exist`) y el usuario ve «No pudimos completar la operación».
 
 ```sql

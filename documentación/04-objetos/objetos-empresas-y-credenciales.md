@@ -1,9 +1,9 @@
 ---
 title: "Objetos: empresas y credenciales"
-description: "Columnas de empresas, resoluciones, certificados, empresa_certificados, tokens_sii y sesiones_sii, quién escribe cada una y la vista v_certificados_estado."
-keywords: [empresas, resoluciones, certificados, empresa_certificados, tokens_sii, sesiones_sii, v_certificados_estado, autorizada_produccion, activa, huella_sha256, pfx_secret_id, clave_secret_id, pfx_legacy, revocado_en, es_representante_electronico, predeterminado, vigente, resoluciones_vigente_unica, empresa_certificados_predeterminado_unico, por_vencer, dias_restantes, registrar_certificado, registrar_resolucion, fijar_certificado_predeterminado]
-related: ["02-guias/onboarding-organizacion.md", "03-api-reference/acceso-por-tabla.md", "03-api-reference/rpc-organizacion.md", "03-api-reference/rpc-backend.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/formatos-y-validaciones.md"]
-source: ["supabase_saas_sii.sql §6 §15 §16 §17", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/empresas.ts", "apps/web/src/server/certificados/"]
+description: "Columnas de empresas, resoluciones, certificados, empresa_certificados, tokens_sii, sesiones_sii y bloqueos_sii, quién escribe cada una y la vista v_certificados_estado."
+keywords: [empresas, resoluciones, certificados, empresa_certificados, tokens_sii, sesiones_sii, v_certificados_estado, autorizada_produccion, activa, huella_sha256, pfx_secret_id, clave_secret_id, pfx_legacy, revocado_en, es_representante_electronico, predeterminado, vigente, resoluciones_vigente_unica, empresa_certificados_predeterminado_unico, por_vencer, dias_restantes, registrar_certificado, registrar_resolucion, fijar_certificado_predeterminado, bloqueos_sii, titular, vence_en, tomado_en, arriendo, cookies_cifradas, expira_en, ultimo_uso_en, SesionesSupabase, conBloqueoCertificado]
+related: ["02-guias/onboarding-organizacion.md", "03-api-reference/acceso-por-tabla.md", "03-api-reference/rpc-organizacion.md", "03-api-reference/rpc-backend.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/formatos-y-validaciones.md", "01-fundamentos/autenticacion-sii.md"]
+source: ["supabase_saas_sii.sql §6 §15 §16 §17", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/empresas.ts", "apps/web/src/server/certificados/", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/sesiones.ts", "apps/web/src/server/sii/bloqueos.ts"]
 ---
 
 # Objetos: empresas y credenciales
@@ -17,6 +17,9 @@ tres RPC con que la app las escribe (`registrar_certificado`, `registrar_resoluc
 una base sin ella, la carga de certificados, el registro de resoluciones y el cambio de
 predeterminado fallan con `42883` (`function … does not exist`).
 
+La Fase 4 suma una séptima tabla, `bloqueos_sii` (migración `0007_bloqueos_sii`,
+**pendiente de aplicar en producción**), y el código que escribe `sesiones_sii`.
+
 Leyenda: ✔ obligatoria (`not null` sin default útil) · 🔒 solo `service_role`.
 
 ## Resumen: quién escribe cada tabla
@@ -28,7 +31,8 @@ Leyenda: ✔ obligatoria (`not null` sin default útil) · 🔒 solo `service_ro
 | `certificados` | todo miembro | 🔒 solo `service_role` (sin políticas de escritura) | `registrar_certificado()` (0005), y `update`/`delete` directos, desde `configuracion/certificados/acciones.ts` |
 | `empresa_certificados` | todo miembro | administradores (RLS) | `server/certificados/asociaciones.ts` y `fijar_certificado_predeterminado()` (0005), con la sesión |
 | `tokens_sii` 🔒 | solo `service_role` | solo `service_role` | `TokenStoreSupabase` sobre `token_obtener` / `token_guardar` / `token_borrar` |
-| `sesiones_sii` 🔒 | solo `service_role` | solo `service_role` | capa SII de la Fase 4 (`sesiones.ts`, aún sin código) |
+| `sesiones_sii` 🔒 | solo `service_role` | solo `service_role` | `SesionesSupabase` y `conSesionReutilizada` (`server/sii/sesiones.ts`, Fase 4) |
+| `bloqueos_sii` 🔒 | solo `service_role` | solo `service_role`, por dos RPC | `conBloqueoCertificado` (`server/sii/bloqueos.ts`) sobre `tomar_bloqueo_certificado` / `liberar_bloqueo_certificado` (migración 0007, **pendiente de aplicar**) |
 
 Matriz completa por rol en [acceso por tabla](../03-api-reference/acceso-por-tabla.md).
 
@@ -199,8 +203,45 @@ seguido (unos 5 ciclos, error `01.01.215.500.771.52`). Mismo blindaje que `token
 | `expira_en` | `timestamptz` | |
 | `ultimo_uso_en`, `creado_en` | `timestamptz` | default `now()` |
 
-PK `(certificado_id, ambiente)`. La escribe la capa SII de la Fase 4; hoy ningún código
-la usa.
+PK `(certificado_id, ambiente)`. La escribe la capa SII de la Fase 4
+(`SesionesSupabase`, `server/sii/sesiones.ts`); todavía ninguna pantalla la usa (la
+primera será la solicitud de folios de la Fase 6).
+
+Lo que hace la capa
+([autenticación](../01-fundamentos/autenticacion-sii.md#sesión-aut2000-sesionests)):
+
+- `cookies_cifradas` = AES-256-GCM de `JSON.stringify(sesion.aArreglo())`, con AAD
+  `["sesiones_sii", "<certificado_id>", "<ambiente>"]`.
+- `expira_en`: lo fija quien autentica (`expiraEn` de `conSesionReutilizada`); si no, queda
+  `null` y la sesión vale hasta que el SII la rechace (`SesionCaducaError`). Una fila con
+  `expira_en` pasado se ignora (no se borra).
+- `ultimo_uso_en` se actualiza en cada lectura útil (informativo, para una futura
+  limpieza de sesiones viejas).
+- Una sesión que caduca se borra (`descartar`); una sin cookies no se guarda.
+- No tiene `organizacion_id`: la clave sale de un certificado cargado con
+  `crearCredenciales()`, que ya filtró por organización (`claveSesion(credenciales, ambiente)`).
+
+## `bloqueos_sii` 🔒
+
+Migración `0007_bloqueos_sii` (**escrita, pendiente de aplicar en producción** al
+2026-11-13). Bloqueo con arriendo por certificado y ambiente: serializa entre peticiones
+las sesiones AUT2000 del SII. Mismo blindaje que `tokens_sii` y `sesiones_sii`: RLS activo
+**sin políticas** y `revoke all` a `anon` y `authenticated`. Solo se toca por
+`tomar_bloqueo_certificado` y `liberar_bloqueo_certificado`
+([RPC](../03-api-reference/rpc-backend.md#tomar_bloqueo_certificado-y-liberar_bloqueo_certificado-migración-0007)).
+
+| Columna | Tipo | Notas |
+|---|---|---|
+| `certificado_id` ✔ | `uuid` | FK `certificados`, `on delete cascade` |
+| `ambiente` ✔ | `ambiente_sii` | el mismo certificado en el otro ambiente es otro bloqueo |
+| `titular` ✔ | `uuid` | quien lo tomó; `bloqueos.ts` genera uno aleatorio por operación |
+| `vence_en` ✔ | `timestamptz` | fin del arriendo (`now() + p_segundos`, 1..900 s; la app usa 300) |
+| `tomado_en` ✔ | `timestamptz` | default `now()`; se conserva cuando el mismo titular renueva |
+
+PK `(certificado_id, ambiente)`. Las filas vencidas que quedan (una función que murió sin
+soltar) no estorban: la próxima toma las pisa. No hay limpieza programada ni hace falta:
+hay como mucho una fila por certificado y ambiente. Al borrar el certificado se borran en
+cascada.
 
 ---
 
@@ -238,3 +279,7 @@ Fase 8.
   ([cómo correrla](../05-pruebas/probar-el-esquema.md)).
 
 Las dos requieren la 0005 aplicada. Corridas en producción el 2026-11-13: 15/15 y 43/43.
+
+- `supabase/verificaciones/0007_bloqueos_sii.sql` (solo lectura, 12) y
+  `rls-fase4-bloqueos.sql` (con `rollback`, 16): `bloqueos_sii` y sus dos RPC.
+  **Pendientes**: requieren la 0007 aplicada (antes de migrar, la 0007 da todo `false`).

@@ -1,7 +1,7 @@
 ---
 title: "Esquema: despliegue"
 description: "Cómo se aplican las migraciones en la única base (Supabase en la nube, producción), requisitos (Vault, Realtime, pg_cron, pg_net) y tareas programadas."
-keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones]
+keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, pendiente]
 related: ["02-guias/quickstart.md", "05-pruebas/probar-el-esquema.md", "08-esquema-supabase/vault-y-secretos.md"]
 source: ["supabase_saas_sii.sql (cabecera, opcional pg_cron)", "PLAN-SAAS.md §4.4 §6"]
 ---
@@ -103,6 +103,40 @@ Pendiente (rendimiento, antes de tener volumen): `unindexed_foreign_keys` (INFO,
 índice, la mayoría `organizacion_id`, que filtran todas las políticas RLS). Se resuelve con
 una migración aditiva de índices `concurrently` (prevista en PLAN-SAAS §6).
 
+### Fase 4: migraciones 0006 y 0007 (pendientes)
+
+Al 2026-11-13 están **escritas y probadas en PGlite, pero sin aplicar en producción**. El
+código de la capa SII ya las usa:
+
+| Migración | Contenido | Qué falla mientras no esté |
+|---|---|---|
+| `0006_realtime_operaciones` | agrega `operaciones_sii` y `solicitudes_folios` a `supabase_realtime` (idempotente, *replica identity* por defecto) | las suscripciones de Realtime a esas dos tablas no reciben nada, sin error ([Realtime](../06-integraciones/realtime-y-storage.md#realtime)) |
+| `0007_bloqueos_sii` | tabla `bloqueos_sii` y RPC `tomar_bloqueo_certificado` / `liberar_bloqueo_certificado` (solo `service_role`); índice único parcial `operaciones_sii_efecto_global_en_curso` (una sola `solicitar_folios` / `postular` / `declarar` confirmada en curso por empresa y ambiente) | `conBloqueoCertificado` lanza `ErrorBloqueo` y toda operación con sesión AUT2000 termina en `error` ([RPC](../03-api-reference/rpc-backend.md#tomar_bloqueo_certificado-y-liberar_bloqueo_certificado-migración-0007)); sin el índice, dos operaciones de efecto global simultáneas no chocan al insertar (queda solo el control posterior de `ejecutarOperacion`) |
+
+Las dos son aditivas y no requieren desplegar código antes (el código actual tolera el
+esquema viejo: falla de forma controlada, sin salir al SII). Pasos:
+
+1. `pnpm exec supabase db push --remote=rbrntkztzijaxsnpgpqn --dry-run`: debe listar solo
+   `0006` y `0007`. Antes de aplicar, la consulta de solo lectura del encabezado de la 0007
+   (duplicados `en_curso` de efecto global) debe devolver 0 filas: si no, el
+   `create unique index` falla y la transacción entera se descarta.
+2. `pnpm exec supabase db push --remote=rbrntkztzijaxsnpgpqn`.
+3. Verificaciones (todas `ok = true`): `supabase/verificaciones/0006_realtime_operaciones.sql`
+   (9/9), `0007_bloqueos_sii.sql` (14/14) y la simulación `rls-fase4-bloqueos.sql` (21/21,
+   con `rollback`), más su consulta de limpieza del encabezado
+   ([cómo](../05-pruebas/probar-el-esquema.md)). Antes de migrar dieron lo esperado: 0006
+   7/9 y 0007 todo `false`. En PGlite, la 0007 sin el índice da `false` justo en 13–14 de la
+   verificación y 17–18 de la simulación.
+4. `pnpm db:tipos` y comparar con lo agregado a mano a `apps/web/src/server/supabase/tipos.ts`
+   (`bloqueos_sii` y las dos RPC).
+5. *Advisors*: `rls_enabled_no_policy` en `bloqueos_sii` (INFO) es **esperado**, igual que en
+   `tokens_sii` y `sesiones_sii`. Las dos RPC nuevas no deberían aparecer en
+   `authenticated_security_definer_function_executable`: `authenticated` no las ejecuta.
+
+Cuando estén aplicadas, actualizar esta sección y las menciones «pendiente» de
+`autenticacion-sii.md`, `rpc-backend.md`, `objetos-empresas-y-credenciales.md`,
+`realtime-y-storage.md`, `probar-el-esquema.md` y `trampas-conocidas.md`.
+
 ## Requisitos del proyecto
 
 - Postgres 17 (`supabase/config.toml` declara `major_version = 17`).
@@ -110,7 +144,7 @@ una migración aditiva de índices `concurrently` (prevista en PLAN-SAAS §6).
 - **Vault** (`supabase_vault`): viene instalado en todo proyecto de Supabase.
 - **Realtime**: la publicación `supabase_realtime` existe por defecto; la 0001 le agrega
   `documentos`, `envios` y `procesos_certificacion` (la Fase 4 suma `operaciones_sii` y
-  `solicitudes_folios`).
+  `solicitudes_folios` con la `0006`, pendiente de aplicar).
 - **Storage**: la 0001 crea el bucket privado `documentos-xml` (10 MB, XML y PDF).
 
 ## Pasos manuales después de la 0002

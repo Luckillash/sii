@@ -1,7 +1,7 @@
 ---
 title: "Probar el esquema (RLS, triggers, cuotas)"
 description: "Cómo verificar el esquema y simular roles en la única base (producción) sin dejar rastro."
-keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp]
+keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp, 0006_realtime_operaciones.sql, 0007_bloqueos_sii.sql, rls-fase4-bloqueos.sql, bloqueos_sii, arriendo]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "08-esquema-supabase/despliegue.md"]
 source: ["supabase_saas_sii.sql §15 §17", "supabase/verificaciones/", "supabase/verificaciones/rls-fase2-tenancy.sql"]
 ---
@@ -22,7 +22,9 @@ comprobación con `ok = true/false` y, si falla, el `detalle`. No escribe nada.
 | Archivo | Qué verifica |
 |---|---|
 | `0001_esquema.sql` | las 33 tablas; RLS activo en todas; `tokens_sii` y `sesiones_sii` sin políticas ni privilegios para `anon`/`authenticated`; `token_guardar` y `leer_secreto` fuera del alcance de la API y disponibles para `service_role`; Vault, `pg_cron` y `pg_net`; bucket privado; publicación de Realtime; `tipos_dte` = 39 y 41 |
-| `0005_certificados_resoluciones.sql` | 15 comprobaciones: las 3 funciones con su firma, nombres de parámetros, `plpgsql`, `security definer` solo en `registrar_certificado`, `search_path` vacío; `registrar_certificado` solo para `service_role`; las otras dos para `authenticated` y `service_role`, no `anon`; `certificados` sin políticas de escritura; `trg_borrar_secretos`; herencia de `organizacion_id`; privilegios que necesitan las funciones invoker; índices parciales; migración registrada. **Pendiente**: la 0005 no está aplicada |
+| `0005_certificados_resoluciones.sql` | 15 comprobaciones: las 3 funciones con su firma, nombres de parámetros, `plpgsql`, `security definer` solo en `registrar_certificado`, `search_path` vacío; `registrar_certificado` solo para `service_role`; las otras dos para `authenticated` y `service_role`, no `anon`; `certificados` sin políticas de escritura; `trg_borrar_secretos`; herencia de `organizacion_id`; privilegios que necesitan las funciones invoker; índices parciales; migración registrada. Aplicada el 2026-11-13: 15/15 `ok` |
+| `0006_realtime_operaciones.sql` | 9 comprobaciones: `supabase_realtime` existe y publica `insert`/`update`/`delete`; `operaciones_sii` y `solicitudes_folios` están en ella; las tres de la 0001 siguen publicadas; RLS activo; política `lectura` (`select`, `authenticated`, `es_miembro(organizacion_id)`); `select` para `authenticated`; nada para `anon`; *replica identity* por defecto; migración registrada. **Pendiente de aplicar**: antes de migrar da 7/9 |
+| `0007_bloqueos_sii.sql` | 14 comprobaciones: `bloqueos_sii` con sus 5 columnas y tipos; PK `(certificado_id, ambiente)`; FK a `certificados` en cascada; RLS activo sin políticas; nada para `anon`/`authenticated`; las 2 funciones con su firma y `boolean`; nombres de parámetros (los que usa `bloqueos.ts`); `plpgsql`, `security definer`, `search_path` vacío; solo `service_role` las ejecuta; el `insert … on conflict` con la condición del arriendo; migración registrada; el índice único y válido `operaciones_sii_efecto_global_en_curso` sobre `(empresa_id, operacion, ambiente)`; su predicado (`en_curso`, `confirmada` y exactamente `solicitar_folios`, `postular`, `declarar`, como `OPERACIONES_EFECTO_GLOBAL`). **Pendiente de aplicar**: antes de migrar da todo `false` |
 
 Se ejecuta pegándolo en el SQL Editor o con el MCP `execute_sql`. Cada migración nueva trae
 el suyo.
@@ -169,7 +171,45 @@ La consulta de control (todo en 0) está en el encabezado del archivo: usuarios
 `@ejemplo.invalid`, organizaciones `zz-prueba-rls-fase3%`, certificados con esas dos
 huellas y secretos con esas descripciones.
 
-## 5. Lo que no se prueba con SQL
+## 5. Simulación del bloqueo de la Fase 4 (`rls-fase4-bloqueos.sql`)
+
+`supabase/verificaciones/rls-fase4-bloqueos.sql` prueba el criterio del bloqueo con
+arriendo: dos peticiones no abren sesiones AUT2000 en paralelo con el mismo certificado y
+ambiente; y el índice único parcial de `operaciones_sii`: dos operaciones de efecto global
+iguales no quedan `en_curso` a la vez. **Requiere la migración 0007 aplicada** (pendiente al 2026-11-13): sin ella se
+detiene con `42P01` (`relation … does not exist`) o `42883` y la transacción se descarta
+completa, sin resultados.
+
+Mismo patrón que las de las Fases 2 y 3 (`request.jwt.claims` y `set local role` por rol,
+`pg_temp.registrar`, parámetros locales `prueba.*`, `rollback` final). Crea como
+`postgres` una organización (`zz-prueba-bloqueos-fase4`) y un certificado de prueba con
+huella `repeat('c', 64)`, **sin secretos en Vault** (los ids de los secretos son
+aleatorios y no apuntan a nada). Usa dos titulares fijos (`…0001` y `…0002`), como los que
+genera `bloqueos.ts`. Dentro de una transacción `now()` no avanza: el arriendo vencido se
+simula moviendo `vence_en` al pasado como `postgres`, y la renovación se distingue moviendo
+`tomado_en`.
+
+| # | Grupo | Comprobaciones |
+|---|---|---|
+| 1 | Preparación | organización y certificado de prueba, sin bloqueos |
+| 2–5 | Tomar (como `service_role`) | el titular 1 toma el libre (`true`, vence en 60 s); el titular 2 no lo toma mientras está vigente (`false`, la fila no cambia); el titular 1 renueva (`true`, 300 s, conserva `tomado_en`); el mismo certificado en producción es otro bloqueo |
+| 6 | Arriendo vencido | con el del titular 1 vencido, el titular 2 lo toma (`tomado_en` nuevo) |
+| 7–9 | Liberar | el titular 1 (vencido) no libera el del titular 2; el titular 2 libera (`true`) y liberar otra vez da `false`, producción sigue tomado; liberado, cualquiera lo vuelve a tomar |
+| 10–12 | Validaciones | `p_segundos` 0, 901, negativo o nulo → `22023`; sin titular, certificado o ambiente → `22004`; certificado inexistente → `23503` |
+| 13–15 | `authenticated` y `anon` | no ejecutan tomar ni liberar ni leen `bloqueos_sii`; sus intentos no cambiaron el bloqueo |
+| 16 | Cascada | borrar el certificado borra sus bloqueos de los dos ambientes |
+| 17–18 | Índice único de efecto global (como `service_role`, sobre una empresa de prueba) | dos `solicitar_folios` confirmadas `en_curso` de la misma empresa y ambiente: la segunda da `23505` con el nombre del índice; `postular` y `declarar` chocan igual; la misma operación en el otro ambiente no |
+| 19–21 | Lo que no choca | ensayos (`confirmada = false`) y operaciones fuera de la lista (`emitir`, `enviar_set`); cerrada la que estaba en curso (`incierto`), otra entra y las filas cerradas no chocan (por eso `ejecutarOperacion` vuelve a revisar después de insertar); sin empresa (`empresa_id` nulo) no chocan (lo cubre `ejecutarOperacion` con `uso`) |
+
+Cómo correrlo: el archivo **completo**, tal cual, con el MCP `execute_sql` o en el SQL
+Editor (como `postgres`); nunca por partes ni cambiando el `rollback` por `commit`. Debe dar
+21/21 con `ok = true` (sin el índice, 17 y 18 salen `false`). Después, la consulta de
+control del encabezado (organizaciones con ese slug, certificados con esa huella, la
+empresa de prueba y `bloqueos_sii`) en 0; `bloqueos` puede no ser 0 si
+la app ya está tomando bloqueos reales: basta con que ninguno sea del certificado de
+prueba.
+
+## 6. Lo que no se prueba con SQL
 
 El aislamiento entre organizaciones y los permisos por rol también se prueban de punta a
 punta con la app (Fase 2): dos usuarios de organizaciones distintas, cada uno con su

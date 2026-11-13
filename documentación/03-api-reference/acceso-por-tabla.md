@@ -71,6 +71,7 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
 | `empresa_certificados` | — | S | S | SIUD ¹⁶ | SIUD ¹⁶ | SIUD |
 | `tokens_sii` 🔒 | — | — | — | — | — | SIUD |
 | `sesiones_sii` 🔒 | — | — | — | — | — | SIUD |
+| `bloqueos_sii` 🔒 ¹⁷ | — | — | — | — | — | SIUD |
 
 ### Folios
 
@@ -140,8 +141,8 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
 12. Solo las columnas `nombre`, `revocada_en` y `expira_en`. Se crean con `crear_api_key()`.
 13. Solo las columnas `url`, `eventos` y `activo`. Se crean con `crear_webhook()`.
 14. `organizacion_id` se hereda de la empresa (`tg_heredar_organizacion`). Para cambiar
-    la vigente, la app usa `registrar_resolucion()` (migración 0005, pendiente de
-    aplicar; `security invoker`, así que aplica esta misma regla): un `insert` directo
+    la vigente, la app usa `registrar_resolucion()` (migración 0005, aplicada el
+    2026-11-13; `security invoker`, así que aplica esta misma regla): un `insert` directo
     con `vigente = true` cuando ya hay una vigente choca con `resoluciones_vigente_unica`
     ([RPC](rpc-organizacion.md#registrar_resolucion-migración-0005)).
 15. Sin políticas de escritura: ni un propietario inserta, edita ni borra certificados
@@ -154,6 +155,15 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
     organización (`23503`). El predeterminado se cambia con
     `fijar_certificado_predeterminado()` (migración 0005, `security invoker`)
     ([RPC](rpc-organizacion.md#fijar_certificado_predeterminado-migración-0005)).
+17. Migración `0007_bloqueos_sii` (pendiente de aplicar). RLS activo sin políticas y
+    `revoke all` a `anon` y `authenticated`, como `tokens_sii` y `sesiones_sii`. La app
+    no la toca directo: solo por `tomar_bloqueo_certificado` /
+    `liberar_bloqueo_certificado` (solo `service_role`)
+    ([RPC del backend](rpc-backend.md#tomar_bloqueo_certificado-y-liberar_bloqueo_certificado-migración-0007)).
+
+`operaciones_sii` la escribe solo la capa SII con `service_role` (`ejecutarOperacion`,
+`marcarInciertaRevisada`); los miembros la leen y, con la migración 0006, reciben sus
+cambios por Realtime ([Realtime](../06-integraciones/realtime-y-storage.md#realtime)).
 
 ## Vistas y Storage
 
@@ -162,7 +172,9 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
   tablas de origen.
 - Bucket `documentos-xml` (privado): `select` para `authenticated` cuando el primer
   segmento de la ruta es una organización de la que es miembro
-  (`<organizacion_id>/<empresa_id>/<ambiente>/<archivo>`). Solo el backend sube archivos.
+  (`<organizacion_id>/<empresa_id>/<ambiente>/<archivo>`). Solo el backend sube archivos,
+  con `AlmacenDocumentos` (`server/sii/almacen.ts`)
+  ([Storage](../06-integraciones/realtime-y-storage.md#storage-documentos-xml)).
 
 ## Verificación
 
@@ -175,3 +187,5 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
 - Empresas, resoluciones, certificados, asociaciones y `v_certificados_estado` por rol:
   `supabase/verificaciones/rls-fase3-empresas.sql`. Requiere la migración 0005; corrida en
   producción el 2026-11-13 (43/43).
+- `bloqueos_sii` y sus dos RPC por rol: `supabase/verificaciones/rls-fase4-bloqueos.sql`
+  (16). Requiere la migración 0007, pendiente de aplicar.

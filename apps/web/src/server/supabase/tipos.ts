@@ -80,6 +80,45 @@ export type Database = {
           },
         ]
       }
+      bloqueos_sii: {
+        Row: {
+          ambiente: Database["public"]["Enums"]["ambiente_sii"]
+          certificado_id: string
+          titular: string
+          tomado_en: string
+          vence_en: string
+        }
+        Insert: {
+          ambiente: Database["public"]["Enums"]["ambiente_sii"]
+          certificado_id: string
+          titular: string
+          tomado_en?: string
+          vence_en: string
+        }
+        Update: {
+          ambiente?: Database["public"]["Enums"]["ambiente_sii"]
+          certificado_id?: string
+          titular?: string
+          tomado_en?: string
+          vence_en?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bloqueos_sii_certificado_id_fkey"
+            columns: ["certificado_id"]
+            isOneToOne: false
+            referencedRelation: "certificados"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bloqueos_sii_certificado_id_fkey"
+            columns: ["certificado_id"]
+            isOneToOne: false
+            referencedRelation: "v_certificados_estado"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cafs: {
         Row: {
           actualizado_en: string
@@ -2422,6 +2461,14 @@ export type Database = {
         Returns: string
       }
       leer_secreto: { Args: { p_id: string }; Returns: string }
+      liberar_bloqueo_certificado: {
+        Args: {
+          p_ambiente: Database["public"]["Enums"]["ambiente_sii"]
+          p_certificado: string
+          p_titular: string
+        }
+        Returns: boolean
+      }
       plan_vigente: {
         Args: { p_organizacion: string }
         Returns: {
@@ -2516,6 +2563,15 @@ export type Database = {
           token_cifrado: string
           vence_en: string
         }[]
+      }
+      tomar_bloqueo_certificado: {
+        Args: {
+          p_ambiente: Database["public"]["Enums"]["ambiente_sii"]
+          p_certificado: string
+          p_segundos: number
+          p_titular: string
+        }
+        Returns: boolean
       }
       uuid_o_nulo: { Args: { p_texto: string }; Returns: string }
       ver_invitacion: {
