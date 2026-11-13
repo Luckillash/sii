@@ -14,6 +14,10 @@ export const dynamic = 'force-dynamic';
 function mismoOrigen(request: NextRequest): boolean {
   const origen = request.headers.get('origin');
   if (!origen) return true;
+  // Con `referrer: no-referrer` (p. ej. /invitacion/[token], para que el token no salga
+  // en el Referer) Chrome manda `Origin: null` aunque el formulario sea del mismo sitio.
+  // Ahí decide `Sec-Fetch-Site`, que pone el navegador y una página no puede falsificar.
+  if (origen === 'null') return request.headers.get('sec-fetch-site') === 'same-origin';
   const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host');
   try {
     return new URL(origen).host === host;

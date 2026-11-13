@@ -189,6 +189,32 @@ test.describe('cerrar sesión', () => {
     expect(respuesta.status()).toBe(403);
   });
 
+  // /invitacion/[token] usa `referrer: no-referrer`: Chrome manda `Origin: null` en el POST
+  // de su botón «Cerrar sesión» (antes respondía 403 «Origen no permitido»).
+  test('acepta Origin: null si Sec-Fetch-Site es same-origin y respeta siguiente', async ({
+    request,
+  }) => {
+    const respuesta = await request.post('/auth/salir', {
+      maxRedirects: 0,
+      headers: { origin: 'null', 'sec-fetch-site': 'same-origin' },
+      form: { siguiente: '/invitacion/abc' },
+    });
+    expect(respuesta.status()).toBe(303);
+    const destino = new URL(respuesta.headers().location ?? '', 'http://x');
+    expect(destino.pathname).toBe('/ingresar');
+    expect(destino.searchParams.get('siguiente')).toBe('/invitacion/abc');
+  });
+
+  for (const sitio of [undefined, 'cross-site', 'same-site']) {
+    test(`rechaza Origin: null con Sec-Fetch-Site ${sitio ?? 'ausente'}`, async ({ request }) => {
+      const respuesta = await request.post('/auth/salir', {
+        maxRedirects: 0,
+        headers: { origin: 'null', ...(sitio ? { 'sec-fetch-site': sitio } : {}) },
+      });
+      expect(respuesta.status()).toBe(403);
+    });
+  }
+
   test('GET /auth/salir no cierra sesión (405)', async ({ request }) => {
     const respuesta = await request.get('/auth/salir', { maxRedirects: 0 });
     expect(respuesta.status()).toBe(405);
