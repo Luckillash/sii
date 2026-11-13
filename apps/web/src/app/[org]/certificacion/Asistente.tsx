@@ -56,6 +56,8 @@ import {
   planAsistente,
   postulacionCompleta,
   textoEnCurso,
+  textoResolucionProduccion,
+  tipoAutorizacion,
 } from './logica';
 import {
   AvisosPostulacion,
@@ -237,8 +239,17 @@ export function Asistente({ slug, admin, vista, diasCertificado }: AsistenteProp
 
   const reenvio = envioSet !== null && ['rechazado', 'inconsistente'].includes(envioSet.estado);
   const operacionARevisar = revisar ? (operaciones.find((o) => o.id === revisar) ?? null) : null;
-  const rutaCertificados = `/${slug}/configuracion/empresas/${empresa.id}/certificados`;
+  const rutaEmpresa = `/${slug}/configuracion/empresas/${empresa.id}`;
+  const rutaCertificados = `${rutaEmpresa}/certificados`;
+  const rutaResoluciones = `${rutaEmpresa}#t-resoluciones`;
   const autorizada = etapa === 'autorizada';
+  // Certificada fuera de Boletéame (resolución de producción registrada): estado final
+  // sin los pasos del asistente.
+  const externa =
+    tipoAutorizacion({
+      autorizadaProduccion: empresa.autorizadaProduccion,
+      autorizacionExterna: vista.autorizacionExterna,
+    }) === 'externa';
   const completos = pasosCompletos(etapa);
 
   function botones(paso: PlanPaso): ReactNode {
@@ -320,6 +331,15 @@ export function Asistente({ slug, admin, vista, diasCertificado }: AsistenteProp
               </details>
             ) : null}
             {enCursoPaso ? botones(paso) : null}
+            {enCursoPaso && admin ? (
+              <p className={estilos.nota}>
+                Si la empresa ya se certificó fuera de Boletéame, no la postules de nuevo: registra
+                su resolución de producción en{' '}
+                <Link href={rutaResoluciones}>las resoluciones de la empresa</Link>. Con eso queda
+                autorizada para emitir en producción. Consultar el estado en el SII no graba nada:
+                solo muestra si la empresa tiene una certificación en curso.
+              </p>
+            ) : null}
           </>
         );
       case 2:
@@ -482,26 +502,33 @@ export function Asistente({ slug, admin, vista, diasCertificado }: AsistenteProp
       <div className={estilos.progreso}>
         <p className={estilos.nota}>
           {empresa.razonSocial} · <span className={estilos.mono}>{formatearRut(empresa.rut)}</span>
-          {proceso?.creadoEn ? ` · Iniciada el ${formatearFecha(proceso.creadoEn)}` : ''}
+          {!externa && proceso?.creadoEn
+            ? ` · Iniciada el ${formatearFecha(proceso.creadoEn)}`
+            : ''}
           {' · '}
-          {autorizada
-            ? ETIQUETA_ETAPA.autorizada
-            : `Paso ${pasoDeEtapa(etapa)} de ${PASOS.length}: ${ETIQUETA_ETAPA[etapa]}`}
+          {externa
+            ? 'Autorizada fuera de Boletéame'
+            : autorizada
+              ? ETIQUETA_ETAPA.autorizada
+              : `Paso ${pasoDeEtapa(etapa)} de ${PASOS.length}: ${ETIQUETA_ETAPA[etapa]}`}
         </p>
-        {/* biome-ignore lint/a11y/useSemanticElements: mismo medidor que la plantilla y MedidorFolios */}
-        <div
-          className={estilos.medidor}
-          role="meter"
-          aria-label={`Pasos completados: ${completos} de ${PASOS.length}`}
-          aria-valuemin={0}
-          aria-valuemax={PASOS.length}
-          aria-valuenow={completos}
-        >
+        {/* Sin medidor de pasos si la empresa no hizo la certificación aquí. */}
+        {externa ? null : (
+          // biome-ignore lint/a11y/useSemanticElements: mismo medidor que la plantilla y MedidorFolios
           <div
-            className={estilos.medidorUso}
-            style={{ width: `${(completos / PASOS.length) * 100}%` }}
-          />
-        </div>
+            className={estilos.medidor}
+            role="meter"
+            aria-label={`Pasos completados: ${completos} de ${PASOS.length}`}
+            aria-valuemin={0}
+            aria-valuemax={PASOS.length}
+            aria-valuenow={completos}
+          >
+            <div
+              className={estilos.medidorUso}
+              style={{ width: `${(completos / PASOS.length) * 100}%` }}
+            />
+          </div>
+        )}
       </div>
 
       {/* Estado en vivo: la operación en curso (desde operaciones_sii) y el resultado. */}
@@ -547,7 +574,7 @@ export function Asistente({ slug, admin, vista, diasCertificado }: AsistenteProp
       </div>
 
       <div className={estilos.avisos}>
-        {autorizada ? (
+        {autorizada && !externa ? (
           <Alerta
             tono="exito"
             titulo="La empresa está autorizada para emitir boletas en producción"
@@ -596,7 +623,7 @@ export function Asistente({ slug, admin, vista, diasCertificado }: AsistenteProp
             repitas sin revisar: {comoRevisar(o.operacion)}
           </Alerta>
         ))}
-        {!admin ? (
+        {!admin && !externa ? (
           <Alerta
             tono="info"
             titulo="Solo un propietario o un administrador avanza la certificación"
@@ -607,39 +634,74 @@ export function Asistente({ slug, admin, vista, diasCertificado }: AsistenteProp
       </div>
 
       <div className={estilos.cuerpo}>
-        <Tarjeta as="ol" relleno="ninguno" className={estilos.pasos} aria-label="Pasos">
-          {plan.map((paso) => {
-            const fecha = paso.estado === 'completo' ? fechaCompleto(paso.numero) : null;
-            return (
-              <li
-                key={paso.numero}
-                className={[estilos.paso, estilos[`paso_${paso.estado}`]].filter(Boolean).join(' ')}
-                aria-current={paso.estado === 'en_curso' ? 'step' : undefined}
-              >
-                <IconoPaso estado={paso.estado} />
-                <div className={estilos.pasoCuerpo}>
-                  <div className={estilos.pasoCabecera}>
-                    <h2 className={estilos.pasoTitulo}>
-                      {paso.numero}. {paso.titulo}
-                    </h2>
-                    <p className={estilos.pasoEstado}>
-                      {paso.estado === 'completo'
-                        ? `Completado${fecha ? ` el ${fecha}` : ''}`
-                        : paso.estado === 'en_curso'
-                          ? 'En curso'
-                          : 'Pendiente'}
-                    </p>
+        {externa ? (
+          <Tarjeta as="section" aria-labelledby="t-final" className={estilos.estadoFinal}>
+            <h2 id="t-final" className={estilos.subtitulo}>
+              Autorizada fuera de Boletéame
+            </h2>
+            <p className={estilos.texto}>
+              {empresa.razonSocial} se certificó ante el SII sin este asistente y registró su
+              resolución de producción. Ya puede emitir boletas electrónicas con validez tributaria
+              en producción: no hace falta certificarla, y los pasos de la certificación quedan
+              cerrados para no devolverla a certificación.
+            </p>
+            <Datos
+              filas={[
+                { etiqueta: 'Estado', valor: 'Autorizada en producción' },
+                {
+                  etiqueta: 'Resolución de producción',
+                  valor: textoResolucionProduccion(vista.resolucionProduccion),
+                },
+              ]}
+            />
+            {vista.resolucionProduccion ? null : (
+              <p className={estilos.nota}>
+                La empresa no tiene una resolución de producción vigente. Regístrala en
+                Configuración antes de emitir: va en la carátula de cada envío al SII.
+              </p>
+            )}
+            <Link href={rutaResoluciones} className={clasesBoton('secundario', 'sm')}>
+              Ver las resoluciones de la empresa
+            </Link>
+          </Tarjeta>
+        ) : null}
+        {externa ? null : (
+          <Tarjeta as="ol" relleno="ninguno" className={estilos.pasos} aria-label="Pasos">
+            {plan.map((paso) => {
+              const fecha = paso.estado === 'completo' ? fechaCompleto(paso.numero) : null;
+              return (
+                <li
+                  key={paso.numero}
+                  className={[estilos.paso, estilos[`paso_${paso.estado}`]]
+                    .filter(Boolean)
+                    .join(' ')}
+                  aria-current={paso.estado === 'en_curso' ? 'step' : undefined}
+                >
+                  <IconoPaso estado={paso.estado} />
+                  <div className={estilos.pasoCuerpo}>
+                    <div className={estilos.pasoCabecera}>
+                      <h2 className={estilos.pasoTitulo}>
+                        {paso.numero}. {paso.titulo}
+                      </h2>
+                      <p className={estilos.pasoEstado}>
+                        {paso.estado === 'completo'
+                          ? `Completado${fecha ? ` el ${fecha}` : ''}`
+                          : paso.estado === 'en_curso'
+                            ? 'En curso'
+                            : 'Pendiente'}
+                      </p>
+                    </div>
+                    {paso.estado === 'pendiente' ? (
+                      <p className={estilos.nota}>{DESCRIPCION_PASO[paso.numero]}</p>
+                    ) : null}
+                    {paso.falta ? <p className={estilos.texto}>{paso.falta}</p> : null}
+                    {contenido(paso)}
                   </div>
-                  {paso.estado === 'pendiente' ? (
-                    <p className={estilos.nota}>{DESCRIPCION_PASO[paso.numero]}</p>
-                  ) : null}
-                  {paso.falta ? <p className={estilos.texto}>{paso.falta}</p> : null}
-                  {contenido(paso)}
-                </div>
-              </li>
-            );
-          })}
-        </Tarjeta>
+                </li>
+              );
+            })}
+          </Tarjeta>
+        )}
 
         <aside className={estilos.lateral} aria-label="Datos de la certificación">
           <Tarjeta aria-labelledby="t-cert" className={estilos.seccionLateral}>

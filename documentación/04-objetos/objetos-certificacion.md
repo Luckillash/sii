@@ -1,9 +1,9 @@
 ---
 title: "Objetos: certificación"
 description: "Columnas de procesos_certificacion y set_pruebas_casos, sus triggers y qué módulo del backend escribe cada columna en cada paso del asistente."
-keywords: [procesos_certificacion, set_pruebas_casos, etapa, etapa_certificacion, borrador, postulada, set_descargado, set_enviado, set_aceptado, revision_solicitada, por_declarar, autorizada, P90, P91, codigo_estado_sii, glosa_estado_sii, paso_sii, avisos_postulacion, set_pruebas_texto, correo_proveedor_set, envio_set_id, revision_solicitada_en, declarada_en, tg_proteger_proceso, tg_certificacion_autorizada, guardar_set_pruebas, actualizarProceso, CASO-N, documento_id, Realtime]
+keywords: [procesos_certificacion, set_pruebas_casos, etapa, etapa_certificacion, borrador, postulada, set_descargado, set_enviado, set_aceptado, revision_solicitada, por_declarar, autorizada, P90, P91, codigo_estado_sii, glosa_estado_sii, paso_sii, avisos_postulacion, set_pruebas_texto, correo_proveedor_set, envio_set_id, revision_solicitada_en, declarada_en, tg_proteger_proceso, tg_certificacion_autorizada, guardar_set_pruebas, actualizarProceso, CASO-N, documento_id, Realtime, autorizada_produccion, autorizada fuera de Boletéame, autorizacionExterna, resolucionProduccion, asegurarProceso, tg_resolucion_autoriza_produccion, 0009]
 related: ["02-guias/certificacion-empresa.md", "05-pruebas/set-de-pruebas.md", "03-api-reference/rpc-backend.md", "09-libreria/mapeo-libreria-tablas.md", "04-objetos/objetos-envios-y-rcof.md", "03-api-reference/acceso-por-tabla.md"]
-source: ["supabase_saas_sii.sql §12", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/certificacion/", "apps/web/src/lib/certificacion.ts"]
+source: ["supabase_saas_sii.sql §12", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/lib/certificacion.ts"]
 ---
 
 # Objetos: certificación
@@ -17,14 +17,16 @@ sistema).
 
 Un proceso por empresa (`empresa_id` es `unique`): la certificación de boleta ante el SII,
 siempre en el ambiente de certificación. Se crea al guardar por primera vez los datos de
-la postulación (paso 1) y **no se borra** desde la app (se va en cascada con la empresa o
-la organización).
+la postulación (paso 1, cliente de sesión) o, si antes se consulta el estado de la
+declaración y el SII responde, en `borrador` con `service_role` (`asegurarProceso` de
+`comun.ts`, filtrado por organización; si otra petición la creó a la vez, `23505` y usa
+esa). **No se borra** desde la app (se va en cascada con la empresa o la organización).
 
 | Columna | Tipo | Notas | Quién la escribe |
 |---|---|---|---|
 | `id` | `uuid` | PK | — |
 | `organizacion_id` ✔ | `uuid` | FK `organizaciones`, cascada. La fija `trg_00_organizacion` desde la empresa | trigger |
-| `empresa_id` ✔ | `uuid` | FK `empresas`, cascada, **única** | `guardarDatosPostulacion` (al crear) |
+| `empresa_id` ✔ | `uuid` | FK `empresas`, cascada, **única** | `guardarDatosPostulacion` o `consultarEstadoDeclaracion` (al crear) |
 | `etapa` | `etapa_certificacion` | default `borrador` ([etapas](#etapas)) | 🔒 backend y triggers |
 | `rut_administrador` | `rut` | quien se autentica después para ver el avance y declarar | formulario del paso 1 |
 | `correo_administrador`, `correo_contacto_sii`, `correo_intercambio` | `correo_sii` | | formulario del paso 1 |
@@ -97,7 +99,25 @@ esa etapa.
 - Un set **ilegible** no cambia la etapa (ver
   [set de pruebas](../05-pruebas/set-de-pruebas.md#set-ilegible)).
 - La UI trata a la empresa como `autorizada` si `empresas.autorizada_produccion` es
-  `true`, aunque el proceso diga otra cosa.
+  `true`, aunque el proceso diga otra cosa. Si además el proceso **no** está en
+  `autorizada` (o no existe), la empresa se autorizó fuera de Boletéame: registró su
+  resolución de producción y el trigger `tg_resolucion_autoriza_produccion` de
+  `resoluciones` la marcó (migración 0009, aplicada el 2026-11-13). `leerAsistente` lo
+  devuelve como `autorizacionExterna = true` junto con `resolucionProduccion` y la UI
+  muestra «Autorizada fuera de Boletéame» en lugar de los pasos. Ese trigger no crea ni
+  mueve el proceso
+  ([guía](../02-guias/certificacion-empresa.md#empresa-autorizada-fuera-de-boletéame)).
+
+### Lo que devuelve `leerAsistente` (`VistaAsistente`)
+
+Además de la empresa, el proceso, los casos, el envío, el CAF, el certificado y las
+operaciones:
+
+| Campo | Qué es |
+|---|---|
+| `resolucionCertificacion` | `{ numero, fecha }` de la resolución de certificación vigente, o `null` |
+| `resolucionProduccion` | `{ numero, fecha }` de la resolución de producción vigente, o `null` |
+| `autorizacionExterna` | `empresa.autorizadaProduccion` y el proceso no llegó a `autorizada` por P91 (certificada fuera de Boletéame) |
 
 ## `set_pruebas_casos`
 

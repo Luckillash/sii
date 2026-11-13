@@ -22,6 +22,7 @@ import {
   actualizarProceso,
   type CambioEtapa,
   cargarEmpresa,
+  cargarEmpresaPorCertificar,
   ejecutar,
   enlazarOperacion,
   ensayar,
@@ -148,7 +149,7 @@ async function prepararEnvio(
   ctx: ContextoCertificacion,
   credenciales: ReturnType<DependenciasCertificacion['credenciales']>,
 ) {
-  const empresa = await cargarEmpresa(cliente, ctx);
+  const empresa = await cargarEmpresaPorCertificar(cliente, ctx);
   const proceso = await exigirProceso(cliente, ctx);
   if (proceso.etapa === 'borrador' || proceso.etapa === 'postulada') {
     throw new ErrorUso('Primero descarga el set de pruebas (paso 2).');

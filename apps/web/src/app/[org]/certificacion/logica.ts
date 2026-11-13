@@ -9,7 +9,13 @@ import {
   pasoDeEtapa,
   type ResultadoOperacion,
 } from '@/lib/certificacion';
-import { correoSiiValido, formatearFechaHora, rutSii, rutValidoSii } from '@/lib/formatos';
+import {
+  correoSiiValido,
+  formatearFecha,
+  formatearFechaHora,
+  rutSii,
+  rutValidoSii,
+} from '@/lib/formatos';
 import type { MensajeError } from '@/server/equipo-errores';
 
 // Lógica pura del asistente de certificación (PLAN-SAAS Fase 5): qué acción ofrece cada
@@ -153,6 +159,9 @@ function faltaYAcciones(
             bloqueo,
             e.postulacionCompleta ? undefined : 'Guarda primero los datos de la postulación.',
           ),
+          // Solo lectura: dice si la empresa ya está en certificación (P90/P91) antes de
+          // postular. «Sin trámite» puede ser una empresa ya autorizada fuera de Boletéame.
+          sii('consultarEstadoDeclaracion', bloqueo),
         ],
       };
     case 'postulada':
@@ -252,6 +261,32 @@ export function planAsistente(e: EntradaPlan): PlanPaso[] {
       acciones: e.admin ? acciones : [],
     };
   });
+}
+
+// --- Autorización a producción -------------------------------------------------------
+
+/**
+ * Cómo está la empresa respecto de producción:
+ *   - `pendiente`: aún no está autorizada (el asistente muestra los 5 pasos);
+ *   - `certificada`: la autorizó el SII al terminar este asistente (P91);
+ *   - `externa`: se certificó fuera de Boletéame y registró su resolución de producción
+ *     (migración 0009). El SII responde «sin trámite» a una empresa así, no P91, por eso
+ *     el asistente no lo puede saber por sí solo. Se muestra el estado final, sin pasos.
+ */
+export type Autorizacion = 'pendiente' | 'certificada' | 'externa';
+
+export function tipoAutorizacion(v: {
+  autorizadaProduccion: boolean;
+  autorizacionExterna: boolean;
+}): Autorizacion {
+  if (!v.autorizadaProduccion) return 'pendiente';
+  return v.autorizacionExterna ? 'externa' : 'certificada';
+}
+
+/** «Resolución n.º 80 del 22-08-2014», o el aviso de que falta. */
+export function textoResolucionProduccion(r: { numero: number; fecha: string } | null): string {
+  if (!r) return 'Sin resolución de producción vigente';
+  return `Resolución n.º ${r.numero} del ${formatearFecha(r.fecha)}`;
 }
 
 /** Pasos completos (para el medidor de la cabecera). */

@@ -275,6 +275,9 @@ export async function registrarResolucion(
   if (error) return { ok: false, error: fallo(error, 'resolucion'), valores };
 
   revalidatePath(`${rutaEmpresas(slug)}/${empresa.id}`);
+  // La de producción marca la empresa como autorizada (trigger de la migración 0009): el
+  // asistente de certificación pasa a mostrar «Autorizada fuera de Boletéame».
+  if (ambiente === 'produccion') revalidatePath(`/${slug}/certificacion`);
   const nombre =
     ambiente === 'produccion'
       ? `la resolución N° ${numero} del ${formatearFecha(fecha)}`

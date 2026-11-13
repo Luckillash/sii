@@ -13,7 +13,10 @@ import type { ClienteServicio } from '../supabase/service';
 import {
   AMBIENTE,
   actualizarProceso,
+  asegurarProceso,
   cargarEmpresa,
+  cargarEmpresaPorCertificar,
+  cargarProceso,
   conIndicacion,
   conSesionSii,
   ejecutar,
@@ -39,16 +42,33 @@ import type { ContextoCertificacion } from './tipos';
 //   - la revisión se pide con el Track ID del envío del set aceptado;
 //     `SetSinDescargarError` lleva la indicación de qué hacer;
 //   - el estado (P90 / P91) se guarda en el proceso y el trigger
-//     `tg_certificacion_autorizada` mueve la etapa y marca la empresa autorizada;
+//     `tg_certificacion_autorizada` mueve la etapa y marca la empresa autorizada; la
+//     consulta sirve también desde `borrador` y sin proceso (lo crea si el SII responde);
 //   - declarar: `verificar_portal` antes; la librería solo declara en P90;
 //     `DeclaracionInciertaError` → `incierto` con la indicación de consultar el estado
-//     (P91 = quedó autorizada; P90 = se puede volver a declarar).
+//     (P91 = quedó autorizada; P90 = se puede volver a declarar);
+//   - revisión y declaración se niegan con la empresa ya autorizada
+//     (`cargarEmpresaPorCertificar`), antes de salir al SII.
 
 const INDICACION_SET_SIN_DESCARGAR =
   'Qué hacer: descarga un set de pruebas nuevo (paso 2), envía las boletas de ESE set y pide la revisión con el Track ID de ese envío.';
 
 const INDICACION_DECLARACION_INCIERTA =
   'No repitas la declaración a ciegas: consulta antes el estado de la declaración (P91 = quedó autorizada; P90 = se puede volver a declarar).';
+
+/** «Sin trámite» en `borrador`: el SII no distingue «nunca postuló» de «ya autorizada». */
+const MENSAJE_SIN_TRAMITE_BORRADOR = {
+  titulo: 'El SII no tiene una certificación en curso para la empresa',
+  detalle:
+    'Si la empresa ya está autorizada a emitir boletas electrónicas (se certificó fuera de Boletéame), registra su resolución de producción en Configuración → Empresas. Si no, completa los datos de la postulación y postula (paso 1).',
+} as const;
+
+/** «Sin trámite» con la empresa ya marcada como autorizada (resolución de producción). */
+const MENSAJE_SIN_TRAMITE_AUTORIZADA = {
+  titulo: 'La empresa ya está autorizada en producción',
+  detalle:
+    'El SII no tiene una certificación en curso, como corresponde a una empresa autorizada. Ya puede emitir boletas electrónicas en producción.',
+} as const;
 
 function lineaEstado(estado: EstadoDeclaracion): string {
   if (estado.codigo === null) {
@@ -65,7 +85,7 @@ async function prepararRevision(
   ctx: ContextoCertificacion,
   credenciales: ReturnType<DependenciasCertificacion['credenciales']>,
 ) {
-  const empresa = await cargarEmpresa(cliente, ctx);
+  const empresa = await cargarEmpresaPorCertificar(cliente, ctx);
   const proceso = await exigirProceso(cliente, ctx);
   if (proceso.etapa !== 'set_aceptado' && proceso.etapa !== 'revision_solicitada') {
     throw new ErrorUso(
@@ -176,7 +196,16 @@ export async function solicitarRevision(
 
 // --- Estado de la declaración -------------------------------------------------------------
 
-/** Consulta el estado de la declaración en el SII (solo lectura, sin ensayo). */
+/**
+ * Consulta el estado de la declaración en el SII (solo lectura, sin ensayo). Disponible
+ * desde `borrador` y aun sin proceso (sirve para saber si la empresa ya está en
+ * certificación o autorizada antes de postular): si no hay proceso, se crea en
+ * `borrador` al guardar el estado. Con P90 / P91 el trigger mueve la etapa (y P91 marca
+ * la empresa). El SII responde «sin trámite» (`codigo: null`) tanto a una empresa que
+ * nunca postuló como a una ya autorizada (p. ej. certificada fuera de Boletéame): en
+ * `borrador` se explica cómo seguir en cada caso (registrar la resolución de producción
+ * o postular).
+ */
 export async function consultarEstadoDeclaracion(
   ctx: ContextoCertificacion,
   dependencias?: Partial<DependenciasCertificacion>,
@@ -186,10 +215,8 @@ export async function consultarEstadoDeclaracion(
   const credenciales = deps.credenciales(cliente);
   const prep = async () => {
     const empresa = await cargarEmpresa(cliente, ctx);
-    const proceso = await exigirProceso(cliente, ctx);
-    if (proceso.etapa === 'borrador') {
-      throw new ErrorUso('Primero postula la empresa (paso 1).');
-    }
+    // Sin proceso no se escribe nada todavía: se crea solo si el SII responde.
+    const proceso = await cargarProceso(cliente, ctx);
     const certificado = await credenciales.certificadoDeEmpresa({
       organizacionId: ctx.organizacionId,
       empresaId: ctx.empresaId,
@@ -218,19 +245,20 @@ export async function consultarEstadoDeclaracion(
         (sesion) => declaracion.estado(sesion, p.empresa.rut),
       );
       agregarDetalle({ codigo_estado: estado.codigo, paso: estado.paso });
+      const proceso = p.proceso ?? (await asegurarProceso(cliente, ctx));
       const cambio = await guardarEstadoDeclaracion(
         cliente,
         ctx,
-        p.proceso,
+        proceso,
         estado,
         deps.reloj.ahora(),
       );
-      return { estado, cambio };
+      return { estado, cambio, autorizadaProduccion: p.empresa.autorizada_produccion };
     },
   );
   if (!r.ok) return errorDeEjecucion(r);
 
-  const { estado, cambio } = r.valor;
+  const { estado, cambio, autorizadaProduccion } = r.valor;
   await notificarCambioEtapa(deps, cliente, ctx, cambio, r.operacionId);
   if (estado.autorizada()) {
     return ok(
@@ -248,6 +276,12 @@ export async function consultarEstadoDeclaracion(
         detalle:
           'El SII aprobó la revisión del set. Declara el cumplimiento para quedar autorizada en producción.',
       },
+      r.operacionId,
+    );
+  }
+  if (estado.codigo === null && cambio.nueva === 'borrador') {
+    return ok(
+      autorizadaProduccion ? MENSAJE_SIN_TRAMITE_AUTORIZADA : MENSAJE_SIN_TRAMITE_BORRADOR,
       r.operacionId,
     );
   }
@@ -297,7 +331,7 @@ async function prepararDeclaracion(
   ctx: ContextoCertificacion,
   credenciales: ReturnType<DependenciasCertificacion['credenciales']>,
 ) {
-  const empresa = await cargarEmpresa(cliente, ctx);
+  const empresa = await cargarEmpresaPorCertificar(cliente, ctx);
   const proceso = await exigirProceso(cliente, ctx);
   if (proceso.etapa === 'autorizada') {
     throw new ErrorUso(

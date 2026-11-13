@@ -15,7 +15,7 @@ import type { ClienteServicio } from '../supabase/service';
 import type { Database } from '../supabase/tipos';
 import {
   AMBIENTE,
-  cargarEmpresa,
+  cargarEmpresaPorCertificar,
   conSesionSii,
   ejecutar,
   enlazarOperacion,
@@ -146,7 +146,7 @@ async function preparar(
   if (folioInicial !== undefined && (!Number.isSafeInteger(folioInicial) || folioInicial < 1)) {
     throw new ErrorUso('El folio inicial tiene que ser un número entero mayor que 0.');
   }
-  const empresa = await cargarEmpresa(cliente, ctx);
+  const empresa = await cargarEmpresaPorCertificar(cliente, ctx);
   const proceso = await exigirProceso(cliente, ctx);
   if (proceso.etapa === 'borrador') {
     throw new ErrorUso('Primero postula la empresa (paso 1).');

@@ -18,9 +18,54 @@ import {
   presentarEstadoEnvio,
   presentarResultado,
   textoEnCurso,
+  textoResolucionProduccion,
+  tipoAutorizacion,
   validarDeclaracion,
   validarPostulacion,
 } from './logica';
+
+describe('autorización a producción', () => {
+  it('pendiente, certificada en el asistente (P91) o externa (resolución de producción)', () => {
+    expect(tipoAutorizacion({ autorizadaProduccion: false, autorizacionExterna: false })).toBe(
+      'pendiente',
+    );
+    expect(tipoAutorizacion({ autorizadaProduccion: true, autorizacionExterna: false })).toBe(
+      'certificada',
+    );
+    expect(tipoAutorizacion({ autorizadaProduccion: true, autorizacionExterna: true })).toBe(
+      'externa',
+    );
+    // Sin autorización no hay externa, aunque el dato venga mal.
+    expect(tipoAutorizacion({ autorizadaProduccion: false, autorizacionExterna: true })).toBe(
+      'pendiente',
+    );
+  });
+
+  it('texto de la resolución de producción con la fecha en formato chileno', () => {
+    expect(textoResolucionProduccion({ numero: 80, fecha: '2014-08-22' })).toBe(
+      'Resolución n.º 80 del 22-08-2014',
+    );
+    expect(textoResolucionProduccion(null)).toBe('Sin resolución de producción vigente');
+  });
+
+  it('con la empresa autorizada (también fuera de Boletéame) no hay acciones en ningún paso', () => {
+    const plan = planAsistente({
+      etapa: 'borrador',
+      admin: true,
+      empresaActiva: true,
+      autorizadaProduccion: true,
+      tieneCertificado: true,
+      operacionEnCurso: false,
+      inciertaSinRevisar: false,
+      postulacionCompleta: true,
+      declaracionCompleta: true,
+      casos: 0,
+      foliosDisponibles: null,
+      envio: null,
+    });
+    expect(plan.every((p) => p.acciones.length === 0)).toBe(true);
+  });
+});
 
 const BASE: EntradaPlan = {
   etapa: 'borrador',
@@ -63,18 +108,34 @@ describe('planAsistente', () => {
     expect(plan.map((p) => p.numero)).toEqual([1, 2, 3, 4, 5]);
   });
 
-  it('paso 1: guardar siempre; postular solo con los datos guardados', () => {
+  it('paso 1: guardar siempre; postular solo con los datos guardados; consultar el estado siempre', () => {
     expect(acciones({ postulacionCompleta: false })).toEqual([
       { accion: 'guardarPostulacion', habilitada: true },
       { accion: 'postular', habilitada: false },
+      { accion: 'consultarEstadoDeclaracion', habilitada: true },
     ]);
     expect(acciones({})).toEqual([
       { accion: 'guardarPostulacion', habilitada: true },
       { accion: 'postular', habilitada: true },
+      { accion: 'consultarEstadoDeclaracion', habilitada: true },
     ]);
     const paso = enCurso(planAsistente({ ...BASE, postulacionCompleta: false }));
     expect(paso.falta).toMatch(/guarda los datos/i);
     expect(paso.acciones[1]?.motivo).toMatch(/Guarda primero/);
+    // La consulta no depende de los datos de la postulación.
+    expect(paso.acciones[2]?.motivo).toBeUndefined();
+  });
+
+  it('paso 1: la consulta del estado sigue los bloqueos que salen al SII (certificado, operación en curso)', () => {
+    expect(acciones({ tieneCertificado: false })).toEqual([
+      { accion: 'guardarPostulacion', habilitada: true },
+      { accion: 'postular', habilitada: false },
+      { accion: 'consultarEstadoDeclaracion', habilitada: false },
+    ]);
+    expect(acciones({ operacionEnCurso: true })[2]).toEqual({
+      accion: 'consultarEstadoDeclaracion',
+      habilitada: false,
+    });
   });
 
   it('paso 2: descargar el set', () => {
@@ -185,6 +246,7 @@ describe('planAsistente', () => {
     expect(acciones({ operacionEnCurso: true })).toEqual([
       { accion: 'guardarPostulacion', habilitada: true },
       { accion: 'postular', habilitada: false },
+      { accion: 'consultarEstadoDeclaracion', habilitada: false },
     ]);
     const paso = enCurso(planAsistente({ ...BASE, operacionEnCurso: true }));
     expect(paso.acciones[1]?.motivo).toMatch(/operación en curso/);

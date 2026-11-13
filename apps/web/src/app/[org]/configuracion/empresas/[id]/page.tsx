@@ -108,8 +108,8 @@ export default async function PaginaEmpresa({
         )}
         <p className={estilos.nota}>
           {empresa.autorizadaProduccion && empresa.autorizadaEn
-            ? `El SII autorizó a la empresa a emitir en producción el ${formatearFecha(empresa.autorizadaEn)}.`
-            : 'La autorización a producción la marca el sistema cuando el SII aprueba la certificación de la empresa.'}
+            ? `La empresa está autorizada a emitir en producción desde el ${formatearFecha(empresa.autorizadaEn)}.`
+            : 'La autorización a producción la marca el sistema cuando el SII aprueba la certificación de la empresa, o cuando registras su resolución de producción si ya se certificó fuera de Boletéame.'}
         </p>
       </Tarjeta>
 

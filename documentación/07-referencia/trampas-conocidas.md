@@ -1,9 +1,9 @@
 ---
 title: "Trampas conocidas"
 description: "Comportamientos no obvios del SII, de la librería y del esquema."
-keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0]
+keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna]
 related: ["08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md"]
-source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/"]
+source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/"]
 ---
 
 # Trampas conocidas
@@ -237,6 +237,42 @@ source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas
   proceso no pasa a `set_descargado`. `tipos.ts` tenía las dos RPC agregadas a mano;
   `pnpm db:tipos` dio un resultado idéntico, sin diferencias
   ([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0008)).
+
+### Empresa autorizada fuera de Boletéame (migración 0009)
+
+- **El SII responde «sin trámite» a una empresa ya autorizada.** A
+  `obtenerEstadoAutorizaEmp` una empresa certificada fuera de Boletéame (con la CLI, otro
+  proveedor o por su cuenta) no le responde P91 sino `codigo: null`, lo mismo que a una que
+  nunca postuló (o cuyo titular del certificado no la representa). Comprobado el
+  2026-11-13 con la única empresa de producción, certificada con la librería el
+  2026-11-06. El asistente no lo puede distinguir solo: antes quedaba en `borrador`
+  invitando a postular (lo que la devolvería a certificación), el candado «P91 no descarga
+  set» no la protegía (mira P91) y `empresas.autorizada_produccion` seguía en `false`, así
+  que no podía emitir en producción.
+- **Cómo lo resuelve la app** (decisión del usuario 2026-11-13): registrar la resolución de
+  **producción** vigente equivale a declarar que la empresa ya está autorizada. El trigger
+  `tg_resolucion_autoriza_produccion` (after insert or update en `resoluciones`, `security
+  definer`) marca `autorizada_produccion = true` y `autorizada_en = coalesce(…, now())`,
+  filtrando por empresa y organización; nunca la desmarca. Si la resolución es falsa, el
+  SII rechaza igual los envíos de producción. Un authenticated sigue sin poder poner la
+  columna a mano (`tg_proteger_autorizacion`): pasa porque el trigger es de `postgres`.
+- **Mientras la 0009 no esté aplicada**, registrar la resolución de producción **no**
+  autoriza la empresa: el asistente sigue mostrando los pasos. El candado del backend y la
+  vista sí están desplegados con el código y miran la columna, así que funcionan apenas la
+  columna cambie ([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0009)).
+- **El candado corre antes de todo.** Los seis pasos ⚠️ llaman a
+  `cargarEmpresaPorCertificar` en la validación previa (también en el ensayo): con la
+  empresa autorizada (por P91 o por resolución) responden `motivo: 'empresa_autorizada'`
+  sin salir al SII ni dejar fila en `operaciones_sii`. Las consultas de solo lectura
+  (`consultarEstadoDeclaracion`, `consultarEstadoSet`) no tienen candado.
+- **`autorizacionExterna` se deduce, no se guarda.** Es «empresa autorizada y el proceso no
+  está en `autorizada`». Si una empresa registró su resolución de producción y después
+  consulta el estado y el SII responde P91, el proceso pasa a `autorizada` y la vista deja
+  de mostrarla como externa (se ve como autorizada por P91, que también es cierto).
+- **Consultar el estado puede crear el proceso.** La consulta está también en el paso 1 y
+  funciona sin proceso (no depende de la 0009): lo crea en `borrador` con service_role solo después de que
+  el SII respondió (una falla no deja fila). El proceso creado así no tiene datos de
+  postulación: el paso 1 sigue pidiendo guardarlos antes de postular.
 
 ### Ensayo y confirmación
 

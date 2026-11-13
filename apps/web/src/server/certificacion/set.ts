@@ -15,7 +15,7 @@ import {
   AMBIENTE,
   actualizarProceso,
   type CambioEtapa,
-  cargarEmpresa,
+  cargarEmpresaPorCertificar,
   conSesionSii,
   ejecutar,
   ensayar,
@@ -39,7 +39,9 @@ import type { ContextoCertificacion } from './tipos';
 //     anterior dejan de servir para la revisión);
 //   - candados: en P90 la librería no descarga (un set nuevo reiniciaría la
 //     certificación); en P91 (ya autorizada) la app tampoco (la CLI exige
-//     `--aunque-autorizada`, que aquí no existe);
+//     `--aunque-autorizada`, que aquí no existe), y con la empresa marcada como
+//     autorizada (P91 o resolución de producción registrada, migración 0009) ni
+//     siquiera sale al SII (`cargarEmpresaPorCertificar`);
 //   - `parsearSetPruebas` (tipo 39) y la RPC `guardar_set_pruebas` (migración 0008)
 //     reemplazan los casos y dejan el proceso en `set_descargado`, en una transacción.
 // El estado de la declaración que se lee antes de descargar también se guarda (puede
@@ -63,7 +65,7 @@ async function preparar(
   credenciales: ReturnType<DependenciasCertificacion['credenciales']>,
   correoOpcion: string | undefined,
 ) {
-  const empresa = await cargarEmpresa(cliente, ctx);
+  const empresa = await cargarEmpresaPorCertificar(cliente, ctx);
   const proceso = await exigirProceso(cliente, ctx);
   if (proceso.etapa === 'borrador') {
     throw new ErrorUso(

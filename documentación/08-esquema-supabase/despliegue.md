@@ -1,7 +1,7 @@
 ---
 title: "Esquema: despliegue"
 description: "Cómo se aplican las migraciones en la única base (Supabase en la nube, producción), requisitos (Vault, Realtime, pg_cron, pg_net) y tareas programadas."
-keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, aplicadas, 0008_certificacion, registrar_caf, guardar_set_pruebas, rls-fase5-certificacion]
+keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, aplicadas, 0008_certificacion, registrar_caf, guardar_set_pruebas, rls-fase5-certificacion, 0009_autorizacion_externa, tg_resolucion_autoriza_produccion, rls-fase5-autorizacion-externa, pendiente de aplicar]
 related: ["02-guias/quickstart.md", "05-pruebas/probar-el-esquema.md", "08-esquema-supabase/vault-y-secretos.md"]
 source: ["supabase_saas_sii.sql (cabecera, opcional pg_cron)", "PLAN-SAAS.md §4.4 §6"]
 ---
@@ -33,7 +33,7 @@ Viven en `supabase/migrations/` con prefijo **secuencial de 4 dígitos** (no tim
 |---|---|
 | `0001_esquema_inicial.sql` | `supabase_saas_sii.sql` **byte a byte** (19 secciones: tipos, tablas, RLS, Vault, Storage, Realtime). Nunca se edita |
 | `0002_extensiones_cron.sql` | `pg_cron` (schema `pg_catalog`) y `pg_net` (schema `extensions`) |
-| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` es de la Fase 5: ver [abajo](#fase-5-migración-0008)) |
+| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, son de la Fase 5: ver [abajo](#fase-5-migración-0008)) |
 
 Reglas, todas derivadas de que la única base es producción:
 
@@ -173,6 +173,53 @@ con Vercel. Registro de lo hecho:
 6. *Advisors* de seguridad: sin avisos nuevos. Las dos RPC no aparecen en
    `authenticated_security_definer_function_executable`: no las ejecutan `anon` ni
    `authenticated`.
+
+### Fase 5: migración 0009
+
+**Estado: aplicada en producción el 2026-11-13 (21:05 UTC).** Registro: el `--dry-run`
+listó solo `0009`; antes de migrar, el `update` del final no tenía filas que marcar (0
+resoluciones de producción vigentes); verificación 9/9 `ok`; simulación 12/12 `ok` y su
+consulta de limpieza en 0 (usuarios, organizaciones, empresas); `pnpm db:tipos` sin
+diferencias; *Advisors* de seguridad sin avisos nuevos (la función no aparece). Pendiente
+solo el paso 8 (registrar la resolución de producción de la empresa del piloto). Antes,
+escrita y probada en PGlite (esquema 0001 y 0003–0008 más
+la 0009, con stubs de `auth`, `storage`, `vault` y `supabase_migrations`): verificación 9/9
+y simulación 12/12; sin la 0009, la verificación da 2/9 (solo las comprobaciones 7 y 8, que
+no dependen de ella) y la simulación 6/12 (fallan 4, 5, 6, 7, 9 y 11). La regresión de la
+Fase 3 (`rls-fase3-empresas.sql`, 43/43) y la de la 0008 (16/16) siguen en verde con la 0009
+aplicada.
+
+| Migración | Contenido | Qué falla si falta |
+|---|---|---|
+| `0009_autorizacion_externa` | Función `tg_resolucion_autoriza_produccion()` (`security definer`, `search_path = ''`, sin `EXECUTE` para PUBLIC, `anon` ni `authenticated`) y trigger `trg_50_resolucion_autoriza_produccion` (`after insert or update` en `resoluciones`, `when (new.ambiente = 'produccion' and new.vigente)`): marca `empresas.autorizada_produccion = true` y `autorizada_en = coalesce(…, now())`; nunca desmarca. Más un `update` idempotente de las empresas que ya tengan una resolución de producción vigente (al escribirla, ninguna). Sin tablas, columnas, políticas ni grants de tablas ([trigger](triggers-y-logica.md#tg_resolucion_autoriza_produccion-migración-0009)) | **Empresas certificadas fuera de Boletéame:** registrar la resolución de producción no las autoriza; el asistente sigue mostrando los pasos (con la nota y «Consultar el estado en el SII», que responde «sin trámite»), y no pueden emitir en producción (`tg_validar_documento` exige `autorizada_produccion`). Nada falla con error: el código desplegado tolera el esquema viejo |
+
+Es aditiva y el código que la usa tolera el esquema con y sin la 0009 (el candado y la vista
+miran `empresas.autorizada_produccion`, que ya existe), así que no hay orden que cuidar con
+Vercel. Pasos, **con autorización del usuario**:
+
+1. Leer la migración completa (`supabase/migrations/0009_autorizacion_externa.sql`) y
+   revisar el respaldo (panel → *Database → Backups*).
+2. Antes de migrar, mirar qué marcaría el `update` del final (lo esperado: 0 filas):
+   `select e.id, e.razon_social from public.empresas e join public.resoluciones r on r.empresa_id = e.id and r.organizacion_id = e.organizacion_id where r.ambiente = 'produccion' and r.vigente and (not e.autorizada_produccion or e.autorizada_en is null);`
+3. `pnpm exec supabase db push --remote=rbrntkztzijaxsnpgpqn --dry-run`: debe listar solo
+   `0009`.
+4. `pnpm exec supabase db push --remote=rbrntkztzijaxsnpgpqn`.
+5. Verificaciones, todas `ok = true`
+   ([cómo](../05-pruebas/probar-el-esquema.md#7-simulación-de-la-autorización-externa-rls-fase5-autorizacion-externasql)):
+   - `supabase/verificaciones/0009_autorizacion_externa.sql` (solo lectura): **9/9**, con la
+     migración registrada como `0009`. Antes de migrar da 2/9.
+   - La simulación `supabase/verificaciones/rls-fase5-autorizacion-externa.sql`: **12/12**,
+     con `rollback`. Después, su consulta de limpieza del encabezado (usuarios
+     `autext-%@ejemplo.invalid`, organizaciones `zz-prueba-autorizacion-externa%` y empresas
+     `Empresa autorizacion externa%`) tiene que dar todo en 0.
+6. `pnpm db:tipos`: no debería cambiar `apps/web/src/server/supabase/tipos.ts` (solo es un
+   trigger; las funciones de trigger no aparecen en `Functions`).
+7. *Advisors* de seguridad: la función no debería aparecer en
+   `authenticated_security_definer_function_executable` (no la ejecutan `anon` ni
+   `authenticated`).
+8. Para la empresa de producción ya certificada con la librería: un administrador registra
+   su resolución de producción en *Configuración → Empresas*; la empresa queda autorizada y
+   el asistente muestra «Autorizada fuera de Boletéame».
 
 ## Requisitos del proyecto
 

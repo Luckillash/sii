@@ -162,7 +162,7 @@ export async function leerAsistente(
   if (empresa.error) throw fallaBase('leer la empresa', empresa.error);
   if (!empresa.data) return null;
 
-  const [proceso, cafs, resolucion, asociaciones, operaciones] = await Promise.all([
+  const [proceso, cafs, resolucion, resolucionProd, asociaciones, operaciones] = await Promise.all([
     supabase
       .from('procesos_certificacion')
       .select('*')
@@ -187,6 +187,14 @@ export async function leerAsistente(
       .eq('vigente', true)
       .maybeSingle(),
     supabase
+      .from('resoluciones')
+      .select('numero, fecha')
+      .eq('organizacion_id', organizacionId)
+      .eq('empresa_id', empresaId)
+      .eq('ambiente', 'produccion')
+      .eq('vigente', true)
+      .maybeSingle(),
+    supabase
       .from('empresa_certificados')
       .select('certificado_id, es_representante_electronico, predeterminado')
       .eq('organizacion_id', organizacionId)
@@ -203,6 +211,9 @@ export async function leerAsistente(
   if (proceso.error) throw fallaBase('leer el proceso de certificación', proceso.error);
   if (cafs.error) throw fallaBase('leer los CAF', cafs.error);
   if (resolucion.error) throw fallaBase('leer la resolución', resolucion.error);
+  if (resolucionProd.error) {
+    throw fallaBase('leer la resolución de producción', resolucionProd.error);
+  }
   if (asociaciones.error)
     throw fallaBase('leer los certificados de la empresa', asociaciones.error);
   if (operaciones.error) throw fallaBase('leer las operaciones', operaciones.error);
@@ -288,6 +299,11 @@ export async function leerAsistente(
     resolucionCertificacion: resolucion.data
       ? { numero: resolucion.data.numero, fecha: resolucion.data.fecha }
       : null,
+    resolucionProduccion: resolucionProd.data
+      ? { numero: resolucionProd.data.numero, fecha: resolucionProd.data.fecha }
+      : null,
+    // Autorizada sin que este asistente llegara a P91: certificada fuera de Boletéame.
+    autorizacionExterna: empresa.data.autorizada_produccion && proceso.data?.etapa !== 'autorizada',
     certificado,
     operaciones: listaOperaciones,
   };

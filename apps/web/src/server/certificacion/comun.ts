@@ -100,6 +100,47 @@ export async function cargarEmpresa(
   return data;
 }
 
+// --- Candado: empresa ya autorizada en producción -------------------------------------
+
+/**
+ * Qué pasó y qué hacer cuando se intenta un paso de la certificación con una empresa ya
+ * autorizada en producción (por P91 o porque registró su resolución de producción tras
+ * certificarse fuera de Boletéame, migración 0009).
+ */
+export const MENSAJE_EMPRESA_AUTORIZADA: MensajeError = Object.freeze({
+  titulo: 'La empresa ya está autorizada en producción',
+  detalle:
+    'No hace falta certificarla: ya puede emitir boletas electrónicas en producción. No se envió nada al SII.',
+});
+
+/**
+ * La empresa ya está autorizada en producción: ningún paso que graba algo en el SII
+ * (postular, descargar el set, pedir folios, enviar el set, pedir la revisión, declarar)
+ * se ejecuta. Postular de nuevo la devolvería a certificación, y un set nuevo podría
+ * afectarla. Reconocido por nombre en `sii/errores.ts` (`uso`, con su propio mensaje).
+ */
+export class ErrorEmpresaAutorizada extends Error {
+  override name = 'ErrorEmpresaAutorizada';
+  readonly mensajeUsuario: MensajeError = MENSAJE_EMPRESA_AUTORIZADA;
+  constructor() {
+    super(MENSAJE_EMPRESA_AUTORIZADA.detalle);
+  }
+}
+
+/**
+ * `cargarEmpresa` + el candado de autorización: para los pasos ⚠️ de la certificación.
+ * Corre en la validación previa (ensayo y confirmada), antes de salir al SII y antes de
+ * abrir una fila en `operaciones_sii`.
+ */
+export async function cargarEmpresaPorCertificar(
+  cliente: ClienteServicio,
+  ctx: ContextoCertificacion,
+): Promise<FilaEmpresaDb> {
+  const empresa = await cargarEmpresa(cliente, ctx);
+  if (empresa.autorizada_produccion) throw new ErrorEmpresaAutorizada();
+  return empresa;
+}
+
 export async function cargarProceso(
   cliente: ClienteServicio,
   ctx: ContextoCertificacion,
@@ -123,6 +164,31 @@ export async function exigirProceso(
     throw new ErrorUso('Primero guarda los datos de la postulación en el paso 1.');
   }
   return proceso;
+}
+
+/**
+ * El proceso de la empresa; si no existe, lo crea en `borrador` con service_role
+ * (filtrado por organización: la empresa ya se leyó en esta organización). La fila es
+ * única por empresa: si otra petición la creó a la vez (23505), se usa la que quedó.
+ */
+export async function asegurarProceso(
+  cliente: ClienteServicio,
+  ctx: ContextoCertificacion,
+): Promise<FilaProcesoDb> {
+  const existente = await cargarProceso(cliente, ctx);
+  if (existente) return existente;
+  // `organizacion_id` lo vuelve a fijar `trg_00_organizacion` desde la empresa.
+  const { data, error } = await cliente
+    .from('procesos_certificacion')
+    .insert({ organizacion_id: ctx.organizacionId, empresa_id: ctx.empresaId })
+    .select('*')
+    .single();
+  if (!error && data) return data;
+  if (error?.code === '23505') {
+    const otra = await cargarProceso(cliente, ctx);
+    if (otra) return otra;
+  }
+  throw fallaBase('crear el proceso de certificación', error);
 }
 
 /** `etapa` está entre `desde` y `hasta` (en el orden del enum, ambos incluidos). */
@@ -282,7 +348,7 @@ export function errorSinEjecutar(error: unknown): ResultadoPaso {
   return {
     tipo: 'error',
     mensaje: mensajeParaUsuario(resultado === 'ok' ? 'error' : resultado, error),
-    motivo: resultado,
+    motivo: error instanceof ErrorEmpresaAutorizada ? 'empresa_autorizada' : resultado,
     operacionId: null,
   };
 }

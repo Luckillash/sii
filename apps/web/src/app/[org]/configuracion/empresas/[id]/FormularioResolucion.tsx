@@ -80,7 +80,7 @@ export function FormularioResolucion({
           ayuda={
             certificacion
               ? 'En certificación el SII entrega solo la fecha: el número es siempre 0.'
-              : 'El número de la resolución que autoriza a la empresa a emitir en producción.'
+              : 'El número de la resolución que autoriza a la empresa a emitir en producción. Al registrarla, la empresa queda autorizada para producción.'
           }
           error={certificacion ? undefined : errores?.numero}
         >

@@ -31,7 +31,7 @@ emisor ve la página (`leerAsistente`) pero no las acciones. Detalle en
 | `enviarSet(ctx, { confirmada })` | `enviarSet` | ⚠️ | sí | `enviar_set` | `asignar_folio` 🔒, Storage, `envios`, `documentos`, `documento_detalles`, `set_pruebas_casos`, proceso (`set_enviado`); o `folios_anulados` |
 | `consultarEstadoSet(ctx)` | `consultarEstadoSet` | 🔁 | no | `estado_envio` | `envios`, `envio_estadisticas`, `envio_rechazos`, `consultas_envio`, proceso (`set_aceptado`) |
 | `solicitarRevision(ctx, { confirmada })` | `solicitarRevision` | ⚠️ | sí | `solicitar_revision` | proceso (`revision_solicitada`) |
-| `consultarEstadoDeclaracion(ctx)` | `consultarEstadoDeclaracion` | 🔁 | no | `estado_declaracion` | proceso (código, glosa, paso; el trigger mueve P90/P91) |
+| `consultarEstadoDeclaracion(ctx)` | `consultarEstadoDeclaracion` | 🔁 | no | `estado_declaracion` | proceso (código, glosa, paso; el trigger mueve P90/P91); si no existe, lo crea en `borrador` (service_role) tras la respuesta del SII. Disponible desde `borrador` |
 | `declarar(ctx, { confirmada })` | `declarar` | ⚠️ | sí | `verificar_portal` + `declarar` | proceso (`declarada_en`, estado SII) |
 | `marcarRevisada(ctx, operacionId)` | `marcarRevisada` | no | — | — | `operaciones_sii.detalle.revisada_en` (vía `marcarInciertaRevisada`) |
 
@@ -40,6 +40,11 @@ Server Action desde la membresía verificada. Todas devuelven `ResultadoPaso`
 (`@/lib/certificacion`): `ensayo` con el resumen, `ok` con el mensaje y los avisos, o
 `error` con el mensaje y, según el caso, `resultado`, `motivo`, `operacionPendienteId`,
 `errores` por campo o `requiere.folioInicial`.
+
+Las seis acciones ⚠️ se niegan con la empresa ya autorizada en producción (por P91 o por
+su resolución de producción, migración 0009), en el ensayo y en la confirmada, antes de
+salir al SII y sin fila en `operaciones_sii`: `error` con `motivo: 'empresa_autorizada'`
+([guía](../02-guias/certificacion-empresa.md#empresa-autorizada-fuera-de-boletéame)).
 
 RPC nuevas de la fase (migración `0008`, aplicada el 2026-11-13), solo `service_role`:
 [`registrar_caf`](rpc-backend.md#registrar_caf-migración-0008) y

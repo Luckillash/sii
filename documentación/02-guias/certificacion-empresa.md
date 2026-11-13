@@ -1,9 +1,9 @@
 ---
 title: "Certificación de la empresa ante el SII"
 description: "El asistente de la Fase 5: los 5 pasos visibles y las 8 etapas de procesos_certificacion, qué hace cada acción en el SII y en la base, ensayo y confirmación, operaciones inciertas y cómo revisarlas, roles, avisos y actualización en vivo."
-keywords: [certificación, asistente, /certificacion, server/certificacion, ResultadoPaso, ResumenEnsayo, ensayo, confirmada, Dialogo, PASOS, ETAPAS, pasoDeEtapa, estadoPaso, postular, guardarDatosPostulacion, ASCII imprimible, verificar_portal, descargarSet, solicitarFoliosSet, enviarSet, consultarEstadoSet, solicitarRevision, consultarEstadoDeclaracion, declarar, guardarDatosDeclaracion, marcarRevisada, bloqueoEnvioSet, incierto, Marcar como revisada, comoRevisar, P90, P91, autorizada_produccion, resolución número 0, puedeAdministrar, lector, emisor, EnVivo, Realtime, correoCertificacion, Idempotency-Key, certificacion.actualizada, maxDuration]
+keywords: [certificación, asistente, /certificacion, server/certificacion, ResultadoPaso, ResumenEnsayo, ensayo, confirmada, Dialogo, PASOS, ETAPAS, pasoDeEtapa, estadoPaso, postular, guardarDatosPostulacion, ASCII imprimible, verificar_portal, descargarSet, solicitarFoliosSet, enviarSet, consultarEstadoSet, solicitarRevision, consultarEstadoDeclaracion, declarar, guardarDatosDeclaracion, marcarRevisada, bloqueoEnvioSet, incierto, Marcar como revisada, comoRevisar, P90, P91, autorizada_produccion, resolución número 0, puedeAdministrar, lector, emisor, EnVivo, Realtime, correoCertificacion, Idempotency-Key, certificacion.actualizada, maxDuration, autorizada fuera de Boletéame, autorizacionExterna, resolucionProduccion, tipoAutorizacion, ErrorEmpresaAutorizada, empresa_autorizada, cargarEmpresaPorCertificar, sin trámite, resolución de producción, tg_resolucion_autoriza_produccion, 0009]
 related: ["05-pruebas/set-de-pruebas.md", "02-guias/folios-caf.md", "04-objetos/objetos-certificacion.md", "03-api-reference/indice-operaciones.md", "03-api-reference/servicios-sii.md", "01-fundamentos/errores-y-resultados.md", "03-api-reference/rpc-backend.md", "07-referencia/trampas-conocidas.md"]
-source: ["supabase_saas_sii.sql §12", "certificacion-node/docs/postulacion.md", "certificacion-node/docs/certificacion.md", "PLAN-SAAS.md Fase 5", "apps/web/src/server/certificacion/", "apps/web/src/lib/certificacion.ts", "apps/web/src/app/[org]/certificacion/", "packages/correos/src/certificacion.ts", "supabase/migrations/0008_certificacion.sql"]
+source: ["supabase_saas_sii.sql §12", "certificacion-node/docs/postulacion.md", "certificacion-node/docs/certificacion.md", "PLAN-SAAS.md Fase 5", "apps/web/src/server/certificacion/", "apps/web/src/lib/certificacion.ts", "apps/web/src/app/[org]/certificacion/", "packages/correos/src/certificacion.ts", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql"]
 ---
 
 # Certificación de la empresa ante el SII
@@ -12,10 +12,14 @@ source: ["supabase_saas_sii.sql §12", "certificacion-node/docs/postulacion.md",
 
 El asistente de `/<org>/certificacion` lleva a una empresa desde la postulación hasta la
 declaración de cumplimiento (P91, autorizada para emitir boletas en producción), todo en
-el **ambiente de certificación** del SII. Es la Fase 5 del plan: el código está escrito
-pero **sin desplegar**, y la migración `0008_certificacion` que usa está
-**aplicada en producción desde el 2026-11-13**
-([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0008)).
+el **ambiente de certificación** del SII. Es la Fase 5 del plan: el código está desplegado
+en *Production* y la migración `0008_certificacion` que usa está **aplicada en producción
+desde el 2026-11-13** ([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0008)).
+Una empresa que ya se certificó **fuera de Boletéame** no recorre los pasos: registra su
+resolución de producción y el asistente la muestra como «Autorizada fuera de Boletéame»
+([abajo](#empresa-autorizada-fuera-de-boletéame)). Eso usa la migración
+`0009_autorizacion_externa`, aplicada en producción el 2026-11-13
+([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0009)).
 
 La app no reimplementa nada de la librería `@winex/certificacion` (principio 4): cada
 acción tiene paridad con un comando `sii certificacion …` de la CLI y solo agrega
@@ -30,7 +34,7 @@ qué paso está el proceso y `estadoPaso(n, etapa)` si cada paso está `completo
 
 | Paso visible | Etapas del paso | Acciones (en el paso en curso) | La etapa avanza con |
 |---|---|---|---|
-| 1. Postulación | `borrador` | guardar datos de la postulación; **Postular en el SII** ⚠️ | `postular` OK → `postulada` |
+| 1. Postulación | `borrador` | guardar datos de la postulación; **Postular en el SII** ⚠️; **Consultar el estado en el SII** 🔁 | `postular` OK → `postulada` (con la consulta, P90 / P91 los aplica el trigger) |
 | 2. Set de pruebas | `postulada` | **Descargar el set de pruebas** ⚠️ | `descargarSet` legible → `set_descargado` |
 | 3. Folios y envío del set | `set_descargado`, `set_enviado` | **Solicitar folios de certificación** ⚠️ (si faltan); **Enviar el set al SII** / **Volver a enviar el set** ⚠️; **Consultar el estado del envío** 🔁 | `enviarSet` con Track ID → `set_enviado`; `consultarEstadoSet` con EPR limpio → `set_aceptado` |
 | 4. Revisión | `set_aceptado`, `revision_solicitada` | **Solicitar revisión** ⚠️; luego **Consultar el estado en el SII** 🔁 | `solicitarRevision` → `revision_solicitada`; el estado P90 → `por_declarar` |
@@ -40,6 +44,40 @@ qué paso está el proceso y `estadoPaso(n, etapa)` si cada paso está `completo
 `tg_certificacion_autorizada` cuando la app guarda `codigo_estado_sii = 'P90'` o `'P91'`
 (y con P91 marca `empresas.autorizada_produccion`). Etiquetas de cada etapa y quién la
 escribe en [objetos de certificación](../04-objetos/objetos-certificacion.md#etapas).
+
+## Empresa autorizada fuera de Boletéame
+
+Una empresa que se certificó con la CLI, con otro proveedor o por su cuenta ya está
+autorizada en el SII, pero **el SII no lo dice como P91**: a `obtenerEstadoAutorizaEmp`
+responde «sin trámite» (`codigo: null`), lo mismo que a una empresa que nunca postuló. El
+asistente no lo puede distinguir solo, y postularla de nuevo la devolvería a certificación.
+Por eso (decisión del usuario, 2026-11-13):
+
+1. **Registrar la resolución de producción equivale a declarar que está autorizada.** En
+   *Configuración → Empresas → (la empresa) → Resoluciones del SII*, un administrador
+   registra la resolución de producción (número y fecha). El trigger
+   `tg_resolucion_autoriza_produccion` (migración 0009) marca
+   `empresas.autorizada_produccion = true` y `autorizada_en` (si no tenía). Nunca la
+   desmarca, igual que P91. Si la resolución es falsa, el SII rechaza igual los envíos de
+   producción ([trigger](../08-esquema-supabase/triggers-y-logica.md#tg_resolucion_autoriza_produccion-migración-0009)).
+2. **El asistente muestra el estado final** «Autorizada fuera de Boletéame», con la
+   resolución de producción vigente («Resolución n.º 80 del 22-08-2014», `lib/formatos`) y
+   un enlace a las resoluciones de la empresa: sin los pasos, sin el medidor y sin acciones
+   de certificación. `leerAsistente` lo indica con `autorizacionExterna = true` (empresa
+   autorizada y el proceso no llegó a `autorizada` por P91) y `resolucionProduccion`. Una
+   empresa autorizada por P91 en el asistente se ve como siempre.
+3. **Candado en el backend**: `postular`, `descargarSet`, `solicitarFoliosSet`,
+   `enviarSet`, `solicitarRevision` y `declarar` (ensayo y confirmada) se niegan con la
+   empresa autorizada (`cargarEmpresaPorCertificar`), **antes de salir al SII y sin fila
+   en `operaciones_sii`**: `error` con `motivo: 'empresa_autorizada'` y «La empresa ya está
+   autorizada en producción. No hace falta certificarla: ya puede emitir boletas
+   electrónicas en producción. No se envió nada al SII.» Las consultas de solo lectura
+   siguen disponibles.
+4. **Paso 1**: además de guardar y postular, ofrece «Consultar el estado en el SII» y una
+   nota: si la empresa ya se certificó por fuera, que registre su resolución de producción
+   (enlace a las resoluciones de la empresa) en vez de postular. Con «sin trámite» en
+   `borrador`, la consulta responde «El SII no tiene una certificación en curso para la
+   empresa» y explica los dos caminos.
 
 ## Roles
 
@@ -84,8 +122,12 @@ revisar. El backend vuelve a validar todo:
   inicia sesión en el SII, firma las boletas y la declaración. Para pedir folios hace falta
   un **representante electrónico** (`representante: true`; si el predeterminado no lo es,
   elige otro representante vigente).
-- **Proceso creado**: se crea al guardar los datos de la postulación; sin él, «Primero
-  guarda los datos de la postulación en el paso 1».
+- **Empresa sin autorizar** (`cargarEmpresaPorCertificar`, en los seis pasos ⚠️): con
+  `autorizada_produccion`, «La empresa ya está autorizada en producción…», sin salir al SII
+  ([arriba](#empresa-autorizada-fuera-de-boletéame)).
+- **Proceso creado**: se crea al guardar los datos de la postulación (o al consultar el
+  estado de la declaración, si el SII responde); sin él, «Primero guarda los datos de la
+  postulación en el paso 1».
 
 ## Ensayo y confirmación
 
@@ -121,7 +163,7 @@ set ilegible, encontrar la empresa en P91 al descargar y consultar un set rechaz
 reparos dejan la operación `ok` y devuelven `error` con `motivo` `set_ilegible`,
 `autorizada`, `set_rechazado` o `set_con_reparos`. Otros `motivo`: `no_ejecutada` (la
 Server Action no llamó al backend), `datos_invalidos`, `uso` / `config` (validación
-previa), los de `ejecutarOperacion` (`incierto_sin_revisar`, `en_curso`,
+previa), `empresa_autorizada` (el candado de la empresa ya autorizada), los de `ejecutarOperacion` (`incierto_sin_revisar`, `en_curso`,
 `sesion_invalida`, `sin_registro`) y `no_encontrada` / `no_revisable` de `marcarRevisada`.
 
 ## Paso 1. Postulación
@@ -195,8 +237,13 @@ deja `set_descargado`; si no se puede leer, guarda el texto, borra los casos y r
   Con **P90** el trigger pasa la etapa a `por_declarar` («La empresa está lista para
   declarar (P90)»); con **P91**, a `autorizada`. Sin trámite (código nulo): «El SII no
   muestra un trámite pendiente: la empresa ya está autorizada, no está postulada o el
-  titular del certificado no la representa». Disponible desde `postulada` (en la UI, en
-  los pasos 4 y 5).
+  titular del certificado no la representa». Disponible desde `borrador` y aun sin
+  proceso (en la UI, en los pasos 1, 4 y 5): si no hay proceso, lo crea en `borrador` con
+  service_role **solo cuando el SII respondió** (una validación o una falla del SII no
+  deja fila). En `borrador`, «sin trámite» responde «El SII no tiene una certificación en
+  curso para la empresa» con qué hacer (registrar la resolución de producción si ya está
+  autorizada; si no, postular), o «La empresa ya está autorizada en producción» si ya
+  registró su resolución de producción.
 
 ## Paso 5. Declaración de cumplimiento
 
@@ -289,10 +336,16 @@ operación en curso se muestra desde `operaciones_sii` («Postulando en el SII d
   `certificacion-prueba.ts`, `caf-prueba.ts`), sin red ni base. `secretos.test.ts` comprueba
   que ninguna llave del CAF, token, cookie ni clave del .pfx llega a `operaciones_sii`, a
   los mensajes, a Sentry ni a la consola.
-- `logica.test.ts` (plan del asistente, validaciones) y
+- `autorizacion-externa.test.ts`: el candado en los seis pasos (ensayo y confirmada, sin
+  red ni filas), la consulta del estado desde `borrador` y sin proceso, y
+  `autorizacionExterna` / `resolucionProduccion` de `leerAsistente`.
+- `logica.test.ts` (plan del asistente, validaciones, `tipoAutorizacion`) y
   `packages/correos/src/certificacion.test.ts`.
 - E2E (`apps/web/e2e/certificacion.spec.ts`): solo que la ruta sin sesión redirige a
   `/ingresar` (la base es producción). El asistente con sesión se prueba a mano contra
   certificación.
 - Base: verificación `0008_certificacion.sql` y simulación `rls-fase5-certificacion.sql`
-  ([cómo](../05-pruebas/probar-el-esquema.md#6-simulación-de-las-rpc-de-la-fase-5-rls-fase5-certificacionsql)).
+  ([cómo](../05-pruebas/probar-el-esquema.md#6-simulación-de-las-rpc-de-la-fase-5-rls-fase5-certificacionsql));
+  verificación `0009_autorizacion_externa.sql` y simulación
+  `rls-fase5-autorizacion-externa.sql`
+  ([cómo](../05-pruebas/probar-el-esquema.md#7-simulación-de-la-autorización-externa-rls-fase5-autorizacion-externasql)).

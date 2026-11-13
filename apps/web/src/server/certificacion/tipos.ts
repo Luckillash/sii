@@ -130,6 +130,14 @@ export interface VistaAsistente {
   /** CAF 39 de certificación activo (el próximo que usa `asignar_folio`). */
   cafSet: CafSet | null;
   resolucionCertificacion: { numero: number; fecha: string } | null;
+  /** Resolución de producción vigente (la que registra una empresa ya autorizada). */
+  resolucionProduccion: { numero: number; fecha: string } | null;
+  /**
+   * La empresa está autorizada en producción, pero no porque el proceso de este asistente
+   * llegara a `autorizada` (P91): se certificó fuera de Boletéame y registró su resolución
+   * de producción (migración 0009). La UI muestra el estado final sin los pasos.
+   */
+  autorizacionExterna: boolean;
   /** Certificado predeterminado de la empresa. */
   certificado: {
     id: string;

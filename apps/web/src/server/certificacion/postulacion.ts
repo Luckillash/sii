@@ -7,7 +7,7 @@ import type { ClienteServicio } from '../supabase/service';
 import {
   AMBIENTE,
   actualizarProceso,
-  cargarEmpresa,
+  cargarEmpresaPorCertificar,
   conSesionSii,
   EXPLICACION_ASCII,
   ejecutar,
@@ -96,7 +96,7 @@ async function preparar(
   ctx: ContextoCertificacion,
   credenciales: ReturnType<DependenciasCertificacion['credenciales']>,
 ) {
-  const empresa = await cargarEmpresa(cliente, ctx);
+  const empresa = await cargarEmpresaPorCertificar(cliente, ctx);
   const proceso = await exigirProceso(cliente, ctx);
   if (!etapaEntre(proceso.etapa, 'borrador', 'revision_solicitada')) {
     throw new ErrorUso(

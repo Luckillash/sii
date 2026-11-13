@@ -4,7 +4,8 @@
 //
 //   - defaults de columnas (ids, fechas, estados) y `organizacion_id` heredado;
 //   - el índice único parcial `operaciones_sii_efecto_global_en_curso` (0007, 23505);
-//   - `tg_proteger_proceso` (con rol `authenticated`) y `tg_certificacion_autorizada`;
+//   - `tg_proteger_proceso` (con rol `authenticated`), `tg_certificacion_autorizada` y
+//     `tg_resolucion_autoriza_produccion` (0009);
 //   - la columna generada `envios.clasificacion` y la sincronización de documentos de
 //     `sincronizar_documentos_envio` (triggers de envíos y rechazos);
 //   - `asignar_folio`, `registrar_caf`, `guardar_set_pruebas`, `registrar_resolucion`,
@@ -295,6 +296,14 @@ export function supabaseFalso(opciones: OpcionesFalso = {}) {
       if (cambio) sincronizarDocumentos(nueva.id);
     }
     if (nombre === 'envio_rechazos') sincronizarDocumentos(nueva.envio_id);
+    // tg_resolucion_autoriza_produccion (0009): la de producción vigente autoriza la empresa.
+    if (nombre === 'resoluciones' && nueva.ambiente === 'produccion' && nueva.vigente) {
+      const empresa = porId('empresas', nueva.empresa_id);
+      if (empresa && empresa.organizacion_id === nueva.organizacion_id) {
+        empresa.autorizada_produccion = true;
+        empresa.autorizada_en ??= ahora();
+      }
+    }
   }
 
   function insertarFila(nombre: string, datos: Fila): { fila?: Fila; error?: ErrorPg } {
