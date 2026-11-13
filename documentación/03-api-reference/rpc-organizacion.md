@@ -1,9 +1,9 @@
 ---
 title: "RPC: organización, equipo, acceso y validación"
-description: "crear_organizacion, crear_invitacion, aceptar_invitacion, ver_invitacion y funciones de acceso y validación."
-keywords: [rpc, supabase.rpc, crear_organizacion, crear_invitacion, aceptar_invitacion, ver_invitacion, token, token_hash, sha256, invitación, slug, 42501, "Sin permiso", "Invitación inválida o vencida", "Requiere sesión", es_miembro, es_admin, puede_emitir, rut_valido, correo_sii_valido]
-related: ["02-guias/onboarding-organizacion.md", "01-fundamentos/tenancy-y-roles.md", "03-api-reference/acceso-por-tabla.md"]
-source: ["supabase_saas_sii.sql §2 §5 §15 §17", "supabase/migrations/0003_preferencias.sql"]
+description: "crear_organizacion, crear_invitacion, aceptar_invitacion, ver_invitacion, registrar_resolucion, fijar_certificado_predeterminado y funciones de acceso y validación."
+keywords: [rpc, supabase.rpc, crear_organizacion, crear_invitacion, aceptar_invitacion, ver_invitacion, registrar_resolucion, fijar_certificado_predeterminado, resolución vigente, certificado predeterminado, for no key update, token, token_hash, sha256, invitación, slug, 42501, P0002, 22004, "Sin permiso", "Invitación inválida o vencida", "Requiere sesión", "La empresa no existe", "El certificado no está asociado a la empresa", es_miembro, es_admin, puede_emitir, rut_valido, correo_sii_valido]
+related: ["02-guias/onboarding-organizacion.md", "01-fundamentos/tenancy-y-roles.md", "03-api-reference/acceso-por-tabla.md", "04-objetos/objetos-empresas-y-credenciales.md"]
+source: ["supabase_saas_sii.sql §2 §5 §15 §17", "supabase/migrations/0003_preferencias.sql", "supabase/migrations/0005_certificados_resoluciones.sql"]
 ---
 
 # RPC: organización, equipo, acceso y validación
@@ -23,9 +23,15 @@ que no dependen del RLS de las tablas que tocan. Los errores llegan en `error.co
 | `crear_invitacion(p_organizacion, p_correo, p_rol)` | `authenticated` (administradores) | `text` (token, una vez) | invitación pendiente por 7 días |
 | `aceptar_invitacion(p_token)` | `authenticated` (correo que calce) | `uuid` | alta como miembro con el rol invitado |
 | `ver_invitacion(p_token)` (migración 0003) | `anon`, `authenticated` | 0 o 1 fila | ninguno (solo lectura) |
+| `registrar_resolucion(p_empresa, p_ambiente, p_numero, p_fecha)` (migración 0005, pendiente) | `authenticated` (administradores), `service_role` | `uuid` | reemplaza la resolución vigente de la empresa en ese ambiente |
+| `fijar_certificado_predeterminado(p_empresa, p_certificado)` (migración 0005, pendiente) | `authenticated` (administradores), `service_role` | `void` | deja ese certificado como el único predeterminado de la empresa |
 
-`anon` no ejecuta `crear_organizacion`, `crear_invitacion` ni `aceptar_invitacion`:
-recibe `42501` `permission denied for function …`.
+`anon` no ejecuta `crear_organizacion`, `crear_invitacion`, `aceptar_invitacion`,
+`registrar_resolucion` ni `fijar_certificado_predeterminado`: recibe `42501`
+`permission denied for function …`.
+
+La tercera RPC de la migración 0005, `registrar_certificado`, es solo de `service_role`
+y está en [RPC del backend](rpc-backend.md#registrar_certificado-migración-0005).
 
 ---
 
@@ -185,6 +191,132 @@ if (!invitacion) {
 }
 // invitacion.organizacion_nombre, invitacion.correo, invitacion.rol, invitacion.expira_en
 ```
+
+---
+
+## Empresa: resolución y certificado predeterminado (migración 0005)
+
+Las dos vienen en `supabase/migrations/0005_certificados_resoluciones.sql`, **pendiente
+de aplicar en producción**. Hasta entonces, llamarlas devuelve `42883`
+(`function … does not exist`) y la app muestra el mensaje genérico.
+
+A diferencia de las de arriba, son **`security invoker`**: corren con el RLS de quien
+llama, así que solo escriben si es administrador de la organización. Existen porque las
+dos tablas tienen un **índice único parcial** (`resoluciones_vigente_unica` y
+`empresa_certificados_predeterminado_unico`) que Postgres revisa fila a fila: para
+cambiar cuál es la vigente o la predeterminada hay que apagar la actual **antes** de
+encender la nueva, en la misma transacción. Con escrituras sueltas desde la app, un
+fallo entre una y otra dejaría la empresa sin vigente o sin predeterminado.
+
+Comportamiento común:
+
+- Primero buscan la fila con el RLS de quien llama: si es de otra organización, es lo
+  mismo que no existir (`P0002`). Después revisan `es_admin`: un emisor o lector, que sí
+  ve la fila, recibe `42501` `Sin permiso`.
+- Antes de escribir toman `for no key update` sobre la fila de la empresa. Dos llamadas
+  simultáneas para la misma empresa se ordenan (la segunda espera y ve lo que dejó la
+  primera) en vez de chocar con el índice. `no key update` no bloquea las FK que apuntan
+  a la empresa. El candado exige pasar la política `UPDATE` de `empresas`, por eso va
+  después de la revisión de permisos.
+- Con `service_role` (sin `auth.uid()`) también sirven: se salta la revisión de
+  administrador, igual que en `tg_limite_empresas`.
+- `authenticated` no necesita grants nuevos: ya tiene `select`/`insert`/`update` sobre
+  esas tablas (RLS decide las filas) y `execute` sobre `es_admin`.
+
+### `registrar_resolucion` (migración 0005)
+
+```sql
+public.registrar_resolucion(
+  p_empresa  uuid,
+  p_ambiente public.ambiente_sii,
+  p_numero   integer,
+  p_fecha    date
+) returns uuid
+-- security invoker · search_path = '' · grant execute to authenticated, service_role
+```
+
+**Quién:** propietarios y administradores de la organización de la empresa.
+
+**Efectos** (en una transacción):
+
+1. Valida los datos (ver errores).
+2. Bloquea la empresa (`for no key update`).
+3. Deja `vigente = false` la resolución vigente de esa empresa **y ese ambiente**. La de
+   otro ambiente no se toca. La anterior se conserva como historial.
+4. Inserta la nueva con `vigente = true`. `organizacion_id` no se pasa: lo llena
+   `trg_00_organizacion` desde la empresa, antes del `WITH CHECK` de RLS.
+
+Devuelve el `id` de la resolución nueva. Registrar dos veces los mismos datos crea dos
+filas (la primera queda en el historial).
+
+**Errores**
+
+| Código | Mensaje | Causa |
+|---|---|---|
+| `P0002` | `La empresa no existe` | id inexistente, o de una organización de la que quien llama no es miembro |
+| `42501` | `Sin permiso` | quien llama ve la empresa pero no es administrador (emisor, lector) |
+| `22004` | `Faltan el ambiente, el número o la fecha de la resolución` | algún parámetro nulo |
+| `23514` | `El número de resolución no puede ser negativo` | `p_numero < 0` |
+| `23514` | `En certificación el número de resolución es 0` | `p_ambiente = 'certificacion'` y `p_numero <> 0` (el mismo check de la tabla, adelantado para dar un mensaje claro) |
+| `23505` | `duplicate key … "resoluciones_vigente_unica"` | no debería pasar gracias al candado; la app lo traduce como «Se registró otra resolución al mismo tiempo» |
+
+La base acepta número 0 en producción; la app exige ≥ 1 y una fecha que no sea futura en
+hora de Chile (`esquemaResolucion`).
+
+```ts
+const { error } = await supabase.rpc('registrar_resolucion', {
+  p_empresa: empresa.id,
+  p_ambiente: 'certificacion',
+  p_numero: 0,
+  p_fecha: '2026-11-10', // AAAA-MM-DD
+});
+// error.code → traducirErrorEmpresa(error, 'resolucion') en server/empresas-errores.ts
+```
+
+### `fijar_certificado_predeterminado` (migración 0005)
+
+```sql
+public.fijar_certificado_predeterminado(p_empresa uuid, p_certificado uuid) returns void
+-- security invoker · search_path = '' · grant execute to authenticated, service_role
+```
+
+**Quién:** propietarios y administradores de la organización de la empresa.
+
+**Efectos** (en una transacción):
+
+1. Comprueba que exista la asociación `(p_empresa, p_certificado)` en
+   `empresa_certificados` y que sea visible para quien llama.
+2. Bloquea la empresa (`for no key update`).
+3. Pone `predeterminado = false` en la que lo era (si es otra).
+4. Pone `predeterminado = true` en la indicada.
+
+Repetirla con el mismo certificado no cambia nada y no falla. Para dejar la empresa
+**sin** predeterminado no hay RPC: basta un `update … set predeterminado = false`
+directo (apagar no choca con el índice).
+
+**Errores**
+
+| Código | Mensaje | Causa |
+|---|---|---|
+| `P0002` | `El certificado no está asociado a la empresa` | no hay asociación, o es de otra organización (RLS no la deja ver). También si el `update` final no afectó filas |
+| `42501` | `Sin permiso` | quien llama ve la asociación pero no es administrador |
+
+Asociar no fija el predeterminado por sí solo: la app inserta la fila con
+`predeterminado = false` y después llama a esta RPC (`server/certificados/asociaciones.ts`).
+
+```ts
+const { error } = await supabase.rpc('fijar_certificado_predeterminado', {
+  p_empresa: empresaId,
+  p_certificado: certificadoId,
+});
+// error.code → traducirErrorCertificado(error, 'predeterminado'):
+// P0002 → «No se aplicó el cambio»; 42501 → «No tienes permiso para hacer esto»
+```
+
+Verificación: comprobaciones 13–20 (resoluciones) y 31–39 (predeterminado) de
+`supabase/verificaciones/rls-fase3-empresas.sql`, y las de firma y privilegios de
+`supabase/verificaciones/0005_certificados_resoluciones.sql`. Se corren después de
+aplicar la 0005 ([probar el esquema](../05-pruebas/probar-el-esquema.md)).
 
 ---
 

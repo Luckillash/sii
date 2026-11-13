@@ -1,14 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import {
+  cabeEnIso88591,
   calcularDv,
+  caracteresFueraDeIso88591,
+  correoSiiValido,
   formatearFecha,
   formatearFechaHora,
   formatearMiles,
   formatearMonto,
   formatearRut,
+  hoyEnChile,
   limpiarRut,
   nombreTipoDte,
   rutSii,
+  rutValidoSii,
   validarRut,
 } from './formatos';
 
@@ -71,5 +76,105 @@ describe('otros formatos', () => {
     expect(nombreTipoDte(39)).toBe('Boleta electrónica');
     expect(nombreTipoDte(41, true)).toBe('Boleta exenta');
     expect(nombreTipoDte(999)).toBe('Documento tributario');
+  });
+});
+
+// Cada regla de `public.correo_sii_valido()` (supabase/migrations/0001_esquema_inicial.sql §2).
+describe('correoSiiValido', () => {
+  it('acepta correos comunes', () => {
+    expect(correoSiiValido('dte@empresa.cl')).toBe(true);
+    expect(correoSiiValido('facturacion.electronica@sub.empresa.cl')).toBe(true);
+    expect(correoSiiValido('a_b-c~d@x.y')).toBe(true);
+  });
+  it('hasta 50 caracteres', () => {
+    const local = 'a'.repeat(50 - '@x.cl'.length);
+    expect(correoSiiValido(`${local}@x.cl`)).toBe(true);
+    expect(correoSiiValido(`a${local}@x.cl`)).toBe(false);
+  });
+  it('solo ASCII imprimible, sin espacios ni tildes', () => {
+    expect(correoSiiValido('dte @empresa.cl')).toBe(false);
+    expect(correoSiiValido(' dte@empresa.cl')).toBe(false);
+    expect(correoSiiValido('dte\t@empresa.cl')).toBe(false);
+    expect(correoSiiValido('pañol@empresa.cl')).toBe(false);
+    expect(correoSiiValido('')).toBe(false);
+  });
+  it('sin ] ! " # $ % & / ( ) = ? + * | < > [ ;', () => {
+    for (const c of ']!"#$%&/()=?+*|<>[;') {
+      expect(correoSiiValido(`dte${c}x@empresa.cl`), c).toBe(false);
+    }
+    // Otros signos imprimibles sí pasan: la regla no los prohíbe.
+    for (const c of "-_'`{}^~,:\\") {
+      expect(correoSiiValido(`dte${c}x@empresa.cl`), c).toBe(true);
+    }
+  });
+  it('un solo @, ni al inicio ni al final', () => {
+    expect(correoSiiValido('dteempresa.cl')).toBe(false);
+    expect(correoSiiValido('dte@@empresa.cl')).toBe(false);
+    expect(correoSiiValido('dte@a@empresa.cl')).toBe(false);
+    expect(correoSiiValido('@empresa.cl')).toBe(false);
+    expect(correoSiiValido('dte.cl@')).toBe(false);
+  });
+  it("sin '@.'", () => {
+    expect(correoSiiValido('dte@.empresa.cl')).toBe(false);
+  });
+  it('sin empezar ni terminar en punto', () => {
+    expect(correoSiiValido('.dte@empresa.cl')).toBe(false);
+    expect(correoSiiValido('dte@empresa.cl.')).toBe(false);
+    // Un punto justo antes del @ sí pasa: la regla no lo prohíbe.
+    expect(correoSiiValido('dte.@empresa.cl')).toBe(true);
+  });
+  it('con un punto después del @', () => {
+    expect(correoSiiValido('dte@empresa')).toBe(false);
+    expect(correoSiiValido('d.te@empresa')).toBe(false);
+  });
+});
+
+// `public.rut_valido()`: formato del dominio `rut` y DV módulo 11.
+describe('rutValidoSii', () => {
+  it('sin puntos, con guion y K mayúscula', () => {
+    expect(rutValidoSii('76354771-K')).toBe(true);
+    expect(rutValidoSii('12345678-5')).toBe(true);
+    expect(rutValidoSii('1-9')).toBe(true);
+    expect(rutValidoSii('76354771-k')).toBe(false);
+    expect(rutValidoSii('76.354.771-K')).toBe(false);
+    expect(rutValidoSii('76354771K')).toBe(false);
+  });
+  it('cuerpo de 1 a 8 dígitos', () => {
+    expect(rutValidoSii('-5')).toBe(false);
+    expect(rutValidoSii('123456789-2')).toBe(false);
+  });
+  it('dígito verificador', () => {
+    expect(rutValidoSii('76354771-1')).toBe(false);
+    expect(rutValidoSii('12345678-K')).toBe(false);
+  });
+});
+
+describe('caracteresFueraDeIso88591', () => {
+  it('acepta todo ISO-8859-1: ASCII, tildes, ñ, ü, º, ª, °, «», ¿¡', () => {
+    const texto = 'Ñuñoa Pingüino Nº 1 1ª piso 20° «A» ¿sí? ¡no! ÿ';
+    expect(caracteresFueraDeIso88591(texto)).toEqual([]);
+    expect(cabeEnIso88591(texto)).toBe(true);
+    expect(cabeEnIso88591(String.fromCodePoint(0xff))).toBe(true);
+  });
+  it('detecta lo que no cabe, sin repetir y en orden', () => {
+    expect(caracteresFueraDeIso88591('Café 😀 “Andes” – 50 € 😀')).toEqual([
+      '😀',
+      '“',
+      '”',
+      '–',
+      '€',
+    ]);
+    expect(cabeEnIso88591(String.fromCodePoint(0x100))).toBe(false);
+  });
+  it('un surrogate suelto cuenta como fuera', () => {
+    expect(cabeEnIso88591('a\uD83Db')).toBe(false);
+  });
+});
+
+describe('hoyEnChile', () => {
+  it('fecha de Chile, no la UTC', () => {
+    // 02:30 UTC del 11 = 23:30 del 10 en Chile (UTC−3 en horario de verano).
+    expect(hoyEnChile(new Date('2026-11-11T02:30:00Z'))).toBe('2026-11-10');
+    expect(hoyEnChile(new Date('2026-11-11T03:30:00Z'))).toBe('2026-11-11');
   });
 });

@@ -3,7 +3,7 @@ title: "Acceso por tabla (PostgREST + RLS)"
 description: "Qué puede hacer cada rol en cada tabla: select, insert, update, delete."
 keywords: [RLS, PostgREST, políticas, grant, revoke, privilegios por columna, anon, authenticated, service_role, lector, emisor, administrador, propietario, select, insert, update, delete, "new row violates row-level security policy", "permission denied for table", 42501]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "01-fundamentos/tenancy-y-roles.md", "03-api-reference/rpc-organizacion.md", "05-pruebas/probar-el-esquema.md"]
-source: ["supabase_saas_sii.sql §17", "supabase/verificaciones/rls-fase2-tenancy.sql"]
+source: ["supabase_saas_sii.sql §17", "supabase/verificaciones/rls-fase2-tenancy.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/verificaciones/rls-fase3-empresas.sql"]
 ---
 
 # Acceso por tabla (PostgREST + RLS)
@@ -66,9 +66,9 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
 | Tabla | anon | lector | emisor | administrador | propietario | service_role |
 |---|---|---|---|---|---|---|
 | `empresas` | — | S | S | SIUD ⁸ | SIUD ⁸ | SIUD |
-| `resoluciones` | — | S | S | SIUD | SIUD | SIUD |
-| `certificados` | — | S | S | S | S | SIUD |
-| `empresa_certificados` | — | S | S | SIUD | SIUD | SIUD |
+| `resoluciones` | — | S | S | SIUD ¹⁴ | SIUD ¹⁴ | SIUD |
+| `certificados` | — | S | S | S ¹⁵ | S ¹⁵ | SIUD |
+| `empresa_certificados` | — | S | S | SIUD ¹⁶ | SIUD ¹⁶ | SIUD |
 | `tokens_sii` 🔒 | — | — | — | — | — | SIUD |
 | `sesiones_sii` 🔒 | — | — | — | — | — | SIUD |
 
@@ -139,6 +139,21 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
     `null`; cambiar `etapa`, `codigo_estado_sii` o `paso_sii` en un `update` lanza error.
 12. Solo las columnas `nombre`, `revocada_en` y `expira_en`. Se crean con `crear_api_key()`.
 13. Solo las columnas `url`, `eventos` y `activo`. Se crean con `crear_webhook()`.
+14. `organizacion_id` se hereda de la empresa (`tg_heredar_organizacion`). Para cambiar
+    la vigente, la app usa `registrar_resolucion()` (migración 0005, pendiente de
+    aplicar; `security invoker`, así que aplica esta misma regla): un `insert` directo
+    con `vigente = true` cuando ya hay una vigente choca con `resoluciones_vigente_unica`
+    ([RPC](rpc-organizacion.md#registrar_resolucion-migración-0005)).
+15. Sin políticas de escritura: ni un propietario inserta, edita ni borra certificados
+    (el `insert` da `42501`; `update` y `delete`, 0 filas). El alta es
+    `registrar_certificado()` (migración 0005, solo `service_role`), y revocar y eliminar
+    los hace el backend con `service_role` filtrando por `organizacion_id`
+    ([RPC del backend](rpc-backend.md#registrar_certificado-migración-0005)).
+16. `organizacion_id` se hereda de la empresa, y la FK compuesta
+    `(organizacion_id, certificado_id)` impide asociar un certificado de otra
+    organización (`23503`). El predeterminado se cambia con
+    `fijar_certificado_predeterminado()` (migración 0005, `security invoker`)
+    ([RPC](rpc-organizacion.md#fijar_certificado_predeterminado-migración-0005)).
 
 ## Vistas y Storage
 
@@ -157,3 +172,6 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
   `supabase/verificaciones/rls-fase2-tenancy.sql` (simulación con `rollback`,
   [cómo correrla](../05-pruebas/probar-el-esquema.md)). El resto de las tablas se cubre
   con la simulación por tabla de la Fase 13.
+- Empresas, resoluciones, certificados, asociaciones y `v_certificados_estado` por rol:
+  `supabase/verificaciones/rls-fase3-empresas.sql`. Requiere la migración 0005; corrida en
+  producción el 2026-11-13 (43/43).

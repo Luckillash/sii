@@ -23,7 +23,7 @@ Valores de la columna Estado: **Listo**, **En parte** o Pendiente. Se actualiza 
 | 0. Fundaciones y prueba de conectividad | **Listo** | **Criterio de aceptación cumplido** (2026-11-11: token de apicert desde Vercel `gru1`, guardado cifrado en `tokens_sii`); spike del SII retirado. 2026-11-12: Sentry conectado (proyecto `luckillash/sii-web`, antes `timbre-web`), variables en Vercel (solo *Production*) y error real de prueba verificado en producción: release del commit, *source maps* legibles y secretos depurados (también en spans, con `beforeSendSpan`). Rutas de prueba retiradas |
 | 1. Design system en Next.js | **Listo** | 2026-11-11: tokens generados, 8 componentes (+ `incierto`, D3), 11 de soporte, 2 layouts, `/_ds` y axe sin violaciones en claro/oscuro/móvil. Deploy `F1` (c307194) verificado en producción con `e2e/despliegue.spec.ts`. 2026-11-12: `incierto` agregado también al artifact del design system y a su copia en `design-system/boleteame/` |
 | 2. Autenticación, organizaciones y equipo | **En parte** | 2026-11-12: código listo (ingreso, crear cuenta, recuperar/restablecer, `proxy.ts`, callback, onboarding, `[org]`, equipo, invitaciones, Turnstile y Resend opcionales); lint, typecheck, Vitest, build y e2e sin escritura en verde. Simulación de roles en SQL con `rollback` (`rls-fase2-tenancy.sql`): 47/47. Migraciones `0003_preferencias` y `0004_cupo_sin_suscripcion` aplicadas y verificadas (13/13); tipos regenerados sin diferencias. Pendientes en la Fase 2 (§7) |
-| 3. Empresas, certificados y resoluciones | Pendiente | |
+| 3. Empresas, certificados y resoluciones | **En parte** | 2026-11-13: código listo (empresas con resoluciones, certificados `.pfx` a Vault con `registrar_certificado`, asociación empresa ↔ certificado, avisos de vencimiento en el Tablero); lint, typecheck, Vitest (301), stylelint y build en verde; `documentación/` de la fase completa. Migración `0005_certificados_resoluciones` aplicada y verificada (15/15) y simulación de roles `rls-fase3-empresas.sql` 43/43; tipos regenerados. Faltan el deploy y la prueba con un `.pfx` real (§7) |
 | 4. Capa de servicio SII (backend) | Pendiente | Núcleo técnico del producto |
 | 5. Certificación ante el SII (boleta) | Pendiente | |
 | 6. Folios (CAF) | Pendiente | |
@@ -254,12 +254,13 @@ Solo claves API nuevas, y `env.ts` rechaza las demás por prefijo. Las legadas (
 | `0002_extensiones_cron` | 0 | `pg_cron` y `pg_net` (el `cron_token` se crea a mano en Vault) |
 | `0003_preferencias` | 2 | **Aplicada** (2026-11-12): `perfiles.tema`, `perfiles.ultima_organizacion`, `perfiles.ultima_empresa` y RPC `ver_invitacion(token)` (anon) para `/invitacion/[token]`. Verificación: `supabase/verificaciones/0003_preferencias.sql` |
 | `0004_cupo_sin_suscripcion` | 2 | **Aplicada** (2026-11-12): `exigir_cupo_usuarios` rechaza si no hay suscripción vigente (una organización `morosa` o `cancelada` aceptaba miembros sin tope; lo detectó `supabase/verificaciones/rls-fase2-tenancy.sql`). Verificación: `supabase/verificaciones/0004_cupo_sin_suscripcion.sql` |
-| `0005_realtime_operaciones` | 4 | Agregar `operaciones_sii` y `solicitudes_folios` a `supabase_realtime` |
-| `0006_bloqueos_sii` | 4 | RPC `bloquear_certificado(uuid)` con `pg_try_advisory_xact_lock` para serializar sesiones AUT2000 por certificado (el SII frena el re-login, error `01.01.215.500.771.52`) |
-| `0007_notificaciones` | 8 | Tabla `notificaciones` (tipo, clave de deduplicación, enviado_en) para alertas por correo |
-| `0008_planes_comerciales` | 10 | Grilla de planes definitiva (D5) |
-| `0009_pagos` | 10 | `pagos` y `eventos_pasarela` (idempotencia de webhooks de la pasarela) |
-| `0010_indices_fk` | 13 (o antes, con volumen) | Índices `concurrently` para las FK sin índice que reporta *Advisors* (sobre todo `organizacion_id`, que filtran las políticas RLS); una migración por índice o sin transacción |
+| `0005_certificados_resoluciones` | 3 | **Aplicada** (2026-11-13, verificación 15/15 y simulación 43/43): RPC `registrar_certificado` (solo service_role; .pfx y clave a Vault y fila en `certificados` en una transacción), `fijar_certificado_predeterminado` y `registrar_resolucion` (invoker, RLS de administradores). Verificación: `supabase/verificaciones/0005_certificados_resoluciones.sql`; simulación de roles: `rls-fase3-empresas.sql` |
+| `0006_realtime_operaciones` | 4 | Agregar `operaciones_sii` y `solicitudes_folios` a `supabase_realtime` |
+| `0007_bloqueos_sii` | 4 | RPC `bloquear_certificado(uuid)` con `pg_try_advisory_xact_lock` para serializar sesiones AUT2000 por certificado (el SII frena el re-login, error `01.01.215.500.771.52`) |
+| `0008_notificaciones` | 8 | Tabla `notificaciones` (tipo, clave de deduplicación, enviado_en) para alertas por correo |
+| `0009_planes_comerciales` | 10 | Grilla de planes definitiva (D5) |
+| `0010_pagos` | 10 | `pagos` y `eventos_pasarela` (idempotencia de webhooks de la pasarela) |
+| `0011_indices_fk` | 13 (o antes, con volumen) | Índices `concurrently` para las FK sin índice que reporta *Advisors* (sobre todo `organizacion_id`, que filtran las políticas RLS); una migración por índice o sin transacción |
 | `00NN_dte_factura` | 14 | Tipos 33/34/52/56/61, columnas de receptor (giro, dirección, comuna), forma de pago, vencimiento, tabla `documento_referencias`, documentos recibidos, RCV |
 
 Cada migración trae su verificación de solo lectura en `supabase/verificaciones/`. Los números son provisorios: el
@@ -341,6 +342,16 @@ Cada fase termina con: código en `main` con lint, typecheck y tests en verde (l
 5. Estado de certificados (`v_certificados_estado`) con `Alerta` `aviso` cuando faltan 30 días, como en el Tablero.
 
 **Criterio:** subir un `.pfx` real deja la fila en `certificados`, los dos secretos en Vault y ningún rastro del archivo o la clave en logs ni en Sentry.
+
+**Pendientes** (el código está listo y probado sin red ni base):
+
+- [x] Aplicar `0005_certificados_resoluciones` en producción y correr `supabase/verificaciones/0005_certificados_resoluciones.sql`. 2026-11-13: `supabase db push --remote` (el ensayo con `--dry-run` mostró solo la `0005`); verificación 15/15 con `ok = true`.
+- [x] Correr `supabase/verificaciones/rls-fase3-empresas.sql` y su consulta de control. 2026-11-13: 43/43 con `ok = true`; el `rollback` no dejó usuarios, organizaciones, certificados ni secretos de prueba (todo en 0).
+- [x] `pnpm db:tipos` (2026-11-13): el resultado coincide con las 3 funciones agregadas a mano a `tipos.ts`; typecheck en verde.
+- [ ] Deploy a *Production* y humo de `/[org]/configuracion/empresas`, `/nueva`, `/[id]`, `/[id]/certificados` y `/[org]/configuracion/certificados`.
+- [ ] Criterio de aceptación con un `.pfx` real: subirlo como administrador; con SQL de solo lectura, la fila en `certificados` y dos filas `certificado:<huella>:pfx|clave` en `vault.secrets` (sin leer `decrypted_secret`); confirmar que el RUT del titular se extrajo del certificado (solo se probó con certificados sintéticos); buscar en logs de Vercel y en Sentry un fragmento de la clave y el nombre del archivo, sin resultados.
+
+Decisiones tomadas en la fase (detalle en `documentación/07-referencia/trampas-conocidas.md`): 3DES no cuenta como `pfx_legacy` (paridad con la librería: OpenSSL 3 lo lee sin el proveedor legacy); textos de la empresa limitados a ISO-8859-1; no hay «borrar empresa» (arrastraría documentos), sino desactivar; `empresas.activa` deberán exigirla las Fases 6 y 7; la Fase 4 debe excluir certificados con `revocado_en`; Sentry filtra todos los campos de formularios de Server Actions; el onboarding de `/bienvenida` solo crea la organización (empresa y certificado se cargan desde Configuración).
 
 ### Fase 4 — Capa de servicio SII (backend)
 

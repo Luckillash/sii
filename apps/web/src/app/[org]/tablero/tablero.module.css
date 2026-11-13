@@ -1,0 +1,5 @@
+/* Tablero: avisos de certificados (Fase 3) con su acción, como en la plantilla. */
+
+.accionAviso {
+  margin-top: var(--space-2);
+}

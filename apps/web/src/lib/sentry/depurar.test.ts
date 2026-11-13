@@ -100,6 +100,105 @@ describe('depurarEvento', () => {
   });
 });
 
+describe('depurarEvento con la carga de un certificado (Server Action, Fase 3)', () => {
+  const CLAVE = 'CENTINELA-clave-del-certificado-4c1e';
+  // Base64 de un .pfx (empieza con MII, como todo DER de una SEQUENCE larga).
+  const PFX_BASE64 = `MIIKaQIBAzCCCi8GCSqGSIb3DQEHAaCCCiAEggocMIIKGDCCBM8GCSqGSIb3DQEHBqCCBMAwggS8AgEAMIIEtQYJKoZIhvcNAQcBMBwGCiqGSIb3DQEMAQYwDgQI${'Ab3x'.repeat(40)}==`;
+  const NOMBRE = '12345678-5 Juan Perez.pfx';
+
+  function prohibidos(json: string) {
+    expect(json).not.toContain(CLAVE);
+    expect(json).not.toContain(PFX_BASE64.slice(0, 60));
+    expect(json).not.toContain(NOMBRE);
+    expect(json).not.toContain('12345678-5 Juan');
+  }
+
+  it('quita el cuerpo multipart, los campos del formulario y los archivos', () => {
+    const formulario = new FormData();
+    formulario.set('pfx', new File([new Uint8Array([0x30, 0x82, 1, 2])], NOMBRE));
+    formulario.set('clave', CLAVE);
+    const evento = {
+      request: {
+        method: 'POST',
+        url: 'https://boleteame.dev/mi-org/configuracion/certificados',
+        headers: {
+          'Next-Action': '7f1c0a',
+          'Content-Type': 'multipart/form-data; boundary=----x',
+        },
+        data: `------x\r\nContent-Disposition: form-data; name="pfx"; filename="${NOMBRE}"\r\n\r\n0\u0082...\r\n------x\r\nContent-Disposition: form-data; name="clave"\r\n\r\n${CLAVE}\r\n`,
+      },
+      // Lo que agrega withServerActionInstrumentation de Sentry con `formData`.
+      extra: {
+        'server_action_form_data.clave': CLAVE,
+        'server_action_form_data.pfx': '[non-string value]',
+        'server_action_form_data.archivo': '[non-string value]',
+        'server_action_form_data.rut_titular': '12.345.678-5',
+        argumentos: ['mi-org', null, formulario],
+        archivo: new File([new Uint8Array([1, 2, 3])], NOMBRE),
+        // Un File ya serializado por otro integrador.
+        adjunto: { name: NOMBRE, size: 2410, type: 'application/x-pkcs12', lastModified: 1 },
+        cuerpo: { clave: CLAVE, pfx: PFX_BASE64, p_pfx_base64: PFX_BASE64, p_clave: CLAVE },
+        body: `pfx=${PFX_BASE64}&clave=${CLAVE}`,
+        formData: { archivo: PFX_BASE64 },
+      },
+      contexts: {
+        rpc: { args: { contenido: PFX_BASE64 } },
+      },
+      breadcrumbs: [
+        { category: 'console', message: `Content-Disposition: form-data; filename="${NOMBRE}"` },
+        { category: 'console', message: 'Leyendo 12345678-5.pfx y firma.P12' },
+        { category: 'console', message: `base64 ${PFX_BASE64}` },
+      ],
+      tags: { organizacion: 'org-1', operacion: 'subir_certificado' },
+    };
+
+    const salida = depurarEvento(evento);
+    prohibidos(JSON.stringify(salida));
+    expect(salida.request).not.toHaveProperty('data');
+    expect(salida.request.headers['Next-Action']).toBe('7f1c0a');
+    expect(salida.extra['server_action_form_data.rut_titular']).toBe(FILTRADO);
+    expect(salida.extra.archivo).toBe(FILTRADO);
+    expect(salida.extra.adjunto).toBe(FILTRADO);
+    expect(salida.extra.argumentos[2]).toBe(FILTRADO);
+    expect(salida.extra.argumentos[0]).toBe('mi-org');
+    expect(salida.tags).toEqual({ organizacion: 'org-1', operacion: 'subir_certificado' });
+    expect(salida.breadcrumbs[1]?.message).toBe(`Leyendo ${FILTRADO} y ${FILTRADO}`);
+    // Los mensajes para el usuario siguen legibles.
+    expect(depurarTexto('El archivo no es un certificado .pfx o .p12')).toBe(
+      'El archivo no es un certificado .pfx o .p12',
+    );
+  });
+
+  it('el base64 largo se filtra también en textos libres, y lo corto o sin dígitos no', () => {
+    expect(depurarTexto(`falló con ${PFX_BASE64} al final`)).toBe(`falló con ${FILTRADO} al final`);
+    const traza = 'a'.repeat(32);
+    expect(depurarTexto(`trace ${traza}`)).toBe(`trace ${traza}`);
+    const ruta = '/mi-org/configuracion/certificados/0b8f3f7e-5a43-4c39-9a0e-0f6b9a3f1c11';
+    expect(depurarTexto(ruta)).toBe(ruta);
+  });
+
+  it('los marcos de la traza siguen legibles', () => {
+    const evento = {
+      exception: {
+        values: [
+          {
+            type: 'ErrorAnalisisCertificado',
+            value: 'La contraseña del certificado no es correcta',
+            stacktrace: {
+              frames: [
+                { filename: 'app:///acciones.js', function: 'subirCertificado', lineno: 10 },
+              ],
+            },
+          },
+        ],
+      },
+    };
+    const salida = depurarEvento(evento);
+    expect(salida.exception.values[0]?.stacktrace.frames[0]?.filename).toBe('app:///acciones.js');
+    expect(salida.exception.values[0]?.value).toBe('La contraseña del certificado no es correcta');
+  });
+});
+
 describe('depurarBreadcrumb', () => {
   it('limpia URLs y datos de fetch', () => {
     const salida = depurarBreadcrumb({

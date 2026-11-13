@@ -1,7 +1,7 @@
 ---
 title: "Probar el esquema (RLS, triggers, cuotas)"
 description: "Cómo verificar el esquema y simular roles en la única base (producción) sin dejar rastro."
-keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, ejemplo.invalid, pg_temp]
+keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "08-esquema-supabase/despliegue.md"]
 source: ["supabase_saas_sii.sql §15 §17", "supabase/verificaciones/", "supabase/verificaciones/rls-fase2-tenancy.sql"]
 ---
@@ -22,6 +22,7 @@ comprobación con `ok = true/false` y, si falla, el `detalle`. No escribe nada.
 | Archivo | Qué verifica |
 |---|---|
 | `0001_esquema.sql` | las 33 tablas; RLS activo en todas; `tokens_sii` y `sesiones_sii` sin políticas ni privilegios para `anon`/`authenticated`; `token_guardar` y `leer_secreto` fuera del alcance de la API y disponibles para `service_role`; Vault, `pg_cron` y `pg_net`; bucket privado; publicación de Realtime; `tipos_dte` = 39 y 41 |
+| `0005_certificados_resoluciones.sql` | 15 comprobaciones: las 3 funciones con su firma, nombres de parámetros, `plpgsql`, `security definer` solo en `registrar_certificado`, `search_path` vacío; `registrar_certificado` solo para `service_role`; las otras dos para `authenticated` y `service_role`, no `anon`; `certificados` sin políticas de escritura; `trg_borrar_secretos`; herencia de `organizacion_id`; privilegios que necesitan las funciones invoker; índices parciales; migración registrada. **Pendiente**: la 0005 no está aplicada |
 
 Se ejecuta pegándolo en el SQL Editor o con el MCP `execute_sql`. Cada migración nueva trae
 el suyo.
@@ -136,7 +137,39 @@ el `rollback` final por `commit`, ni ejecutes el archivo por partes.
 Resultado de la última corrida (2026-11-12, con 0003 y 0004 aplicadas): 52 de 52 en
 `ok = true` (1–51 y 53; la 52 no aparece). La consulta de control dio 0 en todo.
 
-## 4. Lo que no se prueba con SQL
+## 4. Simulación de roles de la Fase 3 (`rls-fase3-empresas.sql`)
+
+`supabase/verificaciones/rls-fase3-empresas.sql` prueba el criterio de la Fase 3 con el
+mismo patrón que la de la Fase 2 (usuarios `@ejemplo.invalid`, claims locales,
+`pg_temp.registrar`, `rollback` final). **Requiere la migración 0005 aplicada**: sin
+ella se detiene con `42883` y la transacción se descarta completa, sin resultados.
+Corrida en producción el 2026-11-13: 43/43 con `ok = true`, y la consulta de control del
+encabezado en 0 (el `rollback` no dejó datos ni secretos de prueba).
+
+Diferencias con la de la Fase 2: cinco usuarios (`…a1`–`a4` en A, `…b1` en B); A pasa a
+Pyme y su equipo se da de alta directo como `postgres` (las invitaciones ya las prueba
+la Fase 2); B queda en Certificación. Crea certificados de prueba con huellas
+`repeat('a', 64)` y `repeat('b', 64)` y dos secretos de prueba por certificado en Vault,
+que el `rollback` también deshace. De `vault.secrets` solo cuenta filas y mira ids y
+descripciones, nunca el contenido. Anota el texto completo de cada error de
+`registrar_certificado` para comprobar que no arrastra la clave ni el base64.
+
+| # | Grupo | Comprobaciones |
+|---|---|---|
+| 1 | Preparación | A (Pyme) con los cuatro roles; B en Certificación |
+| 2–12 | Empresas | tope de 1 empresa en Certificación; el administrador crea y edita en A; `autorizada_produccion` forzada a `false` y no editable; no crea ni edita en B; emisor y lector no crean ni editan (el lector sí ve) |
+| 13–20 | `registrar_resolucion` | crea la vigente y hereda `organizacion_id`; reemplaza la vigente (una sola por ambiente); producción no toca certificación; número ≠ 0 en certificación (`23514`); emisor y lector (`42501`); administrador de otra organización (`P0002`); las vigentes no cambian tras los fallos |
+| 21–30 | `registrar_certificado` | crea la fila y 2 secretos con descripciones `certificado:<huella>:pfx` y `:clave`; misma huella en otra organización; huella repetida (`23505`, sin secretos nuevos); huella inválida y RUT inválido (`22023`); organización inexistente (`23503`); ningún error contiene la clave ni el base64; `authenticated` no la ejecuta ni inserta, edita o borra certificados |
+| 31–39 | Predeterminado | asociar (organización heredada); fijar, cambiar y repetir deja uno solo; no se asocia un certificado de B; no asociado (`P0002`); emisor y lector (`42501`); entre organizaciones (`P0002`); el predeterminado no cambia tras los fallos |
+| 40 | anon | sin `execute` en las tres funciones |
+| 41 | Borrado | borrar el certificado borra sus 2 secretos y su asociación |
+| 42–43 | Vista | el lector de A ve su certificado `por_vencer` y nada de B; B ve solo el suyo y nada de A |
+
+La consulta de control (todo en 0) está en el encabezado del archivo: usuarios
+`@ejemplo.invalid`, organizaciones `zz-prueba-rls-fase3%`, certificados con esas dos
+huellas y secretos con esas descripciones.
+
+## 5. Lo que no se prueba con SQL
 
 El aislamiento entre organizaciones y los permisos por rol también se prueban de punta a
 punta con la app (Fase 2): dos usuarios de organizaciones distintas, cada uno con su

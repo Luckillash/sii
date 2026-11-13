@@ -103,6 +103,68 @@ export function validarRut(rut: string | null | undefined): boolean {
   return calcularDv(cuerpo) === c.slice(-1);
 }
 
+/** Largo máximo de un correo para el SII (`correo_sii_valido`). */
+export const LARGO_MAXIMO_CORREO_SII = 50;
+
+/** Caracteres que el SII no acepta en un correo: ] ! " # $ % & / ( ) = ? + * | < > [ ; */
+const CARACTERES_PROHIBIDOS_CORREO = /[\]!"#$%&/()=?+*|<>[;]/;
+
+/**
+ * Regla `esValidoMail2` del SII, igual que `public.correo_sii_valido()` del esquema
+ * (dominio `correo_sii`): hasta 50 caracteres, ASCII imprimible sin espacios, sin
+ * ] ! " # $ % & / ( ) = ? + * | < > [ ;, un solo @ que no esté al inicio ni al final,
+ * sin `@.`, sin empezar ni terminar en punto y con un punto después del @. No recorta
+ * espacios: quien llama decide (un espacio la hace fallar).
+ */
+export function correoSiiValido(correo: string): boolean {
+  const dominio = correo.split('@')[1] ?? '';
+  return (
+    correo.length <= LARGO_MAXIMO_CORREO_SII &&
+    /^[!-~]+$/.test(correo) &&
+    !CARACTERES_PROHIBIDOS_CORREO.test(correo) &&
+    /^[^@]+@[^@]+$/.test(correo) &&
+    !correo.includes('@.') &&
+    !correo.startsWith('.') &&
+    !correo.endsWith('.') &&
+    dominio.includes('.')
+  );
+}
+
+/**
+ * Caracteres de `texto` que no caben en un byte ISO-8859-1 (code point mayor que
+ * U+00FF: emoji, €, comillas tipográficas “ ”, rayas – —, etc.), sin repetir y en
+ * orden de aparición. Es la regla de `@winex/certificacion` (`FUERA_DE_ISO` en
+ * `core/envio-boleta.ts`, `aIso88591` en `comun/codificacion.ts`), que no exporta un
+ * validador: el DTE se firma en ISO-8859-1 y el generador escribe lo que no cabe como
+ * `&#N;`. Un surrogate suelto también cuenta como fuera.
+ */
+export function caracteresFueraDeIso88591(texto: string): string[] {
+  const fuera = new Set<string>();
+  for (const caracter of texto) {
+    if ((caracter.codePointAt(0) ?? 0) > 0xff) fuera.add(caracter);
+  }
+  return [...fuera];
+}
+
+/** ¿Cabe todo `texto` en ISO-8859-1? (Ver `caracteresFueraDeIso88591`.) */
+export function cabeEnIso88591(texto: string): boolean {
+  return caracteresFueraDeIso88591(texto).length === 0;
+}
+
+/** Formato del dominio `rut` del esquema (`rut_valido`): hasta 8 dígitos, guion y DV. */
+const PATRON_RUT_SII = /^[0-9]{1,8}-[0-9K]$/;
+
+/**
+ * Igual que `public.rut_valido()`: formato `12345678-5` (sin puntos, K mayúscula,
+ * cuerpo de 1 a 8 dígitos) y dígito verificador módulo 11. Para normalizar lo que
+ * escribe el usuario, primero `rutSii()`.
+ */
+export function rutValidoSii(rut: string): boolean {
+  if (!PATRON_RUT_SII.test(rut)) return false;
+  const [cuerpo = '', dv] = rut.split('-');
+  return calcularDv(cuerpo) === dv;
+}
+
 const ZONA_CHILE = 'America/Santiago';
 
 function partes(fecha: Date | string, opciones: Intl.DateTimeFormatOptions) {
@@ -124,6 +186,12 @@ export function formatearFecha(fecha: Date | string): string {
   }
   const p = partes(fecha, { day: '2-digit', month: '2-digit', year: 'numeric' });
   return `${p('day')}-${p('month')}-${p('year')}`;
+}
+
+/** Fecha de hoy en Chile como `AAAA-MM-DD` (el formato de una columna `date` y de `<input type="date">`). */
+export function hoyEnChile(ahora: Date = new Date()): string {
+  const p = partes(ahora, { day: '2-digit', month: '2-digit', year: 'numeric' });
+  return `${p('year')}-${p('month')}-${p('day')}`;
 }
 
 /** `10-11-2026 16:18`, 24 h, en hora de Chile. */

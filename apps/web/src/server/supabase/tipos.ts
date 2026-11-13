@@ -2413,6 +2413,10 @@ export type Database = {
         Args: { p_organizacion: string }
         Returns: undefined
       }
+      fijar_certificado_predeterminado: {
+        Args: { p_certificado: string; p_empresa: string }
+        Returns: undefined
+      }
       guardar_secreto: {
         Args: { p_descripcion?: string; p_secreto: string }
         Returns: string
@@ -2442,6 +2446,32 @@ export type Database = {
         }
       }
       puede_emitir: { Args: { p_organizacion: string }; Returns: boolean }
+      registrar_certificado: {
+        Args: {
+          p_clave: string
+          p_cn: string
+          p_emisor_ca: string
+          p_huella_sha256: string
+          p_nombre_titular: string
+          p_organizacion: string
+          p_pfx_base64: string
+          p_pfx_legacy: boolean
+          p_rut_titular: string
+          p_subido_por: string
+          p_vigente_desde: string
+          p_vigente_hasta: string
+        }
+        Returns: string
+      }
+      registrar_resolucion: {
+        Args: {
+          p_ambiente: Database["public"]["Enums"]["ambiente_sii"]
+          p_empresa: string
+          p_fecha: string
+          p_numero: number
+        }
+        Returns: string
+      }
       rut_valido: { Args: { p_rut: string }; Returns: boolean }
       sincronizar_documentos_envio: {
         Args: { p_envio: string }

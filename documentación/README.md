@@ -93,7 +93,7 @@ sources: ["supabase_saas_sii.sql", "certificacion-node/docs/"]
 | Tablas | Archivo |
 |---|---|
 | `perfiles`, `organizaciones`, `miembros_organizacion`, `invitaciones`, `planes`, `suscripciones`, `uso_mensual` | [04-objetos/objetos-tenancy.md](04-objetos/objetos-tenancy.md) |
-| `empresas`, `resoluciones`, `certificados`, `empresa_certificados`, `tokens_sii`, `sesiones_sii` | [04-objetos/objetos-empresas-y-credenciales.md](04-objetos/objetos-empresas-y-credenciales.md) |
+| `empresas`, `resoluciones`, `certificados`, `empresa_certificados`, `tokens_sii`, `sesiones_sii`, `v_certificados_estado` | [04-objetos/objetos-empresas-y-credenciales.md](04-objetos/objetos-empresas-y-credenciales.md) |
 | `cafs`, `solicitudes_folios`, `folios_anulados`, `v_folios_disponibles` | [04-objetos/objetos-folios.md](04-objetos/objetos-folios.md) |
 | `documentos`, `documento_detalles`, `receptores`, `productos`, `v_ventas_diarias` | [04-objetos/objetos-documentos.md](04-objetos/objetos-documentos.md) |
 | `envios`, `envio_estadisticas`, `consultas_envio`, `envio_rechazos`, `rcof`, `v_envios_por_consultar` | [04-objetos/objetos-envios-y-rcof.md](04-objetos/objetos-envios-y-rcof.md) |
