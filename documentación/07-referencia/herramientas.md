@@ -99,7 +99,7 @@ conectado a `Luckillash/sii`. **Solo se trabaja en *Production*:** no se usan de
 | Región de funciones | `gru1` (también en `apps/web/vercel.json`) |
 | Install / Build | los de `apps/web/vercel.json`: `pnpm install --frozen-lockfile` y `pnpm --dir ../.. build` |
 | Variables de sistema | expuestas (Sentry usa `NEXT_PUBLIC_VERCEL_ENV` y el SHA del commit) |
-| Dominios | `boleteame.dev` (principal, DNS en Vercel); `www.boleteame.dev` redirige con 308 al apex; `timbre-livid.vercel.app` sigue activo (dominio asignado al crear el proyecto; el renombrado no lo cambió) |
+| Dominios | `boleteame.dev` (principal, DNS en Vercel); `www.boleteame.dev` redirige con 308 al apex; `timbre-livid.vercel.app` (dominio asignado al crear el proyecto; el renombrado no lo cambió) redirige con 308 a `boleteame.dev`, conservando ruta y query (2026-11-13) |
 
 Variables cargadas: `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (clave
 publicable `sb_publishable_…`), en *Production* y *Development*. El resto (Supabase
@@ -115,8 +115,8 @@ panel como *Sensitive* (ver
 
 Widget de Cloudflare Turnstile en modo *Managed*, con hostnames `boleteame.dev` y
 `localhost`. Un dominio que no esté en la lista no carga el widget y, con el captcha activo,
-no puede ingresar, crear cuenta ni recuperar contraseña (por ejemplo,
-`timbre-livid.vercel.app` mientras no se agregue).
+no puede ingresar, crear cuenta ni recuperar contraseña (por eso `timbre-livid.vercel.app`
+redirige a `boleteame.dev` en vez de servir la app).
 
 | Pieza | Dónde |
 |---|---|
