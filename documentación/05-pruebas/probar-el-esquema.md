@@ -108,7 +108,8 @@ y `anon` para que las sesiones simuladas puedan anotar resultados.
 | 35–40 | Roles | el administrador no asciende a nadie a propietario, no degrada ni quita a un propietario, no da de alta un propietario y no borra la organización; sí cambia el rol de un no propietario |
 | 41–44 | Último propietario | el único propietario no sale ni se degrada; tras nombrar a otro, sí; el propietario borra su organización (la cascada no choca con la regla) |
 | 45–47 | anon | permiso denegado en las 8 tablas de tenancy; no ejecuta `crear_organizacion` ni `aceptar_invitacion`; sí lee `planes` |
-| 48–51 | `ver_invitacion` | token correcto devuelve la fila; token malo, ya aceptado o vencido devuelve cero filas. Solo si `to_regprocedure('public.ver_invitacion(text)')` existe (migración 0003); si no, `ok = null` y detalle «omitida» |
+| 48–51 | `ver_invitacion` | token correcto devuelve la fila; token malo, ya aceptado o vencido devuelve cero filas. Solo si `to_regprocedure('public.ver_invitacion(text)')` existe (migración 0003); si no, `ok = null` y detalle «omitida». La fila 52 solo aparece (con `ok = false`) si `ver_invitacion` lanza un error inesperado |
+| 53 | Suscripción morosa | como `postgres`, A pasa a `morosa` (en Pyme, con cupo libre) y se reabre la invitación de `vencida-a`; `aceptar_invitacion` rechaza con «La organización no tiene una suscripción vigente» (migración 0004). Sin 0004 sale `ok = false` |
 
 ### Cómo correrlo sin dejar datos
 
@@ -132,8 +133,8 @@ y `anon` para que las sesiones simuladas puedan anotar resultados.
 Si la ejecución se corta a mitad, Postgres descarta la transacción completa. Nunca cambies
 el `rollback` final por `commit`, ni ejecutes el archivo por partes.
 
-Resultado de la última corrida (2026-11-12, con 0003 y 0004 aplicadas): 51 de 51 en
-`ok = true`. La consulta de control dio 0 en todo.
+Resultado de la última corrida (2026-11-12, con 0003 y 0004 aplicadas): 52 de 52 en
+`ok = true` (1–51 y 53; la 52 no aparece). La consulta de control dio 0 en todo.
 
 ## 4. Lo que no se prueba con SQL
 

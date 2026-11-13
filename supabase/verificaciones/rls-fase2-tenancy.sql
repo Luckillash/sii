@@ -24,7 +24,8 @@
 --   ...a2 administrador-a  administrador de A (por invitación)
 --   ...a3 emisor-a  emisor de A (por invitación)
 --   ...a4 lector-a  lector de A (por invitación)
---   ...a5 vencida-a  tiene cuenta, pero su invitación vence antes de aceptarla
+--   ...a5 vencida-a  tiene cuenta, pero su invitación vence antes de aceptarla; luego se
+--                    reabre y choca con la organización morosa (sección 11)
 --   ...b1 propietario-b  propietario de la organización B
 --   pendiente-a6@ejemplo.invalid  solo invitado (sin cuenta)
 
@@ -676,6 +677,30 @@ begin
   perform pg_temp.registrar(51, 'ver_invitacion: token vencido devuelve cero filas', v_filas = 0, v_filas || ' fila(s)');
 exception when others then
   perform pg_temp.registrar(52, 'ver_invitacion: error inesperado', false, sqlstate || ' ' || sqlerrm);
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- 11. Organización morosa no acepta miembros (migración 0004)
+-- ---------------------------------------------------------------------------
+
+-- El backend deja a A `morosa` (Pyme, 4 de 5 usuarios: el cupo no es el motivo) y
+-- reabre la invitación de vencida-a, que ahora sí calza en correo y fecha.
+reset role;
+update public.suscripciones set estado = 'morosa'
+where organizacion_id = current_setting('prueba.org_a')::uuid;
+update public.invitaciones set expira_en = now() + interval '1 day'
+where organizacion_id = current_setting('prueba.org_a')::uuid and correo = 'vencida-a@ejemplo.invalid';
+
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-0000000000a5","role":"authenticated"}', true);
+set local role authenticated;
+do $$
+begin
+  perform public.aceptar_invitacion(current_setting('prueba.tok_a5'));
+  perform pg_temp.registrar(53, 'aceptar_invitacion rechaza si la organización está morosa', false,
+    'entró un miembro sin suscripción vigente (¿falta la migración 0004?)');
+exception when raise_exception then
+  perform pg_temp.registrar(53, 'aceptar_invitacion rechaza si la organización está morosa',
+    sqlerrm = 'La organización no tiene una suscripción vigente', sqlerrm);
 end $$;
 
 -- ---------------------------------------------------------------------------
