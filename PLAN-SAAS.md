@@ -232,8 +232,6 @@ para no compartir estado entre usuarios en el servidor.
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | público | clave `sb_publishable_…` |
 | `SUPABASE_SECRET_KEY` | servidor, *sensitive* | clave `sb_secret_…`; `server/supabase/service.ts` (service_role) y `server/supabase/clave-auth.ts` (reenvía la IP real a Auth con `sb-forwarded-for`; esos clientes nunca para datos) |
-
-Solo claves API nuevas: las legadas (`anon` / `service_role`, JWT `eyJ…`) se retiran en 2027 y `env.ts` las rechaza por prefijo. Los JWT de sesión ya se firman con claves asimétricas (ES256, JWKS).
 | `SII_TOKENS_KEY` | servidor, *sensitive* | 32 bytes base64; AES-256-GCM de tokens y cookies |
 | `CRON_SECRET` | servidor, *sensitive* | mismo valor que `cron_token` en Vault |
 | `RESEND_API_KEY`, `CORREO_REMITENTE` | servidor | |
@@ -244,6 +242,8 @@ Solo claves API nuevas: las legadas (`anon` / `service_role`, JWT `eyJ…`) se r
 
 No hay variables `SII_CERT_*` ni `SII_CAF_*` como en la CLI: en el SaaS esos datos son de
 cada empresa y viven en Vault.
+
+Solo claves API nuevas, y `env.ts` rechaza las demás por prefijo. Las legadas (`anon` / `service_role`, JWT `eyJ…`) están **desactivadas** en Supabase desde el 2026-11-13 (responden 401). Falta el retiro definitivo, que es revocar la clave HS256 legada en *JWT Keys* (Fase 13). Los JWT de sesión se firman con ES256 y se verifican localmente con el JWKS, así que una sesión revocada sigue sirviendo hasta su `exp` (≤ 1 h). Detalle y reglas en `documentación/01-fundamentos/ambientes-y-credenciales.md`.
 
 ---
 
@@ -329,7 +329,8 @@ Cada fase termina con: código en `main` con lint, typecheck y tests en verde (l
   - [x] Vercel (*Production*, 2026-11-12): `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` y `SUPABASE_SECRET_KEY` (*Sensitive*) creadas; `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY` borradas. Deploy `f82b10b` READY. Los dos builds anteriores (`8920ee8`, `f82b10b`) fallaron antes de crear las variables, en el prerender de `/bienvenida` con «Configuración incompleta (Supabase público): revisa NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY»; producción siguió con la versión previa.
   - [x] Verificado en *Production* (2026-11-12): `/`, `/ingresar`, `/crear-cuenta`, `/recuperar`, `/restablecer` → 200; `/bienvenida` sin sesión → `/ingresar`; `/auth/callback` con `token_hash` inventado → `/ingresar?error=enlace`, y en los logs de Auth esa verificación (hecha desde Vercel, `gru1`) quedó con `remote_addr` = IP pública del cliente, no la de Vercel (`otp_expired`, 403). Anti-suplantación: con la clave **publicable** y `sb-forwarded-for: 198.51.100.9`, Auth registró la IP real (la cabecera se ignora sin clave secreta). Sin errores de runtime en Vercel. Revertir = *Instant Rollback* en Vercel.
   - [x] Verificar en el navegador: ingreso con contraseña en `boleteame.dev` (Turnstile por `siteverify` + clave secreta) y que el log de Auth (`/token`, `grant_type=password`) tenga la IP del cliente. 2026-11-13 (Chrome real, `/ingresar`, correo inexistente y contraseña falsa, nada se escribe): el widget dio «¡Operación exitosa!» y la app mostró «El correo o la contraseña no coinciden». En los logs de Auth (01:01:34 UTC): `/token`, `grant_type=password`, `invalid_credentials` (400) y `remote_addr` = IP pública del cliente (la misma de la verificación de `/auth/callback` de arriba), no la de Vercel. Como la app no reenvía el `captcha_token`, que Auth respondiera `invalid_credentials` y no `captcha_failed` prueba que la llamada fue con la clave secreta, tras pasar `siteverify` en la app. Ingreso **exitoso** (01:06:01 UTC): cuenta temporal `e2e-ingreso-…@example.com` creada con la API de administración (confirmada, perfil por `tg_nuevo_usuario`); en Chrome, Turnstile y la contraseña llevaron a `/bienvenida` («Ingresaste como…»); en los logs de Auth, `/token` `grant_type=password` → 200 (`login`, `login_method=password`) con `remote_addr` = IP del cliente. Cuenta borrada después (sin usuario, perfil ni sesiones; queda solo `delivered@resend.dev`).
-  - [ ] Ensayo del retiro: desactivar las claves legadas en *Settings → API Keys* (reversible) y repetir el humo.
+  - [x] Ensayo del retiro: desactivar las claves legadas en *Settings → API Keys* (reversible) y repetir el humo. 2026-11-13: antes, sin dependencias (sin jobs de `pg_cron`, sin Edge Functions, sin JWT en Vault ni en funciones; en 24 h de logs del gateway ninguna petición con clave `eyJ…`, solo `sb_publishable_`, `sb_secret_` y `sb_temp_` del panel). Desactivadas a las 01:12:30 UTC (*Disable JWT-based API keys*); **quedan desactivadas**. Con `anon` → 401 «Legacy API keys are disabled» en `/auth/v1` y `/rest/v1`; con la publicable → 200. Humo en *Production*: `/`, `/ingresar`, `/crear-cuenta`, `/recuperar`, `/restablecer` → 200; `/bienvenida` sin sesión → `/ingresar`; `/auth/callback` con `token_hash` inventado → `/ingresar?error=enlace` (Auth: `/verify` con `sb_secret_`, `otp_expired` 403, `remote_addr` = IP del cliente); en Chrome, ingreso con correo inexistente → «El correo o la contraseña no coinciden» (Turnstile OK; Auth: `/token` `grant_type=password` con `sb_secret_`, `invalid_credentials` 400, IP del cliente). Desde la desactivación, todo el tráfico usa claves nuevas y Vercel no registra errores de runtime. Revertir = *Re-enable JWT-based API keys* en la misma página (instantáneo).
+  - [x] Observado durante el ensayo (no lo causó el cambio): la cookie de la cuenta temporal `e2e-ingreso-…`, borrada minutos antes, todavía abría `/bienvenida` con «Ingresaste como…», porque `getClaims()` verifica el JWT localmente (JWKS) hasta su `exp`. «Cerrar sesión» → Auth `403 user_not_found`, pero `/auth/salir` borró las cookies igual. Sin riesgo de datos (la cascada borró `perfiles` y `miembros_organizacion`), pero un usuario **baneado** conservaría sus membresías hasta una hora. Documentado en `ambientes-y-credenciales.md` («Sesiones de usuario y revocación»), `tenancy-y-roles.md` y `trampas-conocidas.md`. Las reglas pasaron a la Fase 4 (`operacion.ts` con `getUser()` en las operaciones ⚠️) y a la Fase 13 (revisión de seguridad).
 
 ### Fase 3 — Empresas, certificados y resoluciones
 
@@ -352,7 +353,7 @@ El corazón técnico. Todo en `apps/web/src/server/sii/`, `server-only`, runtime
 | `sesiones.ts` | Guarda y recupera cookies de `SesionSii` (`aArreglo` / `desdeArreglo`) cifradas en `sesiones_sii`; reutiliza antes de volver a autenticar |
 | `bloqueos.ts` | `bloquear_certificado()` para que dos peticiones no abran sesiones AUT2000 en paralelo con el mismo certificado |
 | `transporte.ts` | Un `TransporteUndici` por invocación, cerrado con `await using` |
-| `operacion.ts` | `ejecutarOperacion({ operacion, ambiente, confirmada, ... }, fn)`: inserta `operaciones_sii` en `en_curso`, ejecuta, traduce el error tipado de la librería (`SiiError` y derivados) a `resultado_operacion` (ok/error/uso/config/transporte/rechazo_sii/incierto/verificacion_fallida), registra en Sentry con etiquetas y cierra la fila |
+| `operacion.ts` | `ejecutarOperacion({ operacion, ambiente, confirmada, ... }, fn)`: si la operación es ⚠️, primero confirma la sesión con `supabase.auth.getUser()` (le pregunta a Auth; `getClaims()` no detecta una sesión revocada ni un usuario borrado hasta el `exp`, ver `ambientes-y-credenciales.md` → «Sesiones de usuario y revocación»); inserta `operaciones_sii` en `en_curso`, ejecuta, traduce el error tipado de la librería (`SiiError` y derivados) a `resultado_operacion` (ok/error/uso/config/transporte/rechazo_sii/incierto/verificacion_fallida), registra en Sentry con etiquetas y cierra la fila |
 | `almacen.ts` | Sube XML (ISO-8859-1, `Buffer` tal cual) y PDF a Storage; URLs firmadas |
 | `errores.ts` | Mensajes para el usuario según el design system: qué pasó y qué hacer; el detalle técnico queda en `operaciones_sii.detalle` |
 
@@ -472,7 +473,8 @@ Flujo del servidor (`emitirDocumento`):
 
 ### Fase 13 — Endurecimiento y lanzamiento
 
-1. Revisión de seguridad: RLS (simulación de roles por tabla según `acceso-por-tabla`, en transacciones con `rollback`), que ninguna ruta use `service_role` sin filtrar por organización, cabeceras (CSP con Turnstile y Sentry, HSTS), `server-only` en todo `server/`.
+1. Revisión de seguridad: RLS (simulación de roles por tabla según `acceso-por-tabla`, en transacciones con `rollback`), que ninguna ruta use `service_role` sin filtrar por organización, cabeceras (CSP con Turnstile y Sentry, HSTS), `server-only` en todo `server/`. Además, que toda operación ⚠️ (y la creación de API keys y webhooks) confirme la sesión con `getUser()` antes de ejecutar.
+   - Retiro definitivo de las claves legadas: con las legadas desactivadas desde el 2026-11-13 y sin incidentes, revocar la clave HS256 *Previously used* en *Settings → JWT Keys* (antes, confirmar en `edge_logs` que nadie usa claves sin prefijo `sb_`).
 2. Pruebas e2e con Playwright de los flujos críticos: registro → organización → empresa → certificado → certificación (con SII falso) → folios → emisión → seguimiento.
 3. Respaldo: PITR de Supabase; procedimiento de restauración probado; rotación de `SII_TOKENS_KEY` documentada.
 4. Observabilidad: tableros y alertas de Sentry de §4.8; *runbook* para `incierto`, caída del SII y CAF agotado.

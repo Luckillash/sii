@@ -1,7 +1,7 @@
 ---
 title: "Ambientes del SII y credenciales"
-description: "Certificación vs producción, hosts del SII, IDK del CAF, certificado digital, roles de Supabase y dónde vive cada secreto."
-keywords: [ambiente, certificacion, produccion, maullin, palena, apicert, pangal, rahue, herculesr, zeusr, IDK, service_role, Vault, SII_TOKENS_KEY, variables de entorno, spike]
+description: "Certificación vs producción, hosts del SII, IDK del CAF, certificado digital, roles y claves API de Supabase, sesiones y su revocación, y dónde vive cada secreto."
+keywords: [ambiente, certificacion, produccion, maullin, palena, apicert, pangal, rahue, herculesr, zeusr, IDK, service_role, Vault, SII_TOKENS_KEY, variables de entorno, spike, sb_publishable, sb_secret, claves legadas, JWKS, getClaims, getUser, revocación, jwt_expiry]
 related: ["01-fundamentos/autenticacion-sii.md", "08-esquema-supabase/vault-y-secretos.md", "07-referencia/herramientas.md"]
 source: ["supabase_saas_sii.sql §1 §6 §7", "certificacion-node/docs/canales.md", "PLAN-SAAS.md §4.4 §5"]
 ---
@@ -74,6 +74,77 @@ base de producción; cuando el SII la autoriza (P91) empieza a emitir con filas
 
 El cliente `service_role` vive solo en `apps/web/src/server/supabase/service.ts`, marcado
 `import 'server-only'`: importarlo desde un componente cliente rompe el build.
+
+## Claves API de Supabase
+
+Solo se usan las claves nuevas (*Settings → API Keys*):
+
+| Clave | Variable | Rol con el que entra |
+|---|---|---|
+| `sb_publishable_…` | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `anon`, o `authenticated` si la petición lleva el JWT de sesión |
+| `sb_secret_…` | `SUPABASE_SECRET_KEY` | `service_role` |
+
+`src/server/env.ts` y el cliente del navegador rechazan cualquier valor sin esos prefijos.
+
+**Las claves legadas `anon` y `service_role` (JWT `eyJ…`) están desactivadas desde el
+2026-11-13 (01:12:30 UTC).** Cualquier petición con una de ellas recibe
+`401 {"message":"Legacy API keys are disabled"}`, vaya en la cabecera `apikey` o como
+`Authorization: Bearer`. Consecuencias para el desarrollo:
+
+- Los ejemplos de la documentación de Supabase, de tutoriales o de un LLM que usen
+  `SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` o un JWT `eyJ…` como clave **no
+  funcionan** aquí: cambiar por la clave nueva equivalente.
+- Una integración nueva (Marketplace de Vercel, una herramienta externa, un webhook de
+  base de datos, un job de `pg_cron` con `pg_net`, una Edge Function) que pida o
+  inyecte la clave legada fallará con ese 401. Configúrala con `sb_publishable_` o
+  `sb_secret_`.
+- Si algo se rompe por esto: *Settings → API Keys → Re-enable JWT-based API keys*
+  vuelve a activarlas al instante. Para buscar quién las usa, filtra los logs del
+  gateway (`edge_logs`) por `request.sb.apikey.apikey.prefix` (las legadas no tienen
+  prefijo `sb_`).
+- **Retiro definitivo (pendiente, 2027):** en *Settings → JWT Keys* sigue la clave
+  HS256 legada como *Previously used* (verifica tokens antiguos). Revocarla es el paso
+  final. A diferencia del interruptor de *API Keys*, revocar una clave de firma no es
+  un cambio de un clic que se deshace: hazlo solo cuando las legadas lleven tiempo
+  desactivadas sin incidentes.
+
+## Sesiones de usuario y revocación
+
+Los JWT de sesión se firman con la clave asimétrica actual del proyecto (ECC P-256,
+ES256). `getClaims()` (en `src/proxy.ts`, `src/server/sesion.ts` y las Server Actions)
+verifica la firma **localmente** con el JWKS público y no le pregunta nada a Auth.
+PostgREST y RLS hacen lo mismo: aceptan cualquier JWT con firma válida que no haya
+expirado.
+
+Consecuencia: **revocar una sesión no corta el token de acceso ya emitido**. Sigue
+siendo válido hasta su `exp` (`jwt_expiry`, 3600 s por omisión). Revocar solo impide
+renovarlo. Pasa con:
+
+| Evento | Qué corta al instante | Qué sigue vivo hasta `exp` (≤ 1 h) |
+|---|---|---|
+| «Cerrar sesión» (`/auth/salir`, `signOut({ scope: 'local' })`) | las cookies de ese navegador y el *refresh token* de esa sesión | una copia del token de acceso, si alguien la tenía |
+| Borrar el usuario en Auth | refresco y nuevos ingresos; la cascada borra `perfiles` y `miembros_organizacion` | el token: la app muestra la sesión («Ingresaste como…» en `/bienvenida`), pero RLS ya no encuentra membresías y las altas fallan por FK |
+| Banear al usuario (`ban_duration`) | refresco y nuevos ingresos | el token **con sus membresías intactas**: puede seguir leyendo y escribiendo según su rol |
+| Quitar a un miembro o que salga de la organización | **todo** el acceso a esa organización: `es_miembro()` se evalúa en cada consulta | nada de esa organización (sí sus otras organizaciones) |
+
+Observado el 2026-11-13: una cookie de la cuenta temporal `e2e-ingreso-…`, borrada
+minutos antes, todavía abría `/bienvenida` con «Ingresaste como…». Al cerrar sesión,
+Auth respondió `403 user_not_found`, pero `/auth/salir` borró las cookies igual (es lo
+esperado: ver el comentario del route handler).
+
+Reglas para el desarrollo:
+
+1. **Para quitarle el acceso a alguien de inmediato, se quita su membresía** (o la
+   organización le quita el rol). Borrar o banear en Auth es complementario, no
+   suficiente.
+2. **Operaciones irreversibles o con costo** (las ⚠️: emitir, enviar al SII, pedir o
+   anular folios, postular o declarar, subir un certificado, crear API keys o
+   webhooks) deben confirmar la sesión contra Auth antes de ejecutar, con
+   `supabase.auth.getUser()`: le pregunta a Auth, así que falla si la sesión se revocó
+   o el usuario ya no existe. `getClaims()` basta para leer y para el resto de las
+   acciones.
+3. En pruebas e2e que borran usuarios, cerrar también la sesión del navegador. Si no,
+   la cookie vieja sigue «iniciada» hasta una hora y confunde la siguiente prueba.
 
 ## Dónde vive cada secreto
 

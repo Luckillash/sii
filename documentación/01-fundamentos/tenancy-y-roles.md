@@ -62,6 +62,10 @@ Notas:
   sea cual sea su rol (detalle en [acceso por tabla](../03-api-reference/acceso-por-tabla.md)).
 - La UI oculta acciones según el rol, pero **la autoridad es RLS**: un botón escondido no
   protege nada.
+- **Quitar a un miembro corta su acceso al instante**, porque `es_miembro()` se evalúa
+  en cada consulta. Borrar o banear al usuario en Auth, en cambio, deja vivo su token
+  de acceso hasta una hora ([sesiones y revocación](ambientes-y-credenciales.md#sesiones-de-usuario-y-revocación)):
+  para una baja urgente, primero se quita la membresía.
 - La autorización a producción (`empresas.autorizada_produccion`) y la etapa del proceso
   de certificación solo las cambia el sistema (`tg_proteger_autorizacion`,
   `tg_proteger_proceso`), aunque el usuario sea administrador.

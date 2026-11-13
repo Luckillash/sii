@@ -51,7 +51,7 @@ sources: ["supabase_saas_sii.sql", "certificacion-node/docs/"]
 | Si la tarea es… | Lee |
 |---|---|
 | Entender qué es el SaaS y qué pieza hace cada cosa | [01-fundamentos/vision-general.md](01-fundamentos/vision-general.md) |
-| Ambientes, hosts del SII, certificado, roles de Supabase | [01-fundamentos/ambientes-y-credenciales.md](01-fundamentos/ambientes-y-credenciales.md) |
+| Ambientes, hosts del SII, certificado, roles y claves API de Supabase, sesiones y revocación | [01-fundamentos/ambientes-y-credenciales.md](01-fundamentos/ambientes-y-credenciales.md) |
 | Tokens del SII o sesión AUT2000 | [01-fundamentos/autenticacion-sii.md](01-fundamentos/autenticacion-sii.md) |
 | Firma XML, TED, ISO-8859-1 | [01-fundamentos/firma-y-timbre.md](01-fundamentos/firma-y-timbre.md) |
 | Organizaciones, roles y permisos | [01-fundamentos/tenancy-y-roles.md](01-fundamentos/tenancy-y-roles.md) |
@@ -109,7 +109,7 @@ documentación/
 ├── README.md                          ← este índice
 ├── 01-fundamentos/                    ← reglas transversales (SII + SaaS)
 │   ├── vision-general.md              piezas y módulos del esquema
-│   ├── ambientes-y-credenciales.md    certificación/producción, hosts, IDK, secretos, roles
+│   ├── ambientes-y-credenciales.md    certificación/producción, hosts, IDK, secretos, roles, claves, sesiones
 │   ├── autenticacion-sii.md           semilla/token, tokens_sii, AUT2000, sesiones_sii
 │   ├── firma-y-timbre.md              XML-DSig, TED, CAF, ISO-8859-1
 │   ├── tenancy-y-roles.md             organizaciones, roles, funciones de acceso
