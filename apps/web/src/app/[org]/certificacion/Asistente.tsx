@@ -747,28 +747,36 @@ export function Asistente({ slug, admin, vista, diasCertificado }: AsistenteProp
             ) : null}
           </Tarjeta>
 
-          <section aria-labelledby="t-caf" className={estilos.seccionLateral}>
-            <h2 id="t-caf" className={estilos.subtitulo}>
-              Folios de certificación
-            </h2>
-            {cafSet ? (
-              <MedidorFolios
-                codigo={39}
-                desde={cafSet.folioDesde}
-                hasta={cafSet.folioHasta}
-                siguiente={cafSet.siguienteFolio}
-              />
-            ) : (
-              <p className={estilos.nota}>
-                Aún no hay folios de certificación. Se piden en el paso 3.
-              </p>
-            )}
-            <p className={estilos.nota}>
-              {vista.resolucionCertificacion
-                ? `Resolución de certificación n.º ${vista.resolucionCertificacion.numero} del ${formatearFecha(vista.resolucionCertificacion.fecha)}.`
-                : 'La resolución de certificación se registra al postular.'}
-            </p>
-          </section>
+          {/* Una empresa ya autorizada (por P91 o fuera de Boletéame) no necesita las
+              indicaciones de qué falta: solo se muestra lo que tenga. */}
+          {!autorizada || cafSet || vista.resolucionCertificacion ? (
+            <section aria-labelledby="t-caf" className={estilos.seccionLateral}>
+              <h2 id="t-caf" className={estilos.subtitulo}>
+                Folios de certificación
+              </h2>
+              {cafSet ? (
+                <MedidorFolios
+                  codigo={39}
+                  desde={cafSet.folioDesde}
+                  hasta={cafSet.folioHasta}
+                  siguiente={cafSet.siguienteFolio}
+                />
+              ) : autorizada ? null : (
+                <p className={estilos.nota}>
+                  Aún no hay folios de certificación. Se piden en el paso 3.
+                </p>
+              )}
+              {vista.resolucionCertificacion ? (
+                <p className={estilos.nota}>
+                  {`Resolución de certificación n.º ${vista.resolucionCertificacion.numero} del ${formatearFecha(vista.resolucionCertificacion.fecha)}.`}
+                </p>
+              ) : autorizada ? null : (
+                <p className={estilos.nota}>
+                  La resolución de certificación se registra al postular.
+                </p>
+              )}
+            </section>
+          ) : null}
 
           <Tarjeta aria-labelledby="t-ops" variante="tenue" className={estilos.seccionLateral}>
             <h2 id="t-ops" className={estilos.subtitulo}>

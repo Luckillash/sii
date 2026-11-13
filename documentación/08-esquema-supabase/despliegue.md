@@ -180,8 +180,11 @@ con Vercel. Registro de lo hecho:
 listó solo `0009`; antes de migrar, el `update` del final no tenía filas que marcar (0
 resoluciones de producción vigentes); verificación 9/9 `ok`; simulación 12/12 `ok` y su
 consulta de limpieza en 0 (usuarios, organizaciones, empresas); `pnpm db:tipos` sin
-diferencias; *Advisors* de seguridad sin avisos nuevos (la función no aparece). Pendiente
-solo el paso 8 (registrar la resolución de producción de la empresa del piloto). Antes,
+diferencias; *Advisors* de seguridad sin avisos nuevos (la función no aparece). Paso 8
+hecho el mismo día: resolución de producción n.º 80 del 22-08-2014 de la empresa del piloto
+(20630500-2), que quedó autorizada (`autorizada_en` fijado a mano como `postgres` en la fecha
+real de autorización, 06-11-2026, porque el trigger pone `now()`); el asistente la muestra
+«Autorizada fuera de Boletéame». Antes,
 escrita y probada en PGlite (esquema 0001 y 0003–0008 más
 la 0009, con stubs de `auth`, `storage`, `vault` y `supabase_migrations`): verificación 9/9
 y simulación 12/12; sin la 0009, la verificación da 2/9 (solo las comprobaciones 7 y 8, que
