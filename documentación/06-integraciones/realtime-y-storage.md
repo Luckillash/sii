@@ -19,15 +19,15 @@ source: ["supabase_saas_sii.sql §18 §19", "supabase/migrations/0006_realtime_o
 | `documentos` | `0001` §19 | estado de cada boleta en el panel |
 | `envios` | `0001` §19 | estado de los envíos (seguimiento) |
 | `procesos_certificacion` | `0001` §19 | etapa del asistente de certificación |
-| `operaciones_sii` | **`0006_realtime_operaciones`** (pendiente de aplicar) | avance y resultado de las operaciones largas (solicitud de folios, postulación, declaración) |
-| `solicitudes_folios` | **`0006_realtime_operaciones`** (pendiente de aplicar) | estado de cada solicitud de folios |
+| `operaciones_sii` | **`0006_realtime_operaciones`** (aplicada el 2026-11-13) | avance y resultado de las operaciones largas (solicitud de folios, postulación, declaración) |
+| `solicitudes_folios` | **`0006_realtime_operaciones`** (aplicada el 2026-11-13) | estado de cada solicitud de folios |
 
 La 0006 resuelve el hallazgo H9 del plan: sin ella, la UI de las Fases 5 y 6 tendría que
 consultar a cada rato en vez de escuchar los cambios. Es **idempotente** (agrega cada tabla
 solo si la publicación existe y la tabla no está) y **aditiva** (no cambia tablas,
-políticas ni privilegios). Al 2026-11-13 está escrita y probada en PGlite, **sin aplicar en
-producción**: hasta que se aplique, una suscripción a `operaciones_sii` o
-`solicitudes_folios` no recibe nada (no da error).
+políticas ni privilegios). Se probó en PGlite y se **aplicó en
+producción el 2026-11-13**. En una base que no la tenga, una suscripción a `operaciones_sii`
+o `solicitudes_folios` no recibe nada (no da error).
 
 ### Quién recibe qué
 

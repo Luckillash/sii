@@ -216,10 +216,11 @@ actual: mientras la función que lo tomó siga viva, no vence. Contrato de las R
 [RPC del backend](../03-api-reference/rpc-backend.md#tomar_bloqueo_certificado-y-liberar_bloqueo_certificado-migración-0007);
 tabla en [objetos](../04-objetos/objetos-empresas-y-credenciales.md#bloqueos_sii-).
 
-> **Migración 0007 pendiente de aplicar en producción** (2026-11-13). Sin ella,
-> `tomar_bloqueo_certificado` no existe: `conBloqueoCertificado` lanza `ErrorBloqueo`
-> (con el código de función inexistente: `PGRST202` por PostgREST, `42883` en SQL directo)
-> y la operación termina en `error` sin salir al SII.
+> **Migración 0007 aplicada en producción el 2026-11-13** (verificaciones 14/14 y
+> simulación 21/21). En una base que no la tenga, `tomar_bloqueo_certificado` no existe:
+> `conBloqueoCertificado` lanza `ErrorBloqueo` (con el código de función inexistente:
+> `PGRST202` por PostgREST, `42883` en SQL directo) y la operación termina en `error` sin
+> salir al SII.
 
 ## Orden de una operación con sesión AUT2000
 

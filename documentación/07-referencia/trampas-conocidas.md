@@ -101,14 +101,14 @@ source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas
 
 ### Migraciones
 
-- **Las migraciones 0006 y 0007 todavía no están aplicadas en producción** (2026-11-13).
-  Síntomas mientras falten: toda operación que use `conBloqueoCertificado` termina en
-  `error` con mensaje genérico y en Sentry aparece `ErrorBloqueo` con el código de función
-  inexistente (`PGRST202` por PostgREST; `42883` en SQL directo); una suscripción de Realtime a
-  `operaciones_sii` o `solicitudes_folios` no recibe nada y **no da error**. Además,
-  `tipos.ts` tiene `bloqueos_sii` y las dos RPC agregados a mano: regenerar con
-  `pnpm db:tipos` después de aplicar y comparar
-  ([despliegue](../08-esquema-supabase/despliegue.md#fase-4-migraciones-0006-y-0007-pendientes)).
+- **Las migraciones 0006 y 0007 están aplicadas en producción** (2026-11-13). Síntomas si
+  una base nueva (otro proyecto, un entorno recién creado) no las tiene: toda operación que
+  use `conBloqueoCertificado` termina en `error` con mensaje genérico y en Sentry aparece
+  `ErrorBloqueo` con el código de función inexistente (`PGRST202` por PostgREST; `42883` en
+  SQL directo); una suscripción de Realtime a `operaciones_sii` o `solicitudes_folios` no
+  recibe nada y **no da error**. `tipos.ts` tenía `bloqueos_sii` y las dos RPC agregados a
+  mano; `pnpm db:tipos` dio un resultado idéntico, sin diferencias
+  ([despliegue](../08-esquema-supabase/despliegue.md#fase-4-migraciones-0006-y-0007-aplicadas-el-2026-11-13)).
 
 ### Bloqueo del certificado
 
@@ -146,7 +146,8 @@ source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas
   después de insertar se vuelve a revisar, para el `incierto` que aparece entre el control
   previo y el insert (la fila propia se cierra como `uso` con `detalle.motivo`). Detalle en
   [errores y resultados](../01-fundamentos/errores-y-resultados.md#carrera-entre-dos-peticiones-iguales).
-  Mientras la 0007 no esté aplicada, el insert no choca y solo queda el control posterior.
+  La 0007 está aplicada en producción desde el 2026-11-13, así que el índice único ya está
+  activo (en una base sin ella, el insert no choca y solo queda el control posterior).
   Deshabilitar el botón al enviar (Fase 6) sigue siendo buena idea, pero ya no es lo que
   evita el doble timbraje.
 - **`OPERACIONES_EFECTO_GLOBAL` y el predicado del índice van juntos.** Si agregas o quitas

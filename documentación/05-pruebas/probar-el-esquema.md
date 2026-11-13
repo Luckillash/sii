@@ -23,8 +23,8 @@ comprobación con `ok = true/false` y, si falla, el `detalle`. No escribe nada.
 |---|---|
 | `0001_esquema.sql` | las 33 tablas; RLS activo en todas; `tokens_sii` y `sesiones_sii` sin políticas ni privilegios para `anon`/`authenticated`; `token_guardar` y `leer_secreto` fuera del alcance de la API y disponibles para `service_role`; Vault, `pg_cron` y `pg_net`; bucket privado; publicación de Realtime; `tipos_dte` = 39 y 41 |
 | `0005_certificados_resoluciones.sql` | 15 comprobaciones: las 3 funciones con su firma, nombres de parámetros, `plpgsql`, `security definer` solo en `registrar_certificado`, `search_path` vacío; `registrar_certificado` solo para `service_role`; las otras dos para `authenticated` y `service_role`, no `anon`; `certificados` sin políticas de escritura; `trg_borrar_secretos`; herencia de `organizacion_id`; privilegios que necesitan las funciones invoker; índices parciales; migración registrada. Aplicada el 2026-11-13: 15/15 `ok` |
-| `0006_realtime_operaciones.sql` | 9 comprobaciones: `supabase_realtime` existe y publica `insert`/`update`/`delete`; `operaciones_sii` y `solicitudes_folios` están en ella; las tres de la 0001 siguen publicadas; RLS activo; política `lectura` (`select`, `authenticated`, `es_miembro(organizacion_id)`); `select` para `authenticated`; nada para `anon`; *replica identity* por defecto; migración registrada. **Pendiente de aplicar**: antes de migrar da 7/9 |
-| `0007_bloqueos_sii.sql` | 14 comprobaciones: `bloqueos_sii` con sus 5 columnas y tipos; PK `(certificado_id, ambiente)`; FK a `certificados` en cascada; RLS activo sin políticas; nada para `anon`/`authenticated`; las 2 funciones con su firma y `boolean`; nombres de parámetros (los que usa `bloqueos.ts`); `plpgsql`, `security definer`, `search_path` vacío; solo `service_role` las ejecuta; el `insert … on conflict` con la condición del arriendo; migración registrada; el índice único y válido `operaciones_sii_efecto_global_en_curso` sobre `(empresa_id, operacion, ambiente)`; su predicado (`en_curso`, `confirmada` y exactamente `solicitar_folios`, `postular`, `declarar`, como `OPERACIONES_EFECTO_GLOBAL`). **Pendiente de aplicar**: antes de migrar da todo `false` |
+| `0006_realtime_operaciones.sql` | 9 comprobaciones: `supabase_realtime` existe y publica `insert`/`update`/`delete`; `operaciones_sii` y `solicitudes_folios` están en ella; las tres de la 0001 siguen publicadas; RLS activo; política `lectura` (`select`, `authenticated`, `es_miembro(organizacion_id)`); `select` para `authenticated`; nada para `anon`; *replica identity* por defecto; migración registrada. Aplicada el 2026-11-13: 9/9 `ok` (antes de migrar daba 7/9) |
+| `0007_bloqueos_sii.sql` | 14 comprobaciones: `bloqueos_sii` con sus 5 columnas y tipos; PK `(certificado_id, ambiente)`; FK a `certificados` en cascada; RLS activo sin políticas; nada para `anon`/`authenticated`; las 2 funciones con su firma y `boolean`; nombres de parámetros (los que usa `bloqueos.ts`); `plpgsql`, `security definer`, `search_path` vacío; solo `service_role` las ejecuta; el `insert … on conflict` con la condición del arriendo; migración registrada; el índice único y válido `operaciones_sii_efecto_global_en_curso` sobre `(empresa_id, operacion, ambiente)`; su predicado (`en_curso`, `confirmada` y exactamente `solicitar_folios`, `postular`, `declarar`, como `OPERACIONES_EFECTO_GLOBAL`). Aplicada el 2026-11-13: 14/14 `ok` (antes de migrar daba todo `false`) |
 
 Se ejecuta pegándolo en el SQL Editor o con el MCP `execute_sql`. Cada migración nueva trae
 el suyo.
@@ -176,7 +176,7 @@ huellas y secretos con esas descripciones.
 `supabase/verificaciones/rls-fase4-bloqueos.sql` prueba el criterio del bloqueo con
 arriendo: dos peticiones no abren sesiones AUT2000 en paralelo con el mismo certificado y
 ambiente; y el índice único parcial de `operaciones_sii`: dos operaciones de efecto global
-iguales no quedan `en_curso` a la vez. **Requiere la migración 0007 aplicada** (pendiente al 2026-11-13): sin ella se
+iguales no quedan `en_curso` a la vez. **Requiere la migración 0007 aplicada** (aplicada en producción el 2026-11-13): sin ella se
 detiene con `42P01` (`relation … does not exist`) o `42883` y la transacción se descarta
 completa, sin resultados.
 
@@ -208,6 +208,10 @@ control del encabezado (organizaciones con ese slug, certificados con esa huella
 empresa de prueba y `bloqueos_sii`) en 0; `bloqueos` puede no ser 0 si
 la app ya está tomando bloqueos reales: basta con que ninguno sea del certificado de
 prueba.
+
+Corrida en producción el 2026-11-13, después de aplicar la 0006 y la 0007: 21/21 `ok`; tras
+el `rollback`, la consulta de limpieza dio todo en 0 (organizaciones, certificados,
+empresas, bloqueos y operaciones).
 
 ## 6. Lo que no se prueba con SQL
 

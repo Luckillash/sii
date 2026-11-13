@@ -155,7 +155,7 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
     organización (`23503`). El predeterminado se cambia con
     `fijar_certificado_predeterminado()` (migración 0005, `security invoker`)
     ([RPC](rpc-organizacion.md#fijar_certificado_predeterminado-migración-0005)).
-17. Migración `0007_bloqueos_sii` (pendiente de aplicar). RLS activo sin políticas y
+17. Migración `0007_bloqueos_sii` (aplicada el 2026-11-13). RLS activo sin políticas y
     `revoke all` a `anon` y `authenticated`, como `tokens_sii` y `sesiones_sii`. La app
     no la toca directo: solo por `tomar_bloqueo_certificado` /
     `liberar_bloqueo_certificado` (solo `service_role`)
@@ -188,4 +188,5 @@ cambios por Realtime ([Realtime](../06-integraciones/realtime-y-storage.md#realt
   `supabase/verificaciones/rls-fase3-empresas.sql`. Requiere la migración 0005; corrida en
   producción el 2026-11-13 (43/43).
 - `bloqueos_sii` y sus dos RPC por rol: `supabase/verificaciones/rls-fase4-bloqueos.sql`
-  (16). Requiere la migración 0007, pendiente de aplicar.
+  (21, incluye el índice único de `operaciones_sii`). Requiere la migración 0007; corrida en
+  producción el 2026-11-13 (21/21).

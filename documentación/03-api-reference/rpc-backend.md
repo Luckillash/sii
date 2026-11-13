@@ -57,10 +57,10 @@ Detalle en [vault y secretos](../08-esquema-supabase/vault-y-secretos.md#quién-
 
 ## `tomar_bloqueo_certificado` y `liberar_bloqueo_certificado` (migración 0007)
 
-Vienen en `supabase/migrations/0007_bloqueos_sii.sql`, **pendiente de aplicar en
-producción** (2026-11-13). Sin ella, `conBloqueoCertificado` falla con `ErrorBloqueo`
-(con el código de función inexistente: `PGRST202` por PostgREST, `42883` en SQL directo)
-y la operación termina en `error` sin salir al SII.
+Vienen en `supabase/migrations/0007_bloqueos_sii.sql`, **aplicada en
+producción el 2026-11-13**. En una base que no la tenga, `conBloqueoCertificado` falla con
+`ErrorBloqueo` (con el código de función inexistente: `PGRST202` por PostgREST, `42883` en
+SQL directo) y la operación termina en `error` sin salir al SII.
 
 ```sql
 public.tomar_bloqueo_certificado(
@@ -130,7 +130,7 @@ lectura: tabla, PK, FK en cascada, RLS sin políticas, privilegios, firmas, nomb
 parámetros, `security definer`, `search_path`, condición del arriendo, migración
 registrada y, 13–14, el índice único parcial `operaciones_sii_efecto_global_en_curso` que
 la misma migración agrega a `operaciones_sii`) y `rls-fase4-bloqueos.sql` (21, con
-`rollback`; 17–21 son del índice)
+`rollback`; 17–21 son del índice). Corridas en producción el 2026-11-13: 14/14 y 21/21 `ok`
 ([cómo correrlas](../05-pruebas/probar-el-esquema.md#5-simulación-del-bloqueo-de-la-fase-4-rls-fase4-bloqueossql)).
 
 ## `registrar_certificado` (migración 0005)
