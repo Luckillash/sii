@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { clasesBoton, LayoutIngreso } from '@/components/timbre';
+import { clasesBoton, LayoutIngreso } from '@/components/boleteame';
 import estilos from './no-encontrada.module.css';
 
 // 404 de /[org]/*: la organización no existe o el usuario no es miembro. El mismo

@@ -7,7 +7,7 @@ import {
   LayoutApp,
   NAVEGACION,
   type UsuarioActivo,
-} from '@/components/timbre';
+} from '@/components/boleteame';
 
 // `LayoutApp` necesita saber qué sección está activa, y un layout de servidor no lo sabe
 // (no se vuelve a renderizar al navegar). Este envoltorio cliente lo toma del primer

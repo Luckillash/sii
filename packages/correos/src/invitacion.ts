@@ -33,17 +33,17 @@ export function correoInvitacion(datos: DatosInvitacion): Correo {
   const fecha = formatearFecha(datos.expiraEn);
   const quien = datos.invitadoPor?.trim();
 
-  const asunto = `Invitación a ${datos.organizacion} en Timbre`;
+  const asunto = `Invitación a ${datos.organizacion} en Boletéame`;
   const intro = quien
-    ? `${quien} te invitó a unirte a ${datos.organizacion} en Timbre con el rol ${datos.rol}.`
-    : `Te invitaron a unirte a ${datos.organizacion} en Timbre con el rol ${datos.rol}.`;
+    ? `${quien} te invitó a unirte a ${datos.organizacion} en Boletéame con el rol ${datos.rol}.`
+    : `Te invitaron a unirte a ${datos.organizacion} en Boletéame con el rol ${datos.rol}.`;
   const contexto =
-    'Timbre emite boletas electrónicas y lleva la certificación ante el SII en un solo lugar.';
+    'Boletéame emite boletas electrónicas y lleva la certificación ante el SII en un solo lugar.';
   const instrucciones = `Para aceptarla, ingresa o crea tu cuenta con ${datos.correo}. El enlace vence el ${fecha} y sirve una sola vez.`;
   const respaldo = 'Si el botón no funciona, copia este enlace en tu navegador:';
   const ignorar =
     'Si no esperabas esta invitación, ignora este correo: nadie se unirá en tu nombre.';
-  const pie = 'Timbre · Boletas electrónicas y certificación ante el SII.';
+  const pie = 'Boletéame · Boletas electrónicas y certificación ante el SII.';
 
   const estiloEnlace = estilo({
     margin: '0 0 16px',

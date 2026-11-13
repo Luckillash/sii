@@ -1,4 +1,4 @@
-// Formatos chilenos del design system «Timbre» (puerto de `Timbre.utils` del bundle).
+// Formatos chilenos del design system «Boletéame» (puerto de `Boleteame.utils` del bundle).
 // Sin dependencias de React ni del navegador: se usan en el servidor y en el cliente.
 
 export type CodigoDte = 33 | 34 | 39 | 41 | 43 | 46 | 52 | 56 | 61 | 110 | 111 | 112;

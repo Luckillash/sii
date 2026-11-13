@@ -1,7 +1,7 @@
 // Colores y medidas del design system para correos (PLAN-SAAS §4.2, §4.6).
 //
 // Los clientes de correo no leen custom properties ni hojas de estilo externas: los
-// valores van en línea. Son los del tema claro de `design-system/timbre/tokens.json`
+// valores van en línea. Son los del tema claro de `design-system/boleteame/tokens.json`
 // (los mismos que `apps/web/src/styles/tokens.css` genera en `:root`); la mayoría de
 // los clientes no respeta un tema oscuro propio. `tokens.test.ts` comprueba que no se
 // desalineen de tokens.css.

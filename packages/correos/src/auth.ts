@@ -20,7 +20,7 @@ import { COLOR, FUENTE_MONO, RADIO } from './tokens';
 // invitación de Supabase sale del panel; las de organizaciones van por Resend): usan la
 // Site URL con la ruta del callback completa.
 //
-// Mismo tono que el resto de Timbre: español de Chile con tú, sin exclamaciones ni emoji.
+// Mismo tono que el resto de Boletéame: español de Chile con tú, sin exclamaciones ni emoji.
 
 export type PlantillaAuth =
   | 'confirmation'
@@ -35,7 +35,7 @@ export interface CorreoAuth {
   html: string;
 }
 
-const PIE = 'Timbre · Boletas electrónicas y certificación ante el SII.';
+const PIE = 'Boletéame · Boletas electrónicas y certificación ante el SII.';
 
 /**
  * Enlace con token_hash para un flujo que la app inicia con `redirectTo`
@@ -123,10 +123,10 @@ const UNA_VEZ = 'El enlace sirve una sola vez y vence en 1 hora.';
 
 export const PLANTILLAS_AUTH: Record<PlantillaAuth, CorreoAuth> = {
   confirmation: armar({
-    asunto: 'Confirma tu correo en Timbre',
+    asunto: 'Confirma tu correo en Boletéame',
     titulo: 'Confirma tu correo',
     parrafos: [
-      'Creaste una cuenta en Timbre con {{ .Email }}. Confirma que este correo es tuyo para empezar a usarla.',
+      'Creaste una cuenta en Boletéame con {{ .Email }}. Confirma que este correo es tuyo para empezar a usarla.',
     ],
     accion: { texto: 'Confirmar correo', enlace: enlaceRedirect('email') },
     notas: [
@@ -136,10 +136,10 @@ export const PLANTILLAS_AUTH: Record<PlantillaAuth, CorreoAuth> = {
   }),
 
   magic_link: armar({
-    asunto: 'Tu enlace para ingresar a Timbre',
-    titulo: 'Ingresa a Timbre',
-    parrafos: ['Pediste un enlace para ingresar a Timbre con {{ .Email }}, sin contraseña.'],
-    accion: { texto: 'Ingresar a Timbre', enlace: enlaceRedirect('magiclink') },
+    asunto: 'Tu enlace para ingresar a Boletéame',
+    titulo: 'Ingresa a Boletéame',
+    parrafos: ['Pediste un enlace para ingresar a Boletéame con {{ .Email }}, sin contraseña.'],
+    accion: { texto: 'Ingresar a Boletéame', enlace: enlaceRedirect('magiclink') },
     notas: [
       `${UNA_VEZ} Si venció, pide otro desde la pantalla de ingreso.`,
       'Si no lo pediste, ignora este correo: nadie puede ingresar sin abrir el enlace.',
@@ -147,7 +147,7 @@ export const PLANTILLAS_AUTH: Record<PlantillaAuth, CorreoAuth> = {
   }),
 
   recovery: armar({
-    asunto: 'Restablece tu contraseña de Timbre',
+    asunto: 'Restablece tu contraseña de Boletéame',
     titulo: 'Restablece tu contraseña',
     parrafos: [
       'Pediste restablecer la contraseña de la cuenta {{ .Email }}. Abre el enlace y elige una nueva.',
@@ -160,10 +160,10 @@ export const PLANTILLAS_AUTH: Record<PlantillaAuth, CorreoAuth> = {
   }),
 
   email_change: armar({
-    asunto: 'Confirma el cambio de correo en Timbre',
+    asunto: 'Confirma el cambio de correo en Boletéame',
     titulo: 'Confirma el cambio de correo',
     parrafos: [
-      'Pediste cambiar el correo de tu cuenta de Timbre de {{ .Email }} a {{ .NewEmail }}. Confirma el cambio desde este enlace.',
+      'Pediste cambiar el correo de tu cuenta de Boletéame de {{ .Email }} a {{ .NewEmail }}. Confirma el cambio desde este enlace.',
     ],
     accion: { texto: 'Confirmar el cambio', enlace: enlaceSitio('email_change') },
     notas: [
@@ -173,10 +173,10 @@ export const PLANTILLAS_AUTH: Record<PlantillaAuth, CorreoAuth> = {
   }),
 
   invite: armar({
-    asunto: 'Te invitaron a Timbre',
-    titulo: 'Te invitaron a Timbre',
+    asunto: 'Te invitaron a Boletéame',
+    titulo: 'Te invitaron a Boletéame',
     parrafos: [
-      'Te crearon una cuenta en Timbre con {{ .Email }}. Timbre emite boletas electrónicas y lleva la certificación ante el SII en un solo lugar.',
+      'Te crearon una cuenta en Boletéame con {{ .Email }}. Boletéame emite boletas electrónicas y lleva la certificación ante el SII en un solo lugar.',
     ],
     accion: {
       texto: 'Aceptar y elegir contraseña',
@@ -189,9 +189,9 @@ export const PLANTILLAS_AUTH: Record<PlantillaAuth, CorreoAuth> = {
   }),
 
   reauthentication: armar({
-    asunto: 'Tu código de verificación de Timbre',
+    asunto: 'Tu código de verificación de Boletéame',
     titulo: 'Confirma que eres tú',
-    parrafos: ['Para continuar con el cambio en tu cuenta de Timbre, ingresa este código:'],
+    parrafos: ['Para continuar con el cambio en tu cuenta de Boletéame, ingresa este código:'],
     accion: { codigo: '{{ .Token }}' },
     notas: [
       'El código sirve una sola vez y vence en 1 hora.',

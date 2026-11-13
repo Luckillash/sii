@@ -1,6 +1,6 @@
 import 'server-only';
 import { createHash } from 'node:crypto';
-import { correoInvitacion } from '@timbre/correos';
+import { correoInvitacion } from '@sii/correos';
 import { enviarCorreo, type OpcionesEnvio, type ResultadoEnvio } from './resend';
 
 // Envío del correo de invitación. El token llega una sola vez desde

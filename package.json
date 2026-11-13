@@ -1,5 +1,5 @@
 {
-  "name": "timbre",
+  "name": "sii",
   "private": true,
   "description": "SaaS de emisión de documentos tributarios electrónicos (SII) sobre @winex/certificacion.",
   "type": "module",

@@ -88,7 +88,7 @@ Detalle de comandos y códigos de salida (0–7, equivalentes a `resultado_opera
 
 ## Vercel
 
-Proyecto `timbre` (`prj_XEe4L2I60TLJVAI6Ass5y3G6VlFu`, equipo «Lucas' projects»),
+Proyecto `sii` (antes `timbre`, renombrado el 2026-11-12; `prj_XEe4L2I60TLJVAI6Ass5y3G6VlFu`, equipo «Lucas' projects»),
 conectado a `Luckillash/sii`. **Solo se trabaja en *Production*:** no se usan deploys de
 *Preview* ni ramas; cada push a `main` despliega directo a producción.
 
@@ -99,7 +99,7 @@ conectado a `Luckillash/sii`. **Solo se trabaja en *Production*:** no se usan de
 | Región de funciones | `gru1` (también en `apps/web/vercel.json`) |
 | Install / Build | los de `apps/web/vercel.json`: `pnpm install --frozen-lockfile` y `pnpm --dir ../.. build` |
 | Variables de sistema | expuestas (Sentry usa `NEXT_PUBLIC_VERCEL_ENV` y el SHA del commit) |
-| Dominios | `boleteame.dev` (principal, DNS en Vercel); `www.boleteame.dev` redirige con 308 al apex; `timbre-livid.vercel.app` sigue activo |
+| Dominios | `boleteame.dev` (principal, DNS en Vercel); `www.boleteame.dev` redirige con 308 al apex; `timbre-livid.vercel.app` sigue activo (dominio asignado al crear el proyecto; el renombrado no lo cambió) |
 
 Variables cargadas: `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (clave
 publicable `sb_publishable_…`), en *Production* y *Development*. El resto (Supabase
@@ -141,7 +141,7 @@ Action en Vercel, con otra IP que el navegador, y Supabase lo acepta igual.
 
 ## Sentry
 
-Proyecto `luckillash/timbre-web` (plataforma `javascript-nextjs`). La app lee
+Proyecto `luckillash/sii-web` (antes `timbre-web`, renombrado el 2026-11-12; mismo ID y DSN; plataforma `javascript-nextjs`). La app lee
 `NEXT_PUBLIC_SENTRY_DSN`; sin DSN, Sentry queda apagado. El build usa `SENTRY_ORG`,
 `SENTRY_PROJECT` y `SENTRY_AUTH_TOKEN` para subir los source maps.
 

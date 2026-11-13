@@ -4,7 +4,7 @@ import { type ConfiguracionCorreo, enviarCorreo, type MensajeCorreo } from './re
 
 const CONFIG: ConfiguracionCorreo = {
   RESEND_API_KEY: 're_clave_de_prueba_123',
-  CORREO_REMITENTE: 'Timbre <no-responder@timbre.cl>',
+  CORREO_REMITENTE: 'Boletéame <no-responder@mail.boleteame.dev>',
 };
 
 const MENSAJE: MensajeCorreo = {
@@ -42,7 +42,7 @@ describe('enviarCorreo', () => {
     expect(cabeceras.Authorization).toBe('Bearer re_clave_de_prueba_123');
     expect(cabeceras['Idempotency-Key']).toBe('evento/123');
     expect(JSON.parse(String(init?.body))).toEqual({
-      from: 'Timbre <no-responder@timbre.cl>',
+      from: 'Boletéame <no-responder@mail.boleteame.dev>',
       to: ['pedro@andinos.cl'],
       subject: 'Asunto',
       html: '<p>Hola</p>',
@@ -111,7 +111,7 @@ describe('enviarInvitacion', () => {
   const TOKEN = 'b'.repeat(64);
   const DATOS = {
     token: TOKEN,
-    urlApp: 'https://app.timbre.cl/',
+    urlApp: 'https://boleteame.dev/',
     correo: 'pedro@andinos.cl',
     organizacion: 'Servicios Andinos',
     rol: 'Emisor',
@@ -120,8 +120,8 @@ describe('enviarInvitacion', () => {
   };
 
   it('arma el enlace sin doble barra', () => {
-    expect(enlaceInvitacion('https://app.timbre.cl/', TOKEN)).toBe(
-      `https://app.timbre.cl/invitacion/${TOKEN}`,
+    expect(enlaceInvitacion('https://boleteame.dev/', TOKEN)).toBe(
+      `https://boleteame.dev/invitacion/${TOKEN}`,
     );
   });
 
@@ -133,7 +133,7 @@ describe('enviarInvitacion', () => {
 
   it('sin Resend devuelve el enlace para copiarlo', async () => {
     const r = await enviarInvitacion(DATOS, { configuracion: null });
-    expect(r.enlace).toBe(`https://app.timbre.cl/invitacion/${TOKEN}`);
+    expect(r.enlace).toBe(`https://boleteame.dev/invitacion/${TOKEN}`);
     expect(r.envio).toMatchObject({ ok: false, motivo: 'sin_configuracion' });
   });
 
@@ -143,7 +143,7 @@ describe('enviarInvitacion', () => {
     expect(r.envio).toEqual({ ok: true, id: 'msg_2' });
     const cuerpo = JSON.parse(String(f.mock.calls[0]?.[1]?.body));
     expect(cuerpo.to).toEqual(['pedro@andinos.cl']);
-    expect(cuerpo.subject).toBe('Invitación a Servicios Andinos en Timbre');
+    expect(cuerpo.subject).toBe('Invitación a Servicios Andinos en Boletéame');
     expect(cuerpo.html).toContain(`/invitacion/${TOKEN}`);
   });
 });

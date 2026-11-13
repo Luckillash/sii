@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Tarjeta } from '@/components/timbre';
+import { Tarjeta } from '@/components/boleteame';
 import { puedeAdministrar } from '@/lib/permisos';
 import { exigirMembresia } from '@/server/sesion';
 import org from '../organizacion.module.css';
 
-export const metadata: Metadata = { title: 'Tablero · Timbre' };
+export const metadata: Metadata = { title: 'Tablero · Boletéame' };
 
 // Provisorio (Fase 2): sin datos todavía. Las empresas emisoras, sus certificados y
 // resoluciones llegan en la Fase 3; los indicadores, en la Fase 9.

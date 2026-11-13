@@ -1,8 +1,8 @@
 {
-  "name": "@timbre/correos",
+  "name": "@sii/correos",
   "version": "0.0.0",
   "private": true,
-  "description": "Plantillas de correo de Timbre: HTML con estilos en línea tomados de los tokens del design system, más su versión en texto plano.",
+  "description": "Plantillas de correo de Boletéame: HTML con estilos en línea tomados de los tokens del design system, más su versión en texto plano.",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"

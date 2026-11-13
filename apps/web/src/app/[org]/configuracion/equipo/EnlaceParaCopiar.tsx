@@ -2,7 +2,7 @@
 
 import { Check, Copy } from 'lucide-react';
 import { useId, useState } from 'react';
-import { Boton, Input } from '@/components/timbre';
+import { Boton, Input } from '@/components/boleteame';
 import estilos from './equipo.module.css';
 
 export interface EnlaceParaCopiarProps {

@@ -110,7 +110,7 @@ export function documento({ titulo, previa, cuerpo, pie }: OpcionesDocumento): s
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="${fondo}">`,
     '<tr><td align="center" style="padding:32px 16px">',
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px">',
-    `<tr><td style="${marca}">Timbre</td></tr>`,
+    `<tr><td style="${marca}">Boletéame</td></tr>`,
     `<tr><td style="${tarjeta}">${cuerpo}</td></tr>`,
     `<tr><td style="${estiloPie}">${pie}</td></tr>`,
     '</table>',

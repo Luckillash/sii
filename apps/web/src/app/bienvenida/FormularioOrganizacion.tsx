@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import { Alerta, Boton, Campo, Input } from '@/components/timbre';
+import { Alerta, Boton, Campo, Input } from '@/components/boleteame';
 import { crearOrganizacion, type EstadoCrearOrganizacion } from './acciones';
 import estilos from './bienvenida.module.css';
 import { LARGO_MAXIMO_NOMBRE, LARGO_MAXIMO_SLUG, sugerirSlug, validarSlug } from './slug';

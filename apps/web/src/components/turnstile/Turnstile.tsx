@@ -9,7 +9,7 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react';
-import { Boton } from '@/components/timbre';
+import { Boton } from '@/components/boleteame';
 import estilos from './Turnstile.module.css';
 
 // Widget de Cloudflare Turnstile (PLAN-SAAS §4.7), modo *managed*.

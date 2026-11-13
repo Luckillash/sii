@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { ReactElement, ReactNode } from 'react';
-import { Alerta, Boton, clasesBoton } from '@/components/timbre';
+import { Alerta, Boton, clasesBoton } from '@/components/boleteame';
 import estilos from './auth.module.css';
 
 // Piezas de las pantallas de acceso (plantilla «Ingreso»). Sin estado: sirven en

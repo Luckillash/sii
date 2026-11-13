@@ -18,7 +18,7 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Timbre',
+  title: 'Boletéame',
   description: 'Emisión de boletas electrónicas y certificación ante el SII.',
 };
 

@@ -1,0 +1,26 @@
+<!-- @dsCard group="Datos" height=200 subtitle="Neto, IVA y total de una factura" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Monto — vista previa</title></head>
+<body>
+<div id="root" style="padding:16px"></div>
+<script>
+  var T = window.Boleteame, h = React.createElement;
+  function fila(etq, monto) {
+    return h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '24px', padding: '4px 0' } },
+      h('span', { style: { color: 'var(--ink-muted)', fontSize: '14px' } }, etq), monto);
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    h('div', { style: { display: 'flex', gap: '32px', flexWrap: 'wrap', alignItems: 'flex-start' } },
+      h('div', { style: { minWidth: '260px', background: 'var(--surface-sunken)', borderRadius: 'var(--radius-md)', padding: '12px 16px' } },
+        fila('Neto', h(T.Monto, { valor: 1000000, tenue: true })),
+        fila('IVA (19%)', h(T.Monto, { valor: 190000, tenue: true })),
+        h('div', { style: { borderTop: '1px solid var(--line)', marginTop: '6px', paddingTop: '6px' } },
+          fila('Total', h(T.Monto, { valor: 1190000, destacado: true })))),
+      h('div', { style: { display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' } },
+        h(T.Monto, { valor: -238000 }),
+        h(T.Monto, { valor: 12400.5, moneda: 'USD' }),
+        h(T.Monto, { valor: 35.2, moneda: 'UF' }))));
+</script>
+</body>
+</html>

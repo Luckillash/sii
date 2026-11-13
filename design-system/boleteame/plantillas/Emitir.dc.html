@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Emitir factura — Boletéame</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/boleteame/tokens.css">
+<link rel="stylesheet" href="ds/boleteame/components/bundle.css">
+<script src="ds/boleteame/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#0b5f5a}a:hover{color:#074743}
+</style>
+</helmet>
+<div class="tb-pagina {{claseTema}}" style="display: flex; flex-wrap: wrap; align-items: stretch;">
+
+<aside style="flex: 1 1 232px; max-width: 100%; box-sizing: border-box; background: var(--surface-raised); border-right: 1px solid var(--line); padding: 20px 12px; display: flex; flex-direction: column; gap: 20px;">
+<a href="Main.dc.html" style="padding: 0 12px; font-size: 22px; line-height: 28px; font-weight: 600; color: var(--ink); text-decoration: none;">Boletéame</a>
+<div style="margin: 0 4px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); display: flex; flex-direction: column; gap: 2px;">
+<span style="font-size: 13px; line-height: 18px; font-weight: 500;">Servicios Andinos SpA</span>
+<span style="font-family: var(--font-mono); font-size: 12px; line-height: 16px; color: var(--ink-muted);">77.104.562-6</span>
+</div>
+<nav aria-label="Aplicación" style="display: flex; flex-direction: column; gap: 2px;">
+<a href="Tablero.dc.html" class="tb-nav-item"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg>Tablero</a>
+<a href="Emitir.dc.html" class="tb-nav-item tb-nav-activo" aria-current="page"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M9 15h6"></path><path d="M12 18v-6"></path></svg>Emitir documento</a>
+<a href="Documentos.dc.html" class="tb-nav-item"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M16 13H8"></path><path d="M16 17H8"></path><path d="M10 9H8"></path></svg>Documentos emitidos</a>
+<a href="#recibidos" class="tb-nav-item"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>Documentos recibidos</a>
+<a href="#libro" class="tb-nav-item"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>Libro de Compras y Ventas</a>
+<a href="#folios" class="tb-nav-item"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="9" y2="9"></line><line x1="4" x2="20" y1="15" y2="15"></line><line x1="10" x2="8" y1="3" y2="21"></line><line x1="16" x2="14" y1="3" y2="21"></line></svg>Folios (CAF)</a>
+<a href="Certificacion.dc.html" class="tb-nav-item"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>Certificación</a>
+<a href="#configuracion" class="tb-nav-item"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4"></line><line x1="10" x2="3" y1="4" y2="4"></line><line x1="21" x2="12" y1="12" y2="12"></line><line x1="8" x2="3" y1="12" y2="12"></line><line x1="21" x2="16" y1="20" y2="20"></line><line x1="12" x2="3" y1="20" y2="20"></line><line x1="14" x2="14" y1="2" y2="6"></line><line x1="8" x2="8" y1="10" y2="14"></line><line x1="16" x2="16" y1="18" y2="22"></line></svg>Configuración</a>
+</nav>
+<div style="margin-top: auto; padding: 12px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 2px;">
+<span style="font-size: 13px; line-height: 18px; font-weight: 500;">Camila Rojas</span>
+<span style="font-size: 12px; line-height: 16px; color: var(--ink-muted);">Administradora</span>
+</div>
+</aside>
+
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px clamp(16px, 3vw, 40px) 48px; display: flex; flex-direction: column; gap: 24px;">
+<div style="display: flex; flex-direction: column; gap: 4px;">
+<nav aria-label="Ruta" style="font-size: 12px; line-height: 16px; color: var(--ink-muted);"><a href="Documentos.dc.html">Documentos emitidos</a> / Nuevo documento</nav>
+<h1 style="margin: 0; font-size: 32px; line-height: 40px; font-weight: 600; letter-spacing: -0.01em;">Nueva factura electrónica</h1>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+<form style="flex: 999 1 540px; min-width: 0; display: flex; flex-direction: column; gap: 24px;">
+
+<section class="tb-tarjeta" aria-labelledby="t-tipo" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+<h2 id="t-tipo" style="margin: 0; font-size: 17px; line-height: 24px; font-weight: 600;">Documento</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 16px;">
+<div class="tb-campo" style="max-width: none;">
+<label class="tb-campo-etiqueta" for="e-tipo">Tipo de documento</label>
+<select class="tb-input" id="e-tipo"><option>33 · Factura electrónica</option><option>34 · Factura no afecta o exenta electrónica</option><option>52 · Guía de despacho electrónica</option><option>56 · Nota de débito electrónica</option><option>61 · Nota de crédito electrónica</option></select>
+</div>
+<div class="tb-campo" style="max-width: none;">
+<label class="tb-campo-etiqueta" for="e-fecha">Fecha de emisión</label>
+<input class="tb-input tb-input-mono" id="e-fecha" type="text" value="10-11-2026">
+</div>
+<div class="tb-campo" style="max-width: none;">
+<label class="tb-campo-etiqueta" for="e-pago">Forma de pago</label>
+<select class="tb-input" id="e-pago"><option>Crédito</option><option>Contado</option><option>Sin costo</option></select>
+</div>
+<div class="tb-campo" style="max-width: none;">
+<label class="tb-campo-etiqueta" for="e-vence">Vencimiento</label>
+<input class="tb-input tb-input-mono" id="e-vence" type="text" value="10-12-2026">
+</div>
+</div>
+</section>
+
+<section class="tb-tarjeta" aria-labelledby="t-receptor" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+<h2 id="t-receptor" style="margin: 0; font-size: 17px; line-height: 24px; font-weight: 600;">Receptor</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 16px;">
+<x-import component-from-global-scope="Boleteame.CampoRut" etiqueta="RUT del receptor" default-value="76.354.771-K" ayuda="Escríbelo con o sin puntos; lo validamos al salir del campo." style="display: block;"></x-import>
+<div class="tb-campo" style="max-width: none;">
+<label class="tb-campo-etiqueta" for="e-razon">Razón social</label>
+<input class="tb-input" id="e-razon" type="text" value="Comercial Los Aromos SpA">
+</div>
+<div class="tb-campo" style="max-width: none;">
+<label class="tb-campo-etiqueta" for="e-giro">Giro</label>
+<input class="tb-input" id="e-giro" type="text" value="Venta al por mayor de artículos de ferretería">
+</div>
+<div class="tb-campo" style="max-width: none;">
+<label class="tb-campo-etiqueta" for="e-dir">Dirección</label>
+<input class="tb-input" id="e-dir" type="text" value="Av. Los Aromos 1450">
+</div>
+<div class="tb-campo" style="max-width: none;">
+<label class="tb-campo-etiqueta" for="e-comuna">Comuna</label>
+<input class="tb-input" id="e-comuna" type="text" value="Maipú">
+</div>
+<div class="tb-campo" style="max-width: none;">
+<label class="tb-campo-etiqueta" for="e-correo">Correo de intercambio</label>
+<input class="tb-input" id="e-correo" type="email" value="dte@losaromos.cl">
+</div>
+</div>
+</section>
+
+<section aria-labelledby="t-detalle" style="display: flex; flex-direction: column; gap: 12px;">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+<h2 id="t-detalle" style="margin: 0; font-size: 17px; line-height: 24px; font-weight: 600;">Detalle de productos y servicios</h2>
+<button type="button" class="tb-btn tb-btn-discreto tb-btn-sm"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Agregar línea</button>
+</div>
+<div class="tb-tabla-marco">
+<table class="tb-tabla">
+<thead>
+<tr>
+<th scope="col" style="width: 44%;">Descripción</th>
+<th scope="col" class="tb-num" style="width: 12%;">Cantidad</th>
+<th scope="col" class="tb-num" style="width: 20%;">Precio unitario</th>
+<th scope="col" class="tb-num" style="width: 20%;">Subtotal</th>
+<th scope="col"><span class="tb-sr">Acciones</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><input class="tb-input" style="width: 100%; box-sizing: border-box; min-width: 200px;" type="text" aria-label="Descripción línea 1" value="Mantención preventiva de equipos"></td>
+<td><input class="tb-input tb-input-mono" style="width: 100%; box-sizing: border-box; text-align: right; min-width: 64px;" type="text" aria-label="Cantidad línea 1" value="1"></td>
+<td><input class="tb-input tb-input-mono" style="width: 100%; box-sizing: border-box; text-align: right; min-width: 120px;" type="text" aria-label="Precio unitario línea 1" value="650.000"></td>
+<td class="tb-num"><x-import component-from-global-scope="Boleteame.Monto" valor="650000"></x-import></td>
+<td><button type="button" class="tb-btn tb-btn-discreto tb-btn-sm" aria-label="Quitar línea 1"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></td>
+</tr>
+<tr>
+<td><input class="tb-input" style="width: 100%; box-sizing: border-box; min-width: 200px;" type="text" aria-label="Descripción línea 2" value="Filtro hidráulico HF-220"></td>
+<td><input class="tb-input tb-input-mono" style="width: 100%; box-sizing: border-box; text-align: right; min-width: 64px;" type="text" aria-label="Cantidad línea 2" value="4"></td>
+<td><input class="tb-input tb-input-mono" style="width: 100%; box-sizing: border-box; text-align: right; min-width: 120px;" type="text" aria-label="Precio unitario línea 2" value="62.500"></td>
+<td class="tb-num"><x-import component-from-global-scope="Boleteame.Monto" valor="250000"></x-import></td>
+<td><button type="button" class="tb-btn tb-btn-discreto tb-btn-sm" aria-label="Quitar línea 2"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></td>
+</tr>
+<tr>
+<td><input class="tb-input" style="width: 100%; box-sizing: border-box; min-width: 200px;" type="text" aria-label="Descripción línea 3" value="Traslado de técnico a faena"></td>
+<td><input class="tb-input tb-input-mono" style="width: 100%; box-sizing: border-box; text-align: right; min-width: 64px;" type="text" aria-label="Cantidad línea 3" value="1"></td>
+<td><input class="tb-input tb-input-mono" style="width: 100%; box-sizing: border-box; text-align: right; min-width: 120px;" type="text" aria-label="Precio unitario línea 3" value="100.000"></td>
+<td class="tb-num"><x-import component-from-global-scope="Boleteame.Monto" valor="100000"></x-import></td>
+<td><button type="button" class="tb-btn tb-btn-discreto tb-btn-sm" aria-label="Quitar línea 3"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p style="margin: 0; font-size: 12px; line-height: 16px; color: var(--ink-muted);">Precios netos, sin IVA. El IVA se calcula sobre el total neto del documento.</p>
+</section>
+
+<section class="tb-tarjeta" aria-labelledby="t-ref" style="padding: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; box-shadow: none;">
+<div style="display: flex; flex-direction: column; gap: 2px;">
+<h2 id="t-ref" style="margin: 0; font-size: 17px; line-height: 24px; font-weight: 600;">Referencias</h2>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-muted);">Orden de compra, guía de despacho u otro documento relacionado. Opcional.</p>
+</div>
+<button type="button" class="tb-btn tb-btn-secundario tb-btn-sm">Agregar referencia</button>
+</section>
+</form>
+
+<aside aria-labelledby="t-resumen" style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 16px;">
+<section class="tb-tarjeta" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+<h2 id="t-resumen" style="margin: 0; font-size: 17px; line-height: 24px; font-weight: 600;">Resumen</h2>
+<x-import component-from-global-scope="Boleteame.EstadoDTE" estado="borrador"></x-import>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 14px;">
+<span style="color: var(--ink-muted);">Folio que se asignará</span>
+<span style="font-family: var(--font-mono); font-size: 13px; font-weight: 500; padding: 1px 6px; border-radius: 3px; background: var(--ocre); color: var(--on-ocre);">18.245</span>
+</div>
+<div style="background: var(--surface-sunken); border-radius: var(--radius-md); padding: 12px 16px; display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; align-items: baseline;">
+<span style="font-size: 13px; color: var(--ink-muted);">Neto</span>
+<x-import component-from-global-scope="Boleteame.Monto" valor="1000000" tenue="{{si}}" style="text-align: right;"></x-import>
+<span style="font-size: 13px; color: var(--ink-muted);">IVA (19%)</span>
+<x-import component-from-global-scope="Boleteame.Monto" valor="190000" tenue="{{si}}" style="text-align: right;"></x-import>
+<span style="font-size: 15px; font-weight: 600; padding-top: 6px; border-top: 1px solid var(--line);">Total</span>
+<div style="padding-top: 6px; border-top: 1px solid var(--line); text-align: right;"><x-import component-from-global-scope="Boleteame.Monto" valor="1190000" destacado="{{si}}"></x-import></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<a href="Documentos.dc.html" class="tb-btn tb-btn-primario tb-btn-md" style="height: 44px; font-size: 15px;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path></svg>Emitir factura</a>
+<button type="button" class="tb-btn tb-btn-secundario tb-btn-md">Guardar borrador</button>
+<button type="button" class="tb-btn tb-btn-discreto tb-btn-md"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg>Previsualizar PDF</button>
+</div>
+<p style="margin: 0; font-size: 12px; line-height: 16px; color: var(--ink-muted);">Al emitir, firmamos el documento con el certificado de Camila Rojas y lo enviamos al SII.</p>
+</section>
+<x-import component-from-global-scope="Boleteame.MedidorFolios" codigo="33" desde="18001" hasta="19000" siguiente="18245" style="display: block;"></x-import>
+</aside>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"tema":{"editor":"enum","options":["claro","oscuro"],"default":"claro"},"$preview":{"width":1440,"height":1260}}'>
+class Component extends DCLogic {
+renderVals() {
+const tema = this.props.tema ?? 'claro';
+return { claseTema: tema === 'oscuro' ? 'tema-oscuro' : '', si: true };
+}
+}
+</script>
+</body>
+</html>

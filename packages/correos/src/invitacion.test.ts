@@ -7,7 +7,7 @@ const DATOS: DatosInvitacion = {
   rol: 'Emisor',
   invitadoPor: 'Camila Rojas',
   correo: 'pedro@andinos.cl',
-  enlace: `https://app.timbre.cl/invitacion/${TOKEN}`,
+  enlace: `https://boleteame.dev/invitacion/${TOKEN}`,
   // 19-11-2026 03:00 UTC = 19-11-2026 00:00 en Santiago (UTC-3 en verano).
   expiraEn: new Date('2026-11-19T03:00:00Z'),
 };
@@ -18,13 +18,13 @@ describe('correoInvitacion', () => {
   const correo = correoInvitacion(DATOS);
 
   it('arma el asunto con la organización', () => {
-    expect(correo.asunto).toBe('Invitación a Servicios Andinos en Timbre');
+    expect(correo.asunto).toBe('Invitación a Servicios Andinos en Boletéame');
   });
 
   it('lleva el enlace en el botón y como texto de respaldo, y en el texto plano', () => {
-    expect(correo.html).toContain(`href="https://app.timbre.cl/invitacion/${TOKEN}"`);
+    expect(correo.html).toContain(`href="https://boleteame.dev/invitacion/${TOKEN}"`);
     expect(correo.html.split(TOKEN).length - 1).toBe(2);
-    expect(correo.texto).toContain(`https://app.timbre.cl/invitacion/${TOKEN}`);
+    expect(correo.texto).toContain(`https://boleteame.dev/invitacion/${TOKEN}`);
   });
 
   it('dice quién invita, con qué rol, a qué correo y cuándo vence (dd-mm-aaaa)', () => {

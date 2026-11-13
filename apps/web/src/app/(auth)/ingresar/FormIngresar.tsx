@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { type FormEvent, type ReactElement, useState } from 'react';
-import { Alerta, Boton, Campo, Input } from '@/components/timbre';
+import { Alerta, Boton, Campo, Input } from '@/components/boleteame';
 import { Turnstile } from '@/components/turnstile/Turnstile';
 import estilos from '../_compartido/auth.module.css';
 import { CampoClave } from '../_compartido/CampoClave';

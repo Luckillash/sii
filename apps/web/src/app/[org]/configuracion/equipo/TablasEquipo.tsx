@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Alerta, Boton, Dialogo, Select, Tabla, TablaVacia, Td, Th } from '@/components/timbre';
+import { Alerta, Boton, Dialogo, Select, Tabla, TablaVacia, Td, Th } from '@/components/boleteame';
 import { formatearFecha } from '@/lib/formatos';
 import {
   DESCRIPCION_ROL,

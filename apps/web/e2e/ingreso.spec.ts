@@ -10,11 +10,15 @@ import { expect, type Page, test } from '@playwright/test';
 const ETIQUETAS_WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
 
 const PANTALLAS = [
-  { ruta: '/ingresar', titulo: 'Ingresar · Timbre', h1: 'Ingresar' },
-  { ruta: '/crear-cuenta', titulo: 'Crear cuenta · Timbre', h1: 'Crear cuenta' },
-  { ruta: '/recuperar', titulo: 'Recuperar contraseña · Timbre', h1: 'Recuperar contraseña' },
+  { ruta: '/ingresar', titulo: 'Ingresar · Boletéame', h1: 'Ingresar' },
+  { ruta: '/crear-cuenta', titulo: 'Crear cuenta · Boletéame', h1: 'Crear cuenta' },
+  { ruta: '/recuperar', titulo: 'Recuperar contraseña · Boletéame', h1: 'Recuperar contraseña' },
   // Sin sesión de recuperación muestra el aviso y el enlace a /recuperar.
-  { ruta: '/restablecer', titulo: 'Restablecer contraseña · Timbre', h1: 'Restablecer contraseña' },
+  {
+    ruta: '/restablecer',
+    titulo: 'Restablecer contraseña · Boletéame',
+    h1: 'Restablecer contraseña',
+  },
 ];
 
 async function sinViolacionesAxe(page: Page) {

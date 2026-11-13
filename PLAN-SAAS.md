@@ -1,4 +1,4 @@
-# Plan del SaaS «Timbre»: emisión de documentos tributarios electrónicos (SII)
+# Plan del SaaS «Boletéame»: emisión de documentos tributarios electrónicos (SII)
 
 Plan para construir el SaaS de emisión, firma y envío de DTE al SII, y de certificación de
 empresas, sobre la librería `@winex/certificacion` (`../certificacion-node`).
@@ -10,8 +10,8 @@ empresas, sobre la librería `@winex/certificacion` (`../certificacion-node`).
 - **Fuentes:**
   - Modelo de datos: [`supabase_saas_sii.sql`](documentación/08-esquema-supabase/supabase_saas_sii.sql) (19 secciones, RLS, Vault, Storage, Realtime).
   - Librería y CLI: `../certificacion-node` (fases 0–7 listas; piloto en producción en curso, 5 boletas reales EPR).
-  - Design system «Timbre»: <https://claude.ai/artifact/UCjvbZq6pYi2bYVBcuviwr> (tokens, tono, 8 componentes).
-  - Plantillas: <https://claude.ai/artifact/HjnXwP9jcNrawftr55XpRu> (Landing, Ingreso, Tablero, Documentos emitidos, Emitir factura, Certificación SII).
+  - Design system «Boletéame»: <https://claude.ai/artifact/UCjvbZq6pYi2bYVBcuviwr> (tokens, tono, 8 componentes; renombrado de «Timbre» a «Boletéame» el 2026-11-12, versión 7).
+  - Plantillas: <https://claude.ai/artifact/HjnXwP9jcNrawftr55XpRu> (Landing, Ingreso, Tablero, Documentos emitidos, Emitir factura, Certificación SII; marca «Boletéame» desde el 2026-11-12, versión 14, igual a `design-system/boleteame/plantillas/`).
   - Documentación para agentes: [`documentación/`](documentación/) (estructura e índice listos; los archivos todavía son esqueletos `TODO`).
 
 ## Estado
@@ -20,8 +20,8 @@ Valores de la columna Estado: **Listo**, **En parte** o Pendiente. Se actualiza 
 
 | Fase | Estado | Nota |
 |---|---|---|
-| 0. Fundaciones y prueba de conectividad | **Listo** | **Criterio de aceptación cumplido** (2026-11-11: token de apicert desde Vercel `gru1`, guardado cifrado en `tokens_sii`); spike del SII retirado. 2026-11-12: Sentry conectado (proyecto `luckillash/timbre-web`), variables en Vercel (solo *Production*) y error real de prueba verificado en producción: release del commit, *source maps* legibles y secretos depurados (también en spans, con `beforeSendSpan`). Rutas de prueba retiradas |
-| 1. Design system en Next.js | **Listo** | 2026-11-11: tokens generados, 8 componentes (+ `incierto`, D3), 11 de soporte, 2 layouts, `/_ds` y axe sin violaciones en claro/oscuro/móvil. Deploy `F1` (c307194) verificado en producción con `e2e/despliegue.spec.ts`. 2026-11-12: `incierto` agregado también al artifact del design system y a su copia en `design-system/timbre/` |
+| 0. Fundaciones y prueba de conectividad | **Listo** | **Criterio de aceptación cumplido** (2026-11-11: token de apicert desde Vercel `gru1`, guardado cifrado en `tokens_sii`); spike del SII retirado. 2026-11-12: Sentry conectado (proyecto `luckillash/sii-web`, antes `timbre-web`), variables en Vercel (solo *Production*) y error real de prueba verificado en producción: release del commit, *source maps* legibles y secretos depurados (también en spans, con `beforeSendSpan`). Rutas de prueba retiradas |
+| 1. Design system en Next.js | **Listo** | 2026-11-11: tokens generados, 8 componentes (+ `incierto`, D3), 11 de soporte, 2 layouts, `/_ds` y axe sin violaciones en claro/oscuro/móvil. Deploy `F1` (c307194) verificado en producción con `e2e/despliegue.spec.ts`. 2026-11-12: `incierto` agregado también al artifact del design system y a su copia en `design-system/boleteame/` |
 | 2. Autenticación, organizaciones y equipo | **En parte** | 2026-11-12: código listo (ingreso, crear cuenta, recuperar/restablecer, `proxy.ts`, callback, onboarding, `[org]`, equipo, invitaciones, Turnstile y Resend opcionales); lint, typecheck, Vitest, build y e2e sin escritura en verde. Simulación de roles en SQL con `rollback` (`rls-fase2-tenancy.sql`): 47/47. Migraciones `0003_preferencias` y `0004_cupo_sin_suscripcion` aplicadas y verificadas (13/13); tipos regenerados sin diferencias. Pendientes en la Fase 2 (§7) |
 | 3. Empresas, certificados y resoluciones | Pendiente | |
 | 4. Capa de servicio SII (backend) | Pendiente | Núcleo técnico del producto |
@@ -51,7 +51,7 @@ Las cuatro fuentes no cubren exactamente lo mismo. Estas brechas condicionan el 
 | H5 | **Planes:** el SQL trae `certificacion`, `emprendedor`, `pyme`, `empresa` con precios de ejemplo; la landing muestra «Pyme», «Contador» y «API» con `[TU PRECIO]`. | Definir la grilla comercial (D5) y migrar `planes` antes de la Fase 10. |
 | H6 | **Pasarela de pago sin definir.** `suscripciones.proveedor_pago` es texto libre; en el entorno hay MCP de Flow y Transbank, pero el stack pedido no nombra pasarela. | Decisión D4. La Fase 10 se diseña con un adaptador de pasarela. |
 | H7 | **La librería es solo Node.js** (`node-forge`, `undici`, TLS mutuo con el certificado, Node ≥ 22.19). El comentario del SQL propone una Supabase Edge Function (Deno) para el seguimiento. | Todo lo que habla con el SII corre en **funciones Node.js de Vercel**, nunca en Edge runtime ni en Edge Functions de Supabase. El cron de Supabase (`pg_cron` + `pg_net`) puede disparar rutas de Vercel. |
-| H8 | **Los componentes del design system son un bundle global** (`window.Timbre`, React 18, CSS propio). | Se portan a componentes TSX con CSS Modules dentro de la app (Fase 1); el bundle no se carga en producción. |
+| H8 | **Los componentes del design system son un bundle global** (`window.Boleteame`, React 18, CSS propio). | Se portan a componentes TSX con CSS Modules dentro de la app (Fase 1); el bundle no se carga en producción. |
 | H9 | `operaciones_sii` y `solicitudes_folios` **no están en la publicación de Realtime**; el SQL solo publica `documentos`, `envios` y `procesos_certificacion`. | Migración en la Fase 4 para que la UI vea en vivo las operaciones largas (solicitud de folios, postulación). |
 | H10 | La carpeta `documentación/` tiene índice y estructura, pero el contenido es `TODO`. | Cada fase completa los archivos de `documentación/` que toca (criterio de aceptación transversal). |
 
@@ -98,7 +98,7 @@ cerca de Chile disponible para ambos. Se valida en el spike de la Fase 0.
 ### 3.1 Estructura del repositorio (monorepo pnpm)
 
 ```
-timbre/
+sii/
 ├── apps/web/                         Next.js
 │   ├── src/app/
 │   │   ├── (publico)/                landing, precios, legal
@@ -114,7 +114,7 @@ timbre/
 │   │   │   ├── certificacion/
 │   │   │   └── configuracion/        empresa · certificados · equipo · plan · api · webhooks
 │   │   └── api/  v1/ · cron/ · pagos/ · monitoring/ (túnel de Sentry)
-│   ├── src/components/timbre/        port de los 8 componentes + layout (CSS Modules)
+│   ├── src/components/boleteame/        port de los 8 componentes + layout (CSS Modules)
 │   ├── src/stores/                   Zustand
 │   ├── src/server/
 │   │   ├── supabase/                 clientes: servidor (sesión), service-role (server-only)
@@ -127,7 +127,7 @@ timbre/
 │   └── proxy.ts                      refresco de sesión y protección de rutas (ex middleware.ts)
 ├── packages/certificacion/           git subtree de certificacion-node completo (LICENSE, NOTICE, paridad/);
 │                                     @winex/certificacion = packages/core, CLI sii = apps/cli
-├── packages/correos/                 plantillas React Email con estilos Timbre en línea
+├── packages/correos/                 plantillas React Email con estilos Boletéame en línea
 ├── supabase/
 │   ├── migrations/0001_esquema_inicial.sql   ← supabase_saas_sii.sql tal cual
 │   ├── migrations/00NN_*.sql                 cambios posteriores (nunca editar 0001)
@@ -200,7 +200,7 @@ para no compartir estado entre usuarios en el servidor.
 
 | Uso | Detalle |
 |---|---|
-| Correos de Supabase Auth | SMTP personalizado de Supabase apuntando a Resend; plantillas de confirmación, recuperación y cambio de correo traducidas al tono Timbre |
+| Correos de Supabase Auth | SMTP personalizado de Supabase apuntando a Resend; plantillas de confirmación, recuperación y cambio de correo traducidas al tono Boletéame |
 | Invitaciones | enlace con el token que devuelve `crear_invitacion()` (se guarda solo su hash) |
 | Alertas | certificado por vencer (30, 15, 7 y 1 días, desde `v_certificados_estado`), folios por agotarse (umbral del `MedidorFolios`, 15 %), documento rechazado, envío incierto, certificación actualizada |
 | Envío del documento | PDF (y XML si se pide) al correo del receptor desde el detalle del documento |
@@ -307,14 +307,14 @@ Cada fase termina con: código en `main` con lint, typecheck y tests en verde (l
 
 - [x] **Dominio** `boleteame.dev` en Vercel (DNS de Vercel), `www` con redirección 308 al apex, y `NEXT_PUBLIC_APP_URL=https://boleteame.dev` en *Production* (2026-11-12). `timbre-livid.vercel.app` sigue activo.
 - [x] **Supabase Auth, URL Configuration** (2026-11-12): Site URL `https://boleteame.dev`; Redirect URLs `https://boleteame.dev/auth/callback**`, `http://localhost:3000/auth/callback**` (agregada y verificada el 2026-11-12; sin ella, en desarrollo local los correos enlazan a la Site URL y se pierde `siguiente`) y, transitoriamente, `https://timbre-livid.vercel.app/auth/callback**`.
-- [x] **Supabase Auth (panel), resto** (2026-11-12): «Confirm email» activo; contraseña mínima 8; las 6 plantillas de Auth (confirmación, enlace mágico, recuperación, cambio de correo, invitación, reautenticación) en el tono Timbre. Se generan desde `packages/correos/src/auth.ts` a `supabase/templates/*.html` (`pnpm --filter @timbre/correos test -u`) y se pegan en el panel. Enlaces `token_hash`: confirmación, enlace mágico y recuperación usan `{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email|magiclink|recovery` y, si Supabase no recibió un `redirectTo` aceptado ({{ .RedirectTo }} = {{ .SiteURL }}, p. ej. envíos desde el panel), `{{ .SiteURL }}/auth/callback?token_hash=…`; cada rama del `{{ if }}` lleva la URL entera porque Supabase usa `html/template` y un token tras el `{{ end }}` falla con «ambiguous context within a URL» (500 al enviar). Cambio de correo e invitación usan `{{ .SiteURL }}/auth/callback?token_hash=…&type=email_change|invite`. Auth guarda las plantillas en caché unos minutos tras cambiarlas.
+- [x] **Supabase Auth (panel), resto** (2026-11-12): «Confirm email» activo; contraseña mínima 8; las 6 plantillas de Auth (confirmación, enlace mágico, recuperación, cambio de correo, invitación, reautenticación) en el tono Boletéame. Se generan desde `packages/correos/src/auth.ts` a `supabase/templates/*.html` (`pnpm --filter @sii/correos test -u`) y se pegan en el panel. 2026-11-12 (D8): las 6 plantillas y sus asuntos (los de `supabase/config.toml`) se reemplazaron por las de la marca «Boletéame» con la Management API (`PATCH /v1/projects/{ref}/config/auth`, solo esos campos), tras comprobar que el panel coincidía con el repo. Enlaces `token_hash`: confirmación, enlace mágico y recuperación usan `{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email|magiclink|recovery` y, si Supabase no recibió un `redirectTo` aceptado ({{ .RedirectTo }} = {{ .SiteURL }}, p. ej. envíos desde el panel), `{{ .SiteURL }}/auth/callback?token_hash=…`; cada rama del `{{ if }}` lleva la URL entera porque Supabase usa `html/template` y un token tras el `{{ end }}` falla con «ambiguous context within a URL» (500 al enviar). Cambio de correo e invitación usan `{{ .SiteURL }}/auth/callback?token_hash=…&type=email_change|invite`. Auth guarda las plantillas en caché unos minutos tras cambiarlas.
 - [x] **Resend** (2026-11-12): cuenta, dominio verificado (SPF, DKIM, DMARC), SMTP personalizado de Supabase Auth apuntando a Resend, y `RESEND_API_KEY` + `CORREO_REMITENTE` en `.env.local` y Vercel (*Production*). La prueba del correo real de invitación pasó al e2e de dos organizaciones.
   - [x] Dominio de envío `mail.boleteame.dev` en Resend, región São Paulo (sa-east-1), **Verified** (2026-11-12): DKIM `resend._domainkey.mail` y SPF/retorno `send.mail` + `rsend.mail` (CNAME a `*.forge.rmta.net`) en el DNS de Vercel.
-  - [x] `CORREO_REMITENTE=Timbre <no-responder@mail.boleteame.dev>` en `.env.local` y Vercel (*Production*).
+  - [x] `CORREO_REMITENTE=Boletéame <no-responder@mail.boleteame.dev>` en `.env.local` y Vercel (*Production*) (antes `Timbre <…>`; cambiado el 2026-11-12, D8).
   - [x] DMARC: TXT `_dmarc` = `v=DMARC1; p=none;` en `boleteame.dev` (cubre el subdominio), resuelve en DNS público (2026-11-12). Subir a `quarantine` cuando el envío esté estable.
   - [x] Dos API keys de Resend de solo envío restringidas a `mail.boleteame.dev`: `sii-supabase-auth` (SMTP de Supabase) y la de la app (`RESEND_API_KEY` en `.env.local` y Vercel *Production*, *Sensitive*).
-  - [x] SMTP de Supabase Auth: `smtp.resend.com:465`, usuario `resend`, remitente `Timbre <no-responder@mail.boleteame.dev>`. *Rate Limits*: 30 correos/h y 60 s entre correos a un mismo usuario (suficiente antes del lanzamiento).
-  - [x] Correos de Auth probados (2026-11-12, dev local contra producción, destinatario de prueba `delivered@resend.dev`): confirmación y recuperación **Delivered** en Resend con las plantillas Timbre; sus enlaces verifican el token y llevan a `/bienvenida` y `/restablecer`. Queda a propósito la cuenta de prueba `delivered@resend.dev` (confirmada, con perfil, sin organización): no borrarla.
+  - [x] SMTP de Supabase Auth: `smtp.resend.com:465`, usuario `resend`, remitente `Boletéame <no-responder@mail.boleteame.dev>` (nombre cambiado desde «Timbre» el 2026-11-12, D8). *Rate Limits*: 30 correos/h y 60 s entre correos a un mismo usuario (suficiente antes del lanzamiento).
+  - [x] Correos de Auth probados (2026-11-12, dev local contra producción, destinatario de prueba `delivered@resend.dev`): confirmación y recuperación **Delivered** en Resend con las plantillas de Auth; sus enlaces verifican el token y llevan a `/bienvenida` y `/restablecer`. Queda a propósito la cuenta de prueba `delivered@resend.dev` (confirmada, con perfil, sin organización): no borrarla.
 - [x] **Turnstile** (2026-11-12): widget en Cloudflare (modo *Managed*); `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY` (*Sensitive*) en `.env.local` y Vercel (*Production*); deploy `219d8fe` con la site key en el bundle y el widget en `/ingresar`, `/crear-cuenta` y `/recuperar` («¡Operación exitosa!»). **Después** se activó el captcha en Supabase Auth (*Attack Protection*, Turnstile, misma clave secreta). Verificado: `/auth/v1/recover` sin token → 400 `captcha_failed`; recuperación desde `/recuperar` con token (Server Action desde Vercel) → 200 `user_recovery_requested`. Si Auth empieza a fallar con `captcha_failed`, desactivar el captcha en Supabase lo revierte al instante, sin redesplegar. Hostnames del widget: `boleteame.dev` y `localhost` (para desarrollo local contra producción, con las mismas claves en `.env.local`).
 - [x] **Deploy** a *Production* (commit y push a `main`) y humo de las rutas nuevas (2026-11-12, `daa781d`, READY): `/ingresar`, `/crear-cuenta`, `/recuperar`, `/restablecer` e `/invitacion/…` responden 200; `/auth/callback` sin token o con token inválido → `/ingresar?error=enlace`; `/bienvenida` sin sesión → `/ingresar`; `/_ds` 404. Sin errores de runtime. Recuperación real en producción con `delivered@resend.dev`: correo *Delivered* con el enlace normal (`/auth/callback?siguiente=/restablecer&token_hash=…&type=recovery`) que termina en `/restablecer`.
 - [ ] **e2e con dos organizaciones reales en *Production*** (escribe en la base; requiere autorización y borrar los datos de prueba al terminar): crear cuenta y organización, invitar (confirmar que el correo real de invitación llega por Resend desde `no-responder@mail.boleteame.dev` y que su enlace abre `/invitacion/…`), aceptar con el correo correcto y con otro, cambiar rol, quitar, salir, último propietario, cupo del plan y aislamiento entre las dos organizaciones.
@@ -521,7 +521,7 @@ certificación:
 | D5 | Grilla de planes y precios | Unificar la landing (Pyme / Contador / API) con `planes`; «Contador» = varias empresas por organización |
 | D6 | Dominio | Sitio público y app en el mismo dominio (`/` y `/[org]`) para compartir sesión y simplificar; subdominio si se separa el marketing. **Dominio asignado el 2026-11-12: `boleteame.dev`** |
 | D7 | Canal de envío por defecto | REST para emisión (pangal/rahue); SOAP DTEUpload como respaldo configurable por empresa |
-| D8 | Nombre del producto | «Timbre», como en el design system (verificar disponibilidad de marca y dominio). **Pendiente:** el dominio asignado es `boleteame.dev`; decidir si el producto pasa a llamarse «Boleteame» o se queda como «Timbre» (afecta textos, plantillas de correo y `CORREO_REMITENTE`) |
+| D8 | Nombre del producto | **Decidido el 2026-11-12:** el nombre comercial es «Boletéame» (antes «Timbre»), en línea con el dominio `boleteame.dev`. Todo texto visible (UI, títulos, correos, plantillas de Auth, design system) dice «Boletéame»; en identificadores donde la tilde no cabe (namespace JS, carpetas) se escribe `boleteame`. Por detrás, los servicios y paquetes se llaman `sii` / `SII` (paquete raíz `sii`, `@sii/correos`, `project_id` de Supabase `sii`). «timbre» en minúscula sigue siendo el término del SII (timbre electrónico, TED) y no se renombra. **Fuera del repo, hecho el 2026-11-12:** `CORREO_REMITENTE` en Vercel, remitente SMTP y las 6 plantillas de Supabase Auth, el artifact del design system (título, textos, portada y `window.Boleteame`) y el de plantillas (textos de las 6 pantallas, título del lienzo y design system reinstalado en `ds/boleteame/`). El proyecto de Vercel se renombró de `timbre` a `sii` (2026-11-12; Vercel no admite mayúsculas). También el proyecto de Sentry, de `timbre-web` a `sii-web` (mismo ID y DSN; `SENTRY_PROJECT=sii-web` en Vercel *Production* y `.env.local`). Solo queda con el nombre anterior, a propósito, el dominio `timbre-livid.vercel.app` |
 
 ---
 

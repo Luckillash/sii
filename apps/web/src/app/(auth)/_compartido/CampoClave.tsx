@@ -2,7 +2,7 @@
 
 import { Eye, EyeOff } from 'lucide-react';
 import { type ReactElement, type ReactNode, useId, useState } from 'react';
-import { Campo, Input } from '@/components/timbre';
+import { Campo, Input } from '@/components/boleteame';
 import estilos from './auth.module.css';
 
 export interface CampoClaveProps {

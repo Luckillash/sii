@@ -1,0 +1,16 @@
+<!-- @dsCard group="Datos" height=132 subtitle="Código SII + nombre oficial" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>TipoDTE — vista previa</title></head>
+<body>
+<div id="root" class="tb-pila"></div>
+<script>
+  var T = window.Boleteame, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(h(React.Fragment, null,
+    h('div', { className: 'tb-fila', style: { padding: 0, gap: '16px' } },
+      h(T.TipoDTE, { codigo: 33 }), h(T.TipoDTE, { codigo: 61 }), h(T.TipoDTE, { codigo: 52 })),
+    h('div', { className: 'tb-fila', style: { padding: 0, gap: '16px' } },
+      h(T.TipoDTE, { codigo: 39, corto: true }), h(T.TipoDTE, { codigo: 34, corto: true }), h(T.TipoDTE, { codigo: 56, corto: true }), h(T.TipoDTE, { codigo: 110, soloCodigo: true }))));
+</script>
+</body>
+</html>

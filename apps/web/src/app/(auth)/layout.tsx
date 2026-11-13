@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { LayoutIngreso } from '@/components/timbre';
+import { LayoutIngreso } from '@/components/boleteame';
 
 // Pantallas de acceso (PLAN-SAAS Fase 2): ingresar, crear cuenta, recuperar y
 // restablecer contraseña, con la plantilla «Ingreso».

@@ -11,7 +11,7 @@ import {
   Paginacion,
   PanelDetalle,
   TipoDTE,
-} from '@/components/timbre';
+} from '@/components/boleteame';
 import { DemoTablaDTE } from '../Demos';
 import { metadataDs, soloDesarrollo } from '../solo-desarrollo';
 import estilos from './app.module.css';

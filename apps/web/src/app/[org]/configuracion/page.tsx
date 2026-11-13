@@ -1,11 +1,11 @@
 import { Users } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Tarjeta } from '@/components/timbre';
+import { Tarjeta } from '@/components/boleteame';
 import { exigirMembresia } from '@/server/sesion';
 import org from '../organizacion.module.css';
 
-export const metadata: Metadata = { title: 'Configuración · Timbre' };
+export const metadata: Metadata = { title: 'Configuración · Boletéame' };
 
 // Por ahora solo Equipo; empresa, certificados, plan, API y webhooks llegan en las
 // fases siguientes (PLAN-SAAS §3.1).

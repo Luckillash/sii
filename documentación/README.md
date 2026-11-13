@@ -10,6 +10,8 @@ sources: ["supabase_saas_sii.sql", "certificacion-node/docs/"]
 
 <!-- TODO: párrafo de presentación (qué es el SaaS, qué cubre esta carpeta) -->
 
+**Nombres.** El nombre comercial del producto es **«Boletéame»** (antes «Timbre»; decisión D8 de `PLAN-SAAS.md`): es lo único que ve el usuario en la UI, los correos y el design system. Donde no cabe la tilde (namespace JS, carpetas) se escribe `boleteame`. Los servicios y paquetes de backend se llaman `sii` / `SII` (paquete raíz `sii`, `@sii/correos`). «timbre» en minúscula es el término del SII (timbre electrónico, TED), no la marca.
+
 ## Cómo usar esta carpeta (instrucciones para el agente)
 
 1. **Lee este README primero.** La sección [Invariantes](#invariantes) suele bastar para tareas simples.

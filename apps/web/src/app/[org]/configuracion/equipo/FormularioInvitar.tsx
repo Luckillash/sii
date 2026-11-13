@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useEffect, useMemo, useState } from 'react';
-import { Alerta, Boton, Campo, Input, Select } from '@/components/timbre';
+import { Alerta, Boton, Campo, Input, Select } from '@/components/boleteame';
 import { DESCRIPCION_ROL, ETIQUETA_ROL, type RolMiembro } from '@/lib/permisos';
 import { invitar, type ResultadoInvitacion } from './acciones';
 import { EnlaceParaCopiar } from './EnlaceParaCopiar';

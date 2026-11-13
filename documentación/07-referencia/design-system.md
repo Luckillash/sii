@@ -1,12 +1,12 @@
 ---
-title: "Design system «Timbre» en la app"
+title: "Design system «Boletéame» en la app"
 description: "Tokens, componentes TSX con CSS Modules, layouts, catálogo /_ds y pruebas de accesibilidad."
 keywords: ["design system", "tokens", "CSS Modules", "EstadoDTE", "incierto", "Por verificar", "BannerAmbiente", "Dialogo", "LayoutApp", "axe", "/_ds", "stylelint"]
 related: ["01-fundamentos/formatos-y-validaciones.md", "01-fundamentos/errores-y-resultados.md", "07-referencia/trampas-conocidas.md"]
-source: ["PLAN-SAAS.md §4.2 y Fase 1", "design-system/timbre/"]
+source: ["PLAN-SAAS.md §4.2 y Fase 1", "design-system/boleteame/"]
 ---
 
-# Design system «Timbre» en la app
+# Design system «Boletéame» en la app
 
 > **Úsalo cuando:** vas a construir una pantalla, agregar un componente o cambiar un color, una fuente o un texto de estado.
 
@@ -14,12 +14,12 @@ source: ["PLAN-SAAS.md §4.2 y Fase 1", "design-system/timbre/"]
 
 | Pieza | Ruta | Nota |
 |---|---|---|
-| Fuente de verdad (copia del artifact) | `design-system/timbre/` | `tokens.json`, `README.md` (tono y reglas), `components/` (bundle original, `index.d.ts`, guía y `preview.html` por componente), `plantillas/` (pantallas de referencia). Solo referencia: **no se carga en la app** (H8). |
+| Fuente de verdad (copia del artifact) | `design-system/boleteame/` | `tokens.json`, `README.md` (tono y reglas), `components/` (bundle original, `index.d.ts`, guía y `preview.html` por componente), `plantillas/` (pantallas de referencia). Solo referencia: **no se carga en la app** (H8). El bundle expone `window.Boleteame` (antes `window.Timbre`, D8). |
 | Generador de tokens | `scripts/generar-tokens.ts` | `pnpm --filter web tokens` |
 | Tokens CSS (generado) | `apps/web/src/styles/tokens.css` | No editar a mano; Biome y stylelint lo ignoran |
 | Estilos base | `apps/web/src/app/globals.css` | Importa `tokens.css`; foco global con `--focus-ring` |
 | Fuentes | `apps/web/src/app/layout.tsx` | IBM Plex Sans 400/500/600 y Plex Mono 400/500 con `next/font` (`--fuente-plex-*`, que alimentan `--font-sans` / `--font-mono`) |
-| Componentes | `apps/web/src/components/timbre/` | Importar siempre desde `@/components/timbre` |
+| Componentes | `apps/web/src/components/boleteame/` | Importar siempre desde `@/components/boleteame` |
 | Formatos | `apps/web/src/lib/formatos.ts` | RUT, montos, fechas y tipos de DTE; los usa también el servidor |
 | Catálogo | `/_ds` (carpeta `src/app/%5Fds/`) | Solo en desarrollo; en producción responde 404 |
 | Pruebas e2e y axe | `apps/web/e2e/design-system.spec.ts` | `pnpm --filter web test:e2e` |
@@ -35,7 +35,7 @@ source: ["PLAN-SAAS.md §4.2 y Fase 1", "design-system/timbre/"]
 
 **Temas.** Sin `data-theme` se sigue el sistema (`prefers-color-scheme`). `<html data-theme="dark">` o `"light"` fija el tema (lo usará la preferencia `perfiles.tema` de la Fase 2).
 
-**Cambiar un token:** se edita `design-system/timbre/tokens.json` (idealmente primero en el artifact del design system), se corre `pnpm --filter web tokens` y se versionan los dos archivos.
+**Cambiar un token:** se edita `design-system/boleteame/tokens.json` (idealmente primero en el artifact del design system), se corre `pnpm --filter web tokens` y se versionan los dos archivos.
 
 ## Reglas para escribir estilos
 
@@ -47,7 +47,7 @@ source: ["PLAN-SAAS.md §4.2 y Fase 1", "design-system/timbre/"]
 
 ## Componentes
 
-Los ocho del design system mantienen la API de `design-system/timbre/components/index.d.ts`:
+Los ocho del design system mantienen la API de `design-system/boleteame/components/index.d.ts`:
 
 | Componente | Cliente | Notas |
 |---|---|---|
@@ -87,7 +87,7 @@ Un envío sin Track ID no se sabe si llegó al SII (`estado_documento = 'inciert
 - Palabra **«Por verificar»**, tono `aviso`, glifo de signo de interrogación.
 - Nunca ofrece «Reenviar»: va acompañado de una `Alerta` `aviso` que pide revisar el estado en el SII antes de volver a enviar (principio 3 del plan).
 
-El estado está en la app y en el design system (artifact y copia en `design-system/timbre/`, 2026-11-12): `EstadoDTE` lo lista con su glifo, `index.d.ts` lo incluye en `EstadoDte` y el manual de marca lo nombra entre los estados.
+El estado está en la app y en el design system (artifact y copia en `design-system/boleteame/`, 2026-11-12): `EstadoDTE` lo lista con su glifo, `index.d.ts` lo incluye en `EstadoDte` y el manual de marca lo nombra entre los estados.
 
 ## Accesibilidad y verificación
 

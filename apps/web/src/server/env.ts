@@ -31,7 +31,7 @@ const esquemaAuth = esquemaSupabasePublico.extend({
 
 const esquemaCorreo = z.object({
   RESEND_API_KEY: z.string().min(10),
-  // «Timbre <no-responder@dominio>» o solo la dirección.
+  // «Boletéame <no-responder@dominio>» o solo la dirección.
   CORREO_REMITENTE: z.string().min(3),
 });
 

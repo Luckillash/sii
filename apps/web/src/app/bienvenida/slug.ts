@@ -35,7 +35,7 @@ export function validarSlug(slug: string): string | null {
     return 'Usa solo minúsculas sin tilde, números y guiones, y empieza con una letra o un número.';
   }
   if (SLUGS_RESERVADOS.has(slug)) {
-    return 'Esa dirección está reservada para Timbre. Elige otra, por ejemplo agregando el nombre de tu empresa.';
+    return 'Esa dirección está reservada para Boletéame. Elige otra, por ejemplo agregando el nombre de tu empresa.';
   }
   return null;
 }

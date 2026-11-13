@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Tarjeta } from '@/components/timbre';
+import { Tarjeta } from '@/components/boleteame';
 import { puedeAdministrar, rolesInvitables } from '@/lib/permisos';
 import { envCorreo } from '@/server/env';
 import { cupoUsuarios, listarInvitaciones, listarMiembros } from '@/server/equipo';
@@ -10,7 +10,7 @@ import estilos from './equipo.module.css';
 import { FormularioInvitar } from './FormularioInvitar';
 import { TablasEquipo } from './TablasEquipo';
 
-export const metadata: Metadata = { title: 'Equipo · Timbre' };
+export const metadata: Metadata = { title: 'Equipo · Boletéame' };
 
 export default async function PaginaEquipo({ params }: { params: Promise<{ org: string }> }) {
   const { org: slug } = await params;

@@ -1,5 +1,5 @@
 #:schema https://supabase.com/schemas/config/v1.json
-# Timbre usa UNA sola base: el proyecto de Supabase en la nube, que es producción
+# Boletéame usa UNA sola base: el proyecto de Supabase en la nube, que es producción
 # (documentación/08-esquema-supabase/despliegue.md). No hay stack local: este archivo
 # solo lo usan `supabase link` y `supabase db push --remote=rbrntkztzijaxsnpgpqn` (sin
 # --remote, la CLI 3.x apunta a 127.0.0.1:54322). No ejecutar `supabase config push`
@@ -9,7 +9,7 @@
 # https://supabase.com/docs/guides/local-development/cli/config
 # A string used to distinguish different Supabase projects on the same host. Defaults to the
 # working directory name when running `supabase init`.
-project_id = "timbre"
+project_id = "sii"
 
 [api]
 enabled = true
@@ -253,31 +253,31 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
-# Plantillas de Supabase Auth en el tono Timbre, con enlaces token_hash al callback. Se
-# generan desde packages/correos/src/auth.ts (`pnpm --filter @timbre/correos test -u`) y
+# Plantillas de Supabase Auth en el tono Boletéame, con enlaces token_hash al callback. Se
+# generan desde packages/correos/src/auth.ts (`pnpm --filter @sii/correos test -u`) y
 # se pegan en el panel (Authentication → Emails); los asuntos son los de auth.ts.
 [auth.email.template.confirmation]
-subject = "Confirma tu correo en Timbre"
+subject = "Confirma tu correo en Boletéame"
 content_path = "./supabase/templates/confirmation.html"
 
 [auth.email.template.magic_link]
-subject = "Tu enlace para ingresar a Timbre"
+subject = "Tu enlace para ingresar a Boletéame"
 content_path = "./supabase/templates/magic_link.html"
 
 [auth.email.template.recovery]
-subject = "Restablece tu contraseña de Timbre"
+subject = "Restablece tu contraseña de Boletéame"
 content_path = "./supabase/templates/recovery.html"
 
 [auth.email.template.email_change]
-subject = "Confirma el cambio de correo en Timbre"
+subject = "Confirma el cambio de correo en Boletéame"
 content_path = "./supabase/templates/email_change.html"
 
 [auth.email.template.invite]
-subject = "Te invitaron a Timbre"
+subject = "Te invitaron a Boletéame"
 content_path = "./supabase/templates/invite.html"
 
 [auth.email.template.reauthentication]
-subject = "Tu código de verificación de Timbre"
+subject = "Tu código de verificación de Boletéame"
 content_path = "./supabase/templates/reauthentication.html"
 
 # Uncomment to customize notification email template

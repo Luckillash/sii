@@ -12,7 +12,7 @@ import {
   Input,
   Select,
   TablaDTE,
-} from '@/components/timbre';
+} from '@/components/boleteame';
 import { validarRut } from '@/lib/formatos';
 import estilos from './ds.module.css';
 

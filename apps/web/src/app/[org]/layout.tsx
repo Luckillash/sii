@@ -1,6 +1,6 @@
 import { LogOut } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { Boton } from '@/components/timbre';
+import { Boton } from '@/components/boleteame';
 import { ETIQUETA_ROL } from '@/lib/permisos';
 import { exigirUsuario, obtenerMembresias, obtenerPerfil, type Perfil } from '@/server/sesion';
 import { clienteServidor } from '@/server/supabase/servidor';

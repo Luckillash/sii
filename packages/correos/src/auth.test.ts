@@ -3,7 +3,7 @@ import { PLANTILLAS_AUTH, type PlantillaAuth } from './auth';
 
 // Además de revisar el contenido, deja cada plantilla en supabase/templates/<nombre>.html
 // (lo que se pega en el panel de Supabase Auth). Si cambias auth.ts, actualízalas con
-// `pnpm --filter @timbre/correos test -u`.
+// `pnpm --filter @sii/correos test -u`.
 
 const EMOJI = /\p{Extended_Pictographic}/u;
 const NOMBRES = Object.keys(PLANTILLAS_AUTH) as PlantillaAuth[];
@@ -99,14 +99,14 @@ describe('PLANTILLAS_AUTH', () => {
     expect(hrefs(html)).toEqual([]);
   });
 
-  it.each(NOMBRES)('%s: tono Timbre (sin exclamaciones ni emoji) y en español', (nombre) => {
+  it.each(NOMBRES)('%s: tono Boletéame (sin exclamaciones ni emoji) y en español', (nombre) => {
     const { asunto, html } = PLANTILLAS_AUTH[nombre];
     const visible = html.replace(/<[^>]*>/g, ' ');
     for (const texto of [asunto, visible]) {
       expect(texto).not.toMatch(/[!¡]/);
       expect(texto).not.toMatch(EMOJI);
     }
-    expect(asunto).toContain('Timbre');
+    expect(asunto).toContain('Boletéame');
     expect(html).toContain('<html lang="es-CL">');
   });
 

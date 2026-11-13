@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactElement } from 'react';
-import { Alerta, Boton } from '@/components/timbre';
+import { Alerta, Boton } from '@/components/boleteame';
 import estilos from '../_compartido/auth.module.css';
 import { CampoClave } from '../_compartido/CampoClave';
 import {

@@ -3,7 +3,7 @@ import { destinoSeguro } from '@/lib/redireccion';
 import { primerValor } from '../_compartido/piezas';
 import { FormIngresar } from './FormIngresar';
 
-export const metadata: Metadata = { title: 'Ingresar · Timbre' };
+export const metadata: Metadata = { title: 'Ingresar · Boletéame' };
 
 type Parametros = Record<string, string | string[] | undefined>;
 

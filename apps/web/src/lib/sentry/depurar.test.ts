@@ -22,7 +22,7 @@ describe('depurarEvento', () => {
   it('quita cuerpo, cookies y cabeceras sensibles de la petición', () => {
     const evento = {
       request: {
-        url: 'https://app.timbre.cl/api/v1/documentos?token=ABCDEF123456TOKENSII&pagina=2',
+        url: 'https://boleteame.dev/api/v1/documentos?token=ABCDEF123456TOKENSII&pagina=2',
         data: { pfx: 'MIIEvQIBADANBgkqhkiG9w0BAQEFAASC', clave: 'clave-del-pfx' },
         cookies: { 'sb-access': 'sb-access=abc' },
         headers: {
@@ -118,7 +118,7 @@ describe('depurarTexto', () => {
   it('filtra el token de invitación en rutas, en ?siguiente= y en ?invitacion=', () => {
     const token = 'f'.repeat(64);
     const casos = [
-      `https://app.timbre.cl/invitacion/${token}`,
+      `https://boleteame.dev/invitacion/${token}`,
       `/invitacion/${token}?x=1`,
       `/ingresar?siguiente=%2Finvitacion%2F${token}`,
       `/ingresar?siguiente=/invitacion/${token}`,

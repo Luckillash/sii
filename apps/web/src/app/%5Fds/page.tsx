@@ -17,7 +17,7 @@ import {
   Td,
   Th,
   TipoDTE,
-} from '@/components/timbre';
+} from '@/components/boleteame';
 import { DemoCampoRut, DemoCampos, DemoDialogo, DemoTablaDTE } from './Demos';
 import estilos from './ds.module.css';
 import { SelectorTema } from './SelectorTema';
@@ -76,7 +76,7 @@ export default function CatalogoDs() {
       <header className={estilos.cabecera}>
         <div>
           <p className={estilos.nota}>Solo desarrollo · Fase 1</p>
-          <h1 className={estilos.titulo}>Design system Timbre</h1>
+          <h1 className={estilos.titulo}>Design system Boletéame</h1>
         </div>
         <SelectorTema />
       </header>

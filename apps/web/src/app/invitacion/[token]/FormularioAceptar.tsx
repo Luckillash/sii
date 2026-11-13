@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useEffect, useMemo, useRef, useState } from 'react';
-import { Alerta, Boton } from '@/components/timbre';
+import { Alerta, Boton } from '@/components/boleteame';
 import {
   type ControlTurnstile,
   Turnstile,

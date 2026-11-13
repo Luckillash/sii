@@ -20,7 +20,7 @@
     "@sentry/nextjs": "11.11.0",
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.119.0",
-    "@timbre/correos": "workspace:*",
+    "@sii/correos": "workspace:*",
     "@winex/certificacion": "workspace:*",
     "lucide-react": "1.70.0",
     "next": "16.4.6",

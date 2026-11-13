@@ -3,7 +3,7 @@
 
 // Origen ficticio para resolver rutas relativas: si al resolver cambia, la ruta
 // apuntaba fuera de la app.
-const ORIGEN_INTERNO = 'http://timbre.invalid';
+const ORIGEN_INTERNO = 'http://sii.invalid';
 const LARGO_MAXIMO = 2048;
 
 /**

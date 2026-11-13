@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Alerta, Boton, clasesBoton, LayoutIngreso } from '@/components/timbre';
+import { Alerta, Boton, clasesBoton, LayoutIngreso } from '@/components/boleteame';
 import { formatearFecha } from '@/lib/formatos';
 import { DESCRIPCION_ROL, ETIQUETA_ROL, type RolMiembro } from '@/lib/permisos';
 import { urlIngresar } from '@/lib/rutas';
@@ -21,7 +21,7 @@ import { esTokenInvitacion, rutaInvitacion } from './token';
 // página muestra igual el mensaje de invitación inválida.
 
 export const metadata: Metadata = {
-  title: 'Invitación · Timbre',
+  title: 'Invitación · Boletéame',
   referrer: 'no-referrer',
   robots: { index: false, follow: false },
 };

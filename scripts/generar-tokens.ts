@@ -1,4 +1,4 @@
-// Genera apps/web/src/styles/tokens.css desde design-system/timbre/tokens.json
+// Genera apps/web/src/styles/tokens.css desde design-system/boleteame/tokens.json
 // (PLAN-SAAS §4.2). Uso: `pnpm --filter web tokens`. No editar tokens.css a mano.
 //
 // Tema oscuro: `@media (prefers-color-scheme: dark)` cuando no se fijó tema, y
@@ -25,7 +25,7 @@ interface TokensJson {
 }
 
 const raiz = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const origen = resolve(raiz, 'design-system/timbre/tokens.json');
+const origen = resolve(raiz, 'design-system/boleteame/tokens.json');
 const destino = resolve(raiz, 'apps/web/src/styles/tokens.css');
 
 const json = JSON.parse(readFileSync(origen, 'utf8')) as TokensJson;
@@ -68,7 +68,7 @@ const escala = [...json.spacing.tokens, ...json.radius.tokens].map(
   (t) => `  --${t.name}: ${t.value as string};`,
 );
 
-const css = `/* Generado por scripts/generar-tokens.ts desde design-system/timbre/tokens.json.
+const css = `/* Generado por scripts/generar-tokens.ts desde design-system/boleteame/tokens.json.
  * No editar a mano: cambia tokens.json y corre \`pnpm --filter web tokens\`. */
 
 :root {

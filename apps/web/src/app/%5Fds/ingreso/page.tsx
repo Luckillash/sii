@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Boton, Campo, clasesBoton, Input, LayoutIngreso } from '@/components/timbre';
+import { Boton, Campo, clasesBoton, Input, LayoutIngreso } from '@/components/boleteame';
 import { metadataDs, soloDesarrollo } from '../solo-desarrollo';
 import estilos from './ingreso.module.css';
 
