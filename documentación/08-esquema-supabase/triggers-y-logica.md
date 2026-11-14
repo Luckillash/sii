@@ -10,10 +10,49 @@ source: ["supabase_saas_sii.sql §15", "supabase/migrations/0009_autorizacion_ex
 
 > **Úsalo cuando:** necesitas entender un efecto automático de la base.
 
-<!-- TODO: redactar contenido (el resto de los triggers de la 0001) -->
-
 Los triggers de un mismo evento corren en orden alfabético: por eso los nombres llevan un
-prefijo numérico (`trg_00_…` primero, `trg_90_…` al final).
+prefijo numérico (`trg_00_…` primero, `trg_90_…` al final). Los `before` corren antes del
+`with check` de RLS, así que lo que fijan (p. ej. `organizacion_id`) ya está cuando RLS evalúa.
+
+## Triggers de la 0001 (§15 y §17)
+
+### Transversales
+
+| Trigger | Tablas | Cuándo | Qué hace |
+|---|---|---|---|
+| `trg_00_organizacion` (`tg_heredar_organizacion(padre, columna)`, `security definer`) | `resoluciones`, `empresa_certificados`, `cafs`, `solicitudes_folios`, `receptores`, `productos`, `envios`, `documentos`, `rcof`, `procesos_certificacion` (padre `empresas`); `folios_anulados` (`cafs`); `envio_estadisticas`, `consultas_envio`, `envio_rechazos` (`envios`); `documento_detalles` (`documentos`); `set_pruebas_casos` (`procesos_certificacion`) | `before insert or update` | Copia `organizacion_id` del padre: nadie puede colgar filas de otra organización. FK nula → error; padre inexistente → `foreign_key_violation` |
+| `trg_90_actualizado_en` (`tg_actualizado_en`) | `perfiles`, `organizaciones`, `suscripciones`, `empresas`, `certificados`, `cafs`, `receptores`, `productos`, `envios`, `documentos`, `procesos_certificacion`, `webhooks` | `before update` | `actualizado_en = now()` |
+| `trg_borrar_secretos` (`tg_borrar_secretos(columnas…)`, `security definer`) | `certificados` (`pfx_secret_id`, `clave_secret_id`), `cafs` (`caf_secret_id`), `webhooks` (`secreto_secret_id`) | `after delete` | Borra esos secretos de `vault.secrets`: no quedan huérfanos |
+
+### Tenancy y plan
+
+| Trigger | Tabla | Cuándo | Qué hace |
+|---|---|---|---|
+| `trg_nuevo_usuario` (`security definer`) | `auth.users` | `after insert` | Crea el `perfiles` con `correo` y `nombre` (de `raw_user_meta_data`); `on conflict do nothing` |
+| `trg_proteger_ultimo_propietario` (`security definer`) | `miembros_organizacion` | `before update or delete` | Impide degradar o quitar al último `propietario`; se permite si la organización entera se está borrando (cascada) |
+| `trg_10_limite_empresas` | `empresas` | `before insert` | `max_empresas` del plan vigente (`plan_vigente()`). Solo se revisa para quien puede escribir: a un no miembro lo rechaza RLS sin revelar el plan ajeno |
+| `trg_10_limite_usuarios` | `miembros_organizacion` | `before insert` | `max_usuarios` en altas directas; `aceptar_invitacion()` revisa el cupo por su cuenta y `crear_organizacion()` agrega al primer miembro |
+
+### Empresas y certificación
+
+| Trigger | Tabla | Cuándo | Qué hace |
+|---|---|---|---|
+| `trg_05_proteger_autorizacion` | `empresas` | `before insert or update` | `autorizada_produccion` y `autorizada_en` solo los cambia `service_role` o una función `security definer` (ver [RLS y privilegios](rls-y-privilegios.md#campos-del-sistema-protegidos-por-triggers)) |
+| `trg_05_proteger_proceso` | `procesos_certificacion` | `before insert or update` | `etapa`, `codigo_estado_sii`, `glosa_estado_sii` y `paso_sii` solo los cambia el sistema |
+| `trg_10_certificacion_autorizada` (`security definer`) | `procesos_certificacion` | `before insert or update of codigo_estado_sii, etapa` | Al quedar autorizada (P91) marca la empresa (`autorizada_produccion`); nunca desmarca |
+
+### Folios, documentos y envíos (Fases 6–8)
+
+| Trigger | Tabla | Cuándo | Qué hace |
+|---|---|---|---|
+| `trg_10_caf_inicial` | `cafs` | `before insert` | `siguiente_folio = coalesce(siguiente_folio, folio_desde)` |
+| `trg_10_validar_documento` | `documentos` | `before insert or update of folio, caf_id, ambiente, tipo_dte` | El CAF debe ser de la misma empresa, ambiente y tipo, y el folio estar en su rango; en producción, empresa autorizada (P91) y plan con `permite_produccion` |
+| `trg_20_contar_uso` (`tg_contar_uso_documento`) | `documentos` | `before insert or update of folio` | Suma en `uso_mensual` cuando el documento recibe folio (no los borradores); las de producción se controlan contra `max_boletas_mes` |
+| `trg_60_contar_uso` (`tg_contar_uso_otros`) | `cafs`, `envios` | `after insert` | Suma `folios_timbrados` y `envios` en `uso_mensual` |
+| `trg_50_evento_documento` | `documentos` | `after update of estado`, si cambió | Encola un evento de webhook (`encolar_evento`) |
+| `trg_50_envio_actualizado` | `envios` | `after update` de `estado_sii`, `incierto` o los contadores, si cambiaron | Lleva el estado del envío a sus documentos (`sincronizar_documentos_envio`) |
+| `trg_10_envio_rechazo` (`security definer`) | `envio_rechazos` | `before insert` | Si falta `documento_id`, lo busca por empresa, ambiente, tipo y folio del envío |
+| `trg_50_envio_rechazo_sincronizar` (`security definer`) | `envio_rechazos` | `after insert or update` | Llama a `sincronizar_documentos_envio(envio_id)` |
 
 ## `tg_resolucion_autoriza_produccion` (migración 0009)
 

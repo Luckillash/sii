@@ -12,7 +12,7 @@ empresas, sobre la librería `@winex/certificacion` (`../certificacion-node`).
   - Librería y CLI: `../certificacion-node` (fases 0–7 listas; piloto en producción en curso, 5 boletas reales EPR).
   - Design system «Boletéame»: <https://claude.ai/artifact/UCjvbZq6pYi2bYVBcuviwr> (tokens, tono, 8 componentes; renombrado de «Timbre» a «Boletéame» el 2026-11-12, versión 7).
   - Plantillas: <https://claude.ai/artifact/HjnXwP9jcNrawftr55XpRu> (Landing, Ingreso, Tablero, Documentos emitidos, Emitir factura, Certificación SII; marca «Boletéame» desde el 2026-11-12, versión 14, igual a `design-system/boleteame/plantillas/`).
-  - Documentación para agentes: [`documentación/`](documentación/) (estructura e índice listos; los archivos todavía son esqueletos `TODO`).
+  - Documentación para agentes: [`documentación/`](documentación/) (completa en lo que tocan las Fases 0–5; quedan esqueletos `TODO` en archivos generales y de fases posteriores).
 
 ## Estado
 

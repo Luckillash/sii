@@ -15,7 +15,52 @@ function …`, `42501`). Se llaman con el cliente de `src/server/supabase/servic
 (`clienteServicio()`, `import 'server-only'`), que salta RLS: **quien llama filtra
 siempre por `organizacion_id`** y comprueba antes que el usuario tenga el rol necesario.
 
-<!-- TODO: redactar asignar_folio, guardar_secreto, sincronizar_documentos_envio, encolar_evento y plan_vigente -->
+<!-- TODO (Fases 6–8 y 11): asignar_folio, sincronizar_documentos_envio y encolar_evento -->
+
+## `guardar_secreto`
+
+Viene en la §15 de `0001`.
+
+```sql
+public.guardar_secreto(p_secreto text, p_descripcion text default '')
+  returns uuid                                   -- sql · security definer · search_path = ''
+```
+
+- Llama a `vault.create_secret(p_secreto, null, p_descripcion)`: el secreto queda **sin
+  nombre** (`name = null`) y con la descripción como etiqueta. Devuelve el id que va en la
+  columna `*_secret_id`.
+- Solo `service_role`. En la práctica no se llama sola: la usan `registrar_certificado`
+  (`certificado:<huella>:pfx` y `certificado:<huella>:clave`, migración `0005`) y
+  `registrar_caf` (migración `0008`), que crean el secreto y la fila en la misma
+  transacción, así que un error no deja secretos huérfanos.
+- Lo inverso es `leer_secreto(p_id uuid) returns text` (`stable security definer`, lee
+  `vault.decrypted_secrets`). El borrado lo hace `trg_borrar_secretos` al eliminar la fila
+  ([triggers](../08-esquema-supabase/triggers-y-logica.md#transversales)). Detalle en
+  [Vault y secretos](../08-esquema-supabase/vault-y-secretos.md).
+- Nunca registres en logs ni en Sentry el argumento `p_secreto`.
+
+## `plan_vigente`
+
+Viene en la §15 de `0001`.
+
+```sql
+public.plan_vigente(p_organizacion uuid)
+  returns public.planes                          -- sql · stable · security definer · search_path = ''
+```
+
+- Devuelve la fila de `planes` de la suscripción **más reciente** de la organización en
+  estado `prueba` o `activa`. Una organización `morosa` o `cancelada` no tiene plan
+  vigente: devuelve **`null`** (todas las columnas nulas).
+- Quién la usa: `tg_limite_empresas` (`max_empresas`), `exigir_cupo_usuarios` y
+  `tg_limite_usuarios` (`max_usuarios`), `tg_validar_documento` (`permite_produccion`),
+  `tg_contar_uso_documento` (`max_boletas_mes`), `crear_api_key` (`incluye_api`) y
+  `crear_webhook` (`incluye_webhooks`).
+- **Cuidado con el `null`**: un límite nulo en `planes` significa «ilimitado», pero un plan
+  nulo significa «sin suscripción». `tg_limite_empresas` revisa `v_plan.id is null` («La
+  organización no tiene una suscripción vigente») antes de leer el límite; los demás usos de
+  la `0001` envuelven los booleanos en `coalesce(..., false)`; la migración `0004_cupo_sin_suscripcion` corrigió
+  `exigir_cupo_usuarios`, que leía `max_usuarios` nulo como ilimitado y dejaba aceptar
+  miembros sin suscripción vigente. Al usarla en código nuevo, distingue los dos casos.
 
 ## `token_obtener`, `token_guardar`, `token_borrar`
 

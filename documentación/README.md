@@ -8,7 +8,16 @@ sources: ["supabase_saas_sii.sql", "certificacion-node/docs/"]
 
 # SaaS de boleta electrónica (SII) — Índice de documentación (orientado a agentes)
 
-<!-- TODO: párrafo de presentación (qué es el SaaS, qué cubre esta carpeta) -->
+Boletéame es un SaaS multiempresa para emitir boletas electrónicas (DTE 39 y 41) ante el SII
+de Chile y para certificar empresas como emisoras. Una **organización** (cliente) administra
+una o más **empresas** emisoras; cada empresa carga su certificado digital, pide folios
+(CAF), emite, firma y envía boletas, y sigue su estado en el SII. Corre sobre Next.js en
+Vercel y Supabase (Postgres con RLS, Auth, Vault, Storage, Realtime), y habla con el SII a
+través de la librería `@winex/certificacion` (`packages/certificacion`).
+
+Esta carpeta es la referencia para agentes y desarrolladores: modelo de datos, contratos de
+RPC, capa de servicio SII, guías por flujo, pruebas y trampas conocidas. El plan y el estado
+por fase están en `PLAN-SAAS.md`, en la raíz del repositorio.
 
 **Nombres.** El nombre comercial del producto es **«Boletéame»** (antes «Timbre»; decisión D8 de `PLAN-SAAS.md`): es lo único que ve el usuario en la UI, los correos y el design system. Donde no cabe la tilde (namespace JS, carpetas) se escribe `boleteame`. Los servicios y paquetes de backend se llaman `sii` / `SII` (paquete raíz `sii`, `@sii/correos`). «timbre» en minúscula es el término del SII (timbre electrónico, TED), no la marca.
 
@@ -40,8 +49,6 @@ sources: ["supabase_saas_sii.sql", "certificacion-node/docs/"]
 
 ## Invariantes
 
-<!-- TODO: tabla de reglas válidas para todo el sistema -->
-
 | Tema | Regla |
 |---|---|
 | `service_role` | Salta RLS: todo código que lo usa filtra por `organizacion_id`, tomado de la membresía verificada ([tenancy](01-fundamentos/tenancy-y-roles.md)) |
@@ -50,6 +57,11 @@ sources: ["supabase_saas_sii.sql", "certificacion-node/docs/"]
 | ⚠️ e incierto | Las operaciones que graban tienen ensayo y confirmación, y confirman la sesión con `getUser()`. Un `incierto` no se repite a ciegas: bloquea `solicitar_folios`, `postular` y `declarar` (y, en el asistente de certificación, `enviar_set`) hasta marcarlo como revisado ([errores](01-fundamentos/errores-y-resultados.md#la-regla-del-incierto)) |
 | Certificación | El asistente (`/<org>/certificacion`) muestra 5 pasos sobre las 8 etapas de `procesos_certificacion`; `por_declarar` (P90) y `autorizada` (P91) las pone un trigger, nunca la app. Su ensayo no sale al SII ni deja filas ([guía](02-guias/certificacion-empresa.md)) |
 | Secretos | .pfx, clave, CAF, tokens y cookies nunca en mensajes, logs, Sentry ni `operaciones_sii`; credenciales y transporte se crean por invocación, nunca globales ([vault](08-esquema-supabase/vault-y-secretos.md)) |
+| Tenancy | Todo dato de negocio lleva `organizacion_id`, heredado del padre por `trg_00_organizacion`; RLS es la autoridad y la UI solo oculta acciones ([RLS](08-esquema-supabase/rls-y-privilegios.md)) |
+| Campos del sistema | `autorizada_produccion`, la etapa y el estado SII del proceso solo los cambia el sistema (triggers `trg_05_proteger_*`) ([triggers](08-esquema-supabase/triggers-y-logica.md)) |
+| Plan | Los límites salen de `plan_vigente()`; un plan `null` significa «sin suscripción vigente», no «ilimitado» ([RPC del backend](03-api-reference/rpc-backend.md#plan_vigente)) |
+| Ambientes | Una sola base (producción) para local y Vercel; el ambiente del SII (`certificacion` / `produccion`) es un enum, nunca un texto libre, y en certificación se muestra `BannerAmbiente` |
+| Textos al SII | XML en ISO-8859-1 tal cual (`Buffer`, sin recodificar); montos en pesos enteros; fechas en hora de Chile ([formatos](01-fundamentos/formatos-y-validaciones.md)) |
 
 ---
 
@@ -175,12 +187,34 @@ documentación/
 
 ## Glosario mínimo
 
-<!-- TODO: términos clave (DTE, CAF, TED, IDK, trackId, P90/P91, RCOF…) -->
-
 | Término | Significado |
 |---|---|
-| | |
+| DTE | Documento tributario electrónico. Boletéame emite boleta afecta (39) y exenta (41); facturas, en la Fase 14 |
+| CAF | Código de Autorización de Folios: XML del SII con el rango de folios y la llave privada (`RSASK`) con que se timbra. Va en Vault |
+| Folio | Número correlativo de un DTE dentro del rango de un CAF (`asignar_folio`) |
+| TED | Timbre electrónico del documento: firma con la llave del CAF que va en el XML y en el PDF417 impreso |
+| IDK | Identificador de la llave del SII en el CAF: 100 en certificación, 300 en producción |
+| Semilla / token | Autenticación del SII: se firma una semilla con el certificado y se obtiene un token (REST o SOAP), cacheado cifrado en `tokens_sii` |
+| AUT2000 | Sesión web del SII con certificado (cookies), para postular, pedir folios y declarar; cacheada en `sesiones_sii` |
+| Track ID | Identificador que devuelve el SII al recibir un envío; con él se consulta su estado |
+| EPR / RCT / RSC… | Estados de un envío en el SII (`estados_sii`); EPR = envío procesado |
+| Set de pruebas | Casos que el SII entrega en la certificación; se emiten y envían para que los revise |
+| P90 / P91 | Estados de la postulación: P90 = set aprobado, falta declarar; P91 = autorizada para producción |
+| RCOF | Reporte de consumo de folios; obligatorio solo hasta julio de 2022 (🕰️) |
+| Resolución | Número y fecha de la resolución del SII que van en la carátula; en certificación, número 0 |
+| Incierto | Resultado 6: la orden salió al SII y no se sabe si se aplicó; se revisa antes de repetir |
+| Ensayo | Ejecución sin confirmar (`confirmada = false`): valida y muestra lo que haría, sin salir al SII |
 
 ## Fuentes y vigencia
 
-<!-- TODO: fuentes, fecha de análisis y fuente de verdad -->
+| Fuente | Qué aporta | Fuente de verdad para |
+|---|---|---|
+| `supabase/migrations/` (0001–0009) | Esquema aplicado en producción | Tablas, RLS, triggers y RPC |
+| `08-esquema-supabase/supabase_saas_sii.sql` | Esquema original (= `0001`), comentado | Intención de diseño de la `0001` |
+| `apps/web/src/server/` | Capa SII, certificación y Supabase | Comportamiento del backend |
+| `packages/certificacion` (`@winex/certificacion`, de `certificacion-node`) | Librería y CLI `sii`, con sus `docs/` | Protocolo con el SII y códigos de error |
+| `PLAN-SAAS.md` | Fases, decisiones y estado | Qué está hecho y qué falta |
+
+Análisis inicial: 2026-11-10; actualizado por fase hasta la Fase 5 (2026-11-13). Si un
+archivo de esta carpeta contradice a las migraciones o al código, mandan las migraciones y
+el código: corrige el archivo.
