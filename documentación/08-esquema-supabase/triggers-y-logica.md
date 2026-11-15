@@ -1,9 +1,9 @@
 ---
 title: "Esquema: triggers y lógica"
 description: "Cada trigger, su orden de ejecución y lo que hace."
-keywords: [tg_resolucion_autoriza_produccion, trg_50_resolucion_autoriza_produccion, autorizada_produccion, autorizada_en, resoluciones, tg_proteger_autorizacion, tg_certificacion_autorizada, autorizada fuera de Boletéame, migración 0009, trg_20_caf_sin_traslape, tg_caf_sin_traslape, 23P01, traslape, migración 0011]
+keywords: [tg_resolucion_autoriza_produccion, trg_50_resolucion_autoriza_produccion, autorizada_produccion, autorizada_en, resoluciones, tg_proteger_autorizacion, tg_certificacion_autorizada, autorizada fuera de Boletéame, migración 0009, trg_20_caf_sin_traslape, tg_caf_sin_traslape, 23P01, traslape, migración 0011, tg_validar_documento, folio anulado, for key share, migración 0012]
 related: ["02-guias/seguimiento-envios.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "04-objetos/objetos-certificacion.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/despliegue.md"]
-source: ["supabase_saas_sii.sql §15", "supabase/migrations/0009_autorizacion_externa.sql", "supabase/migrations/0011_folios.sql"]
+source: ["supabase_saas_sii.sql §15", "supabase/migrations/0009_autorizacion_externa.sql", "supabase/migrations/0011_folios.sql", "supabase/migrations/0012_folio_anulado.sql"]
 ---
 
 # Esquema: triggers y lógica
@@ -47,13 +47,48 @@ prefijo numérico (`trg_00_…` primero, `trg_90_…` al final). Los `before` co
 |---|---|---|---|
 | `trg_10_caf_inicial` | `cafs` | `before insert` | `siguiente_folio = coalesce(siguiente_folio, folio_desde)` |
 | `trg_20_caf_sin_traslape` (`tg_caf_sin_traslape`, `security definer`; migración 0011, **aplicada el 2026-11-15**) | `cafs` | `before insert or update of folio_desde, folio_hasta, ambiente, tipo_dte, empresa_id` | Toma `for no key update` sobre la empresa y rechaza con `23P01` un rango que se cruza con otro CAF de la misma empresa, ambiente y tipo, en cualquier estado. No lo disparan `asignar_folio`, `anular_folios` ni el enlace de `solicitud_id` ([contrato](../03-api-reference/rpc-backend.md#trg_20_caf_sin_traslape-migración-0011)) |
-| `trg_10_validar_documento` | `documentos` | `before insert or update of folio, caf_id, ambiente, tipo_dte` | El CAF debe ser de la misma empresa, ambiente y tipo, y el folio estar en su rango; en producción, empresa autorizada (P91) y plan con `permite_produccion` |
+| `trg_10_validar_documento` (`tg_validar_documento`, `security definer`; reemplazada por la migración 0012, **aplicada el 2026-11-15**) | `documentos` | `before insert or update of folio, caf_id, ambiente, tipo_dte` | El CAF debe ser de la misma empresa, ambiente y tipo, y el folio estar en su rango; en producción, empresa autorizada (P91) y plan con `permite_produccion`. Con la 0012: lee el CAF con `for key share` y, si el documento fija su folio (INSERT con folio, o UPDATE que cambia `folio` o `caf_id`), rechaza con `23514` un folio que esté en `folios_anulados` ([abajo](#tg_validar_documento-migración-0012)) |
 | `trg_20_contar_uso` (`tg_contar_uso_documento`) | `documentos` | `before insert or update of folio` | Suma en `uso_mensual` cuando el documento recibe folio (no los borradores); las de producción se controlan contra `max_boletas_mes` |
 | `trg_60_contar_uso` (`tg_contar_uso_otros`) | `cafs`, `envios` | `after insert` | Suma `folios_timbrados` y `envios` en `uso_mensual` |
 | `trg_50_evento_documento` | `documentos` | `after update of estado`, si cambió | Encola un evento de webhook (`encolar_evento`) |
 | `trg_50_envio_actualizado` | `envios` | `after update` de `estado_sii`, `incierto` o los contadores, si cambiaron | Lleva el estado del envío a sus documentos (`sincronizar_documentos_envio`) |
 | `trg_10_envio_rechazo` (`security definer`) | `envio_rechazos` | `before insert` | Si falta `documento_id`, lo busca por empresa, ambiente, tipo y folio del envío |
 | `trg_50_envio_rechazo_sincronizar` (`security definer`) | `envio_rechazos` | `after insert or update` | Llama a `sincronizar_documentos_envio(envio_id)` |
+
+## `tg_validar_documento` (migración 0012)
+
+**Estado: aplicada en producción el 2026-11-15** (verificación 7/7 y simulación 9/9;
+[despliegue](despliegue.md#fase-7-migración-0012)).
+
+Cierra el riesgo anotado en la Fase 6: `asignar_folio` entrega el folio en una llamada y el
+documento se inserta, o se le fija el folio, en otra; entre medio un administrador podía
+anular ese folio con `anular_folios` (caso a, sin documento todavía) y el documento entraba
+igual. `create or replace` con el cuerpo de la 0001 más dos cambios:
+
+1. La lectura del CAF es `select … for key share`, **antes** de mirar `folios_anulados`.
+2. Si el documento fija su folio (INSERT con folio, o UPDATE con `folio` o `caf_id`
+   distintos), y `(caf_id, folio)` está en `folios_anulados`: `23514` «El folio N está
+   anulado: no se puede usar en un documento», pista «Pide otro folio (asignar_folio) y
+   vuelve a armar el documento.».
+
+Un UPDATE que no cambia folio ni CAF no se revisa: el `estado = 'anulado'` que hace
+`envio-set.ts` después de anular los folios del set (ni siquiera dispara el trigger) o uno
+que repite el mismo folio en el `set`.
+
+**Por qué el candado va antes de la lectura** (READ COMMITTED, el nivel de PostgREST):
+`for key share` choca con el `for update` que toman `anular_folios` y `asignar_folio` sobre
+el CAF (no con el `update` de `siguiente_folio`, ni con otro `for key share`: dos emisiones
+del mismo CAF no se esperan entre sí).
+
+- Si `anular_folios` llegó primero, el trigger espera su commit y la sentencia siguiente
+  (la lectura de `folios_anulados`) toma una foto nueva que ya ve la anulación: rechazo.
+- Si el documento llegó primero, `anular_folios` espera su commit y su búsqueda de
+  documentos ve el documento: `23503`.
+
+Sin el candado, las dos podían leer antes del commit de la otra y pasar. PGlite (una
+conexión) no prueba la concurrencia; `rls-fase7-folio-anulado.sql` prueba la regla en
+secuencia. El trigger, el dueño, `security definer`, `search_path` y los privilegios no
+cambian.
 
 ## `tg_resolucion_autoriza_produccion` (migración 0009)
 

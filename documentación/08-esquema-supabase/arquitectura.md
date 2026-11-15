@@ -52,9 +52,11 @@ solo lectura en `supabase/verificaciones/` ([despliegue](despliegue.md)).
 | `0009_autorizacion_externa` | `tg_resolucion_autoriza_produccion` |
 | `0010_verificar_autorizacion` | valor `verificar_autorizacion` en el enum `operacion_sii` |
 | `0011_folios` (**aplicada el 2026-11-15**) | RPC `anular_folios` y trigger `trg_20_caf_sin_traslape` en `cafs`; quita la política `alta` de `folios_anulados` (solo se escribe con la RPC o `service_role`); publica `cafs` y `folios_anulados` en Realtime ([despliegue](despliegue.md#fase-6-migración-0011)) |
+| `0012_folio_anulado` (**aplicada el 2026-11-15**) | `tg_validar_documento` lee el CAF con `for key share` y rechaza (`23514`) un documento que fija un folio anulado ([triggers](triggers-y-logica.md#tg_validar_documento-migración-0012)) |
 
-Aplicadas en producción: `0001`–`0010`. Las previstas de las fases siguientes se corren un
-número respecto del plan original (`0012_notificaciones`, `0013_planes_comerciales`…).
+Aplicadas en producción: `0001`–`0012` (la `0011` y la `0012`, el 2026-11-15). Las previstas de
+las fases siguientes se corren respecto del plan original (`0013_notificaciones`,
+`0014_planes_comerciales`…).
 
 ## Relaciones
 

@@ -65,10 +65,13 @@ select * from (
          coalesce((select not public from storage.buckets where id = 'documentos-xml'), false),
          null
   union all
-  select 12, 'Realtime publica documentos, envios y procesos_certificacion',
-         (select array_agg(tablename::text order by tablename) from pg_publication_tables
+  -- Contiene (no igual): las migraciones posteriores agregan tablas a la publicación
+  -- (0006: operaciones_sii y solicitudes_folios; 0011: cafs y folios_anulados), y cada
+  -- una verifica las suyas.
+  select 12, 'Realtime publica documentos, envios y procesos_certificacion (puede haber más tablas de migraciones posteriores)',
+         coalesce((select array_agg(tablename::text order by tablename) from pg_publication_tables
            where pubname = 'supabase_realtime' and schemaname = 'public')
-           = array['documentos', 'envios', 'procesos_certificacion'],
+           @> array['documentos', 'envios', 'procesos_certificacion'], false),
          (select string_agg(tablename::text, ', ' order by tablename) from pg_publication_tables
            where pubname = 'supabase_realtime' and schemaname = 'public')
   union all

@@ -309,10 +309,33 @@ y rol; las Server Actions confirman que la empresa es de la organización.
   motivo: 'sin_caf' | 'agotado' }`: deshabilitar el botón de emitir sin folios.
 - `alertaDespuesDeAsignar(deps, cliente, clave, { cafId, folio })` después de cada
   `asignar_folio`.
-- **Riesgo anotado:** un folio ya asignado cuyo documento todavía no se inserta se puede
-  anular (la RPC solo ve los documentos que existen). La Fase 7 tiene que asignar e
-  insertar en una transacción, o hacer que `tg_validar_documento` rechace folios que estén
-  en `folios_anulados` ([trampas](../07-referencia/trampas-conocidas.md#folios-caf-fase-6)).
+- **Folio anulado entre `asignar_folio` y el documento:** un folio ya asignado cuyo
+  documento todavía no se inserta se puede anular (la RPC solo ve los documentos que
+  existen). La migración 0012 (**aplicada el 2026-11-15**) lo cierra en la base:
+  `tg_validar_documento` rechaza con `23514` («El folio N está anulado…») el `insert` del
+  documento, o el `update` que le fija el folio a un borrador, si `(caf_id, folio)` está en
+  `folios_anulados`. La emisión tiene que tratar ese `23514`: pedir otro folio con
+  `asignar_folio` y volver a armar (el folio anulado ya quedó informado para el RCOF; no se
+  anula de nuevo). Un `update` de `estado` sobre un documento ya emitido no se revisa
+  ([trampas](../07-referencia/trampas-conocidas.md#folios-caf-fase-6),
+  [triggers](../08-esquema-supabase/triggers-y-logica.md#tg_validar_documento-migración-0012)).
+
+## Prueba real en *Production* (criterio de aceptación)
+
+2026-11-15, deploy `4f26921`, sesión del propietario en Chrome, empresa del piloto
+(20.630.500-2), certificado del representante desde Vault:
+
+1. «Preparar la solicitud» (certificación, boleta 39, 5): resumen local, sin filas.
+2. «Revisar antes con el SII»: «El SII asignaría los folios 41 a 45»; solicitud `simulada`
+   (`confirmada = false`, 41–45) y operación `solicitar_folios` `ok` con `nivel: revision`.
+3. «Timbrar 5 folios»: «El SII timbró los folios»; operación `ok` con `nivel: timbrar`,
+   solicitud `timbrada` con `caf_id`, y en `cafs` el CAF de certificación 41–45, IDK 100,
+   `activo`, `fecha_autorizacion` 2026-11-15 y **`siguiente_folio = folio_desde` (41)**; el XML
+   (con `RSASK`) en Vault (secretos de 3 a 4).
+
+Sin secretos en `operaciones_sii` ni en `solicitudes_folios` (búsqueda de `RSASK`, `<CAF`,
+`BEGIN`, `TOKEN`, cookies: 0), ningún bloqueo tomado, sin errores de consola ni de runtime en
+Vercel. El medidor de certificación pasó a «5 de 5 disponibles» sin recargar.
 
 ## Folios del set de pruebas (Fase 5)
 

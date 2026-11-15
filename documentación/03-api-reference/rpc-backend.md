@@ -393,10 +393,13 @@ const { data, error } = await sesion.rpc('anular_folios', {
 Después de anular una cola revisa la alerta `folios.por_agotarse`
 ([guía](../02-guias/folios-caf.md#anular-folios)).
 
-**Riesgo para la Fase 7.** La búsqueda del paso 5 solo ve documentos que ya existen: un
-folio asignado por `asignar_folio` cuyo documento todavía no se inserta se puede anular.
-Asignar e insertar en una transacción, o rechazar en `tg_validar_documento` los folios que
-estén en `folios_anulados`.
+**Folio asignado sin documento todavía.** La búsqueda del paso 5 solo ve documentos que ya
+existen: un folio asignado por `asignar_folio` cuyo documento todavía no se inserta se puede
+anular. Lo cierra la migración 0012 (**aplicada el 2026-11-15**): `tg_validar_documento` lee
+el CAF con `for key share` (se serializa con el `for update` del paso 2) y rechaza con
+`23514` el documento que fija un folio que está en `folios_anulados`
+([triggers](../08-esquema-supabase/triggers-y-logica.md#tg_validar_documento-migración-0012)).
+Quien emite (Fase 7) trata ese `23514` pidiendo otro folio.
 
 Verificación: `supabase/verificaciones/0011_folios.sql` (18, solo lectura) y
 `rls-fase6-folios.sql` (27, con `rollback`)

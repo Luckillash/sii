@@ -489,11 +489,18 @@ librería y lo usa `verificarAutorizacion` de la app como apoyo del mensaje.
   solo bajo `siguiente_folio`.
 - **Un CAF de otra organización da `P0002`, no `42501`.** Igual que uno inexistente: no se
   revela que existe. El `42501` es para un miembro emisor o lector.
-- **Folio asignado sin documento todavía: se puede anular (riesgo para la Fase 7).** La RPC
-  solo ve documentos insertados. Si la emisión asigna el folio y el documento entra
-  después, un administrador puede anularlo entre medio y la boleta saldría con un folio
-  anulado. La Fase 7 tiene que asignar e insertar en una transacción, o
-  `tg_validar_documento` rechazar folios que estén en `folios_anulados`.
+- **Folio asignado sin documento todavía: se puede anular, pero el documento ya no entra
+  (migración 0012, aplicada el 2026-11-15).** La RPC solo ve documentos insertados: si la
+  emisión asigna el folio y el documento entra después, un administrador puede anularlo
+  entre medio. Con la 0012, `tg_validar_documento` rechaza con `23514` («El folio N está
+  anulado…», pista: pedir otro folio) el documento que fija un folio anulado, al
+  insertarlo o al ponerle el folio a un borrador. La emisión de la Fase 7 tiene que tratar
+  ese `23514` pidiendo otro folio. El trigger lee el CAF con `for key share` **antes** de
+  mirar `folios_anulados`, así se serializa con el `for update` de `anular_folios`: gane
+  quien gane, la otra transacción ve lo que confirmó la primera (en READ COMMITTED cada
+  sentencia toma su propia foto). Un `update` que no cambia folio ni CAF (el
+  `estado = 'anulado'` de `envio-set.ts`) no se revisa. Sin la 0012 aplicada, el riesgo
+  sigue abierto ([triggers](../08-esquema-supabase/triggers-y-logica.md#tg_validar_documento-migración-0012)).
 - **Repetir no falla.** `on conflict do nothing` y devuelve 0; la UI lo muestra como «Esos
   folios ya estaban anulados» (`info`), no como error.
 

@@ -33,7 +33,7 @@ Viven en `supabase/migrations/` con prefijo **secuencial de 4 dígitos** (no tim
 |---|---|
 | `0001_esquema_inicial.sql` | `supabase_saas_sii.sql` **byte a byte** (19 secciones: tipos, tablas, RLS, Vault, Storage, Realtime). Nunca se edita |
 | `0002_extensiones_cron.sql` | `pg_cron` (schema `pg_catalog`) y `pg_net` (schema `extensions`) |
-| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, y la `0010_verificar_autorizacion`, aplicada el 2026-11-14, son de la Fase 5: ver [abajo](#fase-5-migración-0008); la `0011_folios`, de la Fase 6, se aplicó el 2026-11-15: ver [abajo](#fase-6-migración-0011)) |
+| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, y la `0010_verificar_autorizacion`, aplicada el 2026-11-14, son de la Fase 5: ver [abajo](#fase-5-migración-0008); la `0011_folios`, de la Fase 6, se aplicó el 2026-11-15: ver [abajo](#fase-6-migración-0011); la `0012_folio_anulado`, de la Fase 7, se aplicó el 2026-11-15: ver [abajo](#fase-7-migración-0012)) |
 
 Reglas, todas derivadas de que la única base es producción:
 
@@ -334,6 +334,65 @@ en el estado de arriba):
    | `README.md` | invariante «Folios», «Fuentes y vigencia» y la nota de actualización |
 
    Y en `PLAN-SAAS.md`, el estado de la Fase 6 y la fila de `0011_folios` en §6.
+
+### Fase 7: migración 0012
+
+**Estado: aplicada el 2026-11-15**, con autorización del usuario. Antes de migrar:
+migraciones `0001`–`0011`, 1 CAF (el de certificación 41–45 de la empresa del piloto), 0
+folios anulados y 0 documentos con folio; `tg_validar_documento` era la de la 0001 (mismo
+md5 del cuerpo) y la verificación 0012 daba 5/7 (lo esperado). Después:
+`supabase/verificaciones/0012_folio_anulado.sql` **7/7**, la simulación
+`rls-fase7-folio-anulado.sql` **9/9** y `0011_folios.sql` sigue **18/18**; tras el
+`rollback` de la simulación, la limpieza dio todo en 0 (usuarios, perfiles, organización,
+empresa, folios anulados, documentos y secretos `caf:11111111-1:%`), `vault.secrets` quedó con
+los mismos 4 secretos y el CAF real siguió intacto (`activo`, `siguiente_folio = 41`, 0
+anulados).
+
+| Migración | Contenido | Qué falla si falta |
+|---|---|---|
+| `0012_folio_anulado` | `create or replace function public.tg_validar_documento()` con el cuerpo de la 0001 más: la lectura del CAF con `for key share` (antes de mirar `folios_anulados`, para serializarse con el `for update` de `anular_folios`) y, si el documento fija su folio (INSERT con folio o UPDATE que cambia `folio` o `caf_id`), `23514` si `(caf_id, folio)` está en `folios_anulados`. Mismo trigger (`trg_10_validar_documento`), dueño, `security definer`, `search_path` y privilegios ([triggers](triggers-y-logica.md#tg_validar_documento-migración-0012)) | Un folio asignado y anulado antes de que exista su documento se puede usar igual: el documento entra con un folio que el RCOF informa como anulado |
+
+El número: el plan reservaba `0012` para `notificaciones` (Fase 8); por orden de creación
+las siguientes se corren un número (`0013_notificaciones`…).
+
+Resultados en PGlite (esquema 0001 y 0003–0012 con los mismos stubs):
+
+| Prueba | Con la 0012 | Sin la 0012 |
+|---|---|---|
+| `supabase/verificaciones/0012_folio_anulado.sql` (solo lectura) | 7/7 | 5/7 (2: cuerpo nuevo; 7: migración registrada) |
+| `supabase/verificaciones/rls-fase7-folio-anulado.sql` (con `rollback`) | 9/9 | 5/9 (2: el documento entra con el folio anulado; 6, 7 y 9 por lo mismo) |
+| Regresiones: `0011_folios.sql`, `rls-fase6-folios.sql`, `rls-fase3-empresas.sql`, `rls-fase4-bloqueos.sql`, `rls-fase5-certificacion.sql`, `rls-fase5-autorizacion-externa.sql`, `rls-fase5-verificar-autorizacion.sql`, verificaciones `0008` y `0006` | 18/18, 27/27, 43/43, 21/21, 16/16, 12/12, 7/7, 10/10, 9/9 | — |
+
+La concurrencia no se puede probar en PGlite (una conexión); el razonamiento del candado
+está en el encabezado de la migración y en
+[triggers](triggers-y-logica.md#tg_validar_documento-migración-0012). El código de la app
+no cambia: el set de pruebas (`envio-set.ts`) inserta los documentos antes de anular sus
+folios y después solo cambia `estado`.
+
+Pasos, **con autorización del usuario** (los que se siguieron el 2026-11-15; los resultados,
+en el estado de arriba):
+
+1. Leer la migración completa (`supabase/migrations/0012_folio_anulado.sql`).
+2. Antes de migrar, la verificación tiene que dar **5/7** (2 y 7 en `false`). Si la 6 sale
+   `false`, hay documentos vivos con un folio anulado: revisarlos antes (la 0012 no los
+   toca, pero un cambio de folio sobre ellos fallaría).
+3. `pnpm exec supabase db push --remote=rbrntkztzijaxsnpgpqn --dry-run`: debe listar **solo
+   `0012`**.
+4. `pnpm exec supabase db push --remote=rbrntkztzijaxsnpgpqn`.
+5. Verificaciones: `supabase/verificaciones/0012_folio_anulado.sql` **7/7**; la simulación
+   `rls-fase7-folio-anulado.sql` **9/9** y su consulta de limpieza del encabezado en 0
+   (usuarios `folan-%@ejemplo.invalid`, organizaciones `zz-prueba-folio-anulado%`, empresas
+   `Empresa folio anulado%`, secretos `caf:11111111-1:%` iguales que antes); de nuevo
+   `0011_folios.sql` 18/18.
+6. `pnpm db:tipos`: sin diferencias (no cambia firmas).
+7. Actualizar la documentación («pendiente de aplicar» → «aplicada el AAAA-MM-DD»):
+   esta sección, `08-esquema-supabase/triggers-y-logica.md` (fila de
+   `trg_10_validar_documento` y su sección), `03-api-reference/rpc-backend.md`
+   («Folio asignado sin documento todavía»), `07-referencia/trampas-conocidas.md` («Folios
+   (CAF) (Fase 6)» → «Anulación»), `02-guias/folios-caf.md` («Puntos de enganche para la
+   Fase 7»), `05-pruebas/probar-el-esquema.md` (fila `0012_folio_anulado.sql` de §1 y
+   §10) y `08-esquema-supabase/arquitectura.md`; en `PLAN-SAAS.md`, la fila de
+   `0012_folio_anulado` en §6.
 
 ## Requisitos del proyecto
 
