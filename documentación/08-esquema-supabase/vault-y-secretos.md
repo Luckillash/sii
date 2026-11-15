@@ -1,9 +1,9 @@
 ---
 title: "Esquema: Vault y secretos"
 description: "Qué secretos hay, dónde van, cómo se guardan, leen y borran, y qué se cifra fuera de la base."
-keywords: [Vault, vault.secrets, vault.decrypted_secrets, vault.create_secret, guardar_secreto, leer_secreto, registrar_certificado, tg_borrar_secretos, trg_borrar_secretos, pfx_secret_id, clave_secret_id, caf_secret_id, secreto_secret_id, cron_token, "certificado:<huella>:pfx", "certificado:<huella>:clave", depurar.ts, depurarEvento, beforeSend, beforeSendSpan, beforeBreadcrumb, server_action_form_data, "[Filtrado]", AES-256-GCM, SII_TOKENS_KEY, AAD, cifrado.ts, crearCredenciales, ErrorCredenciales, sanearTexto, sanearDetalle, detalleSeguro, contextoSesion, SesionesSupabase, registrar_caf, "caf:<rut>", xmlCaf, migración 0008]
+keywords: [Vault, vault.secrets, vault.decrypted_secrets, vault.create_secret, guardar_secreto, leer_secreto, registrar_certificado, tg_borrar_secretos, trg_borrar_secretos, pfx_secret_id, clave_secret_id, caf_secret_id, secreto_secret_id, cron_token, "certificado:<huella>:pfx", "certificado:<huella>:clave", depurar.ts, depurarEvento, beforeSend, beforeSendSpan, beforeBreadcrumb, server_action_form_data, "[Filtrado]", AES-256-GCM, SII_TOKENS_KEY, AAD, cifrado.ts, crearCredenciales, ErrorCredenciales, sanearTexto, sanearDetalle, detalleSeguro, contextoSesion, SesionesSupabase, registrar_caf, "caf:<rut>", xmlCaf, migración 0008, subirCaf, validarCaf, carga manual, CAF de producción]
 related: ["01-fundamentos/ambientes-y-credenciales.md", "03-api-reference/rpc-backend.md", "04-objetos/objetos-empresas-y-credenciales.md", "02-guias/onboarding-organizacion.md"]
-source: ["supabase_saas_sii.sql §6 §7 §14 §15", "supabase/migrations/0002_extensiones_cron.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0008_certificacion.sql", "apps/web/src/lib/sentry/depurar.ts", "apps/web/src/server/cifrado.ts", "PLAN-SAAS.md §2 §4.4 §4.8"]
+source: ["supabase_saas_sii.sql §6 §7 §14 §15", "supabase/migrations/0002_extensiones_cron.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/folios/", "apps/web/src/lib/sentry/depurar.ts", "apps/web/src/server/cifrado.ts", "PLAN-SAAS.md §2 §4.4 §4.8"]
 ---
 
 # Esquema: Vault y secretos
@@ -87,6 +87,23 @@ las boletas del set: lee `caf_secret_id` de la fila de `cafs` filtrando por
 leer el CAF guardado. Vuelve a pedir folios para el set.» (`config`). El XML se usa en
 memoria con `ArmadorBoleta` y no se guarda en otro lado. La UI nunca selecciona
 `caf_secret_id`.
+
+### CAF de producción y carga manual (Fase 6)
+
+Mismo `registrar_caf`, dos entradas nuevas (`apps/web/src/server/folios/`):
+
+| Entrada | De dónde sale el XML | Antes de Vault |
+|---|---|---|
+| Timbraje en producción (`solicitarEnSii`, desde `/folios`) | `SolicitudFolios` en palena (IDK 300) | la librería valida IDK, RUT y tipo; el secreto queda `caf:<rut>:produccion:<tipo>:<desde>-<hasta>` |
+| Carga manual (`subirCaf`, Server Action con `FormData`) | el archivo que sube un administrador (hasta 64 KB) | `validarCaf`: CAF del SII, tipo 39/41, IDK del ambiente, RUT de la empresa, `<RSASK>` legible (`new Timbre`) y del mismo par que `<RSAPK>`; confirma la sesión con `getUser()` |
+
+En la carga manual el archivo solo vive en la petición (`Uint8Array` en memoria): no va a
+disco, logs, Sentry ni de vuelta al navegador, tampoco su nombre. Los mensajes de error
+nombran el dato que falla (y el RUT, tipo o rango públicos del `<DA>`), nunca el contenido;
+los errores de la librería se descartan sin propagar su `cause`. El formulario de la Server
+Action lo filtra además `depurar.ts` (regla de `server_action_form_data`). Con la migración
+0011 (**aplicada el 2026-11-15**), un CAF traslapado aborta `registrar_caf` con `23P01` y el
+secreto se va con la transacción.
 
 ## Quién lee
 
@@ -224,5 +241,4 @@ con AAD `JSON.stringify(['sesiones_sii', certificadoId, ambiente])` (`contextoSe
 Detalle de variables y del spike en
 [ambientes y credenciales](../01-fundamentos/ambientes-y-credenciales.md#cifrado-de-tokens-y-cookies).
 
-<!-- TODO (Fase 6): CAF de producción y carga manual de un CAF (el guardado y la lectura en certificación ya están arriba, Fase 5). -->
 <!-- TODO (Fase 11): rotación del secreto HMAC de un webhook. -->

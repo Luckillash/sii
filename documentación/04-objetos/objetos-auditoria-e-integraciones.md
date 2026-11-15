@@ -113,6 +113,13 @@ llegan por Realtime: no pongas ahí nada que un lector no deba ver.
 | `declarar` | `codigo_estado` | — |
 | `verificar_autorizacion` (la única con `ambiente = 'produccion'`) | `respuesta` (`autorizada`, `sin_representacion` o `no_autorizada`); si está autorizada, `nro_resol`, `fch_resol`, `fecha_autorizacion` y `resolucion` (`igual`, `registrada` o `reemplazada`); del STC, `stc` (`boleta`, `sin_boleta` o `no_disponible`) y, con `boleta`, `stc_ultimo_anio`. Nunca correos, URL ni nombre del software, ni otros datos del STC | — |
 
+Desde la Fase 6, `solicitar_folios` (del asistente y de `/folios`) pasa por
+`solicitarEnSii` (`server/folios/sii.ts`), que agrega además `nivel` (`revision` o
+`timbrar`) y `tipo_dte`. La de `/folios` puede ser de producción, y la **revisión con el
+SII** deja una fila `confirmada = false` que sí salió al SII (no timbra; la solicitud queda
+`simulada`). La carga manual de un CAF y la anulación no dejan fila
+([folios](../02-guias/folios-caf.md)).
+
 Los ensayos del asistente no dejan fila
 ([guía](../02-guias/certificacion-empresa.md#ensayo-y-confirmación)).
 

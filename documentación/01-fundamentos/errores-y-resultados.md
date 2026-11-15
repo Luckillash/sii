@@ -1,7 +1,7 @@
 ---
 title: "Errores, resultados de operación y la regla del incierto"
 description: "Jerarquía de errores de la librería, resultado_operacion, códigos de salida de la CLI, qué ve el usuario, qué llega a Sentry y el bloqueo de reintento por incierto."
-keywords: [resultado_operacion, codigoDeError, resultadoDeError, CODIGO_DE_RESULTADO, ejecutarOperacion, ResultadoEjecucion, ejecutada, motivo, sesion_invalida, incierto_sin_revisar, en_curso, sin_registro, marcarInciertaRevisada, revisada_en, revisada_por, abandonada, MINUTOS_EN_CURSO_ABANDONADA, OPERACIONES_QUE_GRABAN, OPERACIONES_EFECTO_GLOBAL, confirmada, ensayo, getUser, confirmarSesion, SiiError, ErrorTransporte, ErrorRespuestaSii, ErrorSolicitudFolios, SesionCaducaError, FolioInicialRequeridoError, FoliosSinCafError, ErrorPostulacion, DeclaracionInciertaError, SetSinDescargarError, ErrorCertificado, ErrorUso, ErrorConfig, ErrorVerificacion, ErrorIncierto, ErrorCredenciales, BloqueoOcupadoError, mensajeParaUsuario, detalleSeguro, sanearTexto, sanearDetalle, Sentry, ErrorRegistroOperacion, host_sii, carrera, doble timbraje, operaciones_sii_efecto_global_en_curso, 23505, control previo, control posterior, uso]
+keywords: [resultado_operacion, codigoDeError, resultadoDeError, CODIGO_DE_RESULTADO, ejecutarOperacion, ResultadoEjecucion, ejecutada, motivo, sesion_invalida, incierto_sin_revisar, en_curso, sin_registro, marcarInciertaRevisada, revisada_en, revisada_por, abandonada, MINUTOS_EN_CURSO_ABANDONADA, OPERACIONES_QUE_GRABAN, OPERACIONES_EFECTO_GLOBAL, confirmada, ensayo, getUser, confirmarSesion, SiiError, ErrorTransporte, ErrorRespuestaSii, ErrorSolicitudFolios, SesionCaducaError, FolioInicialRequeridoError, FoliosSinCafError, ErrorPostulacion, DeclaracionInciertaError, SetSinDescargarError, ErrorCertificado, ErrorUso, ErrorConfig, ErrorVerificacion, ErrorIncierto, ErrorCredenciales, BloqueoOcupadoError, mensajeParaUsuario, detalleSeguro, sanearTexto, sanearDetalle, Sentry, ErrorRegistroOperacion, host_sii, carrera, doble timbraje, operaciones_sii_efecto_global_en_curso, 23505, control previo, control posterior, uso, ErrorFolios, POR_NOMBRE, anular_folios, traducirErrorAnulacion, 23P01, P0002, 42501, 22023, 23503, migración 0011]
 related: ["04-objetos/objetos-auditoria-e-integraciones.md", "09-libreria/backend-service-role.md", "01-fundamentos/autenticacion-sii.md", "07-referencia/trampas-conocidas.md", "04-objetos/codigos-y-enumeraciones.md", "08-esquema-supabase/solucion-de-problemas.md"]
 source: ["supabase_saas_sii.sql §1 §13", "apps/web/src/server/sii/errores.ts", "apps/web/src/server/sii/operacion.ts", "supabase/migrations/0007_bloqueos_sii.sql", "packages/certificacion/apps/cli/src/errores.ts", "packages/certificacion/packages/core/src/comun/errores.ts", "PLAN-SAAS.md §2 §4.8 (Fase 4)"]
 ---
@@ -51,6 +51,7 @@ siguiente.
 | `ErrorIncierto` | app | `incierto` | 6 | «No sabemos si el SII completó la operación» | evento `error` |
 | `ErrorCredenciales` | `credenciales.ts` | `config` (motivo `base`: `error`) | 3 (1) | su propio `mensaje` (p. ej. «El certificado está vencido» + qué hacer) | breadcrumb `warning` (`error`: excepción) |
 | `BloqueoOcupadoError` | `bloqueos.ts` | `transporte` | 4 | su propio `mensajeUsuario`: «Hay otra operación con el SII en curso con este certificado» | evento `warning`, sin `host_sii` |
+| `ErrorFolios` (Fase 6) | `server/folios/errores.ts` | su `resultado`: `uso` (por defecto) o `config` | 2 / 3 | su propio `mensajeUsuario` (empresa sin autorización, plan sin producción, revisión con el SII pendiente o vencida, empresa desactivada…), que ya termina en «No se envió nada al SII.» | breadcrumb `warning` |
 | `ErrorCertificado` | librería | `config` | 3 | «Falta configurar algo…» | breadcrumb `warning` |
 | `DeclaracionInciertaError`, `FoliosSinCafError` | librería | `incierto` | 6 | «No sabemos si el SII completó la operación» + la instrucción del error (revisar «Folios ya autorizados» / consultar P90–P91) | evento `error` |
 | `ErrorTransporte` | librería | `transporte` | 4 | «No pudimos comunicarnos con el SII» | evento `warning` con etiqueta `host_sii` |
@@ -70,8 +71,9 @@ mensajes propios de `ErrorCredenciales` y `BloqueoOcupadoError` van tal cual, si
 
 Notas:
 
-- Los errores de otros módulos de la capa SII (`ErrorCredenciales`, `BloqueoOcupadoError`)
-  se reconocen **por `name` y por su forma**, sin importarlos. Si traen su propio
+- Los errores de otros módulos de la capa SII (`ErrorCredenciales`, `BloqueoOcupadoError`,
+  `ErrorEmpresaAutorizada` y, desde la Fase 6, `ErrorFolios`; tabla `POR_NOMBRE` de
+  `errores.ts`) se reconocen **por `name` y por su forma**, sin importarlos. Si traen su propio
   `MensajeError` (`mensaje` o `mensajeUsuario`), se muestra ese; si traen `resultado`
   válido (`ErrorCredenciales.resultado`), manda sobre el de la tabla.
 - Un error desconocido **nunca** muestra su `message` (podría traer cualquier cosa):
@@ -198,6 +200,12 @@ llaman a `ejecutarOperacion`: validan en la base y devuelven `{ tipo: 'ensayo', 
 **sin salir al SII y sin fila** en `operaciones_sii` (como la CLI sin `--confirmar`, que
 tampoco registra nada). Solo las confirmadas pasan por `ejecutarOperacion`
 ([guía](../02-guias/certificacion-empresa.md#ensayo-y-confirmación)).
+
+**La revisión con el SII de `/folios` (Fase 6) sí usa `confirmada: false`.** Es el primer
+caso con fila `confirmada = false` que **sale al SII**: recorre el asistente de folios sin
+la orden de timbrar (la corta `TransporteSinTimbrar`) y deja la solicitud `simulada`. Sin
+`getUser()` y sin bloqueo por incierto, como dice la tabla; el ensayo de `/folios` (nivel
+`ensayo`) sigue sin red ni fila ([guía](../02-guias/folios-caf.md#tres-niveles)).
 
 `OPERACIONES_QUE_GRABAN` (⚠️): `postular`, `descargar_set`, `solicitar_folios`,
 `enviar_set`, `solicitar_revision`, `declarar`, `enviar_rcof`, `emitir`. El resto del
@@ -344,4 +352,25 @@ Los errores de PostgREST y de las RPC (códigos `22004`, `22023`, `23503`, `2350
 [solución de problemas](../08-esquema-supabase/solucion-de-problemas.md). La capa SII solo
 informa su `code`, nunca el `message` ni el `details` (podrían traer la fila).
 
-<!-- TODO: códigos de error propios de la base (tg_validar_documento, asignar_folio, cuotas) cuando se documenten sus fases. -->
+### Folios (Fase 6)
+
+Fuera de `ejecutarOperacion` (la carga manual y la anulación no son operaciones del SII),
+`server/folios/errores.ts` traduce los códigos de la base a mensajes del design system. Del
+mensaje de la base solo toma el número del folio usado (`23503`).
+
+| Origen | Código | Qué ve el usuario |
+|---|---|---|
+| `anular_folios` (migración 0011, **aplicada el 2026-11-15**) | `P0002` | «No encontramos el CAF» (inexistente o de otra organización) |
+| | `42501` | «No tienes permiso para gestionar folios» |
+| | `22023` | «Revisa el rango a anular» |
+| | `23503` | «Hay folios del rango que ya se usaron» (con el folio) |
+| | otro (`PGRST202` sin la 0011) | «No pudimos anular los folios» |
+| `registrar_caf` en la carga manual | `23P01` (trigger de la 0011) o `23505` | «El CAF se cruza con otro ya cargado» |
+| | `P0002` | «No encontramos la empresa» |
+| | `22023` | «El CAF no calza con la empresa o el ambiente» |
+| `registrar_caf` en el timbrado | cualquiera | `ErrorIncierto`: solicitud `incierta`, operación `incierto` (los folios ya se timbraron) |
+| `asignar_folio` | `P0002` | sin folios libres (`puedeEmitir` lo anticipa en la Fase 7) |
+
+Contratos en [RPC del backend](../03-api-reference/rpc-backend.md#anular_folios-migración-0011).
+
+<!-- TODO: códigos de error propios de la base (tg_validar_documento, cuotas) cuando se documenten sus fases. -->

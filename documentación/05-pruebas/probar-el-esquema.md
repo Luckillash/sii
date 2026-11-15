@@ -1,7 +1,7 @@
 ---
 title: "Probar el esquema (RLS, triggers, cuotas)"
 description: "Cómo verificar el esquema y simular roles en la única base (producción) sin dejar rastro."
-keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp, 0006_realtime_operaciones.sql, 0007_bloqueos_sii.sql, rls-fase4-bloqueos.sql, bloqueos_sii, arriendo, 0008_certificacion.sql, rls-fase5-certificacion.sql, registrar_caf, guardar_set_pruebas, CAF de mentira, 0009_autorizacion_externa.sql, rls-fase5-autorizacion-externa.sql, tg_resolucion_autoriza_produccion, autorizada_produccion, 0010_verificar_autorizacion.sql, rls-fase5-verificar-autorizacion.sql, verificar_autorizacion, PGlite]
+keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp, 0006_realtime_operaciones.sql, 0007_bloqueos_sii.sql, rls-fase4-bloqueos.sql, bloqueos_sii, arriendo, 0008_certificacion.sql, rls-fase5-certificacion.sql, registrar_caf, guardar_set_pruebas, CAF de mentira, 0009_autorizacion_externa.sql, rls-fase5-autorizacion-externa.sql, tg_resolucion_autoriza_produccion, autorizada_produccion, 0010_verificar_autorizacion.sql, rls-fase5-verificar-autorizacion.sql, verificar_autorizacion, PGlite, 0011_folios.sql, rls-fase6-folios.sql, anular_folios, trg_20_caf_sin_traslape, 23P01]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "08-esquema-supabase/despliegue.md"]
 source: ["supabase_saas_sii.sql §15 §17", "supabase/verificaciones/", "supabase/verificaciones/rls-fase2-tenancy.sql"]
 ---
@@ -28,6 +28,7 @@ comprobación con `ok = true/false` y, si falla, el `detalle`. No escribe nada.
 | `0008_certificacion.sql` | 10 comprobaciones: `registrar_caf` y `guardar_set_pruebas` existen con su firma (`to_regprocedure`); devuelven `uuid` e `integer`; nombres de parámetros (los que usa `server/certificacion` al llamar por RPC); `plpgsql`, `security definer`, `search_path` vacío; `service_role` las ejecuta; `authenticated`, `anon` y `PUBLIC` no; cuerpos (Vault con `guardar_secreto` tras `for no key update`, idempotencia por `folio_hasta`, `unique_violation`, filtro por organización; borrado e inserción de casos, `set_descargado`, `envio_set_id = null`); migración registrada como `0008`. Aplicada el 2026-11-13 ([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0008)): 10/10 `ok` (antes de migrar daba todo `false`) |
 | `0009_autorizacion_externa.sql` | 9 comprobaciones: `tg_resolucion_autoriza_produccion()` existe y devuelve `trigger`; `plpgsql`, `security definer`, `search_path` vacío; sin `EXECUTE` para PUBLIC, `anon` ni `authenticated`; cuerpo (marca `autorizada_produccion` y `coalesce(autorizada_en, now())` filtrando por empresa y organización, sin desmarcar); trigger `trg_50_resolucion_autoriza_produccion` en `resoluciones` (`after`, por fila, `insert` y `update`, activo); su `WHEN` (producción y vigente); `trg_05_proteger_autorizacion` sigue en `empresas`; ninguna empresa con resolución de producción vigente queda sin autorizar; migración registrada como `0009`. Aplicada el 2026-11-13: 9/9 `ok` ([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0009)); en PGlite: 9/9 con la 0009, 2/9 sin ella |
 | `0010_verificar_autorizacion.sql` | 6 comprobaciones: `operacion_sii` tiene `verificar_autorizacion`; es el último valor, justo después de `seguimiento`; los 15 anteriores siguen en su orden (16 en total); el índice único `operaciones_sii_efecto_global_en_curso` (0007) sigue válido y con exactamente `solicitar_folios`, `postular` y `declarar`; ninguna fila `verificar_autorizacion` abandonada en curso (más de 15 minutos); migración registrada como `0010`. Usa `operacion::text` para poder correr antes de migrar. Aplicada el 2026-11-14: 6/6 `ok` ([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0010)); en PGlite: 6/6 con la 0010, 2/6 sin ella |
+| `0011_folios.sql` | 18 comprobaciones: 1–9 de `anular_folios` (firma `(uuid, integer, integer, text)` y `integer` con `to_regprocedure`; nombres de parámetros `p_caf`, `p_desde`, `p_hasta`, `p_motivo`; `plpgsql`, `security definer`, `search_path` vacío; la ejecutan `service_role` y `authenticated`, no `anon` ni PUBLIC; comentario; cuerpo: permiso `service_role` o `es_admin`, `for update`, documentos no anulados con `23503`, `on conflict`, cierre del CAF en la cola completa); 10–11 del trigger (`tg_caf_sin_traslape()` `security definer` con `for no key update` y `23P01`, sin `EXECUTE` para PUBLIC, `anon` ni `authenticated`; `trg_20_caf_sin_traslape` en `cafs`: `before`, por fila, `insert` y `update of` las 5 columnas, activo); 12 ningún par de CAF traslapado en los datos; 13–14 `folios_anulados` sin la política `alta` (solo `lectura`) y `authenticated` sin `insert`, `update`, `delete` ni `truncate` (sí `select`), `anon` sin nada; 15 `cafs` y `folios_anulados` en `supabase_realtime` (`insert`/`update`/`delete`) sin sacar a las 5 de la 0001 y la 0006; 16 Realtime aplica RLS en las dos (RLS activo, `lectura` con `es_miembro`, `select` para `authenticated`, nada para `anon`, *replica identity* por defecto); 17 `cafs` sin columnas de XML ni llave (`caf_secret_id` es un uuid); 18 migración registrada como `0011`. Aplicada el 2026-11-15: 18/18 `ok` ([despliegue](../08-esquema-supabase/despliegue.md#fase-6-migración-0011)); antes de migrar daba 3/18 (12, 16 y 17), igual que en PGlite sin la 0011 (18/18 con ella) |
 
 Se ejecuta pegándolo en el SQL Editor o con el MCP `execute_sql`. Cada migración nueva trae
 el suyo.
@@ -343,7 +344,69 @@ limpieza dio todo en 0. Corrida en producción el 2026-11-14, con la 0010 aplica
 y la limpieza en 0 (también 0 filas `verificar_autorizacion` en `operaciones_sii`)
 ([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0010)).
 
-## 9. Lo que no se prueba con SQL
+## 9. Simulación de folios de la Fase 6 (`rls-fase6-folios.sql`)
+
+`supabase/verificaciones/rls-fase6-folios.sql` prueba la migración 0011: un administrador
+anula folios asignados que no se usaron (caso a) y la cola completa de un CAF (caso b, que
+lo deja `anulado` y fuera de `asignar_folio`); emisor, lector y `anon` no pueden, y para
+otra organización el CAF no existe; un folio con documento no anulado, una cola parcial y
+un rango fuera del CAF se rechazan; repetir devuelve 0; un CAF que se traslapa da `23P01` y
+`registrar_caf` sigue idempotente; un administrador con su sesión no escribe directo en
+`folios_anulados`, y `cafs` y `folios_anulados` están en la publicación de Realtime.
+**Requiere la 0011 aplicada** (en producción desde el 2026-11-15): sin ella el script corre
+igual (cada llamada captura su error), pero solo la 1 sale `true` (`anular_folios` da
+`42883`, los CAF traslapados entran, el `insert` directo pasa y las tablas no están
+publicadas).
+
+Mismo patrón que las anteriores (usuarios ficticios `folios-…@ejemplo.invalid`,
+`request.jwt.claims` + `set local role`, `pg_temp.registrar`, parámetros locales
+`prueba.*`, `rollback` final). Usuarios `…6a1`–`6a4` (propietario, administrador, emisor y
+lector de A) y `…6b1` (propietario de B); A pasa a Pyme. En la empresa de A (tipo 39,
+certificación): CAF1 folios 1–10 y CAF2 11–20 por `registrar_caf` (CAF **de mentira**, con
+su secreto de prueba en Vault, que el `rollback` deshace); `asignar_folio` entrega 5 folios
+de CAF1 (siguiente 6); un documento `anulado` con folio 1 y uno `firmado` con folio 2. No
+llama a `pg_net` (los documentos en `firmado` y `anulado` no encolan webhooks) y de Vault
+solo cuenta filas por descripción.
+
+| # | Grupo | Comprobaciones |
+|---|---|---|
+| 1 | Preparación | A (Pyme) con los 4 roles y B; CAF1 con 5 folios asignados y CAF2 activos; los dos documentos |
+| 2–6 | Caso a (administrador) | anula 3–4: devuelve 2, motivo recortado, `anulado_por` y organización, el CAF sigue activo; repetir devuelve 0 sin duplicar; 3–5 cuenta solo el nuevo (1); un folio con documento `firmado` da `23503` y no entra ninguno; uno cuyo documento está `anulado` sí se anula |
+| 7–11 | Validaciones (`22023`) | cola parcial (6–8) sin cambiar el CAF; cola que empieza más arriba del siguiente (8–10); rango fuera del CAF (9–11 y 0–2); inicial mayor que final; motivo vacío, nulo o de 501 caracteres (el de 500 pasa) |
+| 12–15 | Quienes no pueden | emisor y lector de A (`42501`, el CAF no cambia); propietario de B (`P0002`, mismo mensaje que un CAF inexistente, y no lo ve por `select`); `anon` (`42501`) |
+| 16–20 | Caso b | el propietario anula la cola 6–10: devuelve 5 y CAF1 queda `anulado` con siguiente 11; repetir da 0; `asignar_folio` entrega el 11 de CAF2; `service_role` anula la cola de CAF2 desde un folio ya asignado (11–20 con siguiente 12): 10, `anulado_por` nulo; con los dos anulados, `asignar_folio` da `P0002` |
+| 21–24 | Traslapes y `registrar_caf` | un CAF 15–25 da `23P01` que nombra el rango, sin secreto huérfano; entran el contiguo 21–30 y el mismo 1–10 en tipo 41; mover 21–30 a 18–30 da `23P01`; `registrar_caf` repetido con CAF1 devuelve el mismo id, sin secreto nuevo y sin reactivarlo |
+| 25 | Lectura (RLS de 0001) | el lector de A ve los 19 folios anulados de su organización; B no ve ninguno |
+| 26 | Sin escritura directa | el administrador de A con su sesión no inserta, edita ni borra en `folios_anulados` (`42501`; sin la política `alta`); nada cambia |
+| 27 | Realtime | `cafs` y `folios_anulados` están en `supabase_realtime` |
+
+Cómo correrlo: el archivo **completo**, tal cual, con el MCP `execute_sql` o en el SQL
+Editor (como `postgres`); nunca por partes ni cambiando el `rollback` por `commit`. Debe dar
+27/27 con `ok = true`. Después, la consulta de control del encabezado:
+
+```sql
+select
+  (select count(*) from auth.users where email like 'folios-%@ejemplo.invalid') as usuarios,
+  (select count(*) from public.organizaciones where slug like 'zz-prueba-folios-fase6%') as organizaciones,
+  (select count(*) from public.empresas where razon_social like 'Empresa folios fase 6%') as empresas,
+  (select count(*) from vault.secrets where description like 'caf:11111111-1:%') as secretos;
+-- todo en 0 (secretos: el mismo número que antes, si una empresa real tuviera el RUT 11111111-1)
+```
+
+Probada en PGlite (esquema 0001 y 0003–0011 con stubs, incluida la publicación
+`supabase_realtime`): 27/27 con la 0011 y 1/27 sin ella. En la misma corrida siguen en
+verde `rls-fase3-empresas.sql` (43/43), `rls-fase4-bloqueos.sql` (21/21),
+`rls-fase5-certificacion.sql` (16/16), `rls-fase5-autorizacion-externa.sql` (12/12),
+`rls-fase5-verificar-autorizacion.sql` (7/7) y las verificaciones `0008_certificacion.sql`
+(10/10) y `0006_realtime_operaciones.sql` (9/9).
+
+Corrida en producción el 2026-11-15, con la 0011 aplicada
+([despliegue](../08-esquema-supabase/despliegue.md#fase-6-migración-0011)): 27/27 `ok`; tras
+el `rollback`, la consulta de limpieza dio todo en 0 (usuarios, perfiles, organizaciones,
+empresas, CAF, folios anulados, documentos y secretos `caf:11111111-1:%`), y `vault.secrets`
+quedó con los mismos 3 secretos que antes de correrla.
+
+## 10. Lo que no se prueba con SQL
 
 El aislamiento entre organizaciones y los permisos por rol también se prueban de punta a
 punta con la app (Fase 2): dos usuarios de organizaciones distintas, cada uno con su

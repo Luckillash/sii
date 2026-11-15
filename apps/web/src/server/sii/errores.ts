@@ -98,12 +98,17 @@ export class ErrorIncierto extends Error {
 //   ErrorEmpresaAutorizada (certificacion/comun.ts) la empresa ya está autorizada en
 //                        producción y se intentó un paso de la certificación: `uso`
 //                        (2), nada salió al SII. Trae `mensajeUsuario`.
+//   ErrorFolios          (folios/errores.ts) dato o requisito que falta para pedir folios
+//                        (empresa sin autorización o plan sin producción, revisión con el
+//                        SII pendiente): `uso` o `config` según su `resultado`, nada salió
+//                        al SII. Trae `mensajeUsuario`.
 // Los demás de esos módulos (ErrorBloqueo, ErrorSesiones, ErrorAlmacen,
 // ErrorTokenStore: fallas de Supabase) caen en `error` con mensaje genérico.
 const POR_NOMBRE: Readonly<Record<string, ResultadoFinal>> = Object.freeze({
   ErrorCredenciales: 'config',
   BloqueoOcupadoError: 'transporte',
   ErrorEmpresaAutorizada: 'uso',
+  ErrorFolios: 'uso',
 });
 
 const RESULTADOS_FINALES: readonly string[] = Object.keys(CODIGO_DE_RESULTADO);

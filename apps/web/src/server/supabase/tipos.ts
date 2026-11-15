@@ -2388,6 +2388,15 @@ export type Database = {
     }
     Functions: {
       aceptar_invitacion: { Args: { p_token: string }; Returns: string }
+      anular_folios: {
+        Args: {
+          p_caf: string
+          p_desde: number
+          p_hasta: number
+          p_motivo: string
+        }
+        Returns: number
+      }
       asignar_folio: {
         Args: {
           p_ambiente: Database["public"]["Enums"]["ambiente_sii"]

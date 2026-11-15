@@ -3,5 +3,6 @@
 
 export { type CorreoAuth, PLANTILLAS_AUTH, type PlantillaAuth } from './auth';
 export { correoCertificacion, type DatosCertificacion } from './certificacion';
+export { correoFoliosPorAgotarse, type DatosFoliosPorAgotarse } from './folios';
 export { correoInvitacion, type DatosInvitacion } from './invitacion';
 export type { Correo } from './plantilla';

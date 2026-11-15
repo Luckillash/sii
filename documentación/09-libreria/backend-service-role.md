@@ -213,7 +213,10 @@ librería**. La auditoría envuelve todo para que cualquier falla (también un c
 vencido o el bloqueo ocupado) quede en `operaciones_sii` con su resultado.
 
 Ejemplo: solicitar 5 folios de boleta (39) en certificación desde una Server Action. La
-action ya verificó membresía y rol; la Fase 6 hará la versión real.
+action ya verificó membresía y rol. La versión real está en `server/folios/sii.ts`
+(`solicitarEnSii`, Fase 6): bitácora en `solicitudes_folios`, revisión sin timbrar con
+`TransporteSinTimbrar` y guardado con `registrar_caf`
+([folios](../02-guias/folios-caf.md#solicitar-folios)).
 
 ```ts
 import { SolicitudFolios } from '@winex/certificacion';
@@ -257,7 +260,7 @@ const r = await ejecutarOperacion(
       }),
     );
     agregarDetalle({ tipo_dte: 39, cantidad: 5 });
-    // Guardar el CAF (Vault + cafs, Fase 6). Si eso falla, el CAF ya se timbró:
+    // Guardar el CAF (Vault + cafs con registrar_caf). Si eso falla, el CAF ya se timbró:
     // throw new ErrorIncierto('Los folios se timbraron pero no pudimos guardar el CAF. …')
     return caf;
   },
@@ -321,4 +324,23 @@ certificado con `crearCredenciales` y sube los XML con `AlmacenDocumentos`. Lo q
 
 Detalle en [certificación de la empresa](../02-guias/certificacion-empresa.md).
 
-<!-- TODO (Fases 6–8 y 11): workers y cron (seguimiento, webhooks), CAF de producción, uso desde la API pública (apiKeyId). -->
+## Segundo consumidor: folios (Fase 6)
+
+`apps/web/src/server/folios/` reutiliza las mismas dependencias (`resolverDependencias` de
+`server/certificacion/dependencias.ts`) y helpers (`ejecutar`, `conSesionSii`,
+`errorDeEjecucion` de `comun.ts`). Lo que agrega:
+
+- **`FABRICAS_SII.folios` con ambiente** (`OpcionesClienteFolios`, certificación por
+  defecto): `SolicitudFolios` también en producción (palena).
+- **`solicitarEnSii`** (`sii.ts`), compartida con `solicitarFoliosSet` del asistente: la
+  conversación con el SII, la bitácora y `registrar_caf`, con los cierres `simulada`,
+  `timbrada`, `rechazada`, `error` e `incierta`.
+- **Una operación con `confirmada: false` que sí sale al SII**: la revisión, que corta la
+  orden de timbrar con un transporte envoltorio (`TransporteSinTimbrar`).
+- **`ErrorFolios`**, reconocido por nombre en `server/sii/errores.ts` (`POR_NOMBRE`): dentro
+  de una operación queda `uso` o `config`, nada salió al SII.
+- **Escrituras sin operación**: la carga manual (`registrar_caf`) y la anulación
+  (`anular_folios` con el cliente de **sesión**, para que la base verifique el rol), las
+  dos con `getUser()` antes de escribir.
+
+<!-- TODO (Fases 7–8 y 11): workers y cron (seguimiento, webhooks), uso desde la API pública (apiKeyId). -->

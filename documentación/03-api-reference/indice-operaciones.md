@@ -1,16 +1,43 @@
 ---
 title: "Índice de operaciones"
 description: "Todas las funciones RPC, vistas y servicios del SII, con quién puede llamarlos."
-keywords: [índice, operaciones, asistente de certificación, server/certificacion, Server Actions, postular, descargarSet, solicitarFoliosSet, enviarSet, consultarEstadoSet, solicitarRevision, consultarEstadoDeclaracion, declarar, marcarRevisada, leerAsistente, guardarDatosPostulacion, guardarDatosDeclaracion, registrar_caf, guardar_set_pruebas]
-related: ["03-api-reference/acceso-por-tabla.md", "03-api-reference/servicios-sii.md", "02-guias/certificacion-empresa.md", "03-api-reference/rpc-backend.md"]
-source: ["supabase_saas_sii.sql §15 §16 §17", "apps/web/src/server/certificacion/index.ts", "apps/web/src/app/[org]/certificacion/acciones.ts", "supabase/migrations/0008_certificacion.sql"]
+keywords: [índice, operaciones, asistente de certificación, server/certificacion, Server Actions, postular, descargarSet, solicitarFoliosSet, enviarSet, consultarEstadoSet, solicitarRevision, consultarEstadoDeclaracion, declarar, marcarRevisada, leerAsistente, guardarDatosPostulacion, guardarDatosDeclaracion, registrar_caf, guardar_set_pruebas, folios, server/folios, leerFolios, solicitarFolios, subirCaf, anularFolios, puedeEmitir, alertaDespuesDeAsignar, alertarSiCruza, anular_folios, encolar_evento, folios.por_agotarse, migración 0011]
+related: ["03-api-reference/acceso-por-tabla.md", "03-api-reference/servicios-sii.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "03-api-reference/rpc-backend.md"]
+source: ["supabase_saas_sii.sql §15 §16 §17", "apps/web/src/server/certificacion/index.ts", "apps/web/src/app/[org]/certificacion/acciones.ts", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/folios/index.ts", "apps/web/src/app/[org]/folios/acciones.ts", "supabase/migrations/0011_folios.sql"]
 ---
 
 # Índice de operaciones
 
 > **Úsalo cuando:** buscas una operación por su función.
 
-<!-- TODO: índice completo de RPC, vistas y servicios (Fases 2–4 y 6 en adelante). -->
+<!-- TODO: índice completo de RPC, vistas y servicios (Fases 2–4 y 7 en adelante). -->
+
+## Folios (Fase 6)
+
+Todo vive en `apps/web/src/server/folios/` (API en `index.ts`) y se llama desde las Server
+Actions de `apps/web/src/app/[org]/folios/acciones.ts`, que exigen membresía, rol
+**propietario o administrador** (`puedeAdministrar`) y que la empresa sea de la
+organización. Lector y emisor ven la página. Detalle en
+[folios](../02-guias/folios-caf.md).
+
+| Función de la API | Server Action | Sale al SII | `operacion_sii` | Escribe |
+|---|---|---|---|---|
+| `leerFolios(organizacionId, empresaId)` | (la usa `page.tsx`) | no | — | nada (cliente de sesión, RLS) |
+| `solicitarFolios(ctx, { nivel: 'ensayo', … })` | `solicitarFolios` | no | — | nada |
+| `solicitarFolios(ctx, { nivel: 'revision', … })` | `solicitarFolios` | sí, sin timbrar (corta `of_genera_folio`) | `solicitar_folios`, `confirmada = false` | `solicitudes_folios` (`simulada`) |
+| `solicitarFolios(ctx, { nivel: 'timbrar', …, revisionId? })` | `solicitarFolios` | ⚠️ (efecto global, timbra) | `solicitar_folios`, `confirmada = true` | `solicitudes_folios` + `registrar_caf` 🔒 (Vault + `cafs`) |
+| `subirCaf(ctx, { ambiente, contenido })` | `subirCaf` (`FormData`) | no | — | `registrar_caf` 🔒 (Vault + `cafs`; resuelve una `incierta` que calce) y `operaciones_sii.detalle.revisada_en` de su operación |
+| `anularFolios(ctx, { cafId, desde, hasta, motivo })` | `anularFolios` | no | — | `anular_folios` (migración 0011, **aplicada el 2026-11-15**; cliente de sesión): `folios_anulados` y, si es la cola, el CAF `anulado`; después la alerta |
+| `marcarRevisada(ctx, operacionId)` de `server/certificacion` | `marcarRevisada` | no | — | `operaciones_sii.detalle.revisada_en` (vía `marcarInciertaRevisada`) |
+| `puedeEmitir(cliente, clave)` | (Fase 7) | no | — | nada (service_role) |
+| `alertaDespuesDeAsignar(deps, cliente, clave, asignado)` / `alertarSiCruza(…)` | (Fase 7 / interna) | no | — | `encolar_evento` 🔒 (`folios.por_agotarse`) y correo por Resend |
+
+`ctx` es `ContextoFolios` (`organizacionId`, `empresaId`, `usuarioId`). Todas las acciones
+devuelven `ResultadoFolios` (`@/lib/folios`). RPC de la fase:
+[`anular_folios`](rpc-backend.md#anular_folios-migración-0011) (también `authenticated`
+administrador) y el trigger
+[`trg_20_caf_sin_traslape`](rpc-backend.md#trg_20_caf_sin_traslape-migración-0011), los dos
+de la migración `0011`, **aplicada el 2026-11-15**.
 
 ## Certificación ante el SII (Fase 5)
 

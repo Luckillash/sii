@@ -204,8 +204,9 @@ seguido (unos 5 ciclos, error `01.01.215.500.771.52`). Mismo blindaje que `token
 | `ultimo_uso_en`, `creado_en` | `timestamptz` | default `now()` |
 
 PK `(certificado_id, ambiente)`. La escribe la capa SII de la Fase 4
-(`SesionesSupabase`, `server/sii/sesiones.ts`); todavía ninguna pantalla la usa (la
-primera será la solicitud de folios de la Fase 6).
+(`SesionesSupabase`, `server/sii/sesiones.ts`); la usan el asistente de certificación
+(Fase 5) y la solicitud de folios de `/folios` (Fase 6, también con filas de
+`ambiente = 'produccion'`).
 
 Lo que hace la capa
 ([autenticación](../01-fundamentos/autenticacion-sii.md#sesión-aut2000-sesionests)):

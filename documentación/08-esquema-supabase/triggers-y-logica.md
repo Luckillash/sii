@@ -1,9 +1,9 @@
 ---
 title: "Esquema: triggers y lógica"
 description: "Cada trigger, su orden de ejecución y lo que hace."
-keywords: [tg_resolucion_autoriza_produccion, trg_50_resolucion_autoriza_produccion, autorizada_produccion, autorizada_en, resoluciones, tg_proteger_autorizacion, tg_certificacion_autorizada, autorizada fuera de Boletéame, migración 0009]
-related: ["02-guias/seguimiento-envios.md", "02-guias/certificacion-empresa.md", "04-objetos/objetos-certificacion.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/despliegue.md"]
-source: ["supabase_saas_sii.sql §15", "supabase/migrations/0009_autorizacion_externa.sql"]
+keywords: [tg_resolucion_autoriza_produccion, trg_50_resolucion_autoriza_produccion, autorizada_produccion, autorizada_en, resoluciones, tg_proteger_autorizacion, tg_certificacion_autorizada, autorizada fuera de Boletéame, migración 0009, trg_20_caf_sin_traslape, tg_caf_sin_traslape, 23P01, traslape, migración 0011]
+related: ["02-guias/seguimiento-envios.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "04-objetos/objetos-certificacion.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/despliegue.md"]
+source: ["supabase_saas_sii.sql §15", "supabase/migrations/0009_autorizacion_externa.sql", "supabase/migrations/0011_folios.sql"]
 ---
 
 # Esquema: triggers y lógica
@@ -46,6 +46,7 @@ prefijo numérico (`trg_00_…` primero, `trg_90_…` al final). Los `before` co
 | Trigger | Tabla | Cuándo | Qué hace |
 |---|---|---|---|
 | `trg_10_caf_inicial` | `cafs` | `before insert` | `siguiente_folio = coalesce(siguiente_folio, folio_desde)` |
+| `trg_20_caf_sin_traslape` (`tg_caf_sin_traslape`, `security definer`; migración 0011, **aplicada el 2026-11-15**) | `cafs` | `before insert or update of folio_desde, folio_hasta, ambiente, tipo_dte, empresa_id` | Toma `for no key update` sobre la empresa y rechaza con `23P01` un rango que se cruza con otro CAF de la misma empresa, ambiente y tipo, en cualquier estado. No lo disparan `asignar_folio`, `anular_folios` ni el enlace de `solicitud_id` ([contrato](../03-api-reference/rpc-backend.md#trg_20_caf_sin_traslape-migración-0011)) |
 | `trg_10_validar_documento` | `documentos` | `before insert or update of folio, caf_id, ambiente, tipo_dte` | El CAF debe ser de la misma empresa, ambiente y tipo, y el folio estar en su rango; en producción, empresa autorizada (P91) y plan con `permite_produccion` |
 | `trg_20_contar_uso` (`tg_contar_uso_documento`) | `documentos` | `before insert or update of folio` | Suma en `uso_mensual` cuando el documento recibe folio (no los borradores); las de producción se controlan contra `max_boletas_mes` |
 | `trg_60_contar_uso` (`tg_contar_uso_otros`) | `cafs`, `envios` | `after insert` | Suma `folios_timbrados` y `envios` en `uso_mensual` |

@@ -9,7 +9,9 @@
 //   - la columna generada `envios.clasificacion` y la sincronización de documentos de
 //     `sincronizar_documentos_envio` (triggers de envíos y rechazos);
 //   - `asignar_folio`, `registrar_caf`, `guardar_set_pruebas`, `registrar_resolucion`,
-//     `leer_secreto`, los bloqueos y el TokenStore.
+//     `leer_secreto`, los bloqueos y el TokenStore;
+//   - Fase 6: `anular_folios` y `tg_caf_sin_traslape` (0011, 23P01), `plan_vigente` (desde
+//     `suscripciones` + `planes`) y `encolar_evento` (queda en `escrituras`).
 //
 // No pretende ser Postgres: solo lo suficiente para probar la capa sin red ni base. Todo
 // lo que se escribe queda en `escrituras` para buscar secretos.
@@ -230,7 +232,20 @@ export function supabaseFalso(opciones: OpcionesFalso = {}) {
         if (empresa) empresa.autorizada_produccion = true;
       }
     }
-    if (nombre === 'cafs') nueva.siguiente_folio ??= nueva.folio_desde;
+    if (nombre === 'cafs') {
+      nueva.siguiente_folio ??= nueva.folio_desde;
+      // tg_caf_sin_traslape (0011).
+      const otro = tabla('cafs').find(
+        (c) =>
+          c.id !== nueva.id &&
+          c.empresa_id === nueva.empresa_id &&
+          c.ambiente === nueva.ambiente &&
+          c.tipo_dte === nueva.tipo_dte &&
+          Number(c.folio_desde) <= Number(nueva.folio_hasta) &&
+          Number(nueva.folio_desde) <= Number(c.folio_hasta),
+      );
+      if (otro) return { code: '23P01', message: 'El CAF se traslapa con otro CAF' };
+    }
     if (nombre === 'envios') {
       if (nueva.incierto && nueva.track_id) {
         return { code: '23514', message: 'envios: incierto con track_id' };
@@ -440,6 +455,14 @@ export function supabaseFalso(opciones: OpcionesFalso = {}) {
         filtros.push((f) => f[c] !== v);
         return builder;
       },
+      gt(c: string, v: unknown) {
+        filtros.push((f) => String(f[c]) > String(v));
+        return builder;
+      },
+      gte(c: string, v: unknown) {
+        filtros.push((f) => String(f[c]) >= String(v));
+        return builder;
+      },
       in(c: string, valores: unknown[]) {
         filtros.push((f) => valores.includes(f[c]));
         return builder;
@@ -580,6 +603,67 @@ export function supabaseFalso(opciones: OpcionesFalso = {}) {
       }
       return { data: id, error: null };
     },
+    plan_vigente: (a) => {
+      const s = tabla('suscripciones')
+        .filter(
+          (x) =>
+            x.organizacion_id === a.p_organizacion &&
+            ['prueba', 'activa'].includes(String(x.estado)),
+        )
+        .sort((x, y) => String(y.creado_en).localeCompare(String(x.creado_en)))[0];
+      const plan = s ? porId('planes', s.plan_id) : undefined;
+      return {
+        data: plan ? structuredClone(plan) : { id: null, permite_produccion: null },
+        error: null,
+      };
+    },
+    encolar_evento: () => ({ data: null, error: null }),
+    // anular_folios (0011), como service_role o administrador (el permiso se prueba con
+    // `fallas`: `rpc:anular_folios` → 42501).
+    anular_folios: (a) => {
+      const caf = porId('cafs', a.p_caf);
+      if (!caf) return { data: null, error: { code: 'P0002', message: 'El CAF no existe' } };
+      const desde = Number(a.p_desde);
+      const hasta = Number(a.p_hasta);
+      const motivo = String(a.p_motivo ?? '').trim();
+      const sig = Number(caf.siguiente_folio);
+      const invalido = (m: string) => ({ data: null, error: { code: '22023', message: m } });
+      if (desde > hasta) return invalido('desde > hasta');
+      if (desde < Number(caf.folio_desde) || hasta > Number(caf.folio_hasta))
+        return invalido('fuera');
+      if (motivo === '' || motivo.length > 500) return invalido('motivo');
+      if (hasta >= sig && (hasta !== Number(caf.folio_hasta) || desde > sig))
+        return invalido('cola');
+      const usado = tabla('documentos').find(
+        (d) =>
+          d.empresa_id === caf.empresa_id &&
+          d.ambiente === caf.ambiente &&
+          d.tipo_dte === caf.tipo_dte &&
+          Number(d.folio) >= desde &&
+          Number(d.folio) <= hasta &&
+          d.estado !== 'anulado',
+      );
+      if (usado) {
+        return {
+          data: null,
+          error: {
+            code: '23503',
+            message: `El folio ${usado.folio} ya tiene un documento emitido`,
+          },
+        };
+      }
+      let nuevos = 0;
+      for (let f = desde; f <= hasta; f++) {
+        if (tabla('folios_anulados').some((x) => x.caf_id === caf.id && x.folio === f)) continue;
+        insertarFila('folios_anulados', { caf_id: caf.id, folio: f, motivo });
+        nuevos++;
+      }
+      if (hasta >= sig) {
+        caf.siguiente_folio = Number(caf.folio_hasta) + 1;
+        caf.estado = 'anulado';
+      }
+      return { data: nuevos, error: null };
+    },
     guardar_set_pruebas: (a) => {
       const proceso = porId('procesos_certificacion', a.p_proceso);
       if (!proceso || proceso.organizacion_id !== a.p_organizacion) {
@@ -632,7 +716,8 @@ export function supabaseFalso(opciones: OpcionesFalso = {}) {
 
   async function rpc(nombre: string, args: Record<string, unknown>): Promise<Respuesta> {
     rpcs.push({ nombre, args: structuredClone(args) });
-    if (nombre !== 'leer_secreto' && !nombre.startsWith('token_') && !nombre.includes('bloqueo')) {
+    const lectura = nombre === 'leer_secreto' || nombre === 'plan_vigente';
+    if (!lectura && !nombre.startsWith('token_') && !nombre.includes('bloqueo')) {
       escrituras.push({ tabla: nombre, accion: 'rpc', datos: structuredClone(args) });
     }
     const falla = fallas.get(`rpc:${nombre}`);

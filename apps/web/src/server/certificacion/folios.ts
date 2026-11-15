@@ -1,24 +1,17 @@
 import 'server-only';
-import {
-  decodificarUtf8OIso,
-  ErrorSolicitudFolios,
-  ErrorTransporte,
-  FolioInicialRequeridoError,
-  FoliosSinCafError,
-  parsearDocumento,
-  SiiError,
-} from '@winex/certificacion';
 import type { ResultadoPaso } from '@/lib/certificacion';
 import { formatearRut } from '@/lib/formatos';
-import { ErrorIncierto, ErrorUso, sanearTexto } from '../sii/errores';
+import {
+  foliosDisponibles as disponiblesDeClave,
+  type FoliosDisponibles,
+} from '../folios/disponibles';
+import { type SalidaSolicitud, solicitarEnSii } from '../folios/sii';
+import { ErrorUso } from '../sii/errores';
 import type { ClienteServicio } from '../supabase/service';
-import type { Database } from '../supabase/tipos';
 import {
   AMBIENTE,
   cargarEmpresaPorCertificar,
-  conSesionSii,
   ejecutar,
-  enlazarOperacion,
   ensayar,
   errorDeEjecucion,
   etapaEntre,
@@ -42,84 +35,30 @@ import type { ContextoCertificacion } from './tipos';
 //   - `FolioInicialRequeridoError` (primer timbraje) → `requiere.folioInicial` con el
 //     valor que sugiere el SII (no se timbró nada);
 //   - si el CAF se timbró pero no se pudo guardar → `incierto` (código 6 de la CLI): no
-//     volver a pedirlos, bajar el CAF desde «Folios ya autorizados».
+//     volver a pedirlos, bajar el CAF desde «Folios ya autorizados» y subirlo.
 // El ensayo no sale al SII (la CLI sin `--confirmar` recorre el asistente hasta antes de
-// timbrar; aquí el ensayo nunca sale a la red, PLAN-SAAS principio 3).
+// timbrar; aquí el ensayo nunca sale a la red, PLAN-SAAS principio 3). La revisión con el
+// SII (el asistente sin timbrar) está en `/[org]/folios` (Fase 6).
+//
+// Lo genérico (la conversación con el SII, la lectura del CAF y la disponibilidad) vive
+// en `server/folios/` desde la Fase 6; este módulo solo pone las reglas del set.
 //
 // El XML del CAF (con `<RSASK>`) nunca se registra: solo viaja a la RPC.
 
-type EstadoSolicitud = Database['public']['Enums']['estado_solicitud_folios'];
-
-/** Lo que se lee del `<DA>` de un CAF. Nunca la llave. */
-export interface DatosCaf {
-  rutEmisor: string;
-  razonSocial: string;
-  tipoDte: number;
-  desde: number;
-  hasta: number;
-  fechaAutorizacion: string;
-  idk: number;
-}
-
-/** Lee el `<DA>` de un CAF (UTF-8 o ISO-8859-1). Lanza `Error` sin el contenido. */
-export function leerDatosCaf(caf: Uint8Array): DatosCaf {
-  const doc = parsearDocumento(decodificarUtf8OIso(caf));
-  const da = doc.getElementsByTagName('DA').item(0);
-  const rng = da?.getElementsByTagName('RNG').item(0) ?? null;
-  if (!da || !rng) throw new Error('El CAF no trae <DA> con <RNG>.');
-  const campo = (padre: Element, nombre: string) =>
-    (padre.getElementsByTagName(nombre).item(0)?.textContent ?? '').trim();
-  const entero = (padre: Element, nombre: string) => {
-    const valor = campo(padre, nombre);
-    if (!/^[0-9]+$/.test(valor)) throw new Error(`El CAF no trae <${nombre}> entero.`);
-    return Number(valor);
-  };
-  const fecha = campo(da, 'FA');
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) throw new Error('El CAF no trae <FA> válida.');
-  return {
-    rutEmisor: campo(da, 'RE'),
-    razonSocial: campo(da, 'RS'),
-    tipoDte: entero(da, 'TD'),
-    desde: entero(rng, 'D'),
-    hasta: entero(rng, 'H'),
-    fechaAutorizacion: fecha,
-    idk: entero(da, 'IDK'),
-  };
-}
-
-export interface FoliosDisponibles {
-  total: number;
-  primero: { id: string; desde: number; hasta: number; siguiente: number } | null;
-}
+export { type DatosCaf, leerDatosCaf } from '../folios/caf';
+export type { FoliosDisponibles } from '../folios/disponibles';
 
 /** Folios libres de boleta en certificación, en los CAF activos (lo que usa `asignar_folio`). */
-export async function foliosDisponibles(
+export function foliosDisponibles(
   cliente: ClienteServicio,
   ctx: ContextoCertificacion,
 ): Promise<FoliosDisponibles> {
-  const { data, error } = await cliente
-    .from('cafs')
-    .select('id, folio_desde, folio_hasta, siguiente_folio')
-    .eq('organizacion_id', ctx.organizacionId)
-    .eq('empresa_id', ctx.empresaId)
-    .eq('ambiente', AMBIENTE)
-    .eq('tipo_dte', TIPO_BOLETA)
-    .eq('estado', 'activo')
-    .order('folio_desde', { ascending: true });
-  if (error) throw fallaBase('leer los CAF de la empresa', error);
-  const libres = data.filter((c) => c.siguiente_folio <= c.folio_hasta);
-  const primero = libres[0];
-  return {
-    total: libres.reduce((suma, c) => suma + (c.folio_hasta - c.siguiente_folio + 1), 0),
-    primero: primero
-      ? {
-          id: primero.id,
-          desde: primero.folio_desde,
-          hasta: primero.folio_hasta,
-          siguiente: primero.siguiente_folio,
-        }
-      : null,
-  };
+  return disponiblesDeClave(cliente, {
+    organizacionId: ctx.organizacionId,
+    empresaId: ctx.empresaId,
+    ambiente: AMBIENTE,
+    tipoDte: TIPO_BOLETA,
+  });
 }
 
 /** Número de casos del set guardado (0 si todavía no se descarga). */
@@ -166,28 +105,6 @@ async function preparar(
   });
   return { empresa, proceso, cantidad, disponibles, certificado };
 }
-
-/** Estado y mensaje de la solicitud según el error de la librería (sin secretos). */
-function cierreDeError(error: unknown): {
-  estado: EstadoSolicitud;
-  mensaje: string;
-  rango?: { folio_desde: number; folio_hasta: number };
-} {
-  const mensaje = error instanceof SiiError ? sanearTexto(error.message) : 'Error inesperado.';
-  if (error instanceof FoliosSinCafError) {
-    return {
-      estado: 'incierta',
-      mensaje,
-      rango: { folio_desde: error.folioDesde, folio_hasta: error.folioHasta },
-    };
-  }
-  if (error instanceof ErrorSolicitudFolios) return { estado: 'rechazada', mensaje };
-  if (error instanceof ErrorTransporte) return { estado: 'error', mensaje };
-  return { estado: 'error', mensaje };
-}
-
-const MENSAJE_CAF_SIN_GUARDAR =
-  'Se timbraron los folios, pero no pudimos guardar el CAF. No los vuelvas a pedir: baja el CAF desde «Folios ya autorizados» en el portal del SII y escríbenos a soporte para cargarlo.';
 
 /** Pide folios de boleta (CAF) para el set en certificación (⚠️: timbra folios). */
 export async function solicitarFoliosSet(
@@ -238,109 +155,39 @@ export async function solicitarFoliosSet(
   const previo = await validarAntes(prep);
   if (!previo.ok) return previo.resultado;
 
-  let folioSugerido: string | undefined;
+  const salida: SalidaSolicitud = {};
   const r = await ejecutar(
     deps,
     cliente,
     ctx,
     { operacion: 'solicitar_folios', confirmada: true },
-    async ({ operacionId, agregarDetalle }) => {
+    async (herramientas) => {
       const p = await prep();
-      const solicitud = await cliente
-        .from('solicitudes_folios')
-        .insert({
-          organizacion_id: ctx.organizacionId,
-          empresa_id: ctx.empresaId,
-          certificado_id: p.certificado.certificadoId,
+      const desenlace = await solicitarEnSii(
+        deps,
+        cliente,
+        ctx,
+        {
           ambiente: AMBIENTE,
-          tipo_dte: TIPO_BOLETA,
+          tipoDte: TIPO_BOLETA,
           cantidad: p.cantidad,
-          folio_inicial: opciones.folioInicial ?? null,
-          confirmada: true,
-          estado: 'en_curso',
-          solicitado_por: ctx.usuarioId,
-        })
-        .select('id')
-        .single();
-      if (solicitud.error || !solicitud.data) {
-        throw fallaBase('registrar la solicitud de folios', solicitud.error);
-      }
-      const solicitudId = solicitud.data.id;
-      await enlazarOperacion(cliente, ctx, operacionId, { solicitud_id: solicitudId });
-      agregarDetalle({ cantidad: p.cantidad, solicitud_id: solicitudId });
-
-      const cerrar = async (
-        cambios: Database['public']['Tables']['solicitudes_folios']['Update'],
-      ) => {
-        const { error } = await cliente
-          .from('solicitudes_folios')
-          .update({ ...cambios, terminado_en: deps.reloj.ahora().toISOString() })
-          .eq('organizacion_id', ctx.organizacionId)
-          .eq('id', solicitudId);
-        if (error)
-          console.warn(`certificacion: no se pudo cerrar la solicitud (código ${error.code})`);
-      };
-
-      await using transporte = deps.transporte();
-      const folios = deps.sii.folios({ transporte, reloj: deps.reloj });
-      let caf: Buffer;
-      try {
-        caf = await conSesionSii(
-          deps,
-          cliente,
-          p.certificado,
-          () => folios.autenticar(p.certificado.certificado),
-          (sesion) =>
-            folios.solicitar(
-              sesion,
-              p.empresa.rut,
-              TIPO_BOLETA,
-              p.cantidad,
-              opciones.folioInicial !== undefined ? { folioInicial: opciones.folioInicial } : {},
-            ),
-        );
-      } catch (error) {
-        if (error instanceof FolioInicialRequeridoError) {
-          folioSugerido = /^\d+$/.test(error.folioSugerido) ? error.folioSugerido : '1';
-        }
-        const cierre = cierreDeError(error);
-        await cerrar({ estado: cierre.estado, mensaje: cierre.mensaje, ...cierre.rango });
-        throw error;
-      }
-
-      // Desde aquí los folios ya están timbrados: nada puede perder el CAF sin avisar.
-      try {
-        const datos = leerDatosCaf(caf);
-        const registro = await cliente.rpc('registrar_caf', {
-          p_organizacion: ctx.organizacionId,
-          p_empresa: ctx.empresaId,
-          p_ambiente: AMBIENTE,
-          p_tipo_dte: datos.tipoDte,
-          p_folio_desde: datos.desde,
-          p_folio_hasta: datos.hasta,
-          p_fecha_autorizacion: datos.fechaAutorizacion,
-          p_idk: datos.idk,
-          p_rut_emisor: datos.rutEmisor,
-          p_razon_social: datos.razonSocial,
-          // Texto Unicode (Vault guarda texto); `ArmadorBoleta` lo recibe igual.
-          p_caf_xml: decodificarUtf8OIso(caf),
-          p_solicitud: solicitudId,
-        });
-        if (registro.error || typeof registro.data !== 'string') {
-          throw fallaBase('registrar el CAF', registro.error);
-        }
-        agregarDetalle({ folio_desde: datos.desde, folio_hasta: datos.hasta });
-        return { cafId: registro.data, desde: datos.desde, hasta: datos.hasta };
-      } catch {
-        await cerrar({ estado: 'incierta', mensaje: MENSAJE_CAF_SIN_GUARDAR });
-        throw new ErrorIncierto(MENSAJE_CAF_SIN_GUARDAR);
-      }
+          ...(opciones.folioInicial !== undefined ? { folioInicial: opciones.folioInicial } : {}),
+          certificado: p.certificado,
+          rutEmpresa: p.empresa.rut,
+        },
+        { simular: false },
+        herramientas,
+        salida,
+      );
+      return desenlace;
     },
   );
   if (!r.ok) {
     return errorDeEjecucion(
       r,
-      folioSugerido ? { requiere: { folioInicial: { sugerido: folioSugerido } } } : {},
+      salida.folioSugerido
+        ? { requiere: { folioInicial: { sugerido: salida.folioSugerido } } }
+        : {},
     );
   }
   return ok(

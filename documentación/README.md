@@ -56,6 +56,7 @@ por fase están en `PLAN-SAAS.md`, en la raíz del repositorio.
 | Resultado | `operaciones_sii.resultado` equivale al código de salida de la CLI 0–7 ([errores](01-fundamentos/errores-y-resultados.md)) |
 | ⚠️ e incierto | Las operaciones que graban tienen ensayo y confirmación, y confirman la sesión con `getUser()`. Un `incierto` no se repite a ciegas: bloquea `solicitar_folios`, `postular` y `declarar` (y, en el asistente de certificación, `enviar_set`) hasta marcarlo como revisado ([errores](01-fundamentos/errores-y-resultados.md#la-regla-del-incierto)) |
 | Certificación | El asistente (`/<org>/certificacion`) muestra 5 pasos sobre las 8 etapas de `procesos_certificacion`; `por_declarar` (P90) y `autorizada` (P91) las pone un trigger, nunca la app. Su ensayo no sale al SII ni deja filas ([guía](02-guias/certificacion-empresa.md)) |
+| Folios | `/<org>/folios` pide folios en tres niveles: ensayo (sin red ni filas), revisión con el SII (sale, no timbra, solicitud `simulada`; **obligatoria antes de timbrar en producción**, el servidor exige su `revisionId`) y timbrado ⚠️. El CAF solo entra por `registrar_caf` (Vault + `cafs`); los folios no usados se anulan con `anular_folios` (la cola, completa). La migración `0011` está **aplicada** (2026-11-15; [guía](02-guias/folios-caf.md)) |
 | Secretos | .pfx, clave, CAF, tokens y cookies nunca en mensajes, logs, Sentry ni `operaciones_sii`; credenciales y transporte se crean por invocación, nunca globales ([vault](08-esquema-supabase/vault-y-secretos.md)) |
 | Tenancy | Todo dato de negocio lleva `organizacion_id`, heredado del padre por `trg_00_organizacion`; RLS es la autoridad y la UI solo oculta acciones ([RLS](08-esquema-supabase/rls-y-privilegios.md)) |
 | Campos del sistema | `autorizada_produccion`, la etapa y el estado SII del proceso solo los cambia el sistema (triggers `trg_05_proteger_*`) ([triggers](08-esquema-supabase/triggers-y-logica.md)) |
@@ -80,7 +81,7 @@ por fase están en `PLAN-SAAS.md`, en la raíz del repositorio.
 | Recorrido mínimo ejecutable | [02-guias/quickstart.md](02-guias/quickstart.md) |
 | Alta de cliente, equipo, plan, certificado | [02-guias/onboarding-organizacion.md](02-guias/onboarding-organizacion.md) |
 | **Certificar una empresa ante el SII** | [02-guias/certificacion-empresa.md](02-guias/certificacion-empresa.md) |
-| **Pedir CAF y asignar folios** | [02-guias/folios-caf.md](02-guias/folios-caf.md) |
+| **Pedir, subir o anular CAF; alerta de folios bajos; asignar folios** | [02-guias/folios-caf.md](02-guias/folios-caf.md) |
 | **Emitir una boleta** | [02-guias/emision-boletas.md](02-guias/emision-boletas.md) |
 | **Seguir el estado de los envíos** | [02-guias/seguimiento-envios.md](02-guias/seguimiento-envios.md) |
 | Secuencia resumida de un caso de uso | [02-guias/flujos-tipicos.md](02-guias/flujos-tipicos.md) |
@@ -203,18 +204,20 @@ documentación/
 | RCOF | Reporte de consumo de folios; obligatorio solo hasta julio de 2022 (🕰️) |
 | Resolución | Número y fecha de la resolución del SII que van en la carátula; en certificación, número 0 |
 | Incierto | Resultado 6: la orden salió al SII y no se sabe si se aplicó; se revisa antes de repetir |
-| Ensayo | Ejecución sin confirmar (`confirmada = false`): valida y muestra lo que haría, sin salir al SII |
+| Ensayo | Ejecución sin confirmar: valida y muestra lo que haría, sin salir al SII ni dejar filas |
+| Revisión con el SII | Solicitud de folios que recorre el asistente del SII sin la orden de timbrar (`confirmada = false`, solicitud `simulada`); la única operación sin confirmar que sale al SII |
 
 ## Fuentes y vigencia
 
 | Fuente | Qué aporta | Fuente de verdad para |
 |---|---|---|
-| `supabase/migrations/` (0001–0009) | Esquema aplicado en producción | Tablas, RLS, triggers y RPC |
+| `supabase/migrations/` (0001–0011 aplicadas; la 0011, el 2026-11-15) | Esquema aplicado en producción | Tablas, RLS, triggers y RPC |
 | `08-esquema-supabase/supabase_saas_sii.sql` | Esquema original (= `0001`), comentado | Intención de diseño de la `0001` |
 | `apps/web/src/server/` | Capa SII, certificación y Supabase | Comportamiento del backend |
 | `packages/certificacion` (`@winex/certificacion`, de `certificacion-node`) | Librería y CLI `sii`, con sus `docs/` | Protocolo con el SII y códigos de error |
 | `PLAN-SAAS.md` | Fases, decisiones y estado | Qué está hecho y qué falta |
 
-Análisis inicial: 2026-11-10; actualizado por fase hasta la Fase 5 (2026-11-13). Si un
+Análisis inicial: 2026-11-10; actualizado por fase hasta la Fase 6 (2026-11-15; código sin
+desplegar; migración 0011 aplicada el 2026-11-15). Si un
 archivo de esta carpeta contradice a las migraciones o al código, mandan las migraciones y
 el código: corrige el archivo.

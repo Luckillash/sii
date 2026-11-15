@@ -1,67 +1,129 @@
 ---
 title: "Objetos: folios"
-description: "Columnas de cafs, solicitudes_folios, folios_anulados y la vista v_folios_disponibles. Hoy cubre cómo las escribe la Fase 5 (folios del set de pruebas)."
-keywords: [cafs, solicitudes_folios, folios_anulados, v_folios_disponibles, caf_secret_id, Vault, registrar_caf, solicitud_id, siguiente_folio, estado_caf, estado_solicitud_folios, en_curso, timbrada, incierta, rechazada, simulada, asignar_folio, IDK]
-related: ["02-guias/folios-caf.md", "03-api-reference/rpc-backend.md", "05-pruebas/set-de-pruebas.md", "09-libreria/mapeo-libreria-tablas.md"]
-source: ["supabase_saas_sii.sql §7 §16", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/certificacion/folios.ts", "apps/web/src/server/certificacion/envio-set.ts"]
+description: "Columnas de cafs, solicitudes_folios, folios_anulados y la vista v_folios_disponibles, y cómo las escriben la gestión de folios (Fase 6) y el set de pruebas (Fase 5)."
+keywords: [cafs, solicitudes_folios, folios_anulados, v_folios_disponibles, caf_secret_id, Vault, registrar_caf, anular_folios, trg_20_caf_sin_traslape, tg_caf_sin_traslape, 23P01, migración 0011, solicitud_id, siguiente_folio, estado_caf, activo, agotado, anulado, estado_solicitud_folios, en_curso, timbrada, incierta, rechazada, simulada, revisión con el SII, asignar_folio, IDK, RangoAnulados, motivo, anulado_por, cafs_disponibles]
+related: ["02-guias/folios-caf.md", "03-api-reference/rpc-backend.md", "03-api-reference/acceso-por-tabla.md", "05-pruebas/set-de-pruebas.md", "09-libreria/mapeo-libreria-tablas.md", "04-objetos/codigos-y-enumeraciones.md"]
+source: ["supabase_saas_sii.sql §7 §16", "supabase/migrations/0001_esquema_inicial.sql", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0011_folios.sql", "apps/web/src/server/folios/", "apps/web/src/server/certificacion/folios.ts", "apps/web/src/server/certificacion/envio-set.ts"]
 ---
 
 # Objetos: folios
 
-> **Úsalo cuando:** necesitas los campos de un CAF o una solicitud de folios.
+> **Úsalo cuando:** necesitas los campos de un CAF, una solicitud de folios o un folio anulado.
 
-<!-- TODO (Fase 6): tabla completa de columnas de cafs, solicitudes_folios y folios_anulados, la vista v_folios_disponibles y cómo las escribe la gestión de folios de producción. -->
+Las tres tablas son de la §7 de la `0001` y tienen RLS de lectura para cualquier miembro.
+`cafs` y `solicitudes_folios` no tienen políticas de escritura: las escribe el backend con
+`service_role` filtrando por `organizacion_id`. La app anula con la RPC `anular_folios`
+([acceso](../03-api-reference/acceso-por-tabla.md#folios)). La migración `0011_folios`
+(**aplicada el 2026-11-15**) agrega la RPC y el trigger contra traslapes, quita la política
+`alta` de `folios_anulados` (que dejaba insertar directo a un administrador) y revoca a
+`authenticated` `insert`, `update`, `delete` y `truncate` en esa tabla, y publica `cafs` y
+`folios_anulados` en Realtime; no cambia columnas.
 
-La tabla completa de columnas llega con la **Fase 6**. Lo que sigue es cómo escribe estas
-tablas la **Fase 5** (folios de certificación del set de pruebas,
-`apps/web/src/server/certificacion/`). Todas tienen RLS de lectura para miembros; las
-escrituras son del backend con `service_role` filtrando por `organizacion_id`
-([acceso](../03-api-reference/acceso-por-tabla.md#folios)).
+## `cafs`
 
-## `cafs` (Fase 5)
+Archivo de Autorización de Folios. El XML completo (con `<RSASK>`) vive en Vault.
 
-Una fila por CAF. **Solo la crea `registrar_caf`** (migración 0008,
-aplicada el 2026-11-13; [contrato](../03-api-reference/rpc-backend.md#registrar_caf-migración-0008)),
-nunca un `insert` directo desde la app:
+| Columna | Tipo | Notas |
+|---|---|---|
+| `id` ✔ | `uuid` | default `gen_random_uuid()` |
+| `organizacion_id` ✔ | `uuid` | FK `organizaciones`, cascada; lo hereda `trg_00_organizacion` de la empresa |
+| `empresa_id` ✔ | `uuid` | FK `empresas`, cascada |
+| `ambiente` ✔ | `ambiente_sii` | |
+| `tipo_dte` ✔ | `smallint` | FK `tipos_dte` (hoy 39 y 41) |
+| `folio_desde` ✔ | `integer` | `<RNG><D>`, `>= 1` |
+| `folio_hasta` ✔ | `integer` | `<RNG><H>`, `>= folio_desde` |
+| `siguiente_folio` ✔ | `integer` | el que entrega `asignar_folio`; `trg_10_caf_inicial` lo deja en `folio_desde`; entre `folio_desde` y `folio_hasta + 1` |
+| `fecha_autorizacion` ✔ | `date` | `<FA>` |
+| `idk` ✔ | `smallint` | `<IDK>`: `check` 100 en certificación, 300 en producción |
+| `rut_emisor` ✔ | `rut` | `<RE>` |
+| `razon_social` | `text` | `<RS>` |
+| `caf_secret_id` ✔ | `uuid` | secreto de Vault con el XML; `trg_borrar_secretos` lo borra con la fila. La UI nunca lo lee |
+| `estado` ✔ | `estado_caf` | `activo` (default), `agotado`, `anulado` |
+| `solicitud_id` | `uuid` | FK `solicitudes_folios`, `set null`: la solicitud que lo trajo (nula si se subió a mano sin incierta) |
+| `creado_en`, `actualizado_en` ✔ | `timestamptz` | |
 
-| Columna | Valor que pone `registrar_caf` |
+Restricciones: `unique (empresa_id, ambiente, tipo_dte, folio_desde)` (dos CAF no empiezan
+en el mismo folio) y, con la 0011, `trg_20_caf_sin_traslape`: dos CAF de la misma empresa,
+ambiente y tipo no pueden cruzar sus rangos, en ningún estado (`23P01`;
+[contrato](../03-api-reference/rpc-backend.md#trg_20_caf_sin_traslape-migración-0011)).
+Índice parcial `cafs_disponibles (empresa_id, ambiente, tipo_dte, folio_desde) where estado
+= 'activo'`. `trg_60_contar_uso` suma los folios de un CAF de **producción** en
+`uso_mensual.folios_timbrados`.
+
+| Quién escribe | Qué |
 |---|---|
-| `organizacion_id`, `empresa_id` | los de la llamada (la empresa se verifica dentro de la organización) |
-| `ambiente`, `tipo_dte` | `certificacion`, 39 |
-| `folio_desde`, `folio_hasta` | `<RNG><D>` y `<RNG><H>` del CAF |
-| `siguiente_folio` | `folio_desde` |
-| `fecha_autorizacion`, `idk` | `<FA>`, `<IDK>` (100; el `check` de la tabla exige 100 en certificación y 300 en producción) |
-| `rut_emisor` | `<RE>` normalizado (sin puntos, mayúsculas); tiene que ser el RUT de la empresa |
-| `razon_social` | `<RS>`, nula si viene vacía |
-| `caf_secret_id` | id del secreto de Vault con el **XML completo** (incluida `<RSASK>`), descripción `caf:<rut>:<ambiente>:<tipo>:<desde>-<hasta>` |
-| `solicitud_id` | la solicitud que lo pidió |
-| `estado` | `activo` (default) |
+| `registrar_caf` (0008, service_role) | **la única vía de alta**: desde un timbraje (`solicitarEnSii`, Fases 5 y 6) o una carga manual (`subirCaf`). Pone `siguiente_folio = folio_desde`, `estado = 'activo'`, `caf_secret_id` y `solicitud_id`; con el mismo CAF devuelve el id existente (solo enlaza `solicitud_id` si faltaba) |
+| `asignar_folio` | `siguiente_folio + 1`; `agotado` al pasar de `folio_hasta` |
+| `anular_folios` (0011) | al anular la cola completa: `siguiente_folio = folio_hasta + 1` y `estado = 'anulado'` |
 
-Llave única `(empresa_id, ambiente, tipo_dte, folio_desde)`: un segundo registro del
-mismo CAF devuelve el id existente sin crear otro secreto; otro rango con el mismo
-`folio_desde` da `23505`. Después, `asignar_folio` avanza `siguiente_folio` y pasa el CAF
-a `agotado` al terminarse. La UI nunca lee `caf_secret_id` (`leerAsistente` pide solo
-`id`, `folio_desde`, `folio_hasta`, `siguiente_folio`).
+Ni `asignar_folio` ni `anular_folios` ni el enlace de `solicitud_id` disparan el trigger de
+traslape (solo `insert` o `update` de rango, ambiente, tipo o empresa).
 
-## `solicitudes_folios` (Fase 5)
+## `solicitudes_folios`
 
-Bitácora de cada solicitud **confirmada** al SII. El ensayo no crea fila (no se usa
-`simulada`).
+Bitácora de `SolicitudFolios` (asistente `cvc_cgi/dte/of_*`). Publicada en Realtime (0006).
 
-| Momento | Escritura |
+| Columna | Tipo | Notas |
+|---|---|---|
+| `id` ✔ | `uuid` | |
+| `organizacion_id` ✔, `empresa_id` ✔ | `uuid` | |
+| `certificado_id` | `uuid` | el del representante electrónico; `set null` |
+| `ambiente` ✔ | `ambiente_sii` | |
+| `tipo_dte` ✔ | `smallint` | |
+| `cantidad` ✔ | `integer` | `>= 1` (la app limita a 10.000) |
+| `folio_inicial` | `integer` | solo si el SII lo pidió (primer timbraje del tipo en el ambiente) |
+| `confirmada` ✔ | `boolean` | `false` = revisión con el SII; `check`: `timbrada` exige `true` |
+| `estado` ✔ | `estado_solicitud_folios` | default `en_curso` |
+| `folio_desde`, `folio_hasta` | `integer` | rango que fijó el SII (también en `simulada` e `incierta`) |
+| `caf_id` | `uuid` | FK `cafs`, `set null`; lo pone `registrar_caf` |
+| `mensaje` | `text` | saneado; nunca el XML |
+| `solicitado_por` | `uuid` | `auth.users`, `set null` |
+| `creado_en` ✔, `terminado_en` | `timestamptz` | |
+
+| Momento | Escritura (service_role, `solicitarEnSii`) |
 |---|---|
-| Antes de salir | `insert` con `estado = 'en_curso'`, `confirmada = true`, `ambiente`, `tipo_dte = 39`, `cantidad`, `folio_inicial` (si se informó), `certificado_id` (el del representante), `solicitado_por` |
-| CAF guardado | `registrar_caf` la deja `timbrada` con `folio_desde`, `folio_hasta`, `caf_id` y `terminado_en` |
-| Error de la librería | `update` con `estado` (`rechazada` para `ErrorSolicitudFolios` y `FolioInicialRequeridoError`; `incierta` con el rango para `FoliosSinCafError`; `error` para red u otro), `mensaje` saneado y `terminado_en` |
-| CAF timbrado sin guardar | `incierta` con el mensaje «Se timbraron los folios, pero no pudimos guardar el CAF…» |
+| Antes de salir | `insert` con `estado = 'en_curso'`, `confirmada` (`false` en la revisión), `ambiente`, `tipo_dte`, `cantidad`, `folio_inicial`, `certificado_id`, `solicitado_por`; se enlaza a la operación (`operaciones_sii.solicitud_id`) |
+| Revisión detenida antes de timbrar | `simulada` con `folio_desde`/`folio_hasta` |
+| CAF guardado | `registrar_caf` la deja `timbrada` con el rango, `caf_id` y `terminado_en` |
+| Error de la librería | `rechazada` (`ErrorSolicitudFolios`, `FolioInicialRequeridoError`), `incierta` con el rango (`FoliosSinCafError`) o `error` (red u otro), con `mensaje` saneado |
+| CAF timbrado sin guardar | `incierta` con el rango del CAF (si se pudo leer) y «Se timbraron los folios, pero no pudimos guardar el CAF…» |
+| Incierta resuelta al subir el CAF | `registrar_caf` (con `p_solicitud`) la deja `timbrada` con el CAF |
 
-La fila se enlaza a la operación (`operaciones_sii.solicitud_id`) y está publicada en
-Realtime (migración 0006).
+Un ensayo no crea fila. Una `simulada` es la `revisionId` que habilita timbrar en producción
+(misma empresa, ambiente, tipo, cantidad y folio inicial, menos de 30 min, un solo uso).
 
-## `folios_anulados` (Fase 5)
+## `folios_anulados`
 
-`enviarSet` inserta un registro por folio asignado cuando el set no llega al SII (falla
-antes de salir) o el SII rechaza la subida sin Track ID: `caf_id`, `folio`, `motivo`
-(«El set no se alcanzó a enviar al SII.» o «El SII rechazó la subida del set sin entregar
-un Track ID.») y `anulado_por`. Si el insert falla, solo queda un aviso en consola (con el
-código): la operación termina con el error original.
+Folios no usados. Van en `<RangoAnulados>` del RCOF.
+
+| Columna | Tipo | Notas |
+|---|---|---|
+| `id` ✔ | `uuid` | |
+| `organizacion_id` ✔ | `uuid` | lo hereda `trg_00_organizacion` del CAF |
+| `caf_id` ✔ | `uuid` | FK `cafs`, cascada |
+| `folio` ✔ | `integer` | `unique (caf_id, folio)` |
+| `motivo` | `text` | nulo permitido por la tabla; `anular_folios` lo exige (1–500, sin espacios a los lados) |
+| `anulado_por` | `uuid` | `auth.users`, `set null`; nulo si anula el backend sin usuario |
+| `creado_en` ✔ | `timestamptz` | |
+
+| Quién escribe | Cuándo |
+|---|---|
+| `anular_folios` (0011) | un administrador desde `/folios` (cliente de sesión) o el backend: un rango bajo `siguiente_folio` o la cola completa; `on conflict (caf_id, folio) do nothing` |
+| `enviarSet` (Fase 5, `insert` directo con service_role) | folios asignados a un set que no llegó al SII o que el SII rechazó sin Track ID, con el motivo «El set no se alcanzó a enviar al SII.» o «El SII rechazó la subida del set sin entregar un Track ID.» |
+
+La vista cuenta los anulados por CAF (`count: 'exact', head: true`) sin traer las filas.
+
+## `v_folios_disponibles`
+
+Vista `security_invoker` (aplica el RLS de quien consulta) de la §16:
+
+| Columna | Cálculo, por organización, empresa, ambiente y tipo, sobre los CAF `activo` |
+|---|---|
+| `cafs_activos` | `count(*)` |
+| `folios_disponibles` | Σ (`folio_hasta − siguiente_folio + 1`) |
+| `proximo_folio` | `min(siguiente_folio)` |
+
+La app no la consulta: calcula lo mismo en `disponibilidadDe` (`@/lib/folios`), que además
+da el denominador del 15 % (tamaño de los CAF activos con folios libres) y el CAF en uso
+([regla](../02-guias/folios-caf.md#disponibilidad-y-umbral)). Un CAF `activo` sin folios
+libres no existe en la práctica (`asignar_folio` lo pasa a `agotado`).

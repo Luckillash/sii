@@ -1,9 +1,9 @@
 ---
 title: "Servicios del SII que usa el backend"
 description: "Endpoints REST, SOAP, AUT2000, asistentes y portal GWT, con el método de la librería y la operación de auditoría; cómo los llama la capa SII."
-keywords: [servicios del SII, REST, SOAP, DTEWS, AUT2000, asistente, portal, ClienteBoletaRest, ClienteDtews, SolicitudFolios, PostulacionSii, TokenStore, SesionSii, operacion_sii, canal_sii, ejecutarOperacion, conBloqueoCertificado, conSesionReutilizada, crearTransporte, DeclaracionBoletas, verificarPortal, descargarSetPruebas, solicitarRevisionSet, declarar, enviarBoleta, consultarEnvio, www4, FABRICAS_SII, asistente de certificación, ad_empresa, ConsultaAutorizacion, verificar_autorizacion, STC, getConsultaData, SituacionTributaria, timbrajes]
-related: ["01-fundamentos/ambientes-y-credenciales.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md", "09-libreria/mapeo-libreria-tablas.md", "04-objetos/objetos-auditoria-e-integraciones.md"]
-source: ["certificacion-node/docs/canales.md", "certificacion-node/docs/folios.md", "certificacion-node/docs/postulacion.md", "apps/web/src/server/sii/", "apps/web/src/server/certificacion/"]
+keywords: [servicios del SII, REST, SOAP, DTEWS, AUT2000, asistente, portal, ClienteBoletaRest, ClienteDtews, SolicitudFolios, PostulacionSii, TokenStore, SesionSii, operacion_sii, canal_sii, ejecutarOperacion, conBloqueoCertificado, conSesionReutilizada, crearTransporte, DeclaracionBoletas, verificarPortal, descargarSetPruebas, solicitarRevisionSet, declarar, enviarBoleta, consultarEnvio, www4, FABRICAS_SII, asistente de certificación, ad_empresa, ConsultaAutorizacion, verificar_autorizacion, STC, getConsultaData, SituacionTributaria, timbrajes, folios de producción, palena, of_genera_folio, TransporteSinTimbrar, DetenidoAntesDeTimbrar, revisión con el SII, solicitarEnSii, OpcionesClienteFolios]
+related: ["01-fundamentos/ambientes-y-credenciales.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md", "09-libreria/mapeo-libreria-tablas.md", "04-objetos/objetos-auditoria-e-integraciones.md", "02-guias/folios-caf.md"]
+source: ["certificacion-node/docs/canales.md", "certificacion-node/docs/folios.md", "certificacion-node/docs/postulacion.md", "apps/web/src/server/sii/", "apps/web/src/server/certificacion/", "apps/web/src/server/folios/sii.ts"]
 ---
 
 # Servicios del SII que usa el backend
@@ -61,10 +61,34 @@ de `conBloqueoCertificado` + `conSesionReutilizada` (`conSesionSii` de `comun.ts
   inserta filas en `operaciones_sii` (ni `verificar_portal`): validan datos, empresa,
   certificado, CAF y resolución en la base y devuelven el resumen. Es más estricto que la
   CLI, cuyo `solicitar-folios` sin `--confirmar` recorre el asistente del SII hasta antes
-  de timbrar ([guía](../02-guias/certificacion-empresa.md#ensayo-y-confirmación)).
+  de timbrar ([guía](../02-guias/certificacion-empresa.md#ensayo-y-confirmación)). Esa
+  revisión existe en `/folios` (Fase 6, [abajo](#folios-fase-6)).
 - **El token REST no usa el bloqueo del certificado**: `enviarSet` y `consultarEstadoSet`
   piden el token con `TokenStoreSupabase` (`tokens_sii`), sin `conBloqueoCertificado`.
 - Detalle de cada acción (validaciones previas, qué escribe, mensajes) en
   [certificación de la empresa](../02-guias/certificacion-empresa.md).
 
-<!-- TODO (Fases 6–8): endpoint por endpoint de emisión, folios de producción y seguimiento (método HTTP, ruta, método de la librería, operacion_sii, si es repetible 🔁 o ⚠️, errores que lanza). -->
+## Folios (Fase 6)
+
+Lo que llama `apps/web/src/server/folios/sii.ts` (`solicitarEnSii`), en el ambiente que se
+pida. Es la misma función que usa `solicitarFoliosSet` del asistente (siempre en
+certificación, sin revisión). El cliente sale de `FABRICAS_SII.folios({ transporte, reloj,
+ambiente })` (`OpcionesClienteFolios`: certificación por defecto, producción desde la Fase
+6) y la sesión AUT2000 se abre con `SolicitudFolios.autenticar` dentro de
+`conBloqueoCertificado` + `conSesionReutilizada` del ambiente (`conSesionSii`).
+
+| Acción de la API | Host | Método de la librería | `operacion_sii` | Tipo | Errores que importan |
+|---|---|---|---|---|---|
+| `solicitarFolios` nivel `revision` | `maullin.sii.cl` o `palena.sii.cl` (`cvc_cgi/dte/of_*`) | `SolicitudFolios.solicitar(sesion, rut, 39 \| 41, cantidad, { folioInicial? })` con `TransporteSinTimbrar` (lista permitida: en el portal del ambiente solo pasan `of_solicita_folios`, `of_solicita_folios_dcto` y `of_confirma_folio`; el resto, incluidos `of_genera_folio` y `of_genera_archivo`, lanza `DetenidoAntesDeTimbrar`; el login pasa) | `solicitar_folios`, `confirmada = false` | sale al SII pero no timbra (paridad con la CLI sin `--confirmar`). Antes de abrir la operación: `getUser()` y `revisarOperacionPendiente` (un `incierto` sin revisar o una confirmada en curso de la misma empresa y ambiente la frenan, sin fila) | `FoliosSinCafError` con causa `DetenidoAntesDeTimbrar` → `simulada` con el rango (es el camino normal); `FolioInicialRequeridoError` (5); un CAF que llegue igual → `incierto` (6) |
+| `solicitarFolios` nivel `timbrar` | ídem | `SolicitudFolios.solicitar(…)` con el transporte real | `solicitar_folios`, `confirmada = true` | ⚠️ (efecto global, timbra; en producción, folios reales) | `FolioInicialRequeridoError` (5, sin timbrar: `requiere.folioInicial`); `ErrorSolicitudFolios` (5); `FoliosSinCafError` (6); CAF que no se pudo guardar → `ErrorIncierto` (6) |
+
+- **Certificado de representante electrónico** en los dos niveles
+  (`certificadoDeEmpresa({ representante: true })`): el SII solo entrega folios a un
+  representante electrónico de la empresa.
+- **Producción** exige además `autorizada_produccion`, un plan con `permite_produccion` y,
+  para timbrar, una revisión previa (`revisionId`), todo validado antes de salir
+  ([guía](../02-guias/folios-caf.md#requisitos)).
+- La carga manual de un CAF (`subirCaf`) y la anulación (`anularFolios`) **no** salen al
+  SII ni pasan por `ejecutarOperacion`.
+
+<!-- TODO (Fases 7–8): endpoint por endpoint de emisión y seguimiento (método HTTP, ruta, método de la librería, operacion_sii, si es repetible 🔁 o ⚠️, errores que lanza). -->

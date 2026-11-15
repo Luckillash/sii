@@ -1,7 +1,7 @@
 ---
 title: "Esquema: arquitectura"
 description: "Secciones del SQL, relaciones entre tablas y decisiones de diseño."
-keywords: [secciones, migraciones, 0001_esquema_inicial, organizacion_id, relaciones, empresas, tenant, Vault, secret_id, ambiente, aditiva, verificaciones]
+keywords: [secciones, migraciones, 0001_esquema_inicial, organizacion_id, relaciones, empresas, tenant, Vault, secret_id, ambiente, aditiva, verificaciones, 0010_verificar_autorizacion, 0011_folios]
 related: ["01-fundamentos/vision-general.md"]
 source: ["supabase_saas_sii.sql"]
 ---
@@ -50,6 +50,11 @@ solo lectura en `supabase/verificaciones/` ([despliegue](despliegue.md)).
 | `0007_bloqueos_sii` | `bloqueos_sii` con arriendo e índice único contra el doble timbraje |
 | `0008_certificacion` | `registrar_caf`, `guardar_set_pruebas` |
 | `0009_autorizacion_externa` | `tg_resolucion_autoriza_produccion` |
+| `0010_verificar_autorizacion` | valor `verificar_autorizacion` en el enum `operacion_sii` |
+| `0011_folios` (**aplicada el 2026-11-15**) | RPC `anular_folios` y trigger `trg_20_caf_sin_traslape` en `cafs`; quita la política `alta` de `folios_anulados` (solo se escribe con la RPC o `service_role`); publica `cafs` y `folios_anulados` en Realtime ([despliegue](despliegue.md#fase-6-migración-0011)) |
+
+Aplicadas en producción: `0001`–`0010`. Las previstas de las fases siguientes se corren un
+número respecto del plan original (`0012_notificaciones`, `0013_planes_comerciales`…).
 
 ## Relaciones
 

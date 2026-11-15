@@ -385,7 +385,12 @@ type Pendiente =
  * Filas confirmadas de la misma llave del índice: empresa, operación y ambiente. Solo
  * se llama para operaciones de efecto global, que ya pasaron el paso 0 (con empresa).
  */
-function consultaLlave(ctx: ContextoOperacion) {
+type LlaveOperacion = Pick<
+  ContextoOperacion,
+  'cliente' | 'organizacionId' | 'empresaId' | 'operacion' | 'ambiente'
+>;
+
+function consultaLlave(ctx: LlaveOperacion) {
   return ctx.cliente
     .from('operaciones_sii')
     .select('id, resultado, detalle, iniciada_en')
@@ -420,7 +425,7 @@ function clasificar(
  * (o `en_curso` abandonada) o en curso.
  */
 async function operacionPendiente(
-  ctx: ContextoOperacion,
+  ctx: LlaveOperacion,
   ahora: Date,
   excluirId?: string,
 ): Promise<Pendiente> {
@@ -450,7 +455,7 @@ async function filaEnCurso(ctx: ContextoOperacion, ahora: Date): Promise<Pendien
 }
 
 function mensajePendiente(
-  ctx: ContextoOperacion,
+  ctx: Pick<ContextoOperacion, 'operacion'>,
   pendiente: Extract<Pendiente, { id: string }>,
 ): { motivo: 'en_curso' | 'incierto_sin_revisar'; mensaje: MensajeError } {
   return pendiente.tipo === 'en_curso'
@@ -459,6 +464,35 @@ function mensajePendiente(
         motivo: 'incierto_sin_revisar',
         mensaje: mensajeInciertoPendiente(ctx.operacion, pendiente.iniciadaEn),
       };
+}
+
+/** Resultado del control de una operación anterior pendiente (paso 2). */
+export type BloqueoPendiente =
+  | { tipo: 'libre' }
+  | { tipo: 'fallo'; codigo: string | undefined }
+  | {
+      tipo: 'bloqueada';
+      motivo: 'en_curso' | 'incierto_sin_revisar';
+      mensaje: MensajeError;
+      operacionPendienteId: string;
+    };
+
+/**
+ * El control previo de `ejecutarOperacion` (paso 2), expuesto para quien tiene que
+ * aplicarlo a algo que `ejecutarOperacion` no vigila: la revisión de folios con el SII
+ * (`confirmada: false`, Fase 6) sale al SII y no debe correr con un `incierto` sin revisar
+ * o con una confirmada en curso de la misma empresa, operación y ambiente. Mismo
+ * criterio y mismos mensajes que la operación confirmada.
+ */
+export async function revisarOperacionPendiente(
+  ctx: LlaveOperacion,
+  ahora: Date,
+): Promise<BloqueoPendiente> {
+  const pendiente = await operacionPendiente(ctx, ahora);
+  if (pendiente.tipo === 'fallo') return pendiente;
+  if (pendiente.tipo === 'libre') return { tipo: 'libre' };
+  const { motivo, mensaje } = mensajePendiente(ctx, pendiente);
+  return { tipo: 'bloqueada', motivo, mensaje, operacionPendienteId: pendiente.id };
 }
 
 // --- ejecutarOperacion ----------------------------------------------------------
@@ -567,15 +601,16 @@ export async function ejecutarOperacion<T>(
   // 2. Control previo: un incierto sin revisar o una igual en curso bloquean (principio
   //    3). Evita filas que nacen bloqueadas; la garantía la dan los pasos 3 y 4.
   if (vigilada) {
-    const pendiente = await operacionPendiente(ctx, deps.reloj());
-    if (pendiente.tipo === 'fallo') {
-      reportarFalloBase(deps, ctx, 'consultar la operación anterior', pendiente.codigo);
+    const bloqueo = await revisarOperacionPendiente(ctx, deps.reloj());
+    if (bloqueo.tipo === 'fallo') {
+      reportarFalloBase(deps, ctx, 'consultar la operación anterior', bloqueo.codigo);
       return noEjecutada('sin_registro', MENSAJE_SIN_REGISTRO);
     }
-    if (pendiente.tipo !== 'libre') {
-      const { motivo, mensaje } = mensajePendiente(ctx, pendiente);
-      avisarBloqueo(motivo);
-      return noEjecutada(motivo, mensaje, { operacionPendienteId: pendiente.id });
+    if (bloqueo.tipo === 'bloqueada') {
+      avisarBloqueo(bloqueo.motivo);
+      return noEjecutada(bloqueo.motivo, bloqueo.mensaje, {
+        operacionPendienteId: bloqueo.operacionPendienteId,
+      });
     }
   }
 

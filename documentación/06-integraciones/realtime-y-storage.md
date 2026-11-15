@@ -1,9 +1,9 @@
 ---
 title: "Realtime y Storage"
 description: "Tablas publicadas en Realtime (incluida la migración 0006), bucket documentos-xml, rutas, AlmacenDocumentos, content-type y URLs firmadas."
-keywords: [Realtime, supabase_realtime, postgres_changes, replica identity, migración 0006, operaciones_sii, solicitudes_folios, documentos, envios, procesos_certificacion, RLS, Storage, documentos-xml, bucket, AlmacenDocumentos, rutaDocumento, subirXml, subirPdf, urlFirmada, createSignedUrl, MAXIMO_SEGUNDOS_URL, MAXIMO_BYTES, ErrorAlmacen, content-type, application/xml, text/xml, application/pdf, charset, ISO-8859-1, xml_path, uuid_o_nulo, storage.foldername, EnVivo, router.refresh, asistente de certificación, DTE-39-F, EnvioBOLETA-set]
+keywords: [Realtime, supabase_realtime, postgres_changes, replica identity, migración 0006, operaciones_sii, solicitudes_folios, documentos, envios, procesos_certificacion, RLS, Storage, documentos-xml, bucket, AlmacenDocumentos, rutaDocumento, subirXml, subirPdf, urlFirmada, createSignedUrl, MAXIMO_SEGUNDOS_URL, MAXIMO_BYTES, ErrorAlmacen, content-type, application/xml, text/xml, application/pdf, charset, ISO-8859-1, xml_path, uuid_o_nulo, storage.foldername, EnVivo, router.refresh, asistente de certificación, DTE-39-F, EnvioBOLETA-set, folios, /folios, migración 0011, cafs, folios_anulados]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "04-objetos/objetos-auditoria-e-integraciones.md", "09-libreria/backend-service-role.md", "03-api-reference/acceso-por-tabla.md", "07-referencia/trampas-conocidas.md"]
-source: ["supabase_saas_sii.sql §18 §19", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/verificaciones/0006_realtime_operaciones.sql", "apps/web/src/server/sii/almacen.ts", "apps/web/src/app/[org]/certificacion/EnVivo.tsx", "apps/web/src/server/certificacion/envio-set.ts"]
+source: ["supabase_saas_sii.sql §18 §19", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/verificaciones/0006_realtime_operaciones.sql", "supabase/migrations/0011_folios.sql", "apps/web/src/server/sii/almacen.ts", "apps/web/src/app/[org]/certificacion/EnVivo.tsx", "apps/web/src/server/certificacion/envio-set.ts"]
 ---
 
 # Realtime y Storage
@@ -21,6 +21,8 @@ source: ["supabase_saas_sii.sql §18 §19", "supabase/migrations/0006_realtime_o
 | `procesos_certificacion` | `0001` §19 | etapa del asistente de certificación |
 | `operaciones_sii` | **`0006_realtime_operaciones`** (aplicada el 2026-11-13) | avance y resultado de las operaciones largas (solicitud de folios, postulación, declaración) |
 | `solicitudes_folios` | **`0006_realtime_operaciones`** (aplicada el 2026-11-13) | estado de cada solicitud de folios |
+| `cafs` | **`0011_folios`** (**aplicada el 2026-11-15**) | CAF cargados, `siguiente_folio` y `estado` (agotado, anulado). Solo datos públicos del CAF: el XML con `<RSASK>` está en Vault y la fila trae `caf_secret_id`, un uuid que sin `service_role` no abre nada |
+| `folios_anulados` | **`0011_folios`** (**aplicada el 2026-11-15**) | anulaciones hechas por otro administrador o por el backend (set de pruebas) |
 
 La 0006 resuelve el hallazgo H9 del plan: sin ella, la UI de las Fases 5 y 6 tendría que
 consultar a cada rato en vez de escuchar los cambios. Es **idempotente** (agrega cada tabla
@@ -34,7 +36,7 @@ o `solicitudes_folios` no recibe nada (no da error).
 Realtime respeta RLS: a cada suscriptor de `postgres_changes` le entrega solo las filas que
 su política `select` le deja ver, evaluadas con su rol.
 
-- Las cinco tablas tienen RLS activo y la política `lectura`
+- Las cinco tablas (siete con la 0011) tienen RLS activo y la política `lectura`
   (`for select to authenticated using (es_miembro(organizacion_id))`), y `authenticated`
   tiene `select`: **un miembro recibe los cambios de su organización y nada de las demás**,
   sea cual sea su rol (también un lector).
@@ -45,8 +47,8 @@ su política `select` le deja ver, evaluadas con su rol.
 
 ### `replica identity` por defecto
 
-Las dos tablas de la 0006 quedan con la *replica identity* de siempre (la llave primaria,
-`id`):
+Las dos tablas de la 0006 (y las dos de la 0011) quedan con la *replica identity* de
+siempre (la llave primaria, `id`):
 
 - `INSERT` y `UPDATE` llegan con la **fila nueva completa**, que es lo que la UI necesita.
   El filtro de la suscripción (`organizacion_id=eq.<id>`) se evalúa sobre esa fila.
@@ -103,6 +105,25 @@ Primer uso real de Realtime en la app: `apps/web/src/app/[org]/certificacion/EnV
   spinners por fila.
 - `operaciones_sii` depende de la migración 0006 (aplicada); `procesos_certificacion` está
   publicada desde la 0001.
+
+Segundo uso (Fase 6): `apps/web/src/app/[org]/folios/EnVivo.tsx`, mismo patrón.
+
+- Canal `folios:<empresaId>` con `solicitudes_folios`, `operaciones_sii` y `cafs`
+  (`filter: empresa_id=eq.<empresaId>`) y `folios_anulados`
+  (`filter: organizacion_id=eq.<organizacionId>`: no tiene `empresa_id`),
+  `router.refresh()` con 400 ms y el RSC relee con `leerFolios` (RLS). Mismo aviso si el
+  canal no conecta.
+- Aquí sí escucha `solicitudes_folios`: una revisión con el SII (`simulada`) cambia la
+  solicitud y su operación `confirmada = false`, y el historial de solicitudes la muestra.
+- **`cafs` y `folios_anulados` están publicadas desde la 0011** (aplicada el
+  2026-11-15). Antes, un CAF nuevo solo llegaba con el cambio de su solicitud
+  (`registrar_caf` la deja `timbrada`) o con la Server Action que lo subió o anuló (que hace
+  `revalidatePath`), y la carga o anulación de otro administrador sin solicitud no se veía
+  hasta recargar. `EnVivo.tsx` está suscrito a las dos; en una base sin la 0011 esas
+  suscripciones simplemente no reciben eventos.
+  `folios_anulados` llega por organización, así que una anulación en otra empresa de la
+  misma organización también refresca la vista (inofensivo).
+- `solicitudes_folios` y `operaciones_sii`, de la 0006 (aplicada).
 
 ### Verificación
 

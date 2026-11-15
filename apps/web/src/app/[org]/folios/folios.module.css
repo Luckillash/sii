@@ -1,0 +1,210 @@
+/* Folios (CAF), Fase 6: resumen por tipo y ambiente, solicitud, carga y historiales.
+   Solo tokens del design system (nada de colores literales). */
+
+.cabeceraFila {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+
+.selectorEmpresa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.accionAlerta {
+  margin-top: var(--space-2);
+}
+
+.nota {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.subtitulo {
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}
+
+.avisos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.avisos:empty {
+  display: none;
+}
+
+.listaAvisos {
+  margin: 0;
+  padding-left: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* Resumen: una tarjeta por ambiente, lado a lado si caben. */
+.resumen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: stretch;
+}
+
+.seccion {
+  flex: 1 1 320px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tipo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.tipoCabecera {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.cifra {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.cifra strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.agotado {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--error);
+  font-weight: 500;
+}
+
+/* Formularios. */
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.filaCampos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-4);
+  align-items: flex-start;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.accionesFila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+/* Historiales. */
+.bloque {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.mensaje {
+  max-width: 40ch;
+  overflow-wrap: anywhere;
+  color: var(--ink-muted);
+}
+
+/* Resumen del ensayo dentro del diálogo. */
+.ensayo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.datos {
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  gap: var(--space-2) var(--space-4);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+.dato {
+  display: contents;
+}
+
+.dato dt {
+  color: var(--ink-muted);
+}
+
+.dato dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Insignia de estado (mismo aspecto que EstadoDTE). */
+.insignia {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--tono-fg);
+  background: var(--tono-bg);
+}
+
+.tonoExito {
+  --tono-fg: var(--exito);
+  --tono-bg: var(--exito-soft);
+}
+
+.tonoInfo {
+  --tono-fg: var(--info);
+  --tono-bg: var(--info-soft);
+}
+
+.tonoAviso {
+  --tono-fg: var(--aviso);
+  --tono-bg: var(--aviso-soft);
+}
+
+.tonoError {
+  --tono-fg: var(--error);
+  --tono-bg: var(--error-soft);
+}

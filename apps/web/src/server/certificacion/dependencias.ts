@@ -1,5 +1,6 @@
 import 'server-only';
 import {
+  type Ambiente,
   type Certificado,
   ClienteBoletaRest,
   ConsultaAutorizacion,
@@ -54,15 +55,21 @@ export interface OpcionesCliente {
   readonly reloj: Reloj;
 }
 
+/** Opciones de la solicitud de folios: el ambiente (por defecto certificación, Fase 5). */
+export interface OpcionesClienteFolios extends OpcionesCliente {
+  readonly ambiente?: Ambiente;
+}
+
 /**
- * Fábricas de los clientes de la librería. El ambiente es certificación, salvo
- * `autorizacion` (la consulta de `ad_empresa` solo existe en producción) y
- * `situacionTributaria` (consulta pública, sin ambiente).
+ * Fábricas de los clientes de la librería. El ambiente es certificación, salvo `folios`
+ * (el que se pida; certificación por defecto, Fase 6), `autorizacion` (la consulta de
+ * `ad_empresa` solo existe en producción) y `situacionTributaria` (consulta pública, sin ambiente).
  */
 export interface FabricasSii {
   postulacion(opciones: OpcionesCliente): ClientePostulacion;
   declaracion(opciones: OpcionesCliente): ClienteDeclaracion;
-  folios(opciones: OpcionesCliente): ClienteFolios;
+  /** Fase 6: también producción (palena, folios reales) con `ambiente: 'produccion'`. */
+  folios(opciones: OpcionesClienteFolios): ClienteFolios;
   rest(
     certificado: Certificado,
     opciones: OpcionesCliente & { readonly tokenStore: TokenStore },
@@ -76,8 +83,8 @@ export const FABRICAS_SII: FabricasSii = Object.freeze({
     new PostulacionSii({ transporte, reloj }),
   declaracion: ({ transporte, reloj }: OpcionesCliente) =>
     new DeclaracionBoletas({ transporte, reloj }),
-  folios: ({ transporte, reloj }: OpcionesCliente) =>
-    new SolicitudFolios({ ambiente: 'certificacion', transporte, reloj }),
+  folios: ({ transporte, reloj, ambiente = 'certificacion' }: OpcionesClienteFolios) =>
+    new SolicitudFolios({ ambiente, transporte, reloj }),
   rest: (
     certificado: Certificado,
     { transporte, reloj, tokenStore }: OpcionesCliente & { readonly tokenStore: TokenStore },

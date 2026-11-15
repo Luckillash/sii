@@ -1,9 +1,9 @@
 ---
 title: "Webhooks"
-description: "Eventos, outbox webhook_entregas, firma HMAC, reintentos y eventos que emite el backend. Hoy documenta los eventos que produce el asistente de certificación (Fase 5)."
-keywords: [webhooks, webhook_entregas, encolar_evento, certificacion.actualizada, tg_certificacion_autorizada, envio.actualizado, documento.aceptado, documento.rechazado, documento.incierto, outbox, set de pruebas]
-related: ["03-api-reference/rpc-integraciones.md", "02-guias/certificacion-empresa.md", "04-objetos/objetos-certificacion.md"]
-source: ["supabase_saas_sii.sql §14 §15", "apps/web/src/server/certificacion/notificar.ts"]
+description: "Eventos, outbox webhook_entregas, firma HMAC, reintentos y eventos que emite el backend. Hoy documenta los eventos del asistente de certificación (Fase 5) y folios.por_agotarse (Fase 6)."
+keywords: [webhooks, webhook_entregas, encolar_evento, certificacion.actualizada, tg_certificacion_autorizada, envio.actualizado, documento.aceptado, documento.rechazado, documento.incierto, outbox, set de pruebas, folios.por_agotarse, alertarSiCruza, umbral, agotado]
+related: ["03-api-reference/rpc-integraciones.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "04-objetos/objetos-certificacion.md"]
+source: ["supabase_saas_sii.sql §14 §15", "apps/web/src/server/certificacion/notificar.ts", "apps/web/src/server/folios/alertas.ts"]
 ---
 
 # Webhooks
@@ -37,6 +37,37 @@ Por eso cada paso del asistente que mueve la etapa (postular, descargar el set c
 P90/P91) encola el evento sin código extra. El correo a los administradores, en cambio, sí
 lo manda la app (`notificar.ts`,
 [avisos](../02-guias/certificacion-empresa.md#avisos-por-correo-y-webhook)).
+
+## `folios.por_agotarse` (Fase 6)
+
+Lo encola **la app** (`server/folios/alertas.ts`, `alertarSiCruza`, con `service_role`)
+cuando los folios de una empresa, en un ambiente y para un tipo, cruzan el 15 % o se agotan
+([guía](../02-guias/folios-caf.md#alerta-foliospor_agotarse)). Hoy lo dispara anular la cola
+de un CAF; desde la Fase 7, también cada `asignar_folio` que cruce. El evento ya estaba en
+la lista permitida de `webhooks.eventos` (0001).
+
+```json
+{
+  "evento": "folios.por_agotarse",
+  "creado_en": "<now()>",
+  "datos": {
+    "empresa_id": "<uuid>",
+    "rut_empresa": "76354771-K",
+    "ambiente": "produccion",
+    "tipo_dte": 39,
+    "folios_disponibles": 12,
+    "folios_total": 100,
+    "umbral": 0.15,
+    "agotado": false,
+    "caf_id": "<uuid del CAF en uso, o null>"
+  }
+}
+```
+
+`agotado: true` con `folios_disponibles: 0` cuando se acabaron (y entonces `folios_total`
+puede ser 0: ya no queda ningún CAF con folios libres). Sin secretos. No hay deduplicación
+del lado del webhook (el correo tiene `Idempotency-Key`; la tabla `notificaciones` es de la
+Fase 8): el evento sale una vez por cruce.
 
 ## Eventos del set de pruebas
 

@@ -1,7 +1,7 @@
 ---
 title: "Esquema: RLS y privilegios"
 description: "Políticas por tabla, grants de columnas y funciones, y protección de campos del sistema."
-keywords: [RLS, políticas, es_miembro, tiene_rol, es_admin, puede_emitir, comparte_organizacion, anon, service_role, grants de columnas, tg_proteger_autorizacion, tg_proteger_proceso, tokens_sii, sesiones_sii, registrar_certificado, registrar_resolucion, fijar_certificado_predeterminado, security definer, security invoker, grant execute]
+keywords: [RLS, políticas, es_miembro, tiene_rol, es_admin, puede_emitir, comparte_organizacion, anon, service_role, grants de columnas, tg_proteger_autorizacion, tg_proteger_proceso, tokens_sii, sesiones_sii, registrar_certificado, registrar_resolucion, fijar_certificado_predeterminado, security definer, security invoker, grant execute, anular_folios, tg_caf_sin_traslape, migración 0011, folios_anulados]
 related: ["03-api-reference/acceso-por-tabla.md"]
 source: ["supabase_saas_sii.sql §17"]
 ---
@@ -43,7 +43,7 @@ agregan funciones y tablas con sus propios grants (abajo, la `0005`; las demás 
 | `receptores`, `productos` | miembro | `puede_emitir` | `puede_emitir` | admin |
 | `documentos` | miembro | `puede_emitir`, solo `borrador` sin folio | ídem | ídem, solo `borrador` |
 | `documento_detalles` | miembro | `puede_emitir` si el documento es `borrador` | ídem | ídem |
-| `folios_anulados` | miembro | admin | — | — |
+| `folios_anulados` | miembro | admin (hasta la 0011; con ella, solo `anular_folios()` o backend) | — | — |
 | `api_keys`, `webhooks` | admin | `crear_api_key()` / `crear_webhook()` | admin² | admin |
 | `webhook_entregas` | admin | — | — | — |
 | `suscripciones`, `uso_mensual`, `certificados`, `cafs`, `solicitudes_folios`, `envios`, `envio_estadisticas`, `consultas_envio`, `envio_rechazos`, `rcof`, `set_pruebas_casos`, `operaciones_sii` | miembro | backend | backend | backend |
@@ -100,3 +100,22 @@ sobre `es_admin`. `certificados` sigue sin políticas de escritura. Lo comprueba
 `supabase/verificaciones/0005_certificados_resoluciones.sql` (comprobaciones 4–10 y 13).
 Contratos en [RPC de organización](../03-api-reference/rpc-organizacion.md#empresa-resolución-y-certificado-predeterminado-migración-0005)
 y [RPC del backend](../03-api-reference/rpc-backend.md#registrar_certificado-migración-0005).
+
+## Funciones de la migración 0011 (aplicada el 2026-11-15)
+
+| Función | Seguridad | `execute` | Por qué |
+|---|---|---|---|
+| `anular_folios(uuid, integer, integer, text)` | `security definer`, `search_path = ''` | `authenticated`, `service_role` (`revoke` a `public`, `anon`) | escribe en `folios_anulados` y cierra el CAF en `cafs` (sin políticas de escritura); revisa por dentro el permiso: `service_role` o `es_admin` de la organización del CAF (`42501` a emisor y lector, `P0002` a otra organización) |
+| `tg_caf_sin_traslape()` (trigger `trg_20_caf_sin_traslape` en `cafs`) | `security definer`, `search_path = ''` | nadie (`revoke` a `public`, `anon`, `authenticated`; los triggers no lo piden a quien dispara) | toma el candado de la empresa y ve todos los CAF sin depender del RLS de quien escribe |
+
+No agrega políticas ni grants. **Quita** la política `alta` de `folios_anulados` (0001,
+`insert` para `es_admin`), que dejaba a un administrador insertar folios anulados sueltos
+sin las validaciones, el bloqueo ni el cierre del CAF de la RPC, y revoca a
+`authenticated` `insert`, `update`, `delete` y `truncate` en esa tabla (los tenía por los
+grants por defecto de Supabase; `truncate` no pasa por RLS). Queda la política `lectura`
+(`es_miembro`) con `select`. `anular_folios` no los necesita (es `security definer`) y el
+backend escribe con `service_role`. *Advisors* listará `anular_folios` en
+`authenticated_security_definer_function_executable`: es esperado.
+Lo comprueban `supabase/verificaciones/0011_folios.sql` (4–7, 10, 13 y 14) y
+`rls-fase6-folios.sql` (12–15 y 26)
+([contratos](../03-api-reference/rpc-backend.md#anular_folios-migración-0011)).

@@ -1,7 +1,7 @@
 ---
 title: "Acceso por tabla (PostgREST + RLS)"
 description: "Qué puede hacer cada rol en cada tabla: select, insert, update, delete."
-keywords: [RLS, PostgREST, políticas, grant, revoke, privilegios por columna, anon, authenticated, service_role, lector, emisor, administrador, propietario, select, insert, update, delete, "new row violates row-level security policy", "permission denied for table", 42501]
+keywords: [RLS, PostgREST, políticas, grant, revoke, privilegios por columna, anon, authenticated, service_role, lector, emisor, administrador, propietario, select, insert, update, delete, "new row violates row-level security policy", "permission denied for table", 42501, folios_anulados, anular_folios, migración 0011]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "01-fundamentos/tenancy-y-roles.md", "03-api-reference/rpc-organizacion.md", "05-pruebas/probar-el-esquema.md"]
 source: ["supabase_saas_sii.sql §17", "supabase/verificaciones/rls-fase2-tenancy.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/verificaciones/rls-fase3-empresas.sql"]
 ---
@@ -79,7 +79,7 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
 |---|---|---|---|---|---|---|
 | `cafs` | — | S | S | S | S | SIUD |
 | `solicitudes_folios` | — | S | S | S | S | SIUD |
-| `folios_anulados` | — | S | S | SI | SI | SIUD |
+| `folios_anulados` | — | S | S | SI ¹⁹ | SI ¹⁹ | SIUD |
 
 ### Catálogo comercial y documentos
 
@@ -170,6 +170,19 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
     (`postulada_en`, `declarada_en`…), `glosa_estado_sii` y `envio_set_id` también las
     escribe solo el backend, pero ningún trigger las protege: un administrador podría
     cambiarlas con un `update` directo.
+19. Hasta la migración 0011 (**aplicada el 2026-11-15**), la política `alta` (0001) deja
+    insertar directo a un administrador (`es_admin`), saltándose las validaciones, el
+    bloqueo del CAF y su cierre. La 0011 borra esa política y revoca a `authenticated`
+    `insert`, `update`, `delete` y `truncate` en `folios_anulados`: con ella el
+    administrador y el propietario solo leen la tabla (S) y anulan **solo** con la RPC
+    `anular_folios` (`security definer`, también `authenticated`), que valida el rango
+    contra el CAF y los documentos y cierra el CAF si se anula la cola; un `insert`
+    directo da `42501 permission denied for table folios_anulados`
+    ([RPC](rpc-backend.md#anular_folios-migración-0011)). El set de pruebas
+    (`envio-set.ts`) escribe con `service_role`, que no cambia. `cafs` y
+    `solicitudes_folios` las escribe solo el backend (`registrar_caf`, `asignar_folio`,
+    `solicitarEnSii`); con la 0011, el trigger `trg_20_caf_sin_traslape` rechaza CAF
+    traslapados (`23P01`).
 
 `operaciones_sii` la escribe solo la capa SII con `service_role` (`ejecutarOperacion`,
 `marcarInciertaRevisada`); los miembros la leen y, con la migración 0006, reciben sus
@@ -200,3 +213,8 @@ cambios por Realtime ([Realtime](../06-integraciones/realtime-y-storage.md#realt
 - `bloqueos_sii` y sus dos RPC por rol: `supabase/verificaciones/rls-fase4-bloqueos.sql`
   (21, incluye el índice único de `operaciones_sii`). Requiere la migración 0007; corrida en
   producción el 2026-11-13 (21/21).
+- `folios_anulados` y `cafs` con `anular_folios` por rol (administrador, propietario,
+  emisor, lector, otra organización, `anon`, `service_role`):
+  `supabase/verificaciones/rls-fase6-folios.sql` (27, incluye que un administrador con su
+  sesión no escribe directo en `folios_anulados`). Requiere la migración 0011, aplicada el
+  2026-11-15; corrida en producción ese día (27/27).

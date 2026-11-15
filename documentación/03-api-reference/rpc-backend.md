@@ -1,9 +1,9 @@
 ---
 title: "RPC del backend (service_role)"
-description: "registrar_certificado, registrar_caf, guardar_set_pruebas, token_*, leer_secreto, tomar/liberar_bloqueo_certificado, asignar_folio, guardar_secreto, sincronizar_documentos_envio, encolar_evento, plan_vigente."
-keywords: [service_role, registrar_certificado, registrar_caf, guardar_set_pruebas, migración 0008, CAF, RSASK, "caf:<rut>", idempotente, for no key update, set_pruebas_casos, set_descargado, P0002, "La empresa no existe en la organización", "El IDK del CAF no corresponde al ambiente", "Ya hay un CAF que empieza en el folio", Vault, vault.create_secret, guardar_secreto, leer_secreto, pfx_secret_id, clave_secret_id, huella_sha256, "certificado:<huella>:pfx", 23503, 22023, 23505, 22004, "El certificado ya está registrado en la organización", "permission denied for function", token_obtener, token_guardar, token_borrar, TokenStoreSupabase, tomar_bloqueo_certificado, liberar_bloqueo_certificado, bloqueos_sii, arriendo, titular, conBloqueoCertificado, "La duración del bloqueo debe estar entre 1 y 900 segundos", migración 0007]
-related: ["09-libreria/backend-service-role.md", "08-esquema-supabase/vault-y-secretos.md", "04-objetos/objetos-empresas-y-credenciales.md", "02-guias/onboarding-organizacion.md", "01-fundamentos/autenticacion-sii.md"]
-source: ["supabase_saas_sii.sql §15 §17", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/sii/", "apps/web/src/server/certificacion/"]
+description: "registrar_certificado, registrar_caf, guardar_set_pruebas, anular_folios (también administradores) y el trigger trg_20_caf_sin_traslape, token_*, leer_secreto, tomar/liberar_bloqueo_certificado, asignar_folio, guardar_secreto, encolar_evento, plan_vigente."
+keywords: [service_role, registrar_certificado, registrar_caf, guardar_set_pruebas, migración 0008, CAF, RSASK, "caf:<rut>", idempotente, for no key update, set_pruebas_casos, set_descargado, P0002, "La empresa no existe en la organización", "El IDK del CAF no corresponde al ambiente", "Ya hay un CAF que empieza en el folio", Vault, vault.create_secret, guardar_secreto, leer_secreto, pfx_secret_id, clave_secret_id, huella_sha256, "certificado:<huella>:pfx", 23503, 22023, 23505, 22004, "El certificado ya está registrado en la organización", "permission denied for function", token_obtener, token_guardar, token_borrar, TokenStoreSupabase, tomar_bloqueo_certificado, liberar_bloqueo_certificado, bloqueos_sii, arriendo, titular, conBloqueoCertificado, "La duración del bloqueo debe estar entre 1 y 900 segundos", migración 0007, anular_folios, migración 0011, folios_anulados, cola completa, "El CAF no existe", "Solo un administrador de la organización puede anular folios", "ya tiene un documento emitido", tg_caf_sin_traslape, trg_20_caf_sin_traslape, 23P01, "se traslapa con otro CAF", asignar_folio, "No quedan folios", encolar_evento, folios.por_agotarse]
+related: ["09-libreria/backend-service-role.md", "08-esquema-supabase/vault-y-secretos.md", "04-objetos/objetos-empresas-y-credenciales.md", "04-objetos/objetos-folios.md", "02-guias/folios-caf.md", "02-guias/onboarding-organizacion.md", "01-fundamentos/autenticacion-sii.md"]
+source: ["supabase_saas_sii.sql §15 §17", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0011_folios.sql", "apps/web/src/server/sii/", "apps/web/src/server/certificacion/", "apps/web/src/server/folios/"]
 ---
 
 # RPC del backend (service_role)
@@ -15,7 +15,12 @@ function …`, `42501`). Se llaman con el cliente de `src/server/supabase/servic
 (`clienteServicio()`, `import 'server-only'`), que salta RLS: **quien llama filtra
 siempre por `organizacion_id`** y comprueba antes que el usuario tenga el rol necesario.
 
-<!-- TODO (Fases 6–8 y 11): asignar_folio, sincronizar_documentos_envio y encolar_evento -->
+Una excepción: [`anular_folios`](#anular_folios-migración-0011) (migración 0011,
+**aplicada el 2026-11-15**) también la ejecuta `authenticated`, porque un administrador la
+llama con su sesión y la función revisa el rol por dentro. Está aquí porque escribe en
+`cafs`, tabla del backend.
+
+<!-- TODO (Fase 8): sincronizar_documentos_envio. -->
 
 ## `guardar_secreto`
 
@@ -252,22 +257,37 @@ rango). Ningún mensaje de error incluye el XML: nombran el dato, nunca su valor
 | `22023` | `La solicitud de folios no es de esta empresa, ambiente y tipo` | solicitud de otra organización, empresa, ambiente o tipo |
 | `22023` | `La solicitud de folios ya está enlazada a otro CAF` | `solicitudes_folios.caf_id` apunta a otro CAF |
 | `23505` | `Ya hay un CAF que empieza en el folio N con otro rango` | mismo `folio_desde`, otro `folio_hasta` |
+| `23P01` | `El CAF de folios D a H se traslapa con otro CAF de la empresa (folios … a …) del mismo tipo y ambiente` | con la migración 0011 (**aplicada el 2026-11-15**): el rango se cruza con otro CAF; lo lanza el trigger [`trg_20_caf_sin_traslape`](#trg_20_caf_sin_traslape-migración-0011) en el `insert` y aborta la transacción completa, también el secreto de Vault |
 | `42501` | `permission denied for function registrar_caf` | llamada sin `service_role` |
 
 **Por qué `security definer` y solo `service_role`:** `guardar_secreto` y la tabla `cafs`
 (sin políticas de escritura) son del backend. La función no valida el XML como CAF (no
 revisa la firma del SII): eso lo hizo `SolicitudFolios` de la librería, que ya revisó IDK,
-RUT y tipo antes de devolverlo.
+RUT y tipo antes de devolverlo, o `validarCaf` en la carga manual (Fase 6).
 
-**Cómo la llama la app** (`server/certificacion/folios.ts`, `solicitarFoliosSet`), dentro de
-`ejecutarOperacion`, después de que el SII timbró:
+**Nota (Fase 6, 0011).** `registrar_caf` no cambia: sigue idempotente (con el mismo CAF
+devuelve antes de insertar y solo actualiza `solicitud_id`, que no dispara el trigger). Lo
+nuevo es el `23P01` de arriba. `p_solicitud` acepta una solicitud en **cualquier** estado:
+la carga manual (`subirCaf`) la usa para resolver una solicitud `incierta` que calza con el
+CAF (misma empresa, ambiente, tipo y rango), que queda `timbrada` con el CAF enlazado. En el
+timbrado, cualquier error de esta RPC (también el `23P01`) deja la solicitud `incierta` y la
+operación `incierto`: los folios ya se timbraron.
+
+**Quién la llama** (siempre `service_role`, con la organización de la membresía):
+
+| Llamador | Cuándo | `p_ambiente` | `p_solicitud` |
+|---|---|---|---|
+| `solicitarEnSii` (`server/folios/sii.ts`), desde `solicitarFoliosSet` (Fase 5) y `solicitarFolios` (Fase 6) | dentro de `ejecutarOperacion`, después de que el SII timbró | `certificacion` o `produccion` | la solicitud `en_curso` |
+| `subirCaf` (`server/folios/subir.ts`, Fase 6) | carga manual, después de `validarCaf` y de confirmar la sesión | el que eligió el administrador | la `incierta` que calza, o `null` |
+
+En el timbrado:
 
 ```ts
 const datos = leerDatosCaf(caf);              // <DA>: RE, RS, TD, RNG D/H, FA, IDK; nunca la llave
 const registro = await cliente.rpc('registrar_caf', {
   p_organizacion: ctx.organizacionId,         // de la membresía verificada
   p_empresa: ctx.empresaId,
-  p_ambiente: 'certificacion',
+  p_ambiente: ambiente,                       // el de la solicitud
   p_tipo_dte: datos.tipoDte,
   p_folio_desde: datos.desde,
   p_folio_hasta: datos.hasta,
@@ -278,13 +298,176 @@ const registro = await cliente.rpc('registrar_caf', {
   p_caf_xml: decodificarUtf8OIso(caf),        // texto Unicode: Vault guarda texto
   p_solicitud: solicitudId,
 });
-// cualquier falla (incluida la de leerDatosCaf) → solicitud 'incierta' + ErrorIncierto
+// cualquier falla (incluida la de leerDatosCaf) → solicitud 'incierta' (con el rango) + ErrorIncierto
 ```
 
 El XML del CAF solo viaja a la RPC: no se registra en logs, `operaciones_sii` ni Sentry.
 Quien lo lee después es `enviarSet`, con `leer_secreto(caf_secret_id)` filtrando antes la
 fila de `cafs` por organización
 ([Vault](../08-esquema-supabase/vault-y-secretos.md#caf-registrar_caf-migración-0008)).
+
+## `anular_folios` (migración 0011)
+
+Viene en `supabase/migrations/0011_folios.sql`, **aplicada el 2026-11-15** en producción
+([despliegue](../08-esquema-supabase/despliegue.md#fase-6-migración-0011)).
+En una base sin ella, la llamada falla con `PGRST202` y la app muestra «No pudimos anular
+los folios».
+
+```sql
+public.anular_folios(
+  p_caf    uuid,
+  p_desde  integer,
+  p_hasta  integer,
+  p_motivo text
+) returns integer                    -- folios que quedaron anulados en esta llamada
+-- plpgsql · security definer · search_path = ''
+-- revoke execute from public, anon · grant execute to authenticated, service_role
+```
+
+**Para qué:** anular un rango de folios **no usados** de un CAF (van a `folios_anulados`,
+que el RCOF informa en `<RangoAnulados>`) validando el rango contra el CAF y contra los
+documentos, y cerrar el CAF si se anula su cola, todo en una transacción. Con inserts
+sueltos no se valida nada ni se bloquea el CAF, y `cafs` no tiene políticas de escritura.
+Por eso la misma 0011 borra la política `alta` de `folios_anulados` (0001), que dejaba
+insertar directo a un administrador, y revoca a `authenticated` `insert`, `update`,
+`delete` y `truncate`: la tabla solo se escribe con esta RPC o con `service_role`.
+
+**Permiso.** `service_role` (`auth.role()`, igual que `asignar_folio`) o un administrador
+(`es_admin`) de la organización del CAF. Se revisa **antes** de bloquear y validar: un CAF
+de otra organización se comporta igual que uno inexistente (`P0002`, sin revelar que
+existe); un miembro que no es administrador (emisor, lector) recibe `42501`.
+
+**Efectos, en orden**
+
+1. Permiso (arriba).
+2. `select … for update` del CAF, el mismo candado que `asignar_folio`: una emisión
+   simultánea espera y cada una ve el `siguiente_folio` que dejó la otra.
+3. Valida (`22023`): folios no nulos, `p_desde ≤ p_hasta`, rango dentro del CAF, motivo
+   (sin espacios a los lados) entre 1 y 500 caracteres.
+4. Dos casos válidos:
+   - **a.** todo el rango **bajo** `siguiente_folio` (folios asignados que no se usaron):
+     solo inserta;
+   - **b.** el rango llega a `siguiente_folio` o más arriba (folios que aún no se asignan):
+     solo si es la **cola completa**, `p_desde ≤ siguiente_folio` y `p_hasta =
+     folio_hasta`. Si no, `22023`. Una cola parcial dejaría a `asignar_folio` entregando un
+     folio anulado (avanza de uno en uno sin mirar `folios_anulados`); una que empieza más
+     arriba del siguiente dejaría folios ni emitidos ni anulados al cerrar el CAF.
+5. Busca documentos de la empresa, ambiente y tipo con folio en el rango y `estado <>
+   'anulado'` (la llave única de `documentos`): si hay, `23503` con el primer folio. Un
+   folio usado se corrige con nota de crédito.
+6. `insert` en `folios_anulados` de cada folio del rango (`motivo`, `anulado_por =
+   auth.uid()`, nulo si llama el backend sin usuario) con `on conflict (caf_id, folio) do
+   nothing`. Devuelve cuántos entraron: repetir da 0, y un rango que repite folios cuenta
+   solo los nuevos.
+7. Caso b: deja el CAF con `siguiente_folio = folio_hasta + 1` y `estado = 'anulado'`, así
+   `asignar_folio` ya no lo usa.
+
+**Errores**
+
+| Código | Mensaje | Causa |
+|---|---|---|
+| `P0002` | `El CAF no existe` | CAF inexistente o de una organización de la que quien llama no es miembro |
+| `42501` | `Solo un administrador de la organización puede anular folios` | miembro emisor o lector |
+| `42501` | `permission denied for function anular_folios` | `anon` |
+| `22023` | `Faltan el folio inicial o el final del rango a anular` | `p_desde` o `p_hasta` nulo |
+| `22023` | `El folio inicial (N) es mayor que el final (M)` | `p_desde > p_hasta` |
+| `22023` | `El rango N a M no está dentro del CAF (folios D a H)` | fuera del CAF |
+| `22023` | `Falta el motivo de la anulación` / `El motivo de la anulación no puede pasar de 500 caracteres` | motivo nulo, en blanco o largo |
+| `22023` | `Para anular folios que aún no se usan hay que anular desde el folio S hasta el último del CAF (H)` | cola parcial o que empieza más arriba del siguiente |
+| `23503` | `El folio N ya tiene un documento emitido: no se puede anular` (hint: nota de crédito) | folio con documento no anulado |
+
+**Cómo la llama la app** (`server/folios/anular.ts`, `anularFolios`), con el cliente de
+**sesión** del administrador, después de validar el rango con `validarRangoAnulacion`
+(`@/lib/folios`, mismas reglas) y confirmar la sesión con `getUser()`:
+
+```ts
+const { data, error } = await sesion.rpc('anular_folios', {
+  p_caf: caf.id,             // leído con RLS, filtrado por organización y empresa
+  p_desde: entrada.desde,
+  p_hasta: entrada.hasta,
+  p_motivo: motivo,          // ya recortado
+});
+// error → traducirErrorAnulacion(error): P0002 / 42501 / 22023 / 23503 → MensajeError
+```
+
+Después de anular una cola revisa la alerta `folios.por_agotarse`
+([guía](../02-guias/folios-caf.md#anular-folios)).
+
+**Riesgo para la Fase 7.** La búsqueda del paso 5 solo ve documentos que ya existen: un
+folio asignado por `asignar_folio` cuyo documento todavía no se inserta se puede anular.
+Asignar e insertar en una transacción, o rechazar en `tg_validar_documento` los folios que
+estén en `folios_anulados`.
+
+Verificación: `supabase/verificaciones/0011_folios.sql` (18, solo lectura) y
+`rls-fase6-folios.sql` (27, con `rollback`)
+([cómo correrlas](../05-pruebas/probar-el-esquema.md#9-simulación-de-folios-de-la-fase-6-rls-fase6-foliossql)).
+En producción (2026-11-15, con la 0011 aplicada): 18/18 y 27/27, y la limpieza en 0
+(también en PGlite).
+
+## `trg_20_caf_sin_traslape` (migración 0011)
+
+Trigger de la misma `0011_folios.sql`, **aplicada el 2026-11-15**.
+
+```sql
+public.tg_caf_sin_traslape() returns trigger
+-- plpgsql · security definer · search_path = ''
+-- revoke execute from public, anon, authenticated
+create trigger trg_20_caf_sin_traslape
+  before insert or update of folio_desde, folio_hasta, ambiente, tipo_dte, empresa_id
+  on public.cafs for each row execute function public.tg_caf_sin_traslape();
+```
+
+- Rechaza con **`23P01`** (`El CAF de folios D a H se traslapa con otro CAF de la empresa
+  (folios … a …) del mismo tipo y ambiente`) un CAF cuyo rango se cruza con otro de la
+  misma empresa, ambiente y tipo, **en cualquier estado** (el SII nunca timbra dos veces el
+  mismo folio: un cruce es un CAF equivocado o cargado dos veces). La llave única de la
+  0001 solo atrapa el mismo `folio_desde`; sin el trigger, `asignar_folio` podría entregar
+  dos veces el mismo folio.
+- Antes de buscar toma `for no key update` sobre la fila de la empresa (lo mismo que
+  `registrar_caf`, que ya lo tiene tomado): dos inserts simultáneos de la misma empresa se
+  ordenan y el segundo ve al primero.
+- No lo disparan `asignar_folio` ni `anular_folios` (`siguiente_folio`, `estado`) ni el
+  enlace de `solicitud_id` de `registrar_caf`.
+- Por dónde puede salir: `registrar_caf` (timbrado → solicitud `incierta`; carga manual →
+  «El CAF se cruza con otro ya cargado», aunque `subirCaf` ya lo revisa antes para dar el
+  rango) o un `update` de rango con `service_role`.
+- Nombre `trg_20_…`: los triggers `before` del mismo evento corren en orden alfabético,
+  después de `trg_00_organizacion` y `trg_10_caf_inicial`.
+
+## `asignar_folio`
+
+Viene en la §15 de `0001`. Solo `service_role` en la práctica (con otro rol exige
+`puede_emitir`).
+
+```sql
+public.asignar_folio(p_empresa uuid, p_ambiente public.ambiente_sii, p_tipo_dte smallint)
+  returns table (caf_id uuid, folio integer)     -- plpgsql · security definer · search_path = ''
+```
+
+- Toma el CAF `activo` con `siguiente_folio <= folio_hasta` de `folio_desde` más bajo, con
+  `for update`; devuelve `siguiente_folio` y lo avanza; al pasar de `folio_hasta` deja el CAF
+  `agotado`.
+- `P0002` `No quedan folios de tipo T en A para la empresa` (hint «Solicite un nuevo CAF»)
+  si no hay CAF con folios libres (también si todos están `anulado`). `42501` si quien llama
+  no es `service_role` y no `puede_emitir`.
+- No mira `folios_anulados`: por eso `anular_folios` solo deja anular la cola completa.
+- Hoy la llama `enviarSet` (Fase 5). La emisión (Fase 7) tiene que llamar después a
+  `alertaDespuesDeAsignar` (alerta `folios.por_agotarse`).
+
+## `encolar_evento`
+
+Viene en la §15 de `0001`. Solo `service_role`.
+
+```sql
+public.encolar_evento(p_organizacion uuid, p_evento text, p_payload jsonb) returns void
+-- sql · security definer · search_path = ''
+```
+
+Inserta una fila en `webhook_entregas` por cada webhook activo de la organización suscrito
+a `p_evento`, con payload `{ evento, creado_en, datos: p_payload }`; sin suscritos, nada. La
+llaman los triggers de documentos, envíos y certificación, y desde la Fase 6 la app para
+`folios.por_agotarse` (`server/folios/alertas.ts`, con `service_role`)
+([webhooks](../06-integraciones/webhooks.md)).
 
 ## `guardar_set_pruebas` (migración 0008)
 

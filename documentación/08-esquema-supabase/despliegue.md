@@ -1,7 +1,7 @@
 ---
 title: "Esquema: despliegue"
 description: "Cómo se aplican las migraciones en la única base (Supabase en la nube, producción), requisitos (Vault, Realtime, pg_cron, pg_net) y tareas programadas."
-keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, aplicadas, 0008_certificacion, registrar_caf, guardar_set_pruebas, rls-fase5-certificacion, 0009_autorizacion_externa, tg_resolucion_autoriza_produccion, rls-fase5-autorizacion-externa, 0010_verificar_autorizacion, verificar_autorizacion, operacion_sii, rls-fase5-verificar-autorizacion, pendiente de aplicar]
+keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, aplicadas, 0008_certificacion, registrar_caf, guardar_set_pruebas, rls-fase5-certificacion, 0009_autorizacion_externa, tg_resolucion_autoriza_produccion, rls-fase5-autorizacion-externa, 0010_verificar_autorizacion, verificar_autorizacion, operacion_sii, rls-fase5-verificar-autorizacion, 0011_folios, anular_folios, trg_20_caf_sin_traslape, tg_caf_sin_traslape, rls-fase6-folios, Fase 6]
 related: ["02-guias/quickstart.md", "05-pruebas/probar-el-esquema.md", "08-esquema-supabase/vault-y-secretos.md"]
 source: ["supabase_saas_sii.sql (cabecera, opcional pg_cron)", "PLAN-SAAS.md §4.4 §6"]
 ---
@@ -33,7 +33,7 @@ Viven en `supabase/migrations/` con prefijo **secuencial de 4 dígitos** (no tim
 |---|---|
 | `0001_esquema_inicial.sql` | `supabase_saas_sii.sql` **byte a byte** (19 secciones: tipos, tablas, RLS, Vault, Storage, Realtime). Nunca se edita |
 | `0002_extensiones_cron.sql` | `pg_cron` (schema `pg_catalog`) y `pg_net` (schema `extensions`) |
-| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, y la `0010_verificar_autorizacion`, aplicada el 2026-11-14, son de la Fase 5: ver [abajo](#fase-5-migración-0008)) |
+| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, y la `0010_verificar_autorizacion`, aplicada el 2026-11-14, son de la Fase 5: ver [abajo](#fase-5-migración-0008); la `0011_folios`, de la Fase 6, se aplicó el 2026-11-15: ver [abajo](#fase-6-migración-0011)) |
 
 Reglas, todas derivadas de que la única base es producción:
 
@@ -249,6 +249,92 @@ respaldo, `--dry-run` (solo `0010`), `db push`, las verificaciones
 `supabase/verificaciones/rls-fase5-verificar-autorizacion.sql` (**7/7** con `rollback`, y la
 consulta de limpieza del encabezado en 0), `pnpm db:tipos` y *Advisors*.
 
+### Fase 6: migración 0011
+
+**Estado: aplicada el 2026-11-15**, con autorización del usuario (el código de la Fase 6
+todavía no está desplegado). Antes de migrar: migraciones `0001`–`0010`, 0 CAF, 0 folios
+anulados y la verificación en 3/18 (12, 16 y 17, lo esperado). Después:
+`supabase/verificaciones/0011_folios.sql` **18/18** y la simulación
+`rls-fase6-folios.sql` **27/27**; tras su `rollback`, la limpieza dio todo en 0 (usuarios,
+perfiles, organizaciones, empresas, CAF, folios anulados, documentos y secretos
+`caf:11111111-1:%`) y `vault.secrets` quedó con los mismos 3 secretos que antes.
+
+| Migración | Contenido | Qué falla si falta |
+|---|---|---|
+| `0011_folios` | RPC `anular_folios(p_caf, p_desde, p_hasta, p_motivo) → integer` (`security definer`, `search_path = ''`; `authenticated` y `service_role`, no `anon` ni PUBLIC; service_role o administrador de la organización del CAF) y trigger `trg_20_caf_sin_traslape` en `cafs` (función `tg_caf_sin_traslape()`, `security definer`, sin `EXECUTE` para PUBLIC, `anon` ni `authenticated`). Borra la política `alta` de `folios_anulados` (0001) y revoca a `authenticated` `insert`, `update`, `delete` y `truncate` en esa tabla (solo se escribe con `anular_folios` o `service_role`; nada de la app insertaba con la sesión). Agrega `cafs` y `folios_anulados` a `supabase_realtime` (idempotente, como la 0006). Sin tablas ni columnas ([contratos](../03-api-reference/rpc-backend.md#anular_folios-migración-0011)) | **Anular folios** desde `/folios`: `PGRST202`, el usuario ve «No pudimos anular los folios» y no se anula nada. **Traslapes:** un CAF timbrado que se cruza con otro entra (la carga manual igual lo rechaza en la app). Un administrador puede seguir insertando directo en `folios_anulados` con su sesión. Las suscripciones de Realtime a `cafs` y `folios_anulados` no reciben nada (sin error). Lo demás de la Fase 6 funciona |
+
+El número: el plan reservaba `0011` para `notificaciones` (Fase 8); por orden de creación
+(PLAN-SAAS §6) las de las fases siguientes se corren un número (`0012_notificaciones`…).
+
+Resultados en PGlite (esquema 0001 y 0003–0011 con stubs de `auth`, `storage`, `vault`,
+`supabase_migrations` y la publicación `supabase_realtime`; nada toca la base real):
+
+| Prueba | Con la 0011 | Sin la 0011 |
+|---|---|---|
+| `supabase/verificaciones/0011_folios.sql` (solo lectura) | 18/18 | 3/18 (12, 16 y 17: sin traslapes, RLS de lectura y `cafs` sin XML, ciertos desde la 0001) |
+| `supabase/verificaciones/rls-fase6-folios.sql` (con `rollback`) | 27/27 | 1/27 (solo la preparación) |
+| Regresiones: `rls-fase3-empresas.sql`, `rls-fase4-bloqueos.sql`, `rls-fase5-certificacion.sql`, `rls-fase5-autorizacion-externa.sql`, `rls-fase5-verificar-autorizacion.sql`, verificaciones `0008` y `0006` | 43/43, 21/21, 16/16, 12/12, 7/7, 10/10, 9/9 | — |
+
+Salvo lo de `folios_anulados` (quita una política y privilegios que la app no usa: el set
+de pruebas escribe con `service_role`), es aditiva, y el código de la Fase 6 tolera el
+esquema con y sin ella (falla de forma controlada), así que el orden con Vercel no importa.
+Pasos, **con autorización del usuario** (los que se siguieron el 2026-11-15; los resultados,
+en el estado de arriba):
+
+1. Leer la migración completa (`supabase/migrations/0011_folios.sql`) y revisar el respaldo
+   (panel → *Database → Backups*).
+2. Antes de migrar, la verificación tiene que dar **3/18** (12, «ningún par de CAF se
+   traslapa», 16 y 17 en `true`; así dio el 2026-11-15). Si la 12 sale `false`, hay CAF traslapados: el trigger no los
+   borra, pero cualquier `update` de rango sobre ellos fallará; revisarlos antes.
+3. `pnpm exec supabase db push --remote=rbrntkztzijaxsnpgpqn --dry-run`: debe listar **solo
+   `0011`**.
+4. `pnpm exec supabase db push --remote=rbrntkztzijaxsnpgpqn`.
+5. Verificaciones, todas `ok = true`
+   ([cómo](../05-pruebas/probar-el-esquema.md#9-simulación-de-folios-de-la-fase-6-rls-fase6-foliossql)):
+   - `supabase/verificaciones/0011_folios.sql`: **18/18**, con la migración registrada como
+     `0011`.
+   - `supabase/verificaciones/0006_realtime_operaciones.sql`: sigue **9/9** (la publicación
+     conserva sus tablas).
+   - La simulación `supabase/verificaciones/rls-fase6-folios.sql`: **27/27**, con
+     `rollback`. Después, su consulta de limpieza del encabezado (usuarios
+     `folios-%@ejemplo.invalid`, organizaciones `zz-prueba-folios-fase6%`, empresas
+     `Empresa folios fase 6%` y secretos `caf:11111111-1:%`) tiene que dar 0 (los secretos,
+     el mismo número que antes de correrla).
+6. `pnpm db:tipos`: el resultado debería ser idéntico a lo agregado a mano a
+   `apps/web/src/server/supabase/tipos.ts` (`anular_folios` en `Functions`; el trigger no
+   aparece).
+7. *Advisors* de seguridad: `anular_folios` **sí** aparecerá en
+   `authenticated_security_definer_function_executable` (WARN), y es **esperado**: la
+   llama el administrador con su sesión y valida `auth.uid()` adentro, como
+   `crear_invitacion`. `tg_caf_sin_traslape` no debería aparecer.
+8. Actualizar la documentación: cambiar «pendiente de aplicar» (y «PENDIENTE DE APLICAR»,
+   «sin aplicar») por «aplicada el AAAA-MM-DD», con los resultados reales, en estos
+   archivos; quitar también `pendiente de aplicar` de sus `keywords`
+   (`grep -rni "pendiente de aplicar" documentación/` tiene que quedar vacío, salvo las
+   menciones de migraciones de otras fases):
+
+   | Archivo | Dónde |
+   |---|---|
+   | `08-esquema-supabase/despliegue.md` | esta sección (estado, pasos ya hechos), la tabla de Migraciones |
+   | `08-esquema-supabase/arquitectura.md` | tabla «Migraciones posteriores» y la línea de aplicadas |
+   | `08-esquema-supabase/rls-y-privilegios.md` | «Funciones de la migración 0011» |
+   | `08-esquema-supabase/triggers-y-logica.md` | fila de `trg_20_caf_sin_traslape` |
+   | `08-esquema-supabase/vault-y-secretos.md` | «CAF de producción y carga manual (Fase 6)» |
+   | `03-api-reference/rpc-backend.md` | intro, fila `23P01` de `registrar_caf`, `anular_folios` (estado y verificación), `trg_20_caf_sin_traslape` |
+   | `03-api-reference/indice-operaciones.md` | «Folios (Fase 6)»: fila de `anularFolios` y párrafo final |
+   | `03-api-reference/acceso-por-tabla.md` | nota 19 y «Verificación» |
+   | `02-guias/folios-caf.md` | «Estado (2026-11-15)» (y la tabla «Sin la 0011») y «Anular folios» |
+   | `04-objetos/objetos-folios.md` | intro |
+   | `04-objetos/codigos-y-enumeraciones.md` | fila de `estado_caf` |
+   | `05-pruebas/probar-el-esquema.md` | fila `0011_folios.sql` de §1 y §9 (agregar la corrida en producción) |
+   | `06-integraciones/realtime-y-storage.md` | filas de `cafs` y `folios_anulados` en la tabla de publicadas |
+   | `07-referencia/trampas-conocidas.md` | «Folios (CAF) (Fase 6)» → «Migración 0011» |
+   | `01-fundamentos/errores-y-resultados.md` | «Errores de la base» → «Folios (Fase 6)» |
+   | `01-fundamentos/tenancy-y-roles.md` | fila «Pedir folios (CAF), subir un CAF y anular folios» |
+   | `README.md` | invariante «Folios», «Fuentes y vigencia» y la nota de actualización |
+
+   Y en `PLAN-SAAS.md`, el estado de la Fase 6 y la fila de `0011_folios` en §6.
+
 ## Requisitos del proyecto
 
 - Postgres 17 (`supabase/config.toml` declara `major_version = 17`).
@@ -256,7 +342,8 @@ consulta de limpieza del encabezado en 0), `pnpm db:tipos` y *Advisors*.
 - **Vault** (`supabase_vault`): viene instalado en todo proyecto de Supabase.
 - **Realtime**: la publicación `supabase_realtime` existe por defecto; la 0001 le agrega
   `documentos`, `envios` y `procesos_certificacion` (la Fase 4 suma `operaciones_sii` y
-  `solicitudes_folios` con la `0006`, aplicada el 2026-11-13).
+  `solicitudes_folios` con la `0006`, aplicada el 2026-11-13; la Fase 6 suma `cafs` y
+  `folios_anulados` con la `0011`, aplicada el 2026-11-15).
 - **Storage**: la 0001 crea el bucket privado `documentos-xml` (10 MB, XML y PDF).
 
 ## Pasos manuales después de la 0002
@@ -291,5 +378,5 @@ select cron.schedule('limpiar-tokens', '0 * * * *',
 |---|---|---|
 | limpieza de `tokens_sii` | cada hora | 4 |
 | `/api/cron/seguimiento` | cada 5 min | 8 |
-| alertas (certificado por vencer, folios) | diaria | 8 |
+| alertas (certificado por vencer, folios; la de folios ya sale sin cron desde la Fase 6, al cruzar el 15 %) | diaria | 8 |
 | `/api/cron/webhooks` | cada minuto | 11 |

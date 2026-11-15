@@ -43,7 +43,7 @@ Las organizaciones se crean solo con `crear_organizacion()` y los miembros entra
 | Emitir (folio, firma, envío al SII) | sí | sí | sí | no |
 | Borrar receptores y productos | sí | sí | no | no |
 | Administrar empresas, resoluciones, asociación empresa–certificado y proceso de certificación | sí | sí | no | no |
-| Anular folios (`folios_anulados`) | sí | sí | no | no |
+| Pedir folios (CAF), subir un CAF y anular folios (`/folios`; anular con `anular_folios`, migración 0011, aplicada el 2026-11-15) | sí | sí | no | no |
 | Editar la organización (nombre, slug) | sí | sí | no | no |
 | Ver, crear y borrar invitaciones, API keys y webhooks | sí | sí | no | no |
 | Cambiar el rol o dar de baja a miembros que **no** son propietarios | sí | sí | no | no |

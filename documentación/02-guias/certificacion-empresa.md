@@ -369,6 +369,13 @@ todas las acciones que salen al SII mientras haya una:
 `revisada_por`; con eso la fila deja de bloquear). Marcar desbloquea un reintento que
 puede quemar folios: hazlo solo después de revisar en el SII.
 
+Para una `solicitar_folios` incierta del set hay una salida mejor desde la Fase 6: bajar el
+CAF de «Folios ya autorizados» en maullin y subirlo en **Folios (CAF)**
+(`/<org>/folios`). Si calza con la solicitud (empresa, ambiente, tipo y rango), queda
+`timbrada` con ese CAF y la operación se marca revisada sola
+([folios](folios-caf.md#solicitud-incierta)). El mensaje del incierto («…súbelo en Folios
+(CAF)») ya lo dice.
+
 ## Avisos por correo y webhook
 
 En cada cambio de etapa, `notificarCambioEtapa` (`notificar.ts`) manda un correo por Resend

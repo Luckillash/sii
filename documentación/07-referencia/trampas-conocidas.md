@@ -1,9 +1,9 @@
 ---
 title: "Trampas conocidas"
 description: "Comportamientos no obvios del SII, de la librería y del esquema."
-keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna, ad_empresa1, ad_empresa2, Actualización de datos del contribuyente, representante legal, no está autorizado para operar en esta modalidad, verificar_autorizacion, ConsultaAutorizacion, situación tributaria de terceros, STC, stc/noauthz, getConsultaData, timbrajes, documentos autorizados, reCAPTCHA, SituacionTributaria]
-related: ["08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md"]
-source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/"]
+keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna, ad_empresa1, ad_empresa2, Actualización de datos del contribuyente, representante legal, no está autorizado para operar en esta modalidad, verificar_autorizacion, ConsultaAutorizacion, situación tributaria de terceros, STC, stc/noauthz, getConsultaData, timbrajes, documentos autorizados, reCAPTCHA, SituacionTributaria, Fase 6, folios, migración 0011, anular_folios, cola completa, trg_20_caf_sin_traslape, 23P01, revisión con el SII, simulada, TransporteSinTimbrar, of_genera_folio, revisionId, folios.por_agotarse, Idempotency-Key, denominador, folio asignado sin documento, política alta, subirCaf, RSAPK]
+related: ["08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md"]
+source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/", "supabase/migrations/0011_folios.sql", "apps/web/src/server/folios/", "apps/web/src/app/[org]/folios/"]
 ---
 
 # Trampas conocidas
@@ -148,8 +148,8 @@ source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas
   [errores y resultados](../01-fundamentos/errores-y-resultados.md#carrera-entre-dos-peticiones-iguales).
   La 0007 está aplicada en producción desde el 2026-11-13, así que el índice único ya está
   activo (en una base sin ella, el insert no choca y solo queda el control posterior).
-  Deshabilitar el botón al enviar (Fase 6) sigue siendo buena idea, pero ya no es lo que
-  evita el doble timbraje.
+  La vista de folios (Fase 6) deshabilita los botones mientras hay una acción pendiente,
+  pero eso no es lo que evita el doble timbraje.
 - **`OPERACIONES_EFECTO_GLOBAL` y el predicado del índice van juntos.** Si agregas o quitas
   una operación de la lista en `operacion.ts`, cambia el índice con una migración nueva y
   las comprobaciones 13–14 de `verificaciones/0007_bloqueos_sii.sql`; si no, la operación
@@ -185,8 +185,9 @@ source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas
 - **`FolioInicialRequeridoError` es `rechazo_sii` (5), aunque la CLI devuelve 3.** La capa
   sigue a `codigoDeError()`, donde hereda de `ErrorSolicitudFolios`. El comando
   `certificacion solicitar-folios` de la CLI lo atrapa aparte y devuelve `CONFIG` (3) con
-  la sugerencia `--folio-inicial`. No se timbró nada; la Fase 6 puede envolverlo en
-  `ErrorConfig` para mostrarlo como configuración. Lo mismo pasa con `SesionCaducaError`
+  la sugerencia `--folio-inicial`. No se timbró nada. La Fase 6 lo dejó en `rechazo_sii` y
+  la solicitud en `rechazada`; lo que cambia la UI es que muestra el campo «Folio inicial»
+  con el sugerido (`requiere.folioInicial`). Lo mismo pasa con `SesionCaducaError`
   si llega a escapar de `conSesionReutilizada`: `rechazo_sii`.
 - **Un token corto en texto libre no se puede detectar por patrón.** `sanearTexto()` quita
   PEM, JWT, `TOKEN=`, `clave=…`, cabeceras `Cookie:` y tiras de 32+ caracteres que mezclan
@@ -454,3 +455,112 @@ librería y lo usa `verificarAutorizacion` de la app como apoyo del mensaje.
   `certificacion/<operacionId>/<etapa>`: la misma operación no avisa dos veces la misma
   etapa. Una consulta que no cambia la etapa no manda nada. Sin `NEXT_PUBLIC_APP_URL` no
   se envía (aviso en consola).
+
+## Folios (CAF) (Fase 6)
+
+### Migración 0011
+
+- **Aplicada el 2026-11-15** (verificación 18/18, simulación 27/27; antes de aplicarla, la
+  verificación daba 3/18). En una base sin ella, anular folios falla con `PGRST202` («No
+  pudimos anular los folios») y un CAF **timbrado** que se cruza con otro entra (la carga
+  manual igual lo rechaza en la app)
+  ([despliegue](../08-esquema-supabase/despliegue.md#fase-6-migración-0011)).
+- **`anular_folios` sí la ejecuta `authenticated`.** A diferencia de `registrar_caf`, la
+  llama el administrador con su sesión y la función revisa el rol por dentro. *Advisors*
+  la listará en `authenticated_security_definer_function_executable`: es esperado.
+- **`folios_anulados` no se escribe con la sesión.** Hasta la 0011, la política `alta`
+  (0001) dejaba a un administrador insertar directo, saltándose las validaciones de la RPC
+  (rango, documentos usados, cola completa), el bloqueo del CAF y su cierre. La 0011 la
+  borra y revoca a `authenticated` `insert`, `update`, `delete` y `truncate`: con la
+  sesión, un `insert` da `42501 permission denied for table folios_anulados`. Se escribe
+  solo con `anular_folios` o con `service_role` (el set de pruebas, `envio-set.ts`).
+- **`cafs` y `folios_anulados` en Realtime (0011).** Una carga de CAF o una anulación hecha
+  por otro administrador (o por el backend) llega en vivo, con el mismo RLS de lectura
+  (`es_miembro`). `cafs` no expone el CAF: el XML con `<RSASK>` está en Vault y la fila
+  solo trae `caf_secret_id`, un uuid que sin `service_role` no abre nada. Sin la 0011
+  aplicada, la suscripción a esas dos tablas no recibe nada (sin error).
+
+### Anulación
+
+- **La cola se anula completa o nada.** `asignar_folio` avanza de uno en uno sin mirar
+  `folios_anulados`: si se anularan folios sueltos por encima de `siguiente_folio`, después
+  los entregaría igual. Por eso un rango que llega a `siguiente_folio` tiene que ir de
+  `siguiente_folio` (o antes) hasta `folio_hasta`, y deja el CAF `anulado`. Folios sueltos
+  solo bajo `siguiente_folio`.
+- **Un CAF de otra organización da `P0002`, no `42501`.** Igual que uno inexistente: no se
+  revela que existe. El `42501` es para un miembro emisor o lector.
+- **Folio asignado sin documento todavía: se puede anular (riesgo para la Fase 7).** La RPC
+  solo ve documentos insertados. Si la emisión asigna el folio y el documento entra
+  después, un administrador puede anularlo entre medio y la boleta saldría con un folio
+  anulado. La Fase 7 tiene que asignar e insertar en una transacción, o
+  `tg_validar_documento` rechazar folios que estén en `folios_anulados`.
+- **Repetir no falla.** `on conflict do nothing` y devuelve 0; la UI lo muestra como «Esos
+  folios ya estaban anulados» (`info`), no como error.
+
+### Traslapes
+
+- **Un traslape en el timbrado queda `incierto`, sin proponer subir el CAF.** Si el SII
+  timbra un CAF que se cruza con uno ya cargado (lo normal es que el cargado esté mal),
+  `registrar_caf` falla con `23P01` y la solicitud queda `incierta`. Subir ese CAF también
+  fallaría («El CAF se cruza con otro ya cargado») mientras exista el otro, así que el
+  mensaje es propio («Se timbraron los folios D a H, pero chocan con el CAF de los folios
+  X a Y que ya estaba cargado… revisa los dos CAF… y escríbenos a soporte») y la operación
+  guarda `detalle.incierto_motivo = 'traslape'` con `traslape_desde`/`traslape_hasta` (solo
+  rangos). Con eso la vista no ofrece «Subir el CAF». Hay que aclarar cuál de los dos es el
+  correcto antes de marcarla como revisada. Cualquier otro error de `registrar_caf` sigue
+  con el mensaje de «súbelo en Folios (CAF)».
+- **El trigger mira CAF en cualquier estado.** Un CAF `agotado` o `anulado` sigue
+  ocupando su rango.
+
+### Solicitud
+
+- **La revisión con el SII sí sale al SII, con `confirmada = false`.** Es la primera
+  operación de la app con `confirmada: false` que llega a la red (recorre el asistente
+  `of_*` con la sesión AUT2000 y el bloqueo del certificado). `ejecutarOperacion` no vigila
+  las no confirmadas (ni el índice único de la 0007 las cubre), así que `solicitarFolios`
+  le aplica los candados ANTES de abrir la operación: `getUser()` (como las ⚠️) y
+  `revisarOperacionPendiente`, el mismo control previo de `ejecutarOperacion` exportado (no
+  una copia): con un `incierto` sin revisar o una confirmada `en_curso` reciente de
+  `solicitar_folios` en la misma empresa y ambiente, no sale. Si se agrega otra operación
+  no confirmada que llegue a la red, necesita lo mismo.
+- **`TransporteSinTimbrar` es una lista permitida, no una lista negra.** En el host del
+  portal del ambiente solo pasan `of_solicita_folios`, `of_solicita_folios_dcto` y
+  `of_confirma_folio` bajo `/cvc_cgi/dte/`; todo lo demás de ese host se corta
+  (`of_genera_folio`, `of_genera_archivo`, rutas nuevas). Los hosts de login no se tocan.
+  La CLI solo corta `of_genera_folio`: si el SII renombrara ese paso, la CLI timbraría y la
+  app no (la revisión falla). Si el SII agrega un paso intermedio nuevo antes de la
+  confirmación, la revisión empieza a fallar y hay que agregarlo a `PASOS_REVISION`. Si
+  llegara un CAF, la solicitud queda `incierta` («La revisión obtuvo un CAF…»).
+- **La revisión obligatoria la exige el servidor, no solo la UI.** Un timbraje de
+  producción sin `revisionId` válido (misma empresa, ambiente, tipo, cantidad y folio
+  inicial; `simulada`; menos de 30 min; sin otra confirmada del mismo tipo después) se
+  rechaza antes de abrir la operación. La revisión no reserva el rango: el SII puede
+  asignar otro al timbrar (la app lo avisa).
+- **El plan sale de una sola fuente: `plan_vigente()`.** El servidor y la vista usan
+  `planPermiteProduccion` (`server/folios/plan.ts`). `authenticated` no puede ejecutar
+  `plan_vigente()` (no está en sus grants de la 0001), así que `leerFolios` la llama con
+  service_role filtrando por la organización de la membresía; el resto de la vista sigue
+  con el cliente de sesión. Si la llamada falla, la vista no bloquea
+  (`planPermiteProduccion: null`) y decide el servidor.
+- **El mensaje de «CAF sin guardar» cambió también para el set.** Ahora dice «…súbelo en
+  Folios (CAF)» en vez de «escríbenos a soporte», y la solicitud queda `incierta` con el
+  rango del CAF (antes, sin rango).
+- **La carga manual exige empresa activa**, con el mismo mensaje que pedir folios («La
+  empresa está desactivada»). No es una operación del SII: no deja fila en
+  `operaciones_sii`.
+
+### Alerta `folios.por_agotarse`
+
+- **Solo al cruzar.** Avisa al pasar de `sello` a `aviso` (15 %) o al llegar a cero, no
+  mientras se está bajo el umbral. No hay tabla de deduplicación (es de la Fase 8): repetir
+  la misma alerta la frena la `Idempotency-Key` de Resend
+  (`folios.por_agotarse/<empresa>/<ambiente>/<tipo>/<CAF>/<15|agotado>`), que dura 24 h.
+  El webhook no tiene esa protección.
+- **El denominador es el tamaño de los CAF activos con folios libres**, no el último CAF
+  ni todos los históricos. Cargar un CAF nuevo sube la proporción; si después vuelve a
+  bajar del 15 % es un cruce nuevo (con otro CAF en uso, otra clave).
+- **Anular folios bajo `siguiente_folio` no cambia la disponibilidad**, así que no dispara
+  la alerta; anular la cola sí.
+- **Hoy solo la dispara la anulación de una cola.** El disparo después de cada
+  `asignar_folio` es el enganche de la Fase 7 (`alertaDespuesDeAsignar`); `enviarSet` (Fase
+  5) no lo llama.
