@@ -83,9 +83,11 @@ Por eso (decisión del usuario, 2026-11-13):
 
 ### Verificar la autorización en el SII
 
-**Estado: código listo y probado sin red ni base (2026-11-14); falta la prueba real en
-*Production*** (PLAN-SAAS, Fase 5, «Verificar autorización en el SII»). Sirve para no tener
-que escribir la resolución a mano.
+**Estado: hecha y probada en *Production* el 2026-11-14** con la empresa del piloto (misma
+resolución, sin cambios; fila `verificar_autorizacion` en `ok` con `stc = 'boleta'`).
+Pendiente, por falta de una empresa con que probar: si `ad_empresa` distingue boleta de
+factura (PLAN-SAAS, Fase 5, «Verificar autorización en el SII»). Sirve para no tener que
+escribir la resolución a mano.
 
 La página «Actualización de datos del contribuyente» del portal de producción
 (`ad_empresa1` / `ad_empresa2` en `palena.sii.cl`) confirma la autorización y entrega el

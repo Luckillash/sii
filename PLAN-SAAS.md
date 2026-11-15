@@ -426,7 +426,7 @@ proceso de boleta que implementa la librería:
 - [x] **Empresas autorizadas fuera de Boletéame** (decisión del usuario 2026-11-13, «caso (a)»): el SII no distingue «autorizada» de «nunca postuló» (ambas sin trámite), así que registrar una resolución de producción vigente marca la empresa como autorizada (trigger, migración `0009_autorizacion_externa`); el asistente lo muestra como «Autorizada fuera de Boletéame» y bloquea postular, descargar set, folios, envío, revisión y declaración; «Consultar estado en el SII» disponible desde el paso 1 (crea el proceso solo después de que el SII responde). Código listo sin desplegar (2026-11-13): trigger `trg_50_resolucion_autoriza_produccion` (nunca desmarca; idempotente; con ajuste de datos para resoluciones ya cargadas), candado `cargarEmpresaPorCertificar` en las 6 acciones (ensayo y confirmada, sin fila en `operaciones_sii`), `VistaAsistente.autorizacionExterna` y `resolucionProduccion`, aviso en Configuración → resoluciones. En PGlite: verificación 0009 9/9, simulación `rls-fase5-autorizacion-externa.sql` 12/12, y las de las Fases 3 y 5 siguen 43/43 y 16/16. Typecheck, Vitest (586), Biome, stylelint y build en verde. 0009 aplicada en producción el 2026-11-13 (21:05 UTC): verificación 9/9, simulación 12/12 con limpieza en 0, tipos sin diferencias, Advisors sin avisos nuevos. Deploy `581d124` READY. Resolución de producción de la empresa del piloto (20630500-2) registrada con `registrar_resolucion` como service_role: n.º 80 del 22-08-2014; el trigger la marcó `autorizada_produccion` y `autorizada_en` se fijó en la fecha real de autorización (06-11-2026); sin proceso de certificación creado. En *Production* (Chrome, sesión del propietario) `/servicio/certificacion` muestra «Autorizada fuera de Boletéame» con la resolución, sin pasos ni acciones; sin errores de consola ni de runtime en Vercel. Detalle menor visto y corregido (deploy `0d27c20`, verificado en *Production*: la sección ya no aparece para la empresa del piloto y Vercel sin errores de runtime): la columna lateral mostraba «Aún no hay folios de certificación. Se piden en el paso 3» y «La resolución de certificación se registra al postular» a una empresa autorizada; ahora, si la empresa está autorizada (P91 o fuera de Boletéame), esas indicaciones no aparecen y la sección «Folios de certificación» solo se muestra si tiene CAF o resolución de certificación.
 - [ ] Criterio de aceptación contra el SII de certificación — **pendiente por decisión del usuario (2026-11-13)**: hace falta otra empresa de prueba (certificado cuyo titular sea su representante legal), porque la única de producción ya está autorizada. Recorrido: postular → descargar set → solicitar folios → enviar set (EPR limpio) → solicitar revisión → P90 → declarar → P91, comparando las filas con las que deja la CLI y que ninguna fila, log ni Sentry tenga secretos.
 
-#### Verificar autorización en el SII (código listo; falta la prueba real en *Production*)
+#### Verificar autorización en el SII (hecha; pendiente validar boleta frente a factura)
 
 Decisión del usuario (2026-11-13): reemplazar, cuando se pueda, el registro manual de la
 resolución de producción (migración 0009) por una consulta al SII. El asistente
@@ -581,7 +581,10 @@ autorizaciones. Validado el 2026-11-13 con 2 consultas:
 
 - [ ] Validar con una empresa certificada solo para factura si la respuesta distingue
   boleta de factura. Si no la distingue, decidir con el usuario si la marca automática se
-  queda o si la consulta solo propone la resolución.
+  queda o si la consulta solo propone la resolución. **Pendiente por decisión del usuario
+  (2026-11-14): no hay una empresa certificada en factura con que probar.** Mientras tanto
+  queda la mitigación: el aviso del STC cuando no hay timbrajes de boleta y el rechazo del
+  SII a los envíos de producción.
 - [x] Librería: `ConsultaAutorizacion` y `SituacionTributaria`, CLI, MCP y pruebas con
   páginas y respuestas grabadas (también `enable: true` en `recaptcha/key` y una forma de
   respuesta desconocida). 2026-11-13: las dos clases en `packages/core/src/folios/`, error
@@ -617,11 +620,23 @@ autorizaciones. Validado el 2026-11-13 con 2 consultas:
   con `maxDuration = 300`). Pruebas: `autorizacion.test.ts` (25), `logica.test.ts` y
   `errores.test.ts`; Vitest de la app 615, typecheck, Biome, stylelint y `pnpm build` en
   verde. Sin desplegar.
-- [ ] Prueba real en *Production* con la empresa del piloto. Como ya está marcada, todo
+- [x] Prueba real en *Production* con la empresa del piloto. Como ya está marcada, todo
   tiene que quedar igual (misma resolución), con una fila `verificar_autorizacion` en `ok`
-  y `stc = 'boleta'`.
-- [x] Documentación: pasar de «prevista» a hecha (2026-11-14; queda anotado que falta la
-  prueba real en *Production*)
+  y `stc = 'boleta'`. 2026-11-15 02:53 UTC (23:53 del 14 en Chile), deploy `b1deae4`
+  READY, «Verificar en el SII» desde la tarjeta «Autorizada fuera de Boletéame» (Chrome,
+  sesión del propietario): mensaje «El SII confirma que la empresa está autorizada desde el
+  06-11-2026 (Resolución n.º 80 del 22-08-2014) y ya timbró folios de boleta electrónica. La
+  resolución de producción registrada es la misma.» Antes y después iguales:
+  `autorizada_en` 2026-11-06 03:00 UTC, una sola resolución (producción 80 / 2014-08-22,
+  vigente). Una fila `verificar_autorizacion` (producción, `ok`, ~3 s) con `detalle`
+  `respuesta: autorizada`, `nro_resol: 80`, `fch_resol`, `fecha_autorizacion`,
+  `resolucion: igual`, `stc: boleta`, `stc_ultimo_anio: 2026`, sin correos, URL, software
+  ni razón social. Quedó la sesión de producción guardada (1 login), ningún bloqueo tomado;
+  «Últimas operaciones» la muestra primero; sin errores de consola ni de runtime en Vercel.
+  «Traer del SII» se ve en Configuración → Empresas → Resoluciones (no se pulsó: es la
+  misma acción).
+- [x] Documentación: pasar de «prevista» a hecha (2026-11-14, con la prueba real en
+  *Production* registrada en la guía)
   (`documentación/02-guias/certificacion-empresa.md`, `07-referencia/trampas-conocidas.md`,
   `03-api-reference/servicios-sii.md`, `indice-operaciones.md` y
   `04-objetos/objetos-auditoria-e-integraciones.md`).
