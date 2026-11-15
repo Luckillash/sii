@@ -228,6 +228,24 @@ export async function consultarEstadoDeclaracion(
   );
 }
 
+/**
+ * Pregunta al SII si la empresa ya está autorizada y trae su resolución de producción
+ * (🔁, sin ensayo). Se usa desde el asistente y desde Configuración → Empresas, así que
+ * revalida las dos páginas.
+ */
+export async function verificarAutorizacion(
+  slug: string,
+  empresaId: string,
+): Promise<ResultadoPaso> {
+  const previo = await preparar(slug, empresaId);
+  if (!previo.ok) return previo.resultado;
+  const r = await ejecutar(slug, 'verificarAutorizacion', () =>
+    certificacion.verificarAutorizacion(previo.ctx),
+  );
+  revalidatePath(`/${slug}/configuracion/empresas/${previo.ctx.empresaId}`);
+  return r;
+}
+
 // --- Operación incierta -----------------------------------------------------------------
 
 export async function marcarRevisada(

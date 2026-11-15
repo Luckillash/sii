@@ -62,6 +62,7 @@ export {
   ErrorTimbre,
   ErrorTransporte,
   ErrorValidacion,
+  ErrorVerificacion,
   FolioInicialRequeridoError,
   FoliosSinCafError,
   SesionCaducaError,
@@ -134,7 +135,26 @@ export {
   type ReferenciaBoleta,
 } from './core/generador-boleta.ts';
 export { type DatosTed, type OpcionesTimbre, Timbre } from './core/timbre.ts';
+export {
+  ConsultaAutorizacion,
+  leerAdEmpresa2,
+  type OpcionesConsultaAutorizacion,
+  type ResultadoAutorizacion,
+  RUTA_AD_EMPRESA1,
+  RUTA_AD_EMPRESA2,
+} from './folios/consulta-autorizacion.ts';
 export { type CookieSii, SesionSii } from './folios/sesion-sii.ts';
+export {
+  HOST_STC,
+  MS_STC,
+  type OpcionesSituacionTributaria,
+  PAGINA_STC,
+  type ResultadoTimbrajes,
+  SituacionTributaria,
+  type TimbrajeStc,
+  URL_STC_CONSULTA,
+  URL_STC_RECAPTCHA,
+} from './folios/situacion-tributaria.ts';
 export {
   type CamposForm,
   type FormularioFolios,

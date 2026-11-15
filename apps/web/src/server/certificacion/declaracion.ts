@@ -60,7 +60,7 @@ const INDICACION_DECLARACION_INCIERTA =
 const MENSAJE_SIN_TRAMITE_BORRADOR = {
   titulo: 'El SII no tiene una certificación en curso para la empresa',
   detalle:
-    'Si la empresa ya está autorizada a emitir boletas electrónicas (se certificó fuera de Boletéame), registra su resolución de producción en Configuración → Empresas. Si no, completa los datos de la postulación y postula (paso 1).',
+    'Si la empresa ya está autorizada a emitir boletas electrónicas (se certificó fuera de Boletéame), verifica su autorización en el SII o registra su resolución de producción en Configuración → Empresas. Si no, completa los datos de la postulación y postula (paso 1).',
 } as const;
 
 /** «Sin trámite» con la empresa ya marcada como autorizada (resolución de producción). */
@@ -280,10 +280,12 @@ export async function consultarEstadoDeclaracion(
     );
   }
   if (estado.codigo === null && cambio.nueva === 'borrador') {
-    return ok(
-      autorizadaProduccion ? MENSAJE_SIN_TRAMITE_AUTORIZADA : MENSAJE_SIN_TRAMITE_BORRADOR,
-      r.operacionId,
-    );
+    return autorizadaProduccion
+      ? ok(MENSAJE_SIN_TRAMITE_AUTORIZADA, r.operacionId)
+      : ok(MENSAJE_SIN_TRAMITE_BORRADOR, r.operacionId, [], {
+          tono: 'info',
+          sugerencia: 'verificarAutorizacion',
+        });
   }
   return ok(
     { titulo: 'Consultamos el estado de la declaración', detalle: lineaEstado(estado) },

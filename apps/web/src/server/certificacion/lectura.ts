@@ -20,6 +20,7 @@ import type {
 // certificados sin los ids de Vault.
 
 const MAXIMO_OPERACIONES = 20;
+const MAXIMO_VERIFICACIONES = 5;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function aProceso(f: Tables<'procesos_certificacion'>): FilaProceso {
@@ -162,52 +163,63 @@ export async function leerAsistente(
   if (empresa.error) throw fallaBase('leer la empresa', empresa.error);
   if (!empresa.data) return null;
 
-  const [proceso, cafs, resolucion, resolucionProd, asociaciones, operaciones] = await Promise.all([
-    supabase
-      .from('procesos_certificacion')
-      .select('*')
-      .eq('organizacion_id', organizacionId)
-      .eq('empresa_id', empresaId)
-      .maybeSingle(),
-    supabase
-      .from('cafs')
-      .select('id, folio_desde, folio_hasta, siguiente_folio')
-      .eq('organizacion_id', organizacionId)
-      .eq('empresa_id', empresaId)
-      .eq('ambiente', AMBIENTE)
-      .eq('tipo_dte', TIPO_BOLETA)
-      .eq('estado', 'activo')
-      .order('folio_desde', { ascending: true }),
-    supabase
-      .from('resoluciones')
-      .select('numero, fecha')
-      .eq('organizacion_id', organizacionId)
-      .eq('empresa_id', empresaId)
-      .eq('ambiente', AMBIENTE)
-      .eq('vigente', true)
-      .maybeSingle(),
-    supabase
-      .from('resoluciones')
-      .select('numero, fecha')
-      .eq('organizacion_id', organizacionId)
-      .eq('empresa_id', empresaId)
-      .eq('ambiente', 'produccion')
-      .eq('vigente', true)
-      .maybeSingle(),
-    supabase
-      .from('empresa_certificados')
-      .select('certificado_id, es_representante_electronico, predeterminado')
-      .eq('organizacion_id', organizacionId)
-      .eq('empresa_id', empresaId),
-    supabase
-      .from('operaciones_sii')
-      .select('id, operacion, resultado, confirmada, mensaje, iniciada_en, terminada_en, detalle')
-      .eq('organizacion_id', organizacionId)
-      .eq('empresa_id', empresaId)
-      .eq('ambiente', AMBIENTE)
-      .order('iniciada_en', { ascending: false })
-      .limit(MAXIMO_OPERACIONES),
-  ]);
+  const [proceso, cafs, resolucion, resolucionProd, asociaciones, operaciones, verificaciones] =
+    await Promise.all([
+      supabase
+        .from('procesos_certificacion')
+        .select('*')
+        .eq('organizacion_id', organizacionId)
+        .eq('empresa_id', empresaId)
+        .maybeSingle(),
+      supabase
+        .from('cafs')
+        .select('id, folio_desde, folio_hasta, siguiente_folio')
+        .eq('organizacion_id', organizacionId)
+        .eq('empresa_id', empresaId)
+        .eq('ambiente', AMBIENTE)
+        .eq('tipo_dte', TIPO_BOLETA)
+        .eq('estado', 'activo')
+        .order('folio_desde', { ascending: true }),
+      supabase
+        .from('resoluciones')
+        .select('numero, fecha')
+        .eq('organizacion_id', organizacionId)
+        .eq('empresa_id', empresaId)
+        .eq('ambiente', AMBIENTE)
+        .eq('vigente', true)
+        .maybeSingle(),
+      supabase
+        .from('resoluciones')
+        .select('numero, fecha')
+        .eq('organizacion_id', organizacionId)
+        .eq('empresa_id', empresaId)
+        .eq('ambiente', 'produccion')
+        .eq('vigente', true)
+        .maybeSingle(),
+      supabase
+        .from('empresa_certificados')
+        .select('certificado_id, es_representante_electronico, predeterminado')
+        .eq('organizacion_id', organizacionId)
+        .eq('empresa_id', empresaId),
+      supabase
+        .from('operaciones_sii')
+        .select('id, operacion, resultado, confirmada, mensaje, iniciada_en, terminada_en, detalle')
+        .eq('organizacion_id', organizacionId)
+        .eq('empresa_id', empresaId)
+        .eq('ambiente', AMBIENTE)
+        .order('iniciada_en', { ascending: false })
+        .limit(MAXIMO_OPERACIONES),
+      // La verificación de la autorización consulta producción (palena), pero es parte del
+      // asistente: se muestra junto a las de certificación.
+      supabase
+        .from('operaciones_sii')
+        .select('id, operacion, resultado, confirmada, mensaje, iniciada_en, terminada_en, detalle')
+        .eq('organizacion_id', organizacionId)
+        .eq('empresa_id', empresaId)
+        .eq('operacion', 'verificar_autorizacion')
+        .order('iniciada_en', { ascending: false })
+        .limit(MAXIMO_VERIFICACIONES),
+    ]);
   if (proceso.error) throw fallaBase('leer el proceso de certificación', proceso.error);
   if (cafs.error) throw fallaBase('leer los CAF', cafs.error);
   if (resolucion.error) throw fallaBase('leer la resolución', resolucion.error);
@@ -217,6 +229,7 @@ export async function leerAsistente(
   if (asociaciones.error)
     throw fallaBase('leer los certificados de la empresa', asociaciones.error);
   if (operaciones.error) throw fallaBase('leer las operaciones', operaciones.error);
+  if (verificaciones.error) throw fallaBase('leer las operaciones', verificaciones.error);
 
   let casos: CasoSet[] = [];
   let envioSet: EnvioSet | null = null;
@@ -273,7 +286,10 @@ export async function leerAsistente(
     }
   }
 
-  const listaOperaciones: OperacionAsistente[] = operaciones.data.map((o) => ({
+  const filasOperaciones = [...operaciones.data, ...verificaciones.data]
+    .sort((a, b) => b.iniciada_en.localeCompare(a.iniciada_en))
+    .slice(0, MAXIMO_OPERACIONES);
+  const listaOperaciones: OperacionAsistente[] = filasOperaciones.map((o) => ({
     id: o.id,
     operacion: o.operacion,
     resultado: o.resultado,

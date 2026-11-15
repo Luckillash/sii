@@ -11,6 +11,8 @@ import {
   EstadoDeclaracion,
   huellaCertificado,
   type OpcionesSolicitar,
+  type ResultadoAutorizacion,
+  type ResultadoTimbrajes,
   Rut,
   relojFijo,
   SesionSii,
@@ -20,10 +22,12 @@ import {
 import { vi } from 'vitest';
 import type { ResultadoPaso } from '../src/lib/certificacion';
 import type {
+  ClienteAutorizacion,
   ClienteDeclaracion,
   ClienteFolios,
   ClientePostulacion,
   ClienteRest,
+  ClienteSituacionTributaria,
   DependenciasCertificacion,
 } from '../src/server/certificacion/dependencias';
 import type { ContextoCertificacion } from '../src/server/certificacion/tipos';
@@ -252,6 +256,29 @@ export function escenario(opciones: OpcionesEscenario = {}) {
     consultarEnvio: ReturnType<typeof vi.fn>;
   };
 
+  // ad_empresa (palena): por defecto, la empresa autorizada con la resolución 80/2014.
+  const autorizacion = {
+    autenticar: vi.fn(async (_c: Certificado) => sesionConCookie()),
+    consultar: vi.fn(
+      async (_s: SesionSii, _rut: string | Rut): Promise<ResultadoAutorizacion> => ({
+        tipo: 'autorizada',
+        rut: RUT_EMPRESA,
+        razonSocial: 'EMPRESA DE PRUEBA SPA',
+        fechaAutorizacion: '2026-11-06',
+        resolucion: { numero: 80, fecha: '2014-08-22' },
+      }),
+    ),
+  } satisfies ClienteAutorizacion;
+  // STC (www2): por defecto, ya timbró boletas (39) en 2026.
+  const situacionTributaria = {
+    timbrajes: vi.fn(
+      async (_rut: string | Rut): Promise<ResultadoTimbrajes> => ({
+        tipo: 'ok',
+        timbrajes: [{ tipoDte: 39, ultimoAnio: 2026, folioFinal: 5 }],
+      }),
+    ),
+  } satisfies ClienteSituacionTributaria;
+
   const deps: Partial<DependenciasCertificacion> = {
     servicio: () => falso.cliente,
     sesion: async () => sesion.cliente,
@@ -264,6 +291,8 @@ export function escenario(opciones: OpcionesEscenario = {}) {
       declaracion: () => declaracion,
       folios: () => folios,
       rest: () => rest,
+      autorizacion: () => autorizacion,
+      situacionTributaria: () => situacionTributaria,
     },
     operacion: {
       confirmarSesion: async () => true,
@@ -293,6 +322,8 @@ export function escenario(opciones: OpcionesEscenario = {}) {
     declaracion,
     folios,
     rest,
+    autorizacion,
+    situacionTributaria,
   };
 }
 

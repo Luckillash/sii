@@ -271,6 +271,8 @@ export interface OpcionesEjecucion {
   confirmada: boolean;
   canal?: ContextoOperacion['canal'];
   envioId?: string | null;
+  /** Por defecto certificación; `verificar_autorizacion` consulta producción (palena). */
+  ambiente?: ContextoOperacion['ambiente'];
 }
 
 /** `ejecutarOperacion` en certificación, con la empresa y el usuario del contexto. */
@@ -288,7 +290,7 @@ export function ejecutar<T>(
       empresaId: ctx.empresaId,
       usuarioId: ctx.usuarioId,
       operacion: opciones.operacion,
-      ambiente: AMBIENTE,
+      ambiente: opciones.ambiente ?? AMBIENTE,
       canal: opciones.canal ?? null,
       confirmada: opciones.confirmada,
       envioId: opciones.envioId ?? null,
@@ -302,7 +304,9 @@ export function ejecutar<T>(
  * Sesión AUT2000 reutilizada del certificado, dentro de su bloqueo (dos peticiones no
  * abren sesiones en paralelo con el mismo certificado). `autenticar` es el login de la
  * librería (`PostulacionSii.autenticar` o `SolicitudFolios.autenticar`: el mismo login
- * con la vuelta a maullin; la sesión sirve para maullin y www4).
+ * con la vuelta a maullin; la sesión sirve para maullin y www4). Con
+ * `ambiente = 'produccion'` (la consulta de `ad_empresa`) el bloqueo y la sesión son
+ * los de producción: la sesión de palena es otra.
  */
 export function conSesionSii<T>(
   deps: DependenciasCertificacion,
@@ -310,14 +314,15 @@ export function conSesionSii<T>(
   credenciales: CredencialesCertificado,
   autenticar: () => Promise<SesionSii>,
   usar: (sesion: SesionSii) => Promise<T>,
+  ambiente: ContextoOperacion['ambiente'] = AMBIENTE,
 ): Promise<T> {
   return conBloqueoCertificado(
     cliente,
-    { certificadoId: credenciales.certificadoId, ambiente: AMBIENTE },
+    { certificadoId: credenciales.certificadoId, ambiente },
     () =>
       conSesionReutilizada({
         sesiones: deps.sesionesSii(cliente),
-        clave: claveSesion(credenciales, AMBIENTE),
+        clave: claveSesion(credenciales, ambiente),
         autenticar,
         usar,
       }),
@@ -401,11 +406,14 @@ export function ok(
   mensaje: MensajeError,
   operacionId: string | null,
   avisos: readonly string[] = [],
+  extra: Pick<Extract<ResultadoPaso, { tipo: 'ok' }>, 'tono' | 'sugerencia'> = {},
 ): ResultadoPaso {
   return {
     tipo: 'ok',
     mensaje: { ...mensaje },
     operacionId,
     ...(avisos.length > 0 ? { avisos: [...avisos] } : {}),
+    ...(extra.tono ? { tono: extra.tono } : {}),
+    ...(extra.sugerencia ? { sugerencia: extra.sugerencia } : {}),
   };
 }

@@ -2670,6 +2670,7 @@ export type Database = {
         | "emitir"
         | "consultar_envio"
         | "seguimiento"
+        | "verificar_autorizacion"
       origen_documento: "panel" | "api" | "cli" | "set_pruebas"
       proposito_envio: "emision" | "set_pruebas" | "rcof"
       resultado_operacion:
@@ -2875,6 +2876,7 @@ export const Constants = {
         "emitir",
         "consultar_envio",
         "seguimiento",
+        "verificar_autorizacion",
       ],
       origen_documento: ["panel", "api", "cli", "set_pruebas"],
       proposito_envio: ["emision", "set_pruebas", "rcof"],

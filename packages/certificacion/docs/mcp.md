@@ -34,8 +34,9 @@ nada (código 2). Igual se pueden usar para validar y armar sin enviar:
 | `produccion_emitir` | con `confirmar=true` | omite `confirmar` |
 | `certificacion_enviar_set`, `certificacion_enviar_rcof` | siempre | `solo_armar=true` |
 
-Las consultas (`estado_envio`, `estado_declaracion`, `verificar_portal`, `consultar`) y las
-utilidades locales (`firmar_semilla`, `verificar_ted`) son de solo lectura. `seguimiento`
+Las consultas (`estado_envio`, `estado_declaracion`, `verificar_portal`, `consultar`,
+`produccion_autorizacion`, `util_situacion_tributaria`) y las utilidades locales
+(`firmar_semilla`, `verificar_ted`) son de solo lectura. `seguimiento`
 solo consulta, pero agrega líneas a la bitácora local.
 
 Con `--permitir-envios` (o `SII_MCP_PERMITIR_ENVIOS=1`) esas llamadas sí se ejecutan. Cada

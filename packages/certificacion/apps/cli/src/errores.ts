@@ -10,6 +10,7 @@ import {
   ErrorRespuestaSii,
   ErrorSolicitudFolios,
   ErrorTransporte,
+  ErrorVerificacion,
   FoliosSinCafError,
   SiiError,
 } from '@winex/certificacion';
@@ -32,7 +33,10 @@ export const CODIGOS = Object.freeze({
    * timbrados sin CAF). **No reintentar a ciegas:** revisar el estado en el SII.
    */
   INCIERTO: 6,
-  /** Una verificación local no pasó (p. ej. un TED que no calza con el CAF). */
+  /**
+   * Una verificación no pasó: un TED que no calza con el CAF, o una respuesta del SII
+   * que la librería no reconoce (`ErrorVerificacion`: no se interpretó).
+   */
   VERIFICACION: 7,
 });
 
@@ -66,6 +70,7 @@ export function codigoDeError(error: unknown): CodigoSalida {
     return CODIGOS.INCIERTO;
   }
   if (error instanceof ErrorTransporte) return CODIGOS.TRANSPORTE;
+  if (error instanceof ErrorVerificacion) return CODIGOS.VERIFICACION;
   if (
     error instanceof ErrorRespuestaSii ||
     error instanceof ErrorPostulacion ||

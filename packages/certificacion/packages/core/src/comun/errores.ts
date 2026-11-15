@@ -62,6 +62,15 @@ export class ErrorRespuestaSii extends SiiError {
   }
 }
 
+/**
+ * Lo que respondió el SII no calza con lo que la librería conoce: una página o un
+ * JSON con otra forma, o una redirección a un lugar inesperado. No se sabe qué dijo
+ * el SII, así que no se interpreta ni se copia la respuesta (puede traer datos
+ * personales). Hay que revisar si el SII cambió y actualizar la librería. La CLI lo
+ * informa con el código 7.
+ */
+export class ErrorVerificacion extends SiiError {}
+
 /** La solicitud de folios falló. */
 export class ErrorSolicitudFolios extends SiiError {}
 

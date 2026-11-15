@@ -74,7 +74,7 @@ Son estables: un script que llama a la CLI puede decidir con ellos si reintentar
 | 4 | Red o HTTP inesperado | Reintentar más tarde (salvo que el comando avise que la subida pudo llegar) | `ErrorTransporte` |
 | 5 | El SII respondió, pero rechazó la operación o devolvió algo que no se entiende | Leer el mensaje del SII | `ErrorRespuestaSii`, `ErrorPostulacion`, `ErrorSolicitudFolios` (incluye `SesionCaducaError` y `SetSinDescargarError`) |
 | 6 | **Incierto:** la operación salió y no se sabe si quedó hecha | **No repetir a ciegas.** Revisar el estado en el SII | `FoliosSinCafError`, `DeclaracionInciertaError`, envío de `emitir` sin respuesta |
-| 7 | Una verificación local falló | Revisar el CAF o el sobre | `util verificar-ted` |
+| 7 | Una verificación falló: local (TED que no calza con el CAF) o una respuesta del SII que la librería no reconoce | Revisar el CAF o el sobre; si es del SII, revisar si cambió la página o la consulta y actualizar la librería | `util verificar-ted`, `ErrorVerificacion` |
 
 Algunos comandos usan los códigos con un sentido propio (por ejemplo, `estado-envio`
 termina con 0 aunque el envío esté rechazado; `descargar-set` termina con 1 si la empresa
@@ -97,8 +97,10 @@ ya está autorizada). Se indica en cada comando.
 | `produccion emitir` | Emitir una boleta por la API REST | api + rahue (o apicert + pangal) | `boleta-<amb>-<folio>.xml`, `.envio.json` | Sí |
 | `produccion consultar` | Estado de un envío REST | api (o apicert) | — | No (solo lectura) |
 | `produccion seguimiento` | Estado de todas las boletas emitidas (piloto) | api (o apicert) | solo con `--bitacora` | No (solo lectura) |
+| `produccion autorizacion` | Si la empresa está autorizada y con qué resolución | palena (login + ad_empresa) | — | No (solo lectura) |
 | `util firmar-semilla` | Firmar una semilla REST obtenida a mano | nada | — | No |
 | `util verificar-ted` | Verificar los TED de un sobre contra el CAF | nada | — | No |
+| `util situacion-tributaria` | Historial de timbraje de un RUT | www2 (público, sin certificado) | — | No (solo lectura) |
 
 ---
 
@@ -541,6 +543,33 @@ falló por red · 0 todo aceptado (con o sin reparos), en proceso, o sin registr
 
 Uso en el piloto: [piloto-produccion.md](piloto-produccion.md).
 
+### `autorizacion`
+
+```
+sii produccion autorizacion [rut] [--json]
+```
+
+Consulta en el portal de producción si la empresa está autorizada para emitir con software
+de mercado y con qué resolución (`ConsultaAutorizacion`, [folios.md](folios.md)). Solo
+lectura: nunca envía el formulario que actualiza los datos del contribuyente. El SII solo
+responde si el titular del certificado es **representante legal** de la empresa.
+
+| Argumento / opción | Qué hace |
+|---|---|
+| `rut` | RUT de la empresa (por defecto `SII_RUT_EMPRESA`) |
+| `--json` | Imprime el resultado (`tipo`, `rut`, `razonSocial`, `fechaAutorizacion`, `resolucion`) en JSON |
+
+Si está autorizada, imprime la fecha de autorización, la resolución y las líneas
+`SII_PRODUCCION_NRO_RESOL` / `SII_PRODUCCION_FCH_RESOL` para el `.env`. Si el titular no es
+representante legal, lo dice: el SII no informa nada de la autorización en ese caso.
+
+**Sale al SII:** login AUT2000 con el certificado (vuelta a palena), `GET ad_empresa1` y
+`POST ad_empresa2` con `RUT_EMP`, `DV_EMP` y `ACEPTAR`.
+**Escribe:** nada.
+**Códigos:** 0 el SII respondió (autorizada, sin representación o no autorizada) · 7 página
+desconocida o de otro RUT · 5 certificado rechazado o sesión caducada · 3 RUT o certificado
+inválidos.
+
 ---
 
 ## Grupo `util`
@@ -576,6 +605,28 @@ de `<RSASK>` (como el PHP) y además revisa que coincida con la `<RSAPK>` que pu
 **Sale al SII:** nada. **Escribe:** nada.
 **Códigos:** 0 todos los TED OK · 3 sobre o CAF ilegibles · 7 algún TED falla, el sobre no
 trae ningún TED, o `<RSASK>` y `<RSAPK>` no coinciden.
+
+### `situacion-tributaria`
+
+```
+sii util situacion-tributaria <rut> [--json]
+```
+
+Tipos de documento a los que el SII le timbró folios al RUT, con el año del último timbraje
+y el último folio (`SituacionTributaria`, [folios.md](folios.md)). Sirve para cualquier RUT:
+no usa el `.env` ni el certificado. Es el historial de timbraje, no la lista de
+autorizaciones: 39 o 41 prueban que la empresa está autorizada para boletas; que no
+aparezcan no prueba nada.
+
+| Opción | Qué hace |
+|---|---|
+| `--json` | Imprime `{ tipo, timbrajes }` en JSON |
+
+**Sale al SII:** `GET www2.sii.cl/app/stc/recurso/v1/recaptcha/key` y, si el captcha está
+apagado, `POST .../consulta/getConsultaData/` con el RUT. Públicos, sin cookies.
+**Escribe:** nada.
+**Códigos:** 0 consulta hecha · 5 el SII tiene el captcha activo (no se consultó) · 7 la
+respuesta no tiene la forma conocida · 4 red o HTTP inesperado · 2 RUT inválido.
 
 ---
 

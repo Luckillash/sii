@@ -6,6 +6,7 @@ import {
   ErrorRespuestaSii,
   ErrorSolicitudFolios,
   ErrorTransporte,
+  ErrorVerificacion as ErrorVerificacionSii,
   FolioInicialRequeridoError,
   FoliosSinCafError,
   hostDe,
@@ -67,7 +68,11 @@ export class ErrorConfig extends Error {
   override name = 'ErrorConfig';
 }
 
-/** Una verificación local no pasó (código 7), p. ej. un TED que no calza con el CAF. */
+/**
+ * Una verificación local no pasó (código 7), p. ej. un TED que no calza con el CAF. El
+ * `ErrorVerificacion` de la librería (respuesta del SII que no reconoce) es otra clase con
+ * el mismo nombre y el mismo resultado.
+ */
 export class ErrorVerificacion extends Error {
   override name = 'ErrorVerificacion';
 }
@@ -158,6 +163,8 @@ export function resultadoDeError(error: unknown): ResultadoFinal {
     return 'incierto';
   }
   if (error instanceof ErrorTransporte) return 'transporte';
+  // La librería no reconoció la respuesta del SII (ad_empresa, STC): código 7.
+  if (error instanceof ErrorVerificacionSii) return 'verificacion_fallida';
   if (
     error instanceof ErrorRespuestaSii ||
     error instanceof ErrorPostulacion ||

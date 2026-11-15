@@ -448,3 +448,27 @@ www2.sii.cl/app/stc/recurso/v1/recaptcha/key`, que respondió `enable: false`. D
 autorizaciones: la empresa del `.env` está certificada solo en boleta, y la 41 no aparece
 porque nunca se timbró. Su uso en el SaaS está en `PLAN-SAAS.md` (Fase 5, «Fuente de
 apoyo: situación tributaria de terceros»).
+
+### `ConsultaAutorizacion` y `SituacionTributaria` en la librería (2026-11-13)
+
+1. **Páginas grabadas.** Un script de prueba (1 login de producción, solo lectura) guardó el
+   HTML de `ad_empresa1` y de `ad_empresa2` para tres RUT: 20630500-2 (autorizada),
+   11111111-1 (sin representación) y 20630500-3 (no autorizada). Nunca se envió el
+   formulario de actualización. Con los datos de la empresa reemplazados (RUT 76123456-0,
+   razón social, software, correos, URL) quedaron en `paridad/autorizacion/paginas/`. Las
+   respuestas del STC de la validación anterior, con el nombre reemplazado, quedaron en
+   `paridad/autorizacion/stc/`.
+2. **Formas confirmadas.** La autorización viene en una tabla de dos columnas (Rut, Razón
+   Social, Fecha Autorización, Fecha Resolución, Resolución, y los campos editables con
+   `(*)`). El STC responde `timbrajes: []` para un RUT sin timbrajes (11111111-1,
+   12345678-5, 99999990-5) y 400 `«El RUT ingresado no es válido.»` para un DV malo; la
+   clase valida el RUT antes, así que ese caso no sale.
+3. **CLI contra el SII real**, desde el `.env` del piloto:
+   - `sii util situacion-tributaria 20630500-2`: `39 boleta electrónica: último timbraje
+     2026, último folio 5`, «Boleta electrónica: SÍ». Código 0.
+   - `sii util situacion-tributaria 90749000-9 --json`: 25 tipos (30, 33, 34…). Código 0.
+   - `sii produccion autorizacion`: «Autorizada en producción desde 2026-11-06», resolución
+     n.º 80 del 2014-08-22 (las de `SII_PRODUCCION_NRO_RESOL` / `_FCH_RESOL`). 1 login.
+     Código 0.
+
+**Resultado: OK.** En total, 2 logins de producción en la sesión (la captura y la CLI).

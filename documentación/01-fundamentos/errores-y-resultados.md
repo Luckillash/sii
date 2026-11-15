@@ -29,7 +29,7 @@ lo comprueba error por error (PLAN-SAAS §2, principios 3 y 5).
 | `transporte` | 4 | falla de red o HTTP inesperado; también el certificado ocupado por otra operación | nada irreversible: en folios y declaración la librería lo lanza solo **antes** del paso irreversible (después lanza un error incierto), y el certificado ocupado no llegó a salir | **sí**, en unos minutos |
 | `rechazo_sii` | 5 | el SII respondió y rechazó, o devolvió algo que no se entiende | sí, y lo rechazó | corrigiendo la causa |
 | `incierto` | 6 | llegó al SII y **no se sabe** si quedó hecho | sí | **no, a ciegas**: revisar en el SII |
-| `verificacion_fallida` | 7 | una verificación local no pasó (p. ej. un TED que no calza con el CAF) | depende de la operación | corrigiendo la causa |
+| `verificacion_fallida` | 7 | una verificación no pasó: local (p. ej. un TED que no calza con el CAF) o una respuesta del SII que la librería no reconoce | depende de la operación | corrigiendo la causa |
 
 `CODIGO_DE_RESULTADO` (exportado por `errores.ts`) es esa tabla en código; `ResultadoFinal`
 es el enum sin `en_curso`. La columna lleva la misma tabla como comentario en la base
@@ -54,6 +54,7 @@ siguiente.
 | `ErrorCertificado` | librería | `config` | 3 | «Falta configurar algo…» | breadcrumb `warning` |
 | `DeclaracionInciertaError`, `FoliosSinCafError` | librería | `incierto` | 6 | «No sabemos si el SII completó la operación» + la instrucción del error (revisar «Folios ya autorizados» / consultar P90–P91) | evento `error` |
 | `ErrorTransporte` | librería | `transporte` | 4 | «No pudimos comunicarnos con el SII» | evento `warning` con etiqueta `host_sii` |
+| `ErrorVerificacion` (de la librería: otra clase con el mismo nombre) | librería (`ConsultaAutorizacion`, `SituacionTributaria`) | `verificacion_fallida` | 7 | «La verificación no pasó» + el mensaje de la librería (el SII respondió algo que no reconoce; no se interpretó) | evento `error` |
 | `ErrorRespuestaSii`, `ErrorPostulacion` (y `SetSinDescargarError`), `ErrorSolicitudFolios` (y `SesionCaducaError`, `FolioInicialRequeridoError`) | librería | `rechazo_sii` | 5 | «El SII rechazó la operación» | breadcrumb `warning` |
 | `ErrorValidacion`, `ErrorFirma`, `ErrorTimbre` (otros `SiiError`) | librería | `error` | 1 | «No pudimos completar la operación» + su mensaje | excepción `error` (saneada) |
 | `ErrorTokenStore`, `ErrorSesiones`, `ErrorBloqueo`, `ErrorAlmacen`, cualquier otro | capa SII / desconocido | `error` | 1 | genérico: «No pudimos completar la operación. Ocurrió un error inesperado y quedó registrado…» | excepción `error` (saneada) |
@@ -201,8 +202,9 @@ tampoco registra nada). Solo las confirmadas pasan por `ejecutarOperacion`
 `OPERACIONES_QUE_GRABAN` (⚠️): `postular`, `descargar_set`, `solicitar_folios`,
 `enviar_set`, `solicitar_revision`, `declarar`, `enviar_rcof`, `emitir`. El resto del
 enum `operacion_sii` (`autenticar`, `obtener_token`, `estado_envio`, `verificar_portal`,
-`estado_declaracion`, `consultar_envio`, `seguimiento`) es de lectura 🔁. También lo será
-`verificar_autorizacion`, previsto en la migración `0010_verificar_autorizacion`.
+`estado_declaracion`, `consultar_envio`, `seguimiento`, `verificar_autorizacion`) es de
+lectura 🔁. `verificar_autorizacion` llegó con la migración `0010_verificar_autorizacion`
+(aplicada el 2026-11-14), y la usa `verificarAutorizacion`.
 
 ## `getUser()` antes de las operaciones ⚠️
 

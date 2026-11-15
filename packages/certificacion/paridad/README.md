@@ -10,6 +10,7 @@ Golden tests que exigen que Node produzca **los mismos bytes** que
 | `esperados/` | `<caso>.bin` (bytes exactos del PHP) y `<caso>.meta.json`. **No se editan a mano** |
 | `material/` | Llave RSA y certificado autofirmado **de prueba** (nunca reales) |
 | `http/` | Servidor de captura de la paridad HTTP y el lanzador de `pnpm paridad:generar` |
+| `autorizacion/` | Páginas de `ad_empresa` (`paginas/`) y respuestas del STC (`stc/`) grabadas en el SII el 2026-11-13, con los datos de la empresa reemplazados. No son casos de paridad (no hay PHP): las usan los tests unitarios de `ConsultaAutorizacion` y `SituacionTributaria` y de la CLI |
 
 ## Comandos
 

@@ -79,8 +79,12 @@ export const RIESGOS: Readonly<Record<string, Riesgo>> = {
   'produccion/consultar': consulta,
   // Solo consulta al SII, pero agrega líneas a la bitácora local.
   'produccion/seguimiento': { soloLectura: false, red: true },
+  // Solo lectura: nunca envía el formulario de ad_empresa2 que actualiza datos.
+  'produccion/autorizacion': consulta,
   'util/firmar-semilla': local,
   'util/verificar-ted': local,
+  // Consulta pública, sin certificado.
+  'util/situacion-tributaria': consulta,
 };
 
 /** Un comando sin clasificar se trata como el peor caso: siempre envía. */

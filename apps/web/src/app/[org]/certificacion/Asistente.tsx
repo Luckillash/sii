@@ -20,6 +20,7 @@ import {
   pasoDeEtapa,
   type ResultadoPaso,
   type ResumenEnsayo,
+  type SugerenciaPaso,
 } from '@/lib/certificacion';
 import { formatearFecha, formatearFechaHora, formatearMiles, formatearRut } from '@/lib/formatos';
 // Solo tipos (se borran al compilar): no arrastran `server-only` al bundle.
@@ -35,6 +36,7 @@ import {
   postular,
   solicitarFolios,
   solicitarRevision,
+  verificarAutorizacion,
 } from './acciones';
 import estilos from './certificacion.module.css';
 import { EnVivo } from './EnVivo';
@@ -43,6 +45,7 @@ import {
   type AccionAsistente,
   type AccionDisponible,
   type AccionSii,
+  bloqueoVerificacion,
   type ConsultaSii,
   comoRevisar,
   declaracionCompleta,
@@ -81,7 +84,13 @@ export interface AsistenteProps {
 }
 
 type Aviso =
-  | { tono: 'exito'; titulo: string; detalle?: string; avisos?: string[] }
+  | {
+      tono: 'exito' | 'info' | 'aviso';
+      titulo: string;
+      detalle?: string;
+      avisos?: string[];
+      sugerencia?: SugerenciaPaso;
+    }
   | { tono: 'error'; mensaje: MensajeError; operacionPendienteId?: string };
 
 type Ejecutable = AccionSii | ConsultaSii;
@@ -110,6 +119,8 @@ function etiquetaAccion(accion: Ejecutable, reenvio: boolean): string {
       return 'Solicitar revisión';
     case 'consultarEstadoDeclaracion':
       return 'Consultar el estado en el SII';
+    case 'verificarAutorizacion':
+      return 'Verificar autorización en el SII';
     case 'declarar':
       return 'Declarar cumplimiento';
   }
@@ -173,6 +184,8 @@ export function Asistente({ slug, admin, vista, diasCertificado }: AsistenteProp
         return consultarEstadoSet(slug, empresa.id);
       case 'consultarEstadoDeclaracion':
         return consultarEstadoDeclaracion(slug, empresa.id);
+      case 'verificarAutorizacion':
+        return verificarAutorizacion(slug, empresa.id);
     }
   }
 
@@ -186,10 +199,11 @@ export function Asistente({ slug, admin, vista, diasCertificado }: AsistenteProp
       setErroresCampo({});
       if (accion === 'solicitarFolios') setFolio(null);
       setAviso({
-        tono: 'exito',
+        tono: r.tono ?? 'exito',
         titulo: r.mensaje.titulo,
         detalle: r.mensaje.detalle,
         avisos: r.avisos,
+        sugerencia: r.sugerencia,
       });
       return;
     }
@@ -251,6 +265,11 @@ export function Asistente({ slug, admin, vista, diasCertificado }: AsistenteProp
       autorizacionExterna: vista.autorizacionExterna,
     }) === 'externa';
   const completos = pasosCompletos(etapa);
+  const bloqueoVerificar = bloqueoVerificacion({
+    empresaActiva: empresa.activa,
+    tieneCertificado: certificado !== null,
+    operacionEnCurso: enCurso !== null,
+  });
 
   function botones(paso: PlanPaso): ReactNode {
     const ejecutables = paso.acciones.filter(
@@ -333,11 +352,12 @@ export function Asistente({ slug, admin, vista, diasCertificado }: AsistenteProp
             {enCursoPaso ? botones(paso) : null}
             {enCursoPaso && admin ? (
               <p className={estilos.nota}>
-                Si la empresa ya se certificó fuera de Boletéame, no la postules de nuevo: registra
-                su resolución de producción en{' '}
+                Si la empresa ya se certificó fuera de Boletéame, no la postules de nuevo: verifica
+                su autorización en el SII, que trae la resolución de producción (el titular del
+                certificado tiene que ser su representante legal), o regístrala a mano en{' '}
                 <Link href={rutaResoluciones}>las resoluciones de la empresa</Link>. Con eso queda
-                autorizada para emitir en producción. Consultar el estado en el SII no graba nada:
-                solo muestra si la empresa tiene una certificación en curso.
+                autorizada para emitir en producción. Consultar el estado y verificar la
+                autorización no graban nada en el SII.
               </p>
             ) : null}
           </>
@@ -538,8 +558,8 @@ export function Asistente({ slug, admin, vista, diasCertificado }: AsistenteProp
             La página se actualiza sola cuando el SII responda.
           </Alerta>
         ) : null}
-        {aviso?.tono === 'exito' ? (
-          <Alerta tono="exito" titulo={aviso.titulo} accion={cerrarAviso}>
+        {aviso && aviso.tono !== 'error' ? (
+          <Alerta tono={aviso.tono} titulo={aviso.titulo} accion={cerrarAviso}>
             {aviso.detalle ? <p>{aviso.detalle}</p> : null}
             {aviso.avisos && aviso.avisos.length > 0 ? (
               <ul className={estilos.listaAvisos}>
@@ -547,6 +567,25 @@ export function Asistente({ slug, admin, vista, diasCertificado }: AsistenteProp
                   <li key={a}>{a}</li>
                 ))}
               </ul>
+            ) : null}
+            {admin && aviso.sugerencia === 'verificarAutorizacion' && !bloqueoVerificar ? (
+              <p className={estilos.accionAlerta}>
+                <Boton
+                  tamano="sm"
+                  variante="secundario"
+                  onClick={() => ejecutar('verificarAutorizacion')}
+                  disabled={pendiente}
+                >
+                  {etiquetaAccion('verificarAutorizacion', false)}
+                </Boton>
+              </p>
+            ) : null}
+            {admin && aviso.sugerencia === 'registrarResolucion' ? (
+              <p className={estilos.accionAlerta}>
+                <Link href={rutaResoluciones} className={clasesBoton('secundario', 'sm')}>
+                  Registrar la resolución de producción
+                </Link>
+              </p>
             ) : null}
           </Alerta>
         ) : null}
@@ -660,9 +699,30 @@ export function Asistente({ slug, admin, vista, diasCertificado }: AsistenteProp
                 Configuración antes de emitir: va en la carátula de cada envío al SII.
               </p>
             )}
-            <Link href={rutaResoluciones} className={clasesBoton('secundario', 'sm')}>
-              Ver las resoluciones de la empresa
-            </Link>
+            <div className={estilos.acciones}>
+              {admin ? (
+                <Boton
+                  tamano="sm"
+                  variante="secundario"
+                  onClick={() => ejecutar('verificarAutorizacion')}
+                  disabled={pendiente || bloqueoVerificar !== null}
+                  aria-describedby={bloqueoVerificar ? 'motivo-verificar' : undefined}
+                >
+                  {pendiente && activa === 'verificarAutorizacion'
+                    ? 'Consultando al SII…'
+                    : 'Verificar en el SII'}
+                </Boton>
+              ) : null}
+              <Link href={rutaResoluciones} className={clasesBoton('secundario', 'sm')}>
+                Ver las resoluciones de la empresa
+              </Link>
+            </div>
+            {admin ? (
+              <p id="motivo-verificar" className={estilos.nota}>
+                {bloqueoVerificar ??
+                  'Verificar en el SII confirma la autorización y trae la resolución de producción vigente, si el titular del certificado es representante legal de la empresa. No graba nada en el SII.'}
+              </p>
+            ) : null}
           </Tarjeta>
         ) : null}
         {externa ? null : (

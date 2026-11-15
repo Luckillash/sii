@@ -259,7 +259,7 @@ Solo claves API nuevas, y `env.ts` rechaza las demás por prefijo. Las legadas (
 | `0007_bloqueos_sii` | 4 | **Aplicada** (2026-11-13, verificación 14/14 y simulación 21/21): bloqueo **con arriendo** por certificado y ambiente para serializar sesiones AUT2000 (el SII frena el re-login, error `01.01.215.500.771.52`): tabla `bloqueos_sii` y RPC `tomar_bloqueo_certificado` / `liberar_bloqueo_certificado` (solo service_role). Reemplaza al `bloquear_certificado` con `pg_try_advisory_xact_lock` que proponía el plan: ese bloqueo se suelta al terminar la transacción de la RPC (cada llamada de PostgREST es una) y no serializa nada entre peticiones; uno de sesión se filtraría con el pool. Incluye el índice único parcial `operaciones_sii_efecto_global_en_curso`, que impide dos `solicitar_folios`/`postular`/`declarar` confirmadas en curso a la vez por empresa y ambiente. Verificación: `supabase/verificaciones/0007_bloqueos_sii.sql` (14); comportamiento: `rls-fase4-bloqueos.sql` (21, con `rollback`) |
 | `0008_certificacion` | 5 | **Aplicada** (2026-11-13, verificación 10/10 y simulación 16/16): RPC `registrar_caf` (XML del CAF a Vault + fila en `cafs` + solicitud `timbrada`, en una transacción; idempotente; la reutiliza la Fase 6) y `guardar_set_pruebas` (reemplaza los casos y deja el proceso en `set_descargado`, junto). Solo service_role; sin tablas ni políticas. Verificación: `supabase/verificaciones/0008_certificacion.sql` (10); simulación: `rls-fase5-certificacion.sql` (16, con `rollback`). En PGlite 10/10 y 16/16 |
 | `0009_autorizacion_externa` | 5 | **Aplicada** (2026-11-13, verificación 9/9 y simulación 12/12): trigger en `resoluciones` que, con una resolución de producción vigente, marca `empresas.autorizada_produccion` (empresas certificadas fuera de Boletéame: el SII les responde «sin trámite», no P91). Nunca desmarca. Verificación: `supabase/verificaciones/0009_autorizacion_externa.sql` (9); simulación: `rls-fase5-autorizacion-externa.sql` (12, con `rollback`). En PGlite 9/9 y 12/12 |
-| `0010_verificar_autorizacion` | 5 | **Prevista** (decisión del usuario 2026-11-13): agrega el valor `verificar_autorizacion` (🔁, lectura) al enum `operacion_sii`, para auditar la consulta de `ad_empresa` (Fase 5, «Verificar autorización en el SII»). Solo eso: `alter type … add value` no se puede usar en la misma transacción que lo agrega. Sin tablas ni políticas nuevas (la resolución se registra con lo que ya existe y la marca la pone el trigger de la 0009). Verificación: `supabase/verificaciones/0010_verificar_autorizacion.sql` |
+| `0010_verificar_autorizacion` | 5 | **Aplicada** (2026-11-14, 00:59 UTC; verificación 6/6 y simulación 7/7): agrega el valor `verificar_autorizacion` (🔁, lectura) al final del enum `operacion_sii`, para auditar la consulta de `ad_empresa` y el STC (Fase 5, «Verificar autorización en el SII»). Solo eso: `alter type … add value` no se puede usar en la misma transacción que lo agrega, y no se puede quitar después. El índice de efecto global de la 0007 no cambia. Sin tablas ni políticas nuevas (la resolución se registra con lo que ya existe y la marca la pone el trigger de la 0009). Verificación: `supabase/verificaciones/0010_verificar_autorizacion.sql` (6); simulación: `rls-fase5-verificar-autorizacion.sql` (7, con `rollback`). En PGlite 6/6 y 7/7 |
 | `0011_notificaciones` | 8 | Tabla `notificaciones` (tipo, clave de deduplicación, enviado_en) para alertas por correo |
 | `0012_planes_comerciales` | 10 | Grilla de planes definitiva (D5) |
 | `0013_pagos` | 10 | `pagos` y `eventos_pasarela` (idempotencia de webhooks de la pasarela) |
@@ -426,7 +426,7 @@ proceso de boleta que implementa la librería:
 - [x] **Empresas autorizadas fuera de Boletéame** (decisión del usuario 2026-11-13, «caso (a)»): el SII no distingue «autorizada» de «nunca postuló» (ambas sin trámite), así que registrar una resolución de producción vigente marca la empresa como autorizada (trigger, migración `0009_autorizacion_externa`); el asistente lo muestra como «Autorizada fuera de Boletéame» y bloquea postular, descargar set, folios, envío, revisión y declaración; «Consultar estado en el SII» disponible desde el paso 1 (crea el proceso solo después de que el SII responde). Código listo sin desplegar (2026-11-13): trigger `trg_50_resolucion_autoriza_produccion` (nunca desmarca; idempotente; con ajuste de datos para resoluciones ya cargadas), candado `cargarEmpresaPorCertificar` en las 6 acciones (ensayo y confirmada, sin fila en `operaciones_sii`), `VistaAsistente.autorizacionExterna` y `resolucionProduccion`, aviso en Configuración → resoluciones. En PGlite: verificación 0009 9/9, simulación `rls-fase5-autorizacion-externa.sql` 12/12, y las de las Fases 3 y 5 siguen 43/43 y 16/16. Typecheck, Vitest (586), Biome, stylelint y build en verde. 0009 aplicada en producción el 2026-11-13 (21:05 UTC): verificación 9/9, simulación 12/12 con limpieza en 0, tipos sin diferencias, Advisors sin avisos nuevos. Deploy `581d124` READY. Resolución de producción de la empresa del piloto (20630500-2) registrada con `registrar_resolucion` como service_role: n.º 80 del 22-08-2014; el trigger la marcó `autorizada_produccion` y `autorizada_en` se fijó en la fecha real de autorización (06-11-2026); sin proceso de certificación creado. En *Production* (Chrome, sesión del propietario) `/servicio/certificacion` muestra «Autorizada fuera de Boletéame» con la resolución, sin pasos ni acciones; sin errores de consola ni de runtime en Vercel. Detalle menor visto y corregido (deploy `0d27c20`, verificado en *Production*: la sección ya no aparece para la empresa del piloto y Vercel sin errores de runtime): la columna lateral mostraba «Aún no hay folios de certificación. Se piden en el paso 3» y «La resolución de certificación se registra al postular» a una empresa autorizada; ahora, si la empresa está autorizada (P91 o fuera de Boletéame), esas indicaciones no aparecen y la sección «Folios de certificación» solo se muestra si tiene CAF o resolución de certificación.
 - [ ] Criterio de aceptación contra el SII de certificación — **pendiente por decisión del usuario (2026-11-13)**: hace falta otra empresa de prueba (certificado cuyo titular sea su representante legal), porque la única de producción ya está autorizada. Recorrido: postular → descargar set → solicitar folios → enviar set (EPR limpio) → solicitar revisión → P90 → declarar → P91, comparando las filas con las que deja la CLI y que ninguna fila, log ni Sentry tenga secretos.
 
-#### Verificar autorización en el SII (prevista, sin código)
+#### Verificar autorización en el SII (código listo; falta la prueba real en *Production*)
 
 Decisión del usuario (2026-11-13): reemplazar, cuando se pueda, el registro manual de la
 resolución de producción (migración 0009) por una consulta al SII. El asistente
@@ -582,18 +582,46 @@ autorizaciones. Validado el 2026-11-13 con 2 consultas:
 - [ ] Validar con una empresa certificada solo para factura si la respuesta distingue
   boleta de factura. Si no la distingue, decidir con el usuario si la marca automática se
   queda o si la consulta solo propone la resolución.
-- [ ] Librería: `ConsultaAutorizacion` y `SituacionTributaria`, CLI, MCP y pruebas con
+- [x] Librería: `ConsultaAutorizacion` y `SituacionTributaria`, CLI, MCP y pruebas con
   páginas y respuestas grabadas (también `enable: true` en `recaptcha/key` y una forma de
-  respuesta desconocida).
-- [ ] Migración `0010_verificar_autorizacion` aplicada y verificada; tipos regenerados.
-- [ ] App y UI con pruebas (Supabase falso y doble de la librería): los tres tipos de
+  respuesta desconocida). 2026-11-13: las dos clases en `packages/core/src/folios/`, error
+  nuevo `ErrorVerificacion` (código 7 en la CLI), `leerAdEmpresa2` exportada; CLI
+  `sii produccion autorizacion [rut]` y `sii util situacion-tributaria <rut>` (ambas con
+  `--json`), herramientas MCP `produccion_autorizacion` y `util_situacion_tributaria` (solo
+  lectura). Páginas de `ad_empresa` grabadas en palena (1 login, solo lectura; datos de la
+  empresa reemplazados) y respuestas del STC en `paridad/autorizacion/`. La autorización
+  viene en una tabla (filas «Fecha Autorización», «Fecha Resolución», «Resolución»), no en
+  campos `NroResol` / `FchResol`. Core 1775 pruebas y CLI 217 en verde, Biome y typecheck
+  limpios. Probado contra el SII real con el `.env` del piloto: `produccion autorizacion`
+  → autorizada desde 2026-11-06, resolución 80 del 2014-08-22; `situacion-tributaria`
+  20630500-2 → 39, 2026, folio 5 (`packages/certificacion/docs/validaciones.md`).
+- [x] Migración `0010_verificar_autorizacion` aplicada y verificada; tipos regenerados.
+  2026-11-14 (00:59 UTC), con el OK del usuario: solo el valor `verificar_autorizacion` al
+  final de `operacion_sii` (lo demás ya existe: `registrar_resolucion` de la 0005 y el
+  trigger de la 0009). `--dry-run` solo con la 0010; verificación
+  `supabase/verificaciones/0010_verificar_autorizacion.sql` 6/6 y simulación
+  `rls-fase5-verificar-autorizacion.sql` 7/7 con limpieza en 0, en PGlite y en producción
+  (sin la 0010: 2/6 y 3/7); regresiones de las Fases 3–5 en verde; `pnpm db:tipos` idéntico
+  a lo agregado a mano; Advisors de seguridad sin avisos nuevos. Typecheck, Biome y Vitest
+  de la app (586) en verde.
+- [x] App y UI con pruebas (Supabase falso y doble de la librería): los tres tipos de
   respuesta de `ad_empresa` combinados con `boleta` / `sin_boleta` / `no_disponible` del
   STC, página desconocida, RUT distinto, sin certificado, y ninguna fila con secretos ni
-  correos.
+  correos. 2026-11-14: `server/certificacion/autorizacion.ts` (`verificarAutorizacion`,
+  `apoyoStc`, `medianocheChile`), fábricas `autorizacion` / `situacionTributaria`,
+  `ejecutar` y `conSesionSii` con `ambiente` (sesión y bloqueo de producción), `ErrorVerificacion`
+  de la librería → `verificacion_fallida`, `ResultadoPaso` ok con `tono` y `sugerencia`.
+  `leerAsistente` muestra las filas `verificar_autorizacion`. UI: cuarta acción del paso 1
+  y nota que la propone, botón tras un «sin trámite», «Verificar en el SII» en la tarjeta de
+  autorización externa y «Traer del SII» en Configuración → Empresas → Resoluciones (página
+  con `maxDuration = 300`). Pruebas: `autorizacion.test.ts` (25), `logica.test.ts` y
+  `errores.test.ts`; Vitest de la app 615, typecheck, Biome, stylelint y `pnpm build` en
+  verde. Sin desplegar.
 - [ ] Prueba real en *Production* con la empresa del piloto. Como ya está marcada, todo
   tiene que quedar igual (misma resolución), con una fila `verificar_autorizacion` en `ok`
   y `stc = 'boleta'`.
-- [ ] Documentación: pasar de «prevista» a hecha
+- [x] Documentación: pasar de «prevista» a hecha (2026-11-14; queda anotado que falta la
+  prueba real en *Production*)
   (`documentación/02-guias/certificacion-empresa.md`, `07-referencia/trampas-conocidas.md`,
   `03-api-reference/servicios-sii.md`, `indice-operaciones.md` y
   `04-objetos/objetos-auditoria-e-integraciones.md`).

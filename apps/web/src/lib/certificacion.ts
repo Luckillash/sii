@@ -100,6 +100,15 @@ export interface ResumenEnsayo {
   textoConfirmar: string;
 }
 
+/**
+ * Siguiente paso que la UI ofrece junto a un resultado:
+ *   - `verificarAutorizacion`: preguntar al SII si la empresa ya está autorizada (tras un
+ *     «sin trámite»);
+ *   - `registrarResolucion`: registrar a mano la resolución de producción (el SII no la
+ *     informó porque el titular no es representante legal).
+ */
+export type SugerenciaPaso = 'verificarAutorizacion' | 'registrarResolucion';
+
 /** Datos que la acción necesita para poder repetirse (p. ej. el folio inicial que pide el SII). */
 export interface Requerimiento {
   folioInicial?: { sugerido: string };
@@ -109,11 +118,18 @@ export type ResultadoPaso =
   | { tipo: 'ensayo'; resumen: ResumenEnsayo }
   | {
       tipo: 'ok';
-      /** Qué pasó, para un `Alerta` de tono `exito`. */
+      /** Qué pasó, para un `Alerta` (de tono `exito` salvo que `tono` diga otro). */
       mensaje: { titulo: string; detalle: string };
       /** Avisos que devolvió el SII (p. ej. los de la postulación). */
       avisos?: string[];
       operacionId: string | null;
+      /**
+       * Tono del `Alerta` cuando la operación salió bien pero la respuesta no es una buena
+       * noticia (p. ej. «no pudimos verificar la autorización»). Por defecto `exito`.
+       */
+      tono?: 'exito' | 'info' | 'aviso';
+      /** Qué hacer a continuación; la UI lo ofrece junto al mensaje. */
+      sugerencia?: SugerenciaPaso;
     }
   | {
       tipo: 'error';

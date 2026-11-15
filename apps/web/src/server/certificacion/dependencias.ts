@@ -2,10 +2,12 @@ import 'server-only';
 import {
   type Certificado,
   ClienteBoletaRest,
+  ConsultaAutorizacion,
   DeclaracionBoletas,
   PostulacionSii,
   type Reloj,
   relojSistema,
+  SituacionTributaria,
   SolicitudFolios,
   type TokenStore,
   type TransporteHttp,
@@ -42,12 +44,21 @@ export type ClienteRest = Pick<
   'obtenerToken' | 'enviarBoleta' | 'consultarEnvio'
 >;
 
+/** `ad_empresa` de palena: siempre producción (lo fija la librería). */
+export type ClienteAutorizacion = Pick<ConsultaAutorizacion, 'autenticar' | 'consultar'>;
+/** Consulta pública STC (www2), sin certificado. */
+export type ClienteSituacionTributaria = Pick<SituacionTributaria, 'timbrajes'>;
+
 export interface OpcionesCliente {
   readonly transporte: TransporteHttp;
   readonly reloj: Reloj;
 }
 
-/** Fábricas de los clientes de la librería. El ambiente siempre es certificación. */
+/**
+ * Fábricas de los clientes de la librería. El ambiente es certificación, salvo
+ * `autorizacion` (la consulta de `ad_empresa` solo existe en producción) y
+ * `situacionTributaria` (consulta pública, sin ambiente).
+ */
 export interface FabricasSii {
   postulacion(opciones: OpcionesCliente): ClientePostulacion;
   declaracion(opciones: OpcionesCliente): ClienteDeclaracion;
@@ -56,6 +67,8 @@ export interface FabricasSii {
     certificado: Certificado,
     opciones: OpcionesCliente & { readonly tokenStore: TokenStore },
   ): ClienteRest;
+  autorizacion(opciones: OpcionesCliente): ClienteAutorizacion;
+  situacionTributaria(opciones: Pick<OpcionesCliente, 'transporte'>): ClienteSituacionTributaria;
 }
 
 export const FABRICAS_SII: FabricasSii = Object.freeze({
@@ -75,6 +88,10 @@ export const FABRICAS_SII: FabricasSii = Object.freeze({
       reloj,
       tokenStore,
     }),
+  autorizacion: ({ transporte, reloj }: OpcionesCliente) =>
+    new ConsultaAutorizacion({ transporte, reloj }),
+  situacionTributaria: ({ transporte }: Pick<OpcionesCliente, 'transporte'>) =>
+    new SituacionTributaria({ transporte }),
 });
 
 export interface CorreoCertificacion {

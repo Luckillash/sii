@@ -274,10 +274,11 @@ source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas
   el SII respondió (una falla no deja fila). El proceso creado así no tiene datos de
   postulación: el paso 1 sigue pidiendo guardarlos antes de postular.
 
-### Datos de la empresa autorizada en el SII (`ad_empresa`, prevista)
+### Datos de la empresa autorizada en el SII (`ad_empresa`)
 
-Validado en producción el 2026-11-13, en solo lectura y con el certificado del piloto; el
-código todavía no existe (PLAN-SAAS, Fase 5, «Verificar autorización en el SII»).
+Validado en producción el 2026-11-13, en solo lectura y con el certificado del piloto. Lo
+lee `ConsultaAutorizacion` de la librería y lo usa `verificarAutorizacion` de la app
+([guía](../02-guias/certificacion-empresa.md#verificar-la-autorización-en-el-sii)).
 
 - **Hay una página del SII que sí distingue «autorizada» de «nunca postuló».** El asistente
   «Actualización de datos del contribuyente» (`palena.sii.cl/cvc_cgi/dte/ad_empresa1`, con
@@ -304,11 +305,20 @@ código todavía no existe (PLAN-SAAS, Fase 5, «Verificar autorización en el S
   el HTML no va a logs, Sentry ni `operaciones_sii.detalle`.
 - **Es latin1 con entidades HTML** (`Raz&oacute;n Social`, `Fecha Autorizaci&oacute;n`):
   hay que decodificarla antes de comparar textos. Las fechas vienen como `dd-mm-aaaa`.
+- **La resolución viene en una tabla de dos columnas, no en campos.** Filas «Rut», «Razón
+  Social», «Fecha Autorización», «Fecha Resolución», «Resolución» y los campos editables con
+  `(*)` (software, correos, URL). La librería lee solo las cinco primeras.
+- **Fecha de autorización.** `registrar_resolucion` dispara el trigger de la 0009, que pone
+  `autorizada_en = now()`; la app la corrige después a la fecha del SII a medianoche de Chile
+  (como se fijó a mano la del piloto), solo si la empresa no estaba autorizada.
+- **Otra sesión y otro bloqueo.** La consulta usa la sesión AUT2000 de producción del
+  certificado (`sesiones_sii` con `ambiente = 'produccion'`) y el bloqueo de producción, no
+  los de certificación: comparten el freno de re-login del SII, pero no la sesión.
 
-### Situación tributaria de terceros (STC, fuente de apoyo prevista)
+### Situación tributaria de terceros (STC, fuente de apoyo)
 
-Validado el 2026-11-13 con 2 consultas públicas; el código todavía no existe (PLAN-SAAS,
-Fase 5, «Fuente de apoyo: situación tributaria de terceros»).
+Validado el 2026-11-13 con 2 consultas públicas. Lo lee `SituacionTributaria` de la
+librería y lo usa `verificarAutorizacion` de la app como apoyo del mensaje.
 
 - **«Documentos autorizados» no es lo que la empresa puede emitir.** La tabla sale del
   campo `timbrajes` de `POST www2.sii.cl/app/stc/recurso/v1/consulta/getConsultaData/`

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   bloqueoSii,
+  bloqueoVerificacion,
   camposDe,
   declaracionCompleta,
   type EntradaPlan,
@@ -10,6 +11,7 @@ import {
   esquemaFolioInicial,
   faltanFolios,
   inciertasSinRevisar,
+  nombreOperacion,
   operacionEnCurso,
   type PlanPaso,
   pasosCompletos,
@@ -113,17 +115,20 @@ describe('planAsistente', () => {
       { accion: 'guardarPostulacion', habilitada: true },
       { accion: 'postular', habilitada: false },
       { accion: 'consultarEstadoDeclaracion', habilitada: true },
+      { accion: 'verificarAutorizacion', habilitada: true },
     ]);
     expect(acciones({})).toEqual([
       { accion: 'guardarPostulacion', habilitada: true },
       { accion: 'postular', habilitada: true },
       { accion: 'consultarEstadoDeclaracion', habilitada: true },
+      { accion: 'verificarAutorizacion', habilitada: true },
     ]);
     const paso = enCurso(planAsistente({ ...BASE, postulacionCompleta: false }));
     expect(paso.falta).toMatch(/guarda los datos/i);
     expect(paso.acciones[1]?.motivo).toMatch(/Guarda primero/);
     // La consulta no depende de los datos de la postulación.
     expect(paso.acciones[2]?.motivo).toBeUndefined();
+    expect(paso.acciones[3]?.motivo).toBeUndefined();
   });
 
   it('paso 1: la consulta del estado sigue los bloqueos que salen al SII (certificado, operación en curso)', () => {
@@ -131,6 +136,7 @@ describe('planAsistente', () => {
       { accion: 'guardarPostulacion', habilitada: true },
       { accion: 'postular', habilitada: false },
       { accion: 'consultarEstadoDeclaracion', habilitada: false },
+      { accion: 'verificarAutorizacion', habilitada: false },
     ]);
     expect(acciones({ operacionEnCurso: true })[2]).toEqual({
       accion: 'consultarEstadoDeclaracion',
@@ -247,9 +253,55 @@ describe('planAsistente', () => {
       { accion: 'guardarPostulacion', habilitada: true },
       { accion: 'postular', habilitada: false },
       { accion: 'consultarEstadoDeclaracion', habilitada: false },
+      { accion: 'verificarAutorizacion', habilitada: false },
     ]);
     const paso = enCurso(planAsistente({ ...BASE, operacionEnCurso: true }));
     expect(paso.acciones[1]?.motivo).toMatch(/operación en curso/);
+  });
+});
+
+describe('verificar la autorización', () => {
+  it('paso 1: no la frena una operación por verificar (es de lectura), sí la falta de certificado o una en curso', () => {
+    const porAccion = (cambios: Partial<EntradaPlan>) =>
+      enCurso(planAsistente({ ...BASE, ...cambios })).acciones.find(
+        (a) => a.accion === 'verificarAutorizacion',
+      );
+    expect(porAccion({ inciertaSinRevisar: true })).toEqual({
+      accion: 'verificarAutorizacion',
+      habilitada: true,
+    });
+    // Postular sí queda frenado por la incierta.
+    expect(acciones({ inciertaSinRevisar: true })[1]).toEqual({
+      accion: 'postular',
+      habilitada: false,
+    });
+    expect(porAccion({ tieneCertificado: false })?.motivo).toMatch(/certificado predeterminado/);
+    expect(porAccion({ empresaActiva: false })?.motivo).toMatch(/desactivada/);
+    expect(porAccion({ operacionEnCurso: true })?.motivo).toMatch(/operación en curso/);
+  });
+
+  it('bloqueoVerificacion: sin el candado de empresa autorizada', () => {
+    expect(
+      bloqueoVerificacion({ empresaActiva: true, tieneCertificado: true, operacionEnCurso: false }),
+    ).toBeNull();
+    expect(
+      bloqueoVerificacion({
+        empresaActiva: false,
+        tieneCertificado: false,
+        operacionEnCurso: true,
+      }),
+    ).toMatch(/desactivada/);
+  });
+
+  it('nombre y texto en curso de la operación', () => {
+    expect(nombreOperacion('verificar_autorizacion')).toBe('Verificación de la autorización');
+    expect(
+      textoEnCurso(
+        'verificar_autorizacion',
+        '2026-11-13T15:00:00Z',
+        new Date('2026-11-13T15:01:00Z'),
+      ),
+    ).toBe('Verificando la autorización en el SII desde las 12:00…');
   });
 });
 

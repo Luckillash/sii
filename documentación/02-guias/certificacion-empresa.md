@@ -19,9 +19,9 @@ Una empresa que ya se certificó **fuera de Boletéame** no recorre los pasos: r
 resolución de producción y el asistente la muestra como «Autorizada fuera de Boletéame»
 ([abajo](#empresa-autorizada-fuera-de-boletéame)). Eso usa la migración
 `0009_autorizacion_externa`, aplicada en producción el 2026-11-13
-([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0009)). Está prevista una
-consulta al SII que traiga esa resolución sola cuando el titular del certificado es
-representante legal ([abajo](#verificar-la-autorización-en-el-sii-prevista)).
+([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0009)). «Verificar
+autorización en el SII» trae esa resolución sola cuando el titular del certificado es
+representante legal ([abajo](#verificar-la-autorización-en-el-sii)).
 
 La app no reimplementa nada de la librería `@winex/certificacion` (principio 4): cada
 acción tiene paridad con un comando `sii certificacion …` de la CLI y solo agrega
@@ -81,34 +81,71 @@ Por eso (decisión del usuario, 2026-11-13):
    `borrador`, la consulta responde «El SII no tiene una certificación en curso para la
    empresa» y explica los dos caminos.
 
-### Verificar la autorización en el SII (prevista)
+### Verificar la autorización en el SII
 
-**Estado: prevista, sin código** (decisión del usuario 2026-11-13; PLAN-SAAS, Fase 5,
-«Verificar autorización en el SII»). Sirve para no tener que escribir la resolución a mano.
+**Estado: código listo y probado sin red ni base (2026-11-14); falta la prueba real en
+*Production*** (PLAN-SAAS, Fase 5, «Verificar autorización en el SII»). Sirve para no tener
+que escribir la resolución a mano.
 
 La página «Actualización de datos del contribuyente» del portal de producción
 (`ad_empresa1` / `ad_empresa2` en `palena.sii.cl`) confirma la autorización y entrega el
 número y la fecha de la resolución, **pero solo si el titular del certificado es
 representante legal de la empresa en el SII**
-([trampas](../07-referencia/trampas-conocidas.md#datos-de-la-empresa-autorizada-en-el-sii-ad_empresa-prevista)).
-Cómo se va a usar:
+([trampas](../07-referencia/trampas-conocidas.md#datos-de-la-empresa-autorizada-en-el-sii-ad_empresa)).
+La librería la lee con `ConsultaAutorizacion`, y la consulta pública STC con
+`SituacionTributaria` (`packages/certificacion/docs/folios.md`).
 
-- **Acción** «Verificar autorización en el SII» 🔁, sin ensayo: en el paso 1 (primera
-  opción para una empresa que ya está certificada), después de un «sin trámite» y en
-  *Configuración → Empresas → Resoluciones* («Traer del SII»). No tiene el candado
-  `empresa_autorizada`.
-- **Autorizada:** registra la resolución de producción del SII, y el trigger de la 0009 marca
-  la empresa. `autorizada_en` queda con la fecha de autorización que informa el SII.
-- **Titular sin representación legal:** no cambia nada y ofrece el registro manual de arriba.
-- **No autorizada:** no cambia nada (la marca nunca se quita) y ofrece certificarla.
-- **Apoyo del STC** (consulta pública de situación tributaria, sin certificado): en la misma
-  operación se miran los timbrajes. Si hay de boleta (39/41), se confirma; si la empresa
-  está autorizada pero no hay, se avisa que podría estar certificada solo para factura; si
-  el titular no es representante y hay timbrajes de boleta, se le dice que la empresa ya
-  emite boletas y que registre su resolución. Nunca marca ni bloquea, y con captcha se
-  omite ([trampas](../07-referencia/trampas-conocidas.md#situación-tributaria-de-terceros-stc-fuente-de-apoyo-prevista)).
-- **Auditoría:** `operacion_sii = 'verificar_autorizacion'` (migración `0010`, prevista), con
-  `ambiente = 'produccion'`. No guarda correos, URL ni nombre del software.
+- **Acción** `verificarAutorizacion(ctx)` (`server/certificacion/autorizacion.ts`; Server
+  Action `verificarAutorizacion` en `app/[org]/certificacion/acciones.ts`, propietario o
+  administrador). Es 🔁 y sin ensayo, como `consultarEstadoDeclaracion`. Se ofrece en tres
+  lugares:
+  - en el paso 1, como cuarta acción («Verificar autorización en el SII»), y la nota del
+    paso la propone antes que el registro manual;
+  - después de un «sin trámite» en `borrador`: el resultado trae
+    `sugerencia: 'verificarAutorizacion'` y el aviso muestra el botón;
+  - en la tarjeta «Autorizada fuera de Boletéame» («Verificar en el SII») y en
+    *Configuración → Empresas → Resoluciones* («Traer del SII», `TraerResolucionSii.tsx`).
+    Esa página declara `maxDuration = 300` y `runtime = 'nodejs'`, como `/certificacion`.
+
+  No tiene el candado `empresa_autorizada` (sirve para actualizar la resolución) ni la
+  frena una operación por verificar: solo empresa desactivada, sin certificado
+  predeterminado u otra operación en curso (`bloqueoVerificacion` en `logica.ts`).
+- **Cómo corre:** certificado predeterminado; login AUT2000 de **producción** y
+  `ad_empresa` dentro del bloqueo y con la sesión de producción del certificado
+  (`conSesionSii(..., 'produccion')`: otra fila de `sesiones_sii` y otro bloqueo que los de
+  certificación); después, fuera del bloqueo, la consulta STC.
+- **Autorizada:** si la resolución del SII no es la vigente de producción, la registra con
+  `registrar_resolucion` (service_role; la anterior pasa al historial) y el trigger de la
+  0009 marca la empresa. Si la empresa no estaba autorizada, fija `autorizada_en` en la fecha
+  de autorización del SII, a medianoche de Chile (`medianocheChile`). Si ya era la misma, no
+  escribe nada. Mensaje: «El SII confirma que la empresa está autorizada desde el 06-11-2026
+  (Resolución n.º 80 del 22-08-2014)…». Si había otra resolución, un aviso dice cuál
+  reemplazó.
+- **Titular sin representación legal:** no cambia nada. El aviso (tono `aviso`) ofrece el
+  registro manual (`sugerencia: 'registrarResolucion'`, que enlaza a las resoluciones).
+- **No autorizada:** no cambia nada (la marca nunca se quita). Si la empresa estaba marcada
+  por una resolución registrada a mano, avisa que hay que revisarla.
+- **Apoyo del STC**, en la misma operación (`apoyoStc`): `boleta` (39/41, con el año del
+  último timbraje), `sin_boleta` o `no_disponible` (captcha, error o forma desconocida: nunca
+  hace fallar la operación).
+  - Con `autorizada` y `boleta`, el mensaje agrega «y ya timbró folios de boleta
+    electrónica».
+  - Con `autorizada` y `sin_boleta`, la marca se pone igual, con el aviso de que podría
+    estar certificada solo para factura.
+  - Con `sin_representacion` y `boleta`, dice que la empresa ya emite boletas y que registre
+    su resolución
+    ([trampas](../07-referencia/trampas-conocidas.md#situación-tributaria-de-terceros-stc-fuente-de-apoyo)).
+- **Errores:** una página que la librería no reconoce, o de otro RUT, es
+  `verificacion_fallida` (7), sin escribir nada; un certificado rechazado en el login,
+  `rechazo_sii`; sin certificado o con la empresa desactivada, no se abre la operación.
+- **Auditoría:** `operacion_sii = 'verificar_autorizacion'` (migración `0010`), con
+  `ambiente = 'produccion'`. `detalle`: `respuesta`, y si está autorizada `nro_resol`,
+  `fch_resol`, `fecha_autorizacion` y `resolucion` (`igual`, `registrada` o `reemplazada`);
+  además `stc` y, con `boleta`, `stc_ultimo_anio`. Nunca correos, URL, nombre del software
+  ni razón social. `leerAsistente` muestra estas filas (de producción) en «Últimas
+  operaciones» junto a las de certificación.
+- **Pruebas:** `server/certificacion/autorizacion.test.ts` (25, con Supabase falso y dobles
+  de la librería) y `logica.test.ts`.
 - **Sin validar:** si una empresa certificada solo para factura aparece como autorizada.
 
 ## Roles

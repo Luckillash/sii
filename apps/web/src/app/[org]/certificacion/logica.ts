@@ -36,7 +36,10 @@ export type AccionSii =
   | 'declarar';
 
 /** Consultas de solo lectura al SII (sin ensayo). */
-export type ConsultaSii = 'consultarEstadoSet' | 'consultarEstadoDeclaracion';
+export type ConsultaSii =
+  | 'consultarEstadoSet'
+  | 'consultarEstadoDeclaracion'
+  | 'verificarAutorizacion';
 
 /** Formularios que guardan datos en la app (no salen al SII). */
 export type FormularioAsistente = 'guardarPostulacion' | 'guardarDeclaracion';
@@ -133,6 +136,22 @@ export function bloqueoSii(e: EntradaPlan): string | null {
   return null;
 }
 
+/**
+ * Motivo por el que no se puede verificar la autorización en el SII ahora, o `null`. Es
+ * de solo lectura y no tiene el candado de «empresa ya autorizada» (sirve para traer o
+ * actualizar la resolución de producción), ni lo frena una operación por verificar.
+ */
+export function bloqueoVerificacion(
+  e: Pick<EntradaPlan, 'empresaActiva' | 'tieneCertificado' | 'operacionEnCurso'>,
+): string | null {
+  if (!e.empresaActiva) return 'La empresa está desactivada. Actívala en Configuración.';
+  if (!e.tieneCertificado) {
+    return 'La empresa no tiene certificado predeterminado. Elige uno en Configuración.';
+  }
+  if (e.operacionEnCurso) return 'Espera a que termine la operación en curso.';
+  return null;
+}
+
 function sii(accion: AccionSii | ConsultaSii, bloqueo: string | null, motivo?: string) {
   const razon = bloqueo ?? motivo;
   return razon ? { accion, habilitada: false, motivo: razon } : { accion, habilitada: true };
@@ -162,6 +181,9 @@ function faltaYAcciones(
           // Solo lectura: dice si la empresa ya está en certificación (P90/P91) antes de
           // postular. «Sin trámite» puede ser una empresa ya autorizada fuera de Boletéame.
           sii('consultarEstadoDeclaracion', bloqueo),
+          // Solo lectura: si ya está autorizada (certificada fuera de Boletéame), trae la
+          // resolución de producción del SII en vez de escribirla a mano.
+          sii('verificarAutorizacion', bloqueoVerificacion(e)),
         ],
       };
     case 'postulada':
@@ -313,6 +335,7 @@ const NOMBRE_OPERACION: Partial<Record<OperacionSii, string>> = {
   verificar_portal: 'Verificación del portal del SII',
   estado_declaracion: 'Estado de la declaración',
   declarar: 'Declaración de cumplimiento',
+  verificar_autorizacion: 'Verificación de la autorización',
 };
 
 const GERUNDIO_OPERACION: Partial<Record<OperacionSii, string>> = {
@@ -327,6 +350,7 @@ const GERUNDIO_OPERACION: Partial<Record<OperacionSii, string>> = {
   verificar_portal: 'Verificando el portal del SII',
   estado_declaracion: 'Consultando el estado de la declaración',
   declarar: 'Declarando el cumplimiento en el SII',
+  verificar_autorizacion: 'Verificando la autorización en el SII',
 };
 
 export function nombreOperacion(operacion: OperacionSii): string {

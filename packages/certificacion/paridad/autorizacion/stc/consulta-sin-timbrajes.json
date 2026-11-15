@@ -1,0 +1,87 @@
+{
+  "alertaTablas": [
+    {
+      "titulo": "Observación:",
+      "nombreTabla": "tablaObsv",
+      "alertas": [
+        {
+          "clasificacion": 9,
+          "grupo": "025",
+          "grave": "N",
+          "indFecha": "N",
+          "fechaActivacion": "N",
+          "nombreTabla": null,
+          "muestraTitulo": false,
+          "titulo": null,
+          "motivo": "Como recomendación general, siempre que se realicen transacciones comerciales con cualquier contribuyente, el SII aconseja verificar, en las opciones anteriores habilitadas, el timbraje del documento y que la actividad económica esté vigente en las bases de datos del Servicio. Además, se recomienda verificar que el domicilio y la actividad económica consignados en la factura o boleta que reciba, correspondan al vendedor o prestador del servicio ofrecido. <br><br>Para un mayor resguardo, se recomienda efectuar el pago con cheque nominativo o vale vista a favor del proveedor, anotando al reverso el RUT del emisor y número del documento recibido.",
+          "texto": "Recomendación General",
+          "datoGrupoIndex": 0
+        }
+      ]
+    }
+  ],
+  "atrbRferDTOS": [],
+  "atributosPOFE": [],
+  "captchaInvalido": false,
+  "conTegi": false,
+  "cumpleObligacionTributaria": "SI",
+  "fecha8102": null,
+  "fechaCULT": null,
+  "fechaConsulta": "13-11-2026 20:32:51",
+  "fechaInicioActividades": "01-03-2022",
+  "fechaRSUB": "",
+  "fechaSPDE": null,
+  "fechaSPRO": null,
+  "folios": [],
+  "girosNegocio": [
+    {
+      "codigo": "582000",
+      "categoriaTributaria": "1",
+      "fechaInicio": "06-11-2026",
+      "descripcion": "EDICION DE PROGRAMAS INFORMATICOS",
+      "indicadorAfectoIva": "S"
+    },
+    {
+      "codigo": "620100",
+      "categoriaTributaria": "1",
+      "fechaInicio": "06-11-2026",
+      "descripcion": "ACTIVIDADES DE PROGRAMACION INFORMATICA",
+      "indicadorAfectoIva": "S"
+    },
+    {
+      "codigo": "631100",
+      "categoriaTributaria": "1",
+      "fechaInicio": "06-11-2026",
+      "descripcion": "PROCESAMIENTO DE DATOS, HOSPEDAJE Y ACTIVIDADES CONEXAS",
+      "indicadorAfectoIva": "S"
+    }
+  ],
+  "inicioActividades": true,
+  "modeloEmisionBoletas": [],
+  "mostrarFolios": false,
+  "mostrarObligacionTributaria": true,
+  "nocondonable": " ",
+  "nombre": "EMPRESA DE PRUEBA SPA",
+  "observacion1": "<b>Si el contribuyente correspondiente al RUT consultado, no está de acuerdo o desconoce la situación informada en esta consulta, deberá concurrir a la unidad del SII correspondiente a su domicilio para aclarar o resolver su situación</b>.",
+  "observacion2": "<b><br>Esta consulta no constituye una certificación del comportamiento tributario del contribuyente. De esta manera, si para un RUT no aparecen observaciones, no significa que en una posterior auditoría no se detecten problemas.<br></b>",
+  "registrado": true,
+  "tiene8102": false,
+  "tieneAPME": false,
+  "tieneCULT": false,
+  "tieneEMTP": true,
+  "tieneGirosNegocio": true,
+  "tieneININ": false,
+  "tieneInicio": true,
+  "tieneModeloEmisionBoletas": false,
+  "tieneOFE": false,
+  "tienePOFE": false,
+  "tienePrimeraCategoria": true,
+  "tieneROFL": false,
+  "tieneRSUB": false,
+  "tieneSPDE": false,
+  "tieneSPRO": false,
+  "tieneTimbraje": false,
+  "timbrajeVirtual": false,
+  "timbrajes": [],
+  "urlVdc": "https://www2.sii.cl/vdc"
+}

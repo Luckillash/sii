@@ -1,7 +1,7 @@
 ---
 title: "Esquema: despliegue"
 description: "Cómo se aplican las migraciones en la única base (Supabase en la nube, producción), requisitos (Vault, Realtime, pg_cron, pg_net) y tareas programadas."
-keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, aplicadas, 0008_certificacion, registrar_caf, guardar_set_pruebas, rls-fase5-certificacion, 0009_autorizacion_externa, tg_resolucion_autoriza_produccion, rls-fase5-autorizacion-externa, pendiente de aplicar]
+keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, aplicadas, 0008_certificacion, registrar_caf, guardar_set_pruebas, rls-fase5-certificacion, 0009_autorizacion_externa, tg_resolucion_autoriza_produccion, rls-fase5-autorizacion-externa, 0010_verificar_autorizacion, verificar_autorizacion, operacion_sii, rls-fase5-verificar-autorizacion, pendiente de aplicar]
 related: ["02-guias/quickstart.md", "05-pruebas/probar-el-esquema.md", "08-esquema-supabase/vault-y-secretos.md"]
 source: ["supabase_saas_sii.sql (cabecera, opcional pg_cron)", "PLAN-SAAS.md §4.4 §6"]
 ---
@@ -33,7 +33,7 @@ Viven en `supabase/migrations/` con prefijo **secuencial de 4 dígitos** (no tim
 |---|---|
 | `0001_esquema_inicial.sql` | `supabase_saas_sii.sql` **byte a byte** (19 secciones: tipos, tablas, RLS, Vault, Storage, Realtime). Nunca se edita |
 | `0002_extensiones_cron.sql` | `pg_cron` (schema `pg_catalog`) y `pg_net` (schema `extensions`) |
-| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, son de la Fase 5: ver [abajo](#fase-5-migración-0008)) |
+| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, y la `0010_verificar_autorizacion`, aplicada el 2026-11-14, son de la Fase 5: ver [abajo](#fase-5-migración-0008)) |
 
 Reglas, todas derivadas de que la única base es producción:
 
@@ -223,6 +223,31 @@ Vercel. Pasos, **con autorización del usuario**:
 8. Para la empresa de producción ya certificada con la librería: un administrador registra
    su resolución de producción en *Configuración → Empresas*; la empresa queda autorizada y
    el asistente muestra «Autorizada fuera de Boletéame».
+
+### Fase 5: migración 0010
+
+**Estado: aplicada en producción el 2026-11-14 (00:59 UTC; 21:59 del 13 en Chile).**
+Registro: el `--dry-run` listó solo `0010`; `db push` con la confirmación del usuario;
+verificación 6/6 `ok`; simulación 7/7 `ok` y su consulta de limpieza en 0 (usuarios,
+organizaciones, empresas y filas `verificar_autorizacion`); `pnpm db:tipos` idéntico a lo
+agregado a mano (el valor nuevo en `operacion_sii` y en `Constants`); *Advisors* de
+seguridad sin avisos nuevos (los que salen son anteriores y no tocan la 0010). Antes, en
+PGlite (esquema 0001 y 0003–0010 con stubs): verificación 6/6 y simulación 7/7; sin la
+0010, 2/6 (fallan 1, 2, 3 y 6) y 3/7 (fallan 2, 3, 5 y 6). Las regresiones de las Fases 3,
+4 y 5 (`rls-fase3-empresas.sql` 43/43, verificación 0007 14/14, `rls-fase4-bloqueos.sql`
+21/21, verificación 0009 9/9, `rls-fase5-autorizacion-externa.sql` 12/12 y
+`rls-fase5-certificacion.sql` 16/16) siguen en verde con la 0010.
+
+| Migración | Contenido | Qué falla si falta |
+|---|---|---|
+| `0010_verificar_autorizacion` | Valor `verificar_autorizacion` al final del enum `operacion_sii` (`add value if not exists … after 'seguimiento'`) y un `comment on type`. Es de lectura: no entra en `OPERACIONES_EFECTO_GLOBAL`, así que el índice `operaciones_sii_efecto_global_en_curso` de la 0007 no cambia. Sin tablas, columnas, funciones, políticas ni grants. No se puede deshacer con un `drop` (Postgres no quita valores de un enum) | La Server Action `verificarAutorizacion` (por escribir) no podría registrar su fila en `operaciones_sii` (`22P02`). Nada del código desplegado usa el valor |
+
+Pasos (los mismos de la 0009, con autorización del usuario): leer la migración, revisar el
+respaldo, `--dry-run` (solo `0010`), `db push`, las verificaciones
+([cómo](../05-pruebas/probar-el-esquema.md#8-simulación-de-verificar_autorizacion-rls-fase5-verificar-autorizacionsql)):
+`supabase/verificaciones/0010_verificar_autorizacion.sql` (**6/6**; antes de migrar 2/6) y
+`supabase/verificaciones/rls-fase5-verificar-autorizacion.sql` (**7/7** con `rollback`, y la
+consulta de limpieza del encabezado en 0), `pnpm db:tipos` y *Advisors*.
 
 ## Requisitos del proyecto
 

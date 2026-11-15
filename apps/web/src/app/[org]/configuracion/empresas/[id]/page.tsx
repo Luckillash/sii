@@ -20,8 +20,16 @@ import { FormularioEmpresa } from '../FormularioEmpresa';
 import { AvisoEmpresaCreada } from './AvisoEmpresaCreada';
 import { EstadoEmpresa } from './EstadoEmpresa';
 import { FormularioResolucion } from './FormularioResolucion';
+import { TraerResolucionSii } from './TraerResolucionSii';
 
 export const metadata: Metadata = { title: 'Empresa · Boletéame' };
+
+// «Traer del SII» (Server Action `verificarAutorizacion`) hace un login AUT2000 y dos
+// páginas del SII de hasta 45–70 s cada una, más la consulta pública STC. Igual que en
+// `/certificacion`, el `maxDuration` de la página aplica a sus Server Actions, y la capa
+// SII solo corre en Node.js.
+export const maxDuration = 300;
+export const runtime = 'nodejs';
 
 // Detalle de una empresa: datos tributarios, resoluciones del SII, certificados y
 // activación. Todos los miembros la ven; solo los administradores ven formularios y
@@ -139,6 +147,8 @@ export default async function PaginaEmpresa({
             );
           })}
         </ul>
+
+        {admin ? <TraerResolucionSii slug={slug} empresaId={empresa.id} /> : null}
 
         {admin ? (
           <FormularioResolucion

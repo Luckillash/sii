@@ -9,6 +9,7 @@
       "!paridad/material",
       "!paridad/folios/paginas",
       "!paridad/postulacion/paginas",
+      "!paridad/autorizacion/paginas",
       "!data",
       "!**/*.md",
       "!**/*.yml",

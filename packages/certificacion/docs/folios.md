@@ -120,6 +120,90 @@ Diferencia con el PHP (pend. 1.2): un CAF que no cuadra después de timbrar es
 Jerarquía: `SesionCaducaError` y `FoliosSinCafError` heredan de `ErrorSolicitudFolios`, que
 hereda de `SiiError`. Atrapar de la más específica a la más general.
 
+## `ConsultaAutorizacion`
+
+Nuevo en Node (no existe en el PHP). Consulta en el portal de **producción** si una empresa
+está autorizada para emitir con software de mercado y con qué resolución. Usa la página
+«Actualización de datos del contribuyente» (`cvc_cgi/dte/ad_empresa1` → `ad_empresa2`).
+Validada en palena el 2026-11-13 ([validaciones.md](validaciones.md)).
+
+`new ConsultaAutorizacion({ transporte?, reloj? })`. No recibe ambiente: siempre es
+`'produccion'` (palena), porque en maullin la página no dice nada útil.
+
+- `autenticar(certificado)`: el mismo login AUT2000 de `SolicitudFolios` en producción. La
+  sesión sirve para las dos clases y se puede reutilizar una guardada (freno de re-login).
+- `consultar(sesion, rutEmpresa): Promise<ResultadoAutorizacion>`:
+  1. `GET https://palena.sii.cl/cvc_cgi/dte/ad_empresa1`. Tiene que traer el formulario del
+     RUT (`RUT_EMP`, `DV_EMP`) hacia `ad_empresa2`.
+  2. `POST https://palena.sii.cl/cvc_cgi/dte/ad_empresa2` con **solo** `RUT_EMP`, `DV_EMP` y
+     `ACEPTAR` (el valor del botón de la página, `Ingresar`). Tope 70 s (`MS_ASISTENTE`).
+
+El SII **solo responde si el titular del certificado es representante legal** de la
+empresa. No basta el representante electrónico. Revisa primero la representación y después
+la autorización:
+
+| `tipo` | Página del SII | Qué trae |
+|---|---|---|
+| `autorizada` | «Antecedentes del Contribuyente registrados» (tabla) | `rut`, `razonSocial`, `fechaAutorizacion` y `resolucion: { numero, fecha }` (fechas `AAAA-MM-DD`) |
+| `sin_representacion` | «Usted no está registrado en la empresa Rut … como Representante Legal…» | nada: el SII responde lo mismo esté o no autorizada |
+| `no_autorizada` | «… el Contribuyente no está autorizado para operar en esta modalidad» | nada |
+
+«Esta modalidad» es software de mercado, no boleta: falta validar con una empresa
+certificada solo para factura si la página distingue entre las dos.
+
+**Candados** (no dependen de lo que mande el SII):
+- solo esas dos URLs, por https a palena; cualquier otra redirección se detiene antes de
+  enviarle nada (`ErrorVerificacion`). Una redirección al login es `SesionCaducaError`;
+- `ad_empresa2` trae, para el representante legal, un formulario que **actualiza** los datos
+  del contribuyente (botones `MOD_EMP` / `MOD_USU`, campos `ORDEN`, `PAGINA`). Nunca se
+  envía: el POST lo arma la clase con sus tres campos;
+- el RUT de la respuesta (la fila «Rut» o el de «no está registrado») tiene que ser el
+  pedido;
+- una página que no es exactamente una de las tres, o le falta un dato, o trae una fecha que
+  no existe o una resolución que no es un número ≥ 1, lanza `ErrorVerificacion` sin copiar
+  el HTML. La página de una empresa autorizada trae correos, URL y nombre del software: no
+  salen en el resultado ni en los errores.
+
+`leerAdEmpresa2(html, rut)` (exportada) es solo la lectura de la página, para las pruebas.
+
+| Error | Cuándo |
+|---|---|
+| `ErrorValidacion` | RUT inválido. No sale nada al SII |
+| `SesionCaducaError` | la sesión no sirve: volver a autenticar |
+| `ErrorVerificacion` | página desconocida, otro RUT, o redirección fuera de la consulta |
+| `ErrorTransporte` | red o HTTP ≠ 200 |
+| `ErrorSolicitudFolios` | (`autenticar`) el SII no aceptó el certificado |
+
+## `SituacionTributaria`
+
+Nuevo en Node. Historial de timbraje de **cualquier RUT** en la consulta pública
+«Situación tributaria de terceros» (STC), sin login, certificado ni representación.
+
+`new SituacionTributaria({ transporte? })` y `timbrajes(rut): Promise<ResultadoTimbrajes>`:
+
+1. `GET https://www2.sii.cl/app/stc/recurso/v1/recaptcha/key` → `{ enable, key }`. Si
+   `enable` es `true`, devuelve `{ tipo: 'captcha' }` **sin consultar**: no se intenta
+   resolver el captcha.
+2. `POST https://www2.sii.cl/app/stc/recurso/v1/consulta/getConsultaData/` con el JSON
+   `{ rut, dv, reAction: "consultaSTC", reToken: " " }` (lo mismo que manda la SPA con el
+   captcha apagado), `Origin` y `Referer` de `www2.sii.cl/stc/noauthz`. Tope 30 s.
+
+Devuelve `{ tipo: 'ok', timbrajes: [{ tipoDte, ultimoAnio, folioFinal }] }` con los números
+ya limpios (`"0039"` → 39, `"         5"` → 5). Con `captchaInvalido: true` en la respuesta,
+también `{ tipo: 'captcha' }`. Del resto de la respuesta (nombre, giros, observaciones) no
+se lee nada.
+
+Qué prueba: un tipo aparece solo cuando ya se le timbraron folios. **39 o 41 prueban que la
+empresa está autorizada para boletas**, porque el SII no timbra folios de producción de esos
+tipos sin autorización. Que falten no prueba nada: una empresa recién certificada todavía
+no tiene timbrajes. Es frágil (el SII puede encender el captcha): úsese como apoyo, nunca
+como requisito.
+
+Errores: `ErrorValidacion` (RUT inválido, no sale nada), `ErrorVerificacion` (la clave o la
+consulta no tienen la forma conocida: `enable` o `captchaInvalido` no booleanos,
+`timbrajes` que no es una lista, o un timbraje sin `codigo`, `fechaTimbraje` o `folioFinal`
+numéricos), `ErrorTransporte` (red o HTTP ≠ 200; el SII responde 400 a un RUT inválido).
+
 ## `SesionSii`
 
 Cookies de la sesión AUT2000 en `*.sii.cl`. **Es una credencial**: con ella se timbran

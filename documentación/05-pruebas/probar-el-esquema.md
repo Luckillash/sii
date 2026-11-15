@@ -1,7 +1,7 @@
 ---
 title: "Probar el esquema (RLS, triggers, cuotas)"
 description: "Cómo verificar el esquema y simular roles en la única base (producción) sin dejar rastro."
-keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp, 0006_realtime_operaciones.sql, 0007_bloqueos_sii.sql, rls-fase4-bloqueos.sql, bloqueos_sii, arriendo, 0008_certificacion.sql, rls-fase5-certificacion.sql, registrar_caf, guardar_set_pruebas, CAF de mentira, 0009_autorizacion_externa.sql, rls-fase5-autorizacion-externa.sql, tg_resolucion_autoriza_produccion, autorizada_produccion, PGlite]
+keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp, 0006_realtime_operaciones.sql, 0007_bloqueos_sii.sql, rls-fase4-bloqueos.sql, bloqueos_sii, arriendo, 0008_certificacion.sql, rls-fase5-certificacion.sql, registrar_caf, guardar_set_pruebas, CAF de mentira, 0009_autorizacion_externa.sql, rls-fase5-autorizacion-externa.sql, tg_resolucion_autoriza_produccion, autorizada_produccion, 0010_verificar_autorizacion.sql, rls-fase5-verificar-autorizacion.sql, verificar_autorizacion, PGlite]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "08-esquema-supabase/despliegue.md"]
 source: ["supabase_saas_sii.sql §15 §17", "supabase/verificaciones/", "supabase/verificaciones/rls-fase2-tenancy.sql"]
 ---
@@ -27,6 +27,7 @@ comprobación con `ok = true/false` y, si falla, el `detalle`. No escribe nada.
 | `0007_bloqueos_sii.sql` | 14 comprobaciones: `bloqueos_sii` con sus 5 columnas y tipos; PK `(certificado_id, ambiente)`; FK a `certificados` en cascada; RLS activo sin políticas; nada para `anon`/`authenticated`; las 2 funciones con su firma y `boolean`; nombres de parámetros (los que usa `bloqueos.ts`); `plpgsql`, `security definer`, `search_path` vacío; solo `service_role` las ejecuta; el `insert … on conflict` con la condición del arriendo; migración registrada; el índice único y válido `operaciones_sii_efecto_global_en_curso` sobre `(empresa_id, operacion, ambiente)`; su predicado (`en_curso`, `confirmada` y exactamente `solicitar_folios`, `postular`, `declarar`, como `OPERACIONES_EFECTO_GLOBAL`). Aplicada el 2026-11-13: 14/14 `ok` (antes de migrar daba todo `false`) |
 | `0008_certificacion.sql` | 10 comprobaciones: `registrar_caf` y `guardar_set_pruebas` existen con su firma (`to_regprocedure`); devuelven `uuid` e `integer`; nombres de parámetros (los que usa `server/certificacion` al llamar por RPC); `plpgsql`, `security definer`, `search_path` vacío; `service_role` las ejecuta; `authenticated`, `anon` y `PUBLIC` no; cuerpos (Vault con `guardar_secreto` tras `for no key update`, idempotencia por `folio_hasta`, `unique_violation`, filtro por organización; borrado e inserción de casos, `set_descargado`, `envio_set_id = null`); migración registrada como `0008`. Aplicada el 2026-11-13 ([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0008)): 10/10 `ok` (antes de migrar daba todo `false`) |
 | `0009_autorizacion_externa.sql` | 9 comprobaciones: `tg_resolucion_autoriza_produccion()` existe y devuelve `trigger`; `plpgsql`, `security definer`, `search_path` vacío; sin `EXECUTE` para PUBLIC, `anon` ni `authenticated`; cuerpo (marca `autorizada_produccion` y `coalesce(autorizada_en, now())` filtrando por empresa y organización, sin desmarcar); trigger `trg_50_resolucion_autoriza_produccion` en `resoluciones` (`after`, por fila, `insert` y `update`, activo); su `WHEN` (producción y vigente); `trg_05_proteger_autorizacion` sigue en `empresas`; ninguna empresa con resolución de producción vigente queda sin autorizar; migración registrada como `0009`. Aplicada el 2026-11-13: 9/9 `ok` ([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0009)); en PGlite: 9/9 con la 0009, 2/9 sin ella |
+| `0010_verificar_autorizacion.sql` | 6 comprobaciones: `operacion_sii` tiene `verificar_autorizacion`; es el último valor, justo después de `seguimiento`; los 15 anteriores siguen en su orden (16 en total); el índice único `operaciones_sii_efecto_global_en_curso` (0007) sigue válido y con exactamente `solicitar_folios`, `postular` y `declarar`; ninguna fila `verificar_autorizacion` abandonada en curso (más de 15 minutos); migración registrada como `0010`. Usa `operacion::text` para poder correr antes de migrar. Aplicada el 2026-11-14: 6/6 `ok` ([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0010)); en PGlite: 6/6 con la 0010, 2/6 sin ella |
 
 Se ejecuta pegándolo en el SQL Editor o con el MCP `execute_sql`. Cada migración nueva trae
 el suyo.
@@ -307,7 +308,42 @@ producción el 2026-11-13, con la 0009 aplicada: 12/12 `ok` y la consulta de lim
 (usuarios, organizaciones, empresas)
 ([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0009)).
 
-## 8. Lo que no se prueba con SQL
+## 8. Simulación de `verificar_autorizacion` (`rls-fase5-verificar-autorizacion.sql`)
+
+`supabase/verificaciones/rls-fase5-verificar-autorizacion.sql` prueba el valor que agrega la
+migración 0010. **Requiere la 0010 aplicada** (en producción desde el 2026-11-14): sin ella
+el script corre igual, pero las comprobaciones 2, 3, 5 y 6 salen `false` (`22P02`, el valor
+no existe).
+
+Mismo patrón que las anteriores (`pg_temp.registrar`, parámetros locales `prueba.*`,
+`set local role` por rol, `rollback` final). Como `postgres` crea un usuario ficticio
+(`veraut-propietario@ejemplo.invalid`), la organización `zz-prueba-verificar-autorizacion`
+con ese usuario de propietario y la empresa `Empresa verificar autorizacion`. No toca Vault.
+
+| # | Rol | Comprobación |
+|---|---|---|
+| 1 | postgres | preparación |
+| 2–3 | service_role | registra una `verificar_autorizacion` confirmada en producción; una segunda en curso de la misma empresa y ambiente no choca (no es de efecto global) |
+| 4 | service_role | control: una segunda `solicitar_folios` en curso sigue chocando (`23505`) |
+| 5 | service_role | la cierra en `ok` con `terminada_en` y el `detalle` de la consulta (`respuesta`, `nro_resol`, `fch_resol`, `fecha_autorizacion`, `stc`, `stc_ultimo_anio`) |
+| 6–7 | authenticated (propietario) | ve las dos filas de su organización; no inserta en `operaciones_sii` (`42501`: solo escribe el backend) |
+
+Cómo correrlo: el archivo **completo**, tal cual, con el MCP `execute_sql` o en el SQL
+Editor (como `postgres`). Debe dar 7/7. Después, la consulta de control del encabezado en 0:
+
+```sql
+select
+  (select count(*) from auth.users where email like 'veraut-%@ejemplo.invalid') as usuarios,
+  (select count(*) from public.organizaciones where slug like 'zz-prueba-verificar-autorizacion%') as organizaciones,
+  (select count(*) from public.empresas where razon_social like 'Empresa verificar autorizacion%') as empresas;
+```
+
+Probada en PGlite (esquema 0001 y 0003–0010 con stubs): 7/7 con la 0010 y 3/7 sin ella; la
+limpieza dio todo en 0. Corrida en producción el 2026-11-14, con la 0010 aplicada: 7/7 `ok`
+y la limpieza en 0 (también 0 filas `verificar_autorizacion` en `operaciones_sii`)
+([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0010)).
+
+## 9. Lo que no se prueba con SQL
 
 El aislamiento entre organizaciones y los permisos por rol también se prueban de punta a
 punta con la app (Fase 2): dos usuarios de organizaciones distintas, cada uno con su

@@ -90,11 +90,12 @@ Reglas:
   autorizada y proceso que no está en `autorizada`), `autorizacionExterna` en
   `leerAsistente` ([guía](../02-guias/certificacion-empresa.md#empresa-autorizada-fuera-de-boletéame)).
 
-**Previsto:** `verificarAutorizacion` (Fase 5, migración `0010`) registrará la resolución
-de producción que informa el SII (`ad_empresa2`) con service_role; este mismo trigger hace
-la marca. Después la app fija `autorizada_en` en la fecha de autorización del SII, cosa que
-`tg_proteger_autorizacion` le permite a service_role. El trigger no cambia
-([guía](../02-guias/certificacion-empresa.md#verificar-la-autorización-en-el-sii-prevista)).
+`verificarAutorizacion` (Fase 5, migración `0010`) registra la resolución de producción que
+informa el SII (`ad_empresa2`) con service_role; este mismo trigger hace la marca. Después,
+si la empresa no estaba autorizada, la app fija `autorizada_en` en la fecha de autorización
+del SII (medianoche de Chile), cosa que `tg_proteger_autorizacion` le permite a
+service_role. El trigger no cambia
+([guía](../02-guias/certificacion-empresa.md#verificar-la-autorización-en-el-sii)).
 
 La migración además marca, una vez y de forma idempotente, las empresas que ya tuvieran una
 resolución de producción vigente (al escribirla no había ninguna).

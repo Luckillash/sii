@@ -406,6 +406,7 @@ SiiError
 ├── ErrorTimbre               TED o CAF
 ├── ErrorTransporte           red o HTTP inesperado (status, url)
 ├── ErrorRespuestaSii         el SII respondió pero rechazó o no se entiende (estado, glosa)
+├── ErrorVerificacion         respuesta del SII con una forma que la librería no conoce (no se interpreta)
 ├── ErrorSolicitudFolios
 │   ├── SesionCaducaError     sesión AUT2000 vencida (también desde la postulación)
 │   ├── FolioInicialRequeridoError  primer timbraje: falta folioInicial (no timbró)

@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html>
+<head>
+<title>Actualización de Datos del Contribuyente</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<script type="text/javascript" src="https://zeus.sii.cl/admin/barranav.js">
+</script>
+<script type="text/javascript" src="/cvc/dte/validadte.js">
+</script>
+<STYLE TYPE="text/css">
+ .titulo  {
+  font-family: arial,helvetica;
+  font-style: bold;
+  font-size: 14pt;
+  text-decoration: none;
+  color: #000000;
+ }
+ .texto  {
+  font-family: arial,helvetica;
+  font-style: normal;
+  font-size: 10pt;
+  text-decoration: none;
+  color: #000000;
+ }
+ .reporte  {
+  font-family: arial,helvetica;
+  font-style: normal;
+  font-size: 7.5pt;
+  text-decoration: none;
+  color: #000000;
+ }
+</STYLE>
+</head>
+<body link="#003399">
+<center><div><table border="0" width="920">
+<tr><td width="920">
+<script type="text/javascript">mostrar();</script></td></tr>
+<tr><td width="920"><p align="justify">
+<font color="#000000" face="Arial" size="4"><strong><B>
+ACTUALIZACION DE DATOS DEL CONTRIBUYENTE
+</b></strong></font><br>
+<font class="texto">A trav&eacute;s de esta opci&oacute;n el Representante Legal de un Contribuyente, podr&aacute; actualizar sus antecedentes.</font>
+</p></td></tr>
+<tr>
+<td height="40"><hr>
+</td>
+</tr>
+</table></div></center>
+<center>
+<table border=0>
+<tr><td width="630"><p align="justify">
+<font class="texto">
+Ingrese el rut de la Empresa a la que desea actualizar sus antecedentes : 
+</font><p></td></tr>
+</table>
+<form name="form1" method="post" action="/cvc_cgi/dte/ad_empresa2" onSubmit="return validarut()">
+<br>
+<table border="0" width="280" align="center">
+<tr><td width="200">
+<font class="texto"><b>RUT de la Empresa </b></font></td><td width="200"><p align="justify">
+<input name="RUT_EMP" type="text" size=8 maxlength=8 > - 
+<input name="DV_EMP"  type="text" size=1 maxlength=1 onBlur="this.value=this.value.toUpperCase()">
+</p></td></tr>
+</table><br><br>
+<input type="reset" value="Limpiar">
+<input name="ACEPTAR" type="submit" value="Ingresar">
+</form>
+</center>
+<script type="text/javascript">document.form1.RUT_EMP.focus()</script>
+<div id="certifica" style="position:absolute; width:0; height:0; z-index:6;top: 0; left: 0; visibility: hidden">
+<script type="text/javascript" src="/admin/certifica_dte.js">
+</script>
+<script type="text/javascript">
+certifica(14484,'Prod','autdem');
+</script>
+</div>
+</body>
+</html>

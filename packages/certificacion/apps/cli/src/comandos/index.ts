@@ -10,11 +10,13 @@ import { comando as postular } from './certificacion/postular.ts';
 import { comando as solicitarFolios } from './certificacion/solicitar-folios.ts';
 import { comando as solicitarRevision } from './certificacion/solicitar-revision.ts';
 import { comando as verificarPortal } from './certificacion/verificar-portal.ts';
+import { comando as autorizacion } from './produccion/autorizacion.ts';
 import { comando as consultar } from './produccion/consultar.ts';
 import { comando as emitir } from './produccion/emitir.ts';
 import { comando as seguimiento } from './produccion/seguimiento.ts';
 import type { DefinicionComando } from './tipos.ts';
 import { comando as firmarSemilla } from './util/firmar-semilla.ts';
+import { comando as situacionTributaria } from './util/situacion-tributaria.ts';
 import { comando as verificarTed } from './util/verificar-ted.ts';
 
 export const COMANDOS: readonly DefinicionComando[] = [
@@ -32,6 +34,8 @@ export const COMANDOS: readonly DefinicionComando[] = [
   emitir,
   consultar,
   seguimiento,
+  autorizacion,
   firmarSemilla,
   verificarTed,
+  situacionTributaria,
 ];
