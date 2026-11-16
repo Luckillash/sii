@@ -1,9 +1,9 @@
 ---
 title: "Formatos y validaciones: RUT, correo, montos, IVA y fechas"
 description: "Dominios rut y correo_sii, montos enteros, cálculo neto/IVA, hora de Chile y largos del SII."
-keywords: ["formatearRut", "validarRut", "calcularDv", "rutSii", "rutValidoSii", "correoSiiValido", "LARGO_MAXIMO_CORREO_SII", "cabeEnIso88591", "caracteresFueraDeIso88591", "hoyEnChile", "formatearMonto", "formatearFecha", "formatearFechaHora", "TIPOS_DTE", "lib/formatos", "rut_valido", "correo_sii_valido", "dominio rut", "dominio correo_sii", "esValidoMail2", "ISO-8859-1", "razón social", "giro", "dirección", "comuna", "comillas tipográficas", "largoEnCaracteres", "esquemaEmpresa"]
+keywords: ["calcularTotales", "redondearPhp", "GeneradorBoleta", "precio bruto", "neto", "IVA", "descuento global", "formatearRut", "validarRut", "calcularDv", "rutSii", "rutValidoSii", "correoSiiValido", "LARGO_MAXIMO_CORREO_SII", "cabeEnIso88591", "caracteresFueraDeIso88591", "hoyEnChile", "formatearMonto", "formatearFecha", "formatearFechaHora", "TIPOS_DTE", "lib/formatos", "rut_valido", "correo_sii_valido", "dominio rut", "dominio correo_sii", "esValidoMail2", "ISO-8859-1", "razón social", "giro", "dirección", "comuna", "comillas tipográficas", "largoEnCaracteres", "esquemaEmpresa"]
 related: ["04-objetos/objetos-documentos.md", "04-objetos/objetos-empresas-y-credenciales.md", "07-referencia/reglas-y-limites.md", "07-referencia/design-system.md"]
-source: ["supabase_saas_sii.sql §2 §6 §10", "certificacion-node/docs/core.md", "design-system/boleteame/README.md", "apps/web/src/lib/formatos.ts", "apps/web/src/app/[org]/configuracion/empresas/esquemas.ts"]
+source: ["supabase_saas_sii.sql §2 §6 §10", "certificacion-node/docs/core.md", "design-system/boleteame/README.md", "apps/web/src/lib/formatos.ts", "apps/web/src/app/[org]/configuracion/empresas/esquemas.ts", "apps/web/src/lib/emision.ts"]
 ---
 
 # Formatos y validaciones: RUT, correo, montos, IVA y fechas
@@ -114,4 +114,29 @@ todo con textos pegados desde Word o desde un correo, que cambian las comillas y
 guiones por sus versiones tipográficas.
 
 El correo de intercambio no necesita esta regla: `correo_sii` ya exige ASCII.
-<!-- TODO (Fase 7): cálculo neto/IVA de boleta (precio bruto; neto = round(bruto / 1,19); IVA = bruto − neto) y montos enteros. -->
+
+Desde la Fase 7 la misma regla (`cabeEnIso88591`) se aplica en el formulario de emisión al
+nombre de cada línea, la unidad y la razón social del receptor («Tiene caracteres que el
+SII no acepta (emoji o símbolos especiales).»).
+
+## Montos de la boleta (neto e IVA)
+
+La boleta lleva el precio **bruto** (IVA incluido) y el XML desglosa neto e IVA. La cuenta
+es la de `GeneradorBoleta` de la librería, replicada en `calcularTotales` de
+`@/lib/emision` (la librería no corre en el navegador) y comparada contra ella en
+`emision.test.ts`:
+
+| Paso | Regla |
+|---|---|
+| Línea | bruto = `round(cantidad × precio)` con el `round()` de PHP 8.3 (`redondearPhp`: mitad hacia afuera, con la corrección de precisión de PHP) |
+| Afecto y exento | suma de las líneas afectas / exentas |
+| Descuento global | solo sobre lo afecto: `monto` (pesos enteros) o `porcentaje` de lo afecto, acotado a lo afecto; se reparte entre las líneas afectas como `<DescuentoMonto>` (proporcional y el resto de a un peso). Las exentas no reciben descuento |
+| Neto | `round((afecto − descuento) / 1,19)` |
+| IVA | (afecto − descuento) − neto |
+| Total | neto + IVA + exento |
+
+Todo en **pesos enteros**: precio unitario y descuento en monto sin decimales; la cantidad,
+hasta 3 decimales en el panel (6 en la base). Los montos menores que 1e15 (límite de la
+librería y `check` de `documentos.mnt_total`). Una boleta exenta (41) no tiene neto ni IVA.
+Lo que queda en `documentos` al emitir son los montos que escribió la librería en el DTE
+([emisión](../02-guias/emision-boletas.md#totales-paridad-con-la-librería)).

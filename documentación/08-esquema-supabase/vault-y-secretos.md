@@ -109,8 +109,9 @@ secreto se va con la transacción.
 
 `leer_secreto(p_id)` devuelve `decrypted_secret` de `vault.decrypted_secrets`. Solo la
 ejecuta `service_role` (`revoke execute … from public, anon, authenticated` en la §17 de
-`0001`). La llaman dos lugares: el XML del CAF lo lee `enviarSet` (arriba, Fase 5), y el
-certificado, `crearCredenciales()` de `server/sii/credenciales.ts` (Fase 4), que arma el
+`0001`). El XML del CAF lo leen `enviarSet` (arriba, Fase 5) y la emisión (`xmlCaf` de
+`server/emision/emitir.ts`, Fase 7: lee `caf_secret_id` filtrando por organización, solo
+dentro de la operación y nunca lo registra), y el certificado, `crearCredenciales()` de `server/sii/credenciales.ts` (Fase 4), que arma el
 `Certificado` / `FirmaElectronica` en memoria por invocación:
 
 - Lee la fila de `certificados` filtrando por `organizacion_id` e `id`; rechaza revocados

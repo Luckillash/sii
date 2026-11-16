@@ -343,4 +343,31 @@ Detalle en [certificación de la empresa](../02-guias/certificacion-empresa.md).
   (`anular_folios` con el cliente de **sesión**, para que la base verifique el rol), las
   dos con `getUser()` antes de escribir.
 
-<!-- TODO (Fases 7–8 y 11): workers y cron (seguimiento, webhooks), uso desde la API pública (apiKeyId). -->
+## Tercer consumidor: emisión (Fase 7)
+
+`apps/web/src/server/emision/` reutiliza las dependencias de certificación
+(`resolverDependenciasEmision` extiende `resolverDependencias`) y agrega tres propias,
+inyectables para las pruebas:
+
+- **`rest`**: `FABRICA_REST_EMISION`, el `ClienteBoletaRest` **en el ambiente que se
+  pida**. `FABRICAS_SII.rest` fija certificación y no sirve para emitir en producción.
+- **`pdf`** (`generarPdf` de `server/pdf`) y **`correoBoleta`** (`enviarBoletaPorCorreo`).
+
+Lo que cambia respecto de los anteriores:
+
+- **`ejecutarOperacion` directo** (no el helper `ejecutar`), para pasar `documentoId`,
+  `ambiente` y `canal: 'rest'`.
+- **Sin `conBloqueoCertificado`**: el REST no abre sesiones AUT2000 y `asignar_folio` es
+  atómico.
+- **Escrituras mixtas**: el borrador con la **sesión** (RLS `puede_emitir`) antes de la
+  operación; lo que fija el folio, con `service_role` filtrando por organización.
+- **Cierres que nunca lanzan**: anular folios, cerrar o marcar incierto el envío y anular el
+  documento corren dentro del manejo de otro error y solo dejan un aviso en consola.
+- **`ErrorEmision`** hereda de `ErrorUso` / `ErrorConfig` (sin tocar `sii/errores.ts`) y
+  trae su `mensajeUsuario` con título.
+- **Trabajo después del `ok`** (alerta de folios, PDF, correo) fuera de la operación: si
+  falla, la emisión sigue `ok` con avisos.
+
+Detalle en [emisión de boletas](../02-guias/emision-boletas.md).
+
+<!-- TODO (Fases 8 y 11): workers y cron (seguimiento, webhooks), uso desde la API pública (apiKeyId). -->

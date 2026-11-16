@@ -2,6 +2,7 @@
 // fechas, tipos de DTE) están en `@/lib/formatos`, que también usa el servidor.
 
 export { Alerta, type AlertaProps } from './Alerta';
+export { Autocompletado, type AutocompletadoProps } from './Autocompletado';
 export { BannerAmbiente, type BannerAmbienteProps } from './BannerAmbiente';
 export { Boton, type BotonProps, clasesBoton, type TamanoBoton, type VarianteBoton } from './Boton';
 export { Campo, type CampoProps, unirIds, useCampo } from './Campo';

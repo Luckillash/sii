@@ -40,7 +40,7 @@ Las organizaciones se crean solo con `crear_organizacion()` y los miembros entra
 | Editar el propio perfil | sí | sí | sí | sí |
 | Crear, editar y borrar **borradores** (`documentos` y `documento_detalles` en `estado = 'borrador'`, sin folio) | sí | sí | sí | no |
 | Crear y editar receptores y productos | sí | sí | sí | no |
-| Emitir (folio, firma, envío al SII) | sí | sí | sí | no |
+| Emitir (folio, firma, envío al SII) y descargar XML y PDF desde `/emitir` (Fase 7) | sí | sí | sí | no |
 | Borrar receptores y productos | sí | sí | no | no |
 | Administrar empresas, resoluciones, asociación empresa–certificado y proceso de certificación | sí | sí | no | no |
 | Pedir folios (CAF), subir un CAF y anular folios (`/folios`; anular con `anular_folios`, migración 0011, aplicada el 2026-11-15) | sí | sí | no | no |
@@ -55,8 +55,10 @@ Notas:
 
 - **Emitir** no es una escritura directa: el folio lo asigna `asignar_folio()` y lo
   timbrado lo escribe el backend con `service_role` (`authenticated` no puede ejecutar
-  `asignar_folio`). La regla de quién puede pedirlo es `puede_emitir()`; el backend la
-  valida antes de operar (PLAN-SAAS Fase 7).
+  `asignar_folio`). La regla de quién puede pedirlo es `puede_emitir()`: las Server
+  Actions de `/emitir` la revisan (`puedeEmitir(rol)`) antes de llamar al backend, y el
+  borrador se guarda con la sesión, así que RLS la aplica otra vez
+  ([emisión](../02-guias/emision-boletas.md#permisos)).
 - **Certificados, CAF, envíos, solicitudes de folios, RCOF, set de pruebas, operaciones,
   uso y suscripciones** los escribe solo el backend. Para los usuarios son de solo lectura,
   sea cual sea su rol (detalle en [acceso por tabla](../03-api-reference/acceso-por-tabla.md)).

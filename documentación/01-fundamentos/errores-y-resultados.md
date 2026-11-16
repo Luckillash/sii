@@ -1,7 +1,7 @@
 ---
 title: "Errores, resultados de operación y la regla del incierto"
 description: "Jerarquía de errores de la librería, resultado_operacion, códigos de salida de la CLI, qué ve el usuario, qué llega a Sentry y el bloqueo de reintento por incierto."
-keywords: [resultado_operacion, codigoDeError, resultadoDeError, CODIGO_DE_RESULTADO, ejecutarOperacion, ResultadoEjecucion, ejecutada, motivo, sesion_invalida, incierto_sin_revisar, en_curso, sin_registro, marcarInciertaRevisada, revisada_en, revisada_por, abandonada, MINUTOS_EN_CURSO_ABANDONADA, OPERACIONES_QUE_GRABAN, OPERACIONES_EFECTO_GLOBAL, confirmada, ensayo, getUser, confirmarSesion, SiiError, ErrorTransporte, ErrorRespuestaSii, ErrorSolicitudFolios, SesionCaducaError, FolioInicialRequeridoError, FoliosSinCafError, ErrorPostulacion, DeclaracionInciertaError, SetSinDescargarError, ErrorCertificado, ErrorUso, ErrorConfig, ErrorVerificacion, ErrorIncierto, ErrorCredenciales, BloqueoOcupadoError, mensajeParaUsuario, detalleSeguro, sanearTexto, sanearDetalle, Sentry, ErrorRegistroOperacion, host_sii, carrera, doble timbraje, operaciones_sii_efecto_global_en_curso, 23505, control previo, control posterior, uso, ErrorFolios, POR_NOMBRE, anular_folios, traducirErrorAnulacion, 23P01, P0002, 42501, 22023, 23503, migración 0011]
+keywords: [resultado_operacion, codigoDeError, resultadoDeError, CODIGO_DE_RESULTADO, ejecutarOperacion, ResultadoEjecucion, ejecutada, motivo, sesion_invalida, incierto_sin_revisar, en_curso, sin_registro, marcarInciertaRevisada, revisada_en, revisada_por, abandonada, MINUTOS_EN_CURSO_ABANDONADA, OPERACIONES_QUE_GRABAN, OPERACIONES_EFECTO_GLOBAL, confirmada, ensayo, getUser, confirmarSesion, SiiError, ErrorTransporte, ErrorRespuestaSii, ErrorSolicitudFolios, SesionCaducaError, FolioInicialRequeridoError, FoliosSinCafError, ErrorPostulacion, DeclaracionInciertaError, SetSinDescargarError, ErrorCertificado, ErrorUso, ErrorConfig, ErrorVerificacion, ErrorIncierto, ErrorCredenciales, BloqueoOcupadoError, mensajeParaUsuario, detalleSeguro, sanearTexto, sanearDetalle, Sentry, ErrorRegistroOperacion, host_sii, carrera, doble timbraje, operaciones_sii_efecto_global_en_curso, 23505, control previo, control posterior, uso, ErrorFolios, POR_NOMBRE, anular_folios, traducirErrorAnulacion, 23P01, P0002, 42501, 22023, 23503, migración 0011, emitir, ErrorEmision, envioIncierto, 23514, P0001, cuota, tg_validar_documento, tg_contar_uso_documento]
 related: ["04-objetos/objetos-auditoria-e-integraciones.md", "09-libreria/backend-service-role.md", "01-fundamentos/autenticacion-sii.md", "07-referencia/trampas-conocidas.md", "04-objetos/codigos-y-enumeraciones.md", "08-esquema-supabase/solucion-de-problemas.md"]
 source: ["supabase_saas_sii.sql §1 §13", "apps/web/src/server/sii/errores.ts", "apps/web/src/server/sii/operacion.ts", "supabase/migrations/0007_bloqueos_sii.sql", "packages/certificacion/apps/cli/src/errores.ts", "packages/certificacion/packages/core/src/comun/errores.ts", "PLAN-SAAS.md §2 §4.8 (Fase 4)"]
 ---
@@ -252,7 +252,10 @@ Solo cuenta la última: si después de un `incierto` hubo un `ok` (alguien lo re
 revisarlo), ya no bloquea. Certificación y producción son independientes, igual que dos
 empresas de la misma organización.
 
-`emitir` **no** se bloquea aquí: su incierto es por documento (`envios.incierto`, Fase 7).
+`emitir` **no** se bloquea aquí: su incierto es por documento (`envios.incierto`; el
+documento queda `incierto` y ya no se puede reemitir con su `borradorId`) y, en la
+pantalla, por sesión del navegador hasta «Ya la revisé». Una boleta nueva sí se puede emitir
+([emisión](../02-guias/emision-boletas.md#boleta-por-verificar-incierta)).
 
 `enviar_set` (Fase 5) tampoco se bloquea aquí: lo bloquea el asistente con
 `bloqueoEnvioSet` (`server/certificacion/operaciones.ts`), que aplica la misma tabla de
@@ -369,8 +372,25 @@ mensaje de la base solo toma el número del folio usado (`23503`).
 | | `P0002` | «No encontramos la empresa» |
 | | `22023` | «El CAF no calza con la empresa o el ambiente» |
 | `registrar_caf` en el timbrado | cualquiera | `ErrorIncierto`: solicitud `incierta`, operación `incierto` (los folios ya se timbraron) |
-| `asignar_folio` | `P0002` | sin folios libres (`puedeEmitir` lo anticipa en la Fase 7) |
+| `asignar_folio` | `P0002` | sin folios libres (en la emisión: «No quedan folios», `config`; la vista y la validación previa lo anticipan con la disponibilidad de los CAF) |
 
 Contratos en [RPC del backend](../03-api-reference/rpc-backend.md#anular_folios-migración-0011).
 
-<!-- TODO: códigos de error propios de la base (tg_validar_documento, cuotas) cuando se documenten sus fases. -->
+### Emisión (Fase 7)
+
+`server/emision/` traduce estos errores de la base a `ErrorEmision` (hereda de `ErrorUso` o
+`ErrorConfig`, así que dentro de `ejecutarOperacion` queda `uso` o `config`). Del mensaje
+de la base solo mira si es el de folio anulado o de cuota (y el número del límite).
+
+| Origen | Código | Qué pasa |
+|---|---|---|
+| `tg_validar_documento` en el `update` a `firmado` (0012) | `23514` con «anulad» en el mensaje | el folio se anuló entre `asignar_folio` y el `update`: otro folio, hasta 3 intentos; después «Los folios asignados se anularon mientras emitíamos» (`config`) |
+| | `23514` sin «anulad» (un `CHECK`) | falla genérica: folio anulado, mensaje genérico (`error`) |
+| `tg_validar_documento` en el `insert` de un borrador de producción | `P0001` («no está autorizada» / «plan») | «La empresa no está autorizada en producción» / «Tu plan no incluye producción», sin operación |
+| `tg_contar_uso_documento` en el `update` a `firmado` | `P0001` «Se alcanzó el límite de N boletas…» | «Se alcanzó el límite de boletas del mes», folio anulado (`config`). La validación previa ya lo revisa contra `uso_mensual` |
+| RLS al guardar el borrador | `42501` | «No tienes permiso para emitir» |
+| `update` del documento | 0 filas | «El borrador cambió mientras lo emitíamos», folio anulado (`uso`) |
+
+La regla del incierto al enviar (`envioIncierto`: incierto salvo `ErrorValidacion` o HTTP
+< 500) y los estados por camino están en la
+[guía de emisión](../02-guias/emision-boletas.md#cómo-termina-una-emisión).

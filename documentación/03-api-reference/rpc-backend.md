@@ -399,7 +399,8 @@ anular. Lo cierra la migración 0012 (**aplicada el 2026-11-15**): `tg_validar_d
 el CAF con `for key share` (se serializa con el `for update` del paso 2) y rechaza con
 `23514` el documento que fija un folio que está en `folios_anulados`
 ([triggers](../08-esquema-supabase/triggers-y-logica.md#tg_validar_documento-migración-0012)).
-Quien emite (Fase 7) trata ese `23514` pidiendo otro folio.
+La emisión (Fase 7) trata ese `23514` pidiendo otro folio, hasta 3 intentos
+([emisión](../02-guias/emision-boletas.md#cómo-termina-una-emisión)).
 
 Verificación: `supabase/verificaciones/0011_folios.sql` (18, solo lectura) y
 `rls-fase6-folios.sql` (27, con `rollback`)
@@ -454,8 +455,10 @@ public.asignar_folio(p_empresa uuid, p_ambiente public.ambiente_sii, p_tipo_dte 
   si no hay CAF con folios libres (también si todos están `anulado`). `42501` si quien llama
   no es `service_role` y no `puede_emitir`.
 - No mira `folios_anulados`: por eso `anular_folios` solo deja anular la cola completa.
-- Hoy la llama `enviarSet` (Fase 5). La emisión (Fase 7) tiene que llamar después a
-  `alertaDespuesDeAsignar` (alerta `folios.por_agotarse`).
+- La llaman `enviarSet` (Fase 5) y `emitirDocumento` (Fase 7, después de obtener el token
+  y hasta 3 veces si el folio resulta anulado, `23514`). La emisión llama a
+  `alertaDespuesDeAsignar` (alerta `folios.por_agotarse`) después de un `ok`
+  ([emisión](../02-guias/emision-boletas.md#3-la-operación-con-el-sii)).
 
 ## `encolar_evento`
 

@@ -1,9 +1,9 @@
 ---
 title: "Servicios del SII que usa el backend"
 description: "Endpoints REST, SOAP, AUT2000, asistentes y portal GWT, con el método de la librería y la operación de auditoría; cómo los llama la capa SII."
-keywords: [servicios del SII, REST, SOAP, DTEWS, AUT2000, asistente, portal, ClienteBoletaRest, ClienteDtews, SolicitudFolios, PostulacionSii, TokenStore, SesionSii, operacion_sii, canal_sii, ejecutarOperacion, conBloqueoCertificado, conSesionReutilizada, crearTransporte, DeclaracionBoletas, verificarPortal, descargarSetPruebas, solicitarRevisionSet, declarar, enviarBoleta, consultarEnvio, www4, FABRICAS_SII, asistente de certificación, ad_empresa, ConsultaAutorizacion, verificar_autorizacion, STC, getConsultaData, SituacionTributaria, timbrajes, folios de producción, palena, of_genera_folio, TransporteSinTimbrar, DetenidoAntesDeTimbrar, revisión con el SII, solicitarEnSii, OpcionesClienteFolios]
+keywords: [servicios del SII, REST, SOAP, DTEWS, AUT2000, asistente, portal, ClienteBoletaRest, ClienteDtews, SolicitudFolios, PostulacionSii, TokenStore, SesionSii, operacion_sii, canal_sii, ejecutarOperacion, conBloqueoCertificado, conSesionReutilizada, crearTransporte, DeclaracionBoletas, verificarPortal, descargarSetPruebas, solicitarRevisionSet, declarar, enviarBoleta, consultarEnvio, www4, FABRICAS_SII, asistente de certificación, ad_empresa, ConsultaAutorizacion, verificar_autorizacion, STC, getConsultaData, SituacionTributaria, timbrajes, folios de producción, palena, of_genera_folio, TransporteSinTimbrar, DetenidoAntesDeTimbrar, revisión con el SII, solicitarEnSii, OpcionesClienteFolios, emisión, emitirDocumento, FABRICA_REST_EMISION, envioIncierto, olvidarToken, rahue, api.sii.cl]
 related: ["01-fundamentos/ambientes-y-credenciales.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md", "09-libreria/mapeo-libreria-tablas.md", "04-objetos/objetos-auditoria-e-integraciones.md", "02-guias/folios-caf.md"]
-source: ["certificacion-node/docs/canales.md", "certificacion-node/docs/folios.md", "certificacion-node/docs/postulacion.md", "apps/web/src/server/sii/", "apps/web/src/server/certificacion/", "apps/web/src/server/folios/sii.ts"]
+source: ["certificacion-node/docs/canales.md", "certificacion-node/docs/folios.md", "certificacion-node/docs/postulacion.md", "apps/web/src/server/sii/", "apps/web/src/server/certificacion/", "apps/web/src/server/folios/sii.ts", "apps/web/src/server/emision/emitir.ts", "apps/web/src/server/emision/dependencias.ts"]
 ---
 
 # Servicios del SII que usa el backend
@@ -91,4 +91,24 @@ ambiente })` (`OpcionesClienteFolios`: certificación por defecto, producción d
 - La carga manual de un CAF (`subirCaf`) y la anulación (`anularFolios`) **no** salen al
   SII ni pasan por `ejecutarOperacion`.
 
-<!-- TODO (Fases 7–8): endpoint por endpoint de emisión y seguimiento (método HTTP, ruta, método de la librería, operacion_sii, si es repetible 🔁 o ⚠️, errores que lanza). -->
+## Emisión (Fase 7)
+
+Lo que llama `apps/web/src/server/emision/emitir.ts` (`emitirDocumento`, nivel `emitir`),
+en el ambiente del borrador. El cliente sale de `FABRICA_REST_EMISION`
+(`server/emision/dependencias.ts`), no de `FABRICAS_SII.rest`, que fija certificación
+([trampa](../07-referencia/trampas-conocidas.md#emisión-de-boletas-fase-7)). Transporte por
+invocación y `TokenStoreSupabase`; sin bloqueo del certificado ni sesión AUT2000.
+
+| Paso | Host | Método de la librería | `operacion_sii` | Tipo | Errores que importan |
+|---|---|---|---|---|---|
+| token (antes de asignar el folio) | `apicert.sii.cl` / `api.sii.cl` | `ClienteBoletaRest.obtenerToken(rut)` (semilla firmada; cacheado en `tokens_sii`) | dentro de `emitir` | 🔁 | cualquiera: nada se consumió (`transporte` si es de red) |
+| subida del sobre | `pangal.sii.cl` / `rahue.sii.cl` | `ClienteBoletaRest.enviarBoleta(token, rut, rutEnvia, sobre)` | `emitir`, `canal = 'rest'`, `confirmada = true`, con `documento_id` | ⚠️ (usa un folio; boleta real en producción) | regla de `envioIncierto()` de la CLI: `ErrorValidacion` o `ErrorTransporte` con HTTP < 500 → el SII no la recibió (documento `anulado`, folio anulado; un 401 además `olvidarToken`); cualquier otro error después de salir (red, 5xx, sin `trackid`) → `incierto` (6), sin anular |
+
+- **Ensayo sin red**: `nivel: 'ensayo'` valida en la base y resume, sin token ni folio.
+- La consulta del estado del envío (`consultarEnvio`, `estado_envio`) y el seguimiento
+  automático son de la Fase 8; hoy solo los usa el asistente para el set
+  ([arriba](#asistente-de-certificación-fase-5)).
+- Flujo completo y estados por camino en la
+  [guía de emisión](../02-guias/emision-boletas.md#flujo-del-servidor-emitirdocumento).
+
+<!-- TODO (Fase 8): endpoint por endpoint del seguimiento (método HTTP, ruta, método de la librería, operacion_sii, si es repetible 🔁 o ⚠️, errores que lanza). -->

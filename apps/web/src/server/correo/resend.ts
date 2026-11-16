@@ -23,6 +23,54 @@ export interface MensajeCorreo {
    */
   claveIdempotencia: string;
   responderA?: string;
+  /** Archivos adjuntos (p. ej. el PDF de una boleta). Su contenido nunca va en un error. */
+  adjuntos?: AdjuntoCorreo[];
+}
+
+export interface AdjuntoCorreo {
+  /** Nombre con que lo ve quien recibe (`boleta-39-F41.pdf`), sin rutas. */
+  nombre: string;
+  contenido: Buffer;
+  /** Tipo MIME (`application/pdf`). Sin él, Resend lo deduce de la extensión. */
+  tipo?: string;
+}
+
+/** Límite de Resend para el correo completo, con los adjuntos ya en base64. */
+const TAMANO_MAXIMO_ADJUNTOS = 40 * 1024 * 1024;
+
+/** Nombre de archivo razonable: sin rutas, controles ni comillas, y no muy largo. */
+function nombreAdjuntoValido(nombre: string): boolean {
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: se rechazan justamente los controles.
+  return nombre.length > 0 && nombre.length <= 200 && !/[\\/\u0000-\u001f\u007f"]/.test(nombre);
+}
+
+/**
+ * `attachments` de la API de Resend, o el motivo para no enviar. El detalle del error
+ * solo nombra el problema (nunca el contenido del archivo).
+ */
+function adjuntosResend(
+  adjuntos: AdjuntoCorreo[] | undefined,
+):
+  | { ok: true; valor: { filename: string; content: string; content_type?: string }[] }
+  | { ok: false; detalle: string } {
+  if (!adjuntos || adjuntos.length === 0) return { ok: true, valor: [] };
+  let tamano = 0;
+  const valor: { filename: string; content: string; content_type?: string }[] = [];
+  for (const a of adjuntos) {
+    if (!nombreAdjuntoValido(a.nombre)) {
+      return { ok: false, detalle: 'Nombre de adjunto inválido.' };
+    }
+    if (!Buffer.isBuffer(a.contenido) || a.contenido.length === 0) {
+      return { ok: false, detalle: `El adjunto ${a.nombre} está vacío.` };
+    }
+    const content = a.contenido.toString('base64');
+    tamano += content.length;
+    valor.push({ filename: a.nombre, content, ...(a.tipo ? { content_type: a.tipo } : {}) });
+  }
+  if (tamano > TAMANO_MAXIMO_ADJUNTOS) {
+    return { ok: false, detalle: 'Los adjuntos superan el tamaño máximo de Resend (40 MB).' };
+  }
+  return { ok: true, valor };
 }
 
 export type MotivoFalla =
@@ -71,6 +119,8 @@ export async function enviarCorreo(
   if (clave.length === 0 || clave.length > LARGO_MAXIMO_CLAVE) {
     return { ok: false, motivo: 'rechazado', detalle: 'Clave de idempotencia inválida.' };
   }
+  const adjuntos = adjuntosResend(mensaje.adjuntos);
+  if (!adjuntos.ok) return { ok: false, motivo: 'rechazado', detalle: adjuntos.detalle };
 
   const hacerFetch = opciones.fetch ?? fetch;
   let respuesta: Response;
@@ -89,6 +139,7 @@ export async function enviarCorreo(
         html: mensaje.html,
         text: mensaje.texto,
         ...(mensaje.responderA ? { reply_to: mensaje.responderA } : {}),
+        ...(adjuntos.valor.length > 0 ? { attachments: adjuntos.valor } : {}),
       }),
       signal: AbortSignal.timeout(TIEMPO_MAXIMO_MS),
       cache: 'no-store',

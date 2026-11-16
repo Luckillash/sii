@@ -1,6 +1,6 @@
 ---
 title: "Webhooks"
-description: "Eventos, outbox webhook_entregas, firma HMAC, reintentos y eventos que emite el backend. Hoy documenta los eventos del asistente de certificación (Fase 5) y folios.por_agotarse (Fase 6)."
+description: "Eventos, outbox webhook_entregas, firma HMAC, reintentos y eventos que emite el backend. Hoy documenta los eventos del asistente de certificación (Fase 5), folios.por_agotarse (Fase 6) y los que dispara la emisión (Fase 7)."
 keywords: [webhooks, webhook_entregas, encolar_evento, certificacion.actualizada, tg_certificacion_autorizada, envio.actualizado, documento.aceptado, documento.rechazado, documento.incierto, outbox, set de pruebas, folios.por_agotarse, alertarSiCruza, umbral, agotado]
 related: ["03-api-reference/rpc-integraciones.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "04-objetos/objetos-certificacion.md"]
 source: ["supabase_saas_sii.sql §14 §15", "apps/web/src/server/certificacion/notificar.ts", "apps/web/src/server/folios/alertas.ts"]
@@ -43,7 +43,7 @@ lo manda la app (`notificar.ts`,
 Lo encola **la app** (`server/folios/alertas.ts`, `alertarSiCruza`, con `service_role`)
 cuando los folios de una empresa, en un ambiente y para un tipo, cruzan el 15 % o se agotan
 ([guía](../02-guias/folios-caf.md#alerta-foliospor_agotarse)). Hoy lo dispara anular la cola
-de un CAF; desde la Fase 7, también cada `asignar_folio` que cruce. El evento ya estaba en
+de un CAF y, desde la Fase 7, cada emisión `ok` cuyo folio cruce. El evento ya estaba en
 la lista permitida de `webhooks.eventos` (0001).
 
 ```json
@@ -82,3 +82,17 @@ propósito; solo excluyen `rcof`):
 
 Un integrador que solo quiera la operación real tiene que mirar `ambiente` en el payload de
 `envio.actualizado` (`certificacion` para el set).
+
+## Eventos de la emisión (Fase 7)
+
+La emisión del panel tampoco encola eventos con código propio (salvo
+`folios.por_agotarse`, arriba): los mismos triggers de envíos y documentos los encolan.
+
+| Evento | Cuándo, al emitir |
+|---|---|
+| `envio.actualizado` | al guardar el Track ID con un `estado_sii` de subida, o al marcar el envío `incierto` |
+| `documento.incierto` | cuando el envío queda `incierto` y el trigger pasa la boleta a `incierto` |
+| `documento.aceptado`, `documento.aceptado_con_reparos`, `documento.rechazado` | todavía no desde la emisión: los pone la consulta del estado (Fase 8) |
+
+`firmado`, `enviado` y `anulado` no encolan evento (`tg_evento_documento` solo los cuatro
+de arriba).

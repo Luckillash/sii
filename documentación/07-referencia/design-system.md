@@ -1,9 +1,9 @@
 ---
 title: "Design system «Boletéame» en la app"
 description: "Tokens, componentes TSX con CSS Modules, layouts, catálogo /_ds y pruebas de accesibilidad."
-keywords: ["design system", "tokens", "CSS Modules", "EstadoDTE", "incierto", "Por verificar", "BannerAmbiente", "Dialogo", "LayoutApp", "axe", "/_ds", "stylelint"]
+keywords: ["design system", "tokens", "CSS Modules", "EstadoDTE", "incierto", "Por verificar", "BannerAmbiente", "Dialogo", "LayoutApp", "axe", "/_ds", "stylelint", "Autocompletado", "combobox", "aria-activedescendant"]
 related: ["01-fundamentos/formatos-y-validaciones.md", "01-fundamentos/errores-y-resultados.md", "07-referencia/trampas-conocidas.md"]
-source: ["PLAN-SAAS.md §4.2 y Fase 1", "design-system/boleteame/"]
+source: ["PLAN-SAAS.md §4.2 y Fase 1", "design-system/boleteame/", "apps/web/src/components/boleteame/Autocompletado.tsx"]
 ---
 
 # Design system «Boletéame» en la app
@@ -72,6 +72,7 @@ Componentes de soporte (equivalen a las clases `tb-*` de las plantillas):
 | `PanelDetalle` | no | Panel lateral del detalle; se cierra con `hrefCerrar` (URL) u `onCerrar`. |
 | `Paginacion` | no | «Mostrando 1–8 de 128» y enlaces Anterior/Siguiente con `hrefPagina(n)`. |
 | `BannerAmbiente` | no | En `certificacion` muestra la `Alerta` info fija «Estás en el ambiente de certificación del SII»; en `produccion` no muestra nada. Toda página de la app la recibe en `aviso`. |
+| `Autocompletado<T>` (Fase 7) | sí | Campo de texto con sugerencias, patrón *combobox* de ARIA 1.2 con lista (`role="combobox"`, `aria-expanded`, `aria-controls`, `aria-activedescendant`; opciones `role="option"`). Props: `value`, `onChange` (todo lo que se escribe), `buscar(texto) → Promise<T[]>` (un error cuenta como «sin resultados»), `onElegir`, `claveOpcion`, `renderOpcion`, `minimo` (2 letras), `espera` (250 ms tras la última tecla), `sinResultados`, `mono`. Flechas recorren, Enter elige, Escape cierra; el foco se queda en el campo. Las sugerencias son opcionales: lo escrito vale sin elegir. Descarta respuestas viejas (turno por búsqueda) y anuncia el estado en una región `aria-live`. Dentro de un `Campo` toma su `id` y ayuda; suelto, necesita `aria-label`. Lo usa `/emitir` para receptores y productos. Todavía no está en `/_ds`. |
 
 Layouts:
 

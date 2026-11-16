@@ -1,9 +1,9 @@
 ---
 title: "Realtime y Storage"
 description: "Tablas publicadas en Realtime (incluida la migración 0006), bucket documentos-xml, rutas, AlmacenDocumentos, content-type y URLs firmadas."
-keywords: [Realtime, supabase_realtime, postgres_changes, replica identity, migración 0006, operaciones_sii, solicitudes_folios, documentos, envios, procesos_certificacion, RLS, Storage, documentos-xml, bucket, AlmacenDocumentos, rutaDocumento, subirXml, subirPdf, urlFirmada, createSignedUrl, MAXIMO_SEGUNDOS_URL, MAXIMO_BYTES, ErrorAlmacen, content-type, application/xml, text/xml, application/pdf, charset, ISO-8859-1, xml_path, uuid_o_nulo, storage.foldername, EnVivo, router.refresh, asistente de certificación, DTE-39-F, EnvioBOLETA-set, folios, /folios, migración 0011, cafs, folios_anulados]
+keywords: [Realtime, supabase_realtime, postgres_changes, replica identity, migración 0006, operaciones_sii, solicitudes_folios, documentos, envios, procesos_certificacion, RLS, Storage, documentos-xml, bucket, AlmacenDocumentos, rutaDocumento, subirXml, subirPdf, urlFirmada, createSignedUrl, MAXIMO_SEGUNDOS_URL, MAXIMO_BYTES, ErrorAlmacen, content-type, application/xml, text/xml, application/pdf, charset, ISO-8859-1, xml_path, uuid_o_nulo, storage.foldername, EnVivo, router.refresh, asistente de certificación, DTE-39-F, EnvioBOLETA-set, folios, /folios, migración 0011, cafs, folios_anulados, emisión, EnvioBOLETA-39-F, DTE-39-F41-carta.pdf, rollo, metadata.pdf, receptor_correo, metadata.correo, enlaceDocumento, SEGUNDOS_URL, nombresArchivos, nombrePdfDeXml]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "04-objetos/objetos-auditoria-e-integraciones.md", "09-libreria/backend-service-role.md", "03-api-reference/acceso-por-tabla.md", "07-referencia/trampas-conocidas.md"]
-source: ["supabase_saas_sii.sql §18 §19", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/verificaciones/0006_realtime_operaciones.sql", "supabase/migrations/0011_folios.sql", "apps/web/src/server/sii/almacen.ts", "apps/web/src/app/[org]/certificacion/EnVivo.tsx", "apps/web/src/server/certificacion/envio-set.ts"]
+source: ["supabase_saas_sii.sql §18 §19", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/verificaciones/0006_realtime_operaciones.sql", "supabase/migrations/0011_folios.sql", "apps/web/src/server/sii/almacen.ts", "apps/web/src/app/[org]/certificacion/EnVivo.tsx", "apps/web/src/server/certificacion/envio-set.ts", "apps/web/src/server/emision/representacion.ts", "apps/web/src/server/emision/enlaces.ts"]
 ---
 
 # Realtime y Storage
@@ -125,6 +125,10 @@ Segundo uso (Fase 6): `apps/web/src/app/[org]/folios/EnVivo.tsx`, mismo patrón.
   misma organización también refresca la vista (inofensivo).
 - `solicitudes_folios` y `operaciones_sii`, de la 0006 (aplicada).
 
+`/emitir` (Fase 7) **no** usa Realtime: la emisión es una sola Server Action que devuelve
+el resultado, y después revalida `/emitir` y `/folios` (`revalidatePath`). El cambio de
+estado de una boleta después de la subida (aceptada, rechazada) es de la Fase 8.
+
 ### Verificación
 
 `supabase/verificaciones/0006_realtime_operaciones.sql` (solo lectura, 9 comprobaciones):
@@ -173,6 +177,25 @@ representaciones impresas en PDF.
   y el id del envío no se repiten). Si el envío no llega a salir, los archivos quedan en
   Storage aunque las boletas pasen a `anulado`. Con esta subida se puede confirmar lo de
   la [trampa del `content-type`](../07-referencia/trampas-conocidas.md#errores-y-saneado).
+- **Emisión (Fase 7).** Nombres deterministas por tipo y folio, en
+  `<org>/<empresa>/<ambiente>/` (`nombresArchivos` de `server/emision/representacion.ts`):
+
+  | Archivo | Qué es | Dónde queda la ruta | Cuándo se sube |
+  |---|---|---|---|
+  | `DTE-39-F41.xml` | DTE firmado (ISO-8859-1) | `documentos.xml_path` | antes de salir al SII, `upsert: false` |
+  | `EnvioBOLETA-39-F41.xml` | sobre `EnvioBOLETA` | `envios.xml_path` | antes de salir, `upsert: false` |
+  | `DTE-39-F41-carta.pdf` | representación impresa carta | `documentos.metadata.pdf.carta` | después del `ok`, con `sobrescribir: true` |
+  | `DTE-39-F41-rollo.pdf` | representación impresa rollo 80 mm | `documentos.metadata.pdf.rollo` | ídem |
+
+  (39 y 41 son el tipo y el folio de ejemplo.) El nombre del PDF se deriva del XML
+  (`nombrePdfDeXml`). Los PDF se pueden regenerar y se sobrescriben; los XML firmados no.
+  Si la emisión falla antes de enviar o se reintenta con otro folio (`23514`), los XML ya
+  subidos quedan en Storage. `documentos.metadata.receptor_correo` y
+  `documentos.metadata.correo` (`{ id, enviado_en }` del correo con el PDF) no son
+  archivos, pero viven en el mismo `metadata`
+  ([objetos](../04-objetos/objetos-documentos.md#metadata-fase-7)). La subida del set usa
+  `DTE-39-F<folio>.xml` en la misma carpeta de certificación; no chocan porque el folio es
+  único por empresa, ambiente y tipo.
 
 ### `AlmacenDocumentos`
 
@@ -213,6 +236,10 @@ rutaDocumento(organizacionId: string, destino: DestinoArchivo, tipo?: 'xml' | 'p
   no es de esta organización.»).
 - Firmada con `service_role`, la URL abre el archivo a quien la tenga. **Quien la pide ya
   comprobó que el usuario es miembro** de la organización.
+- **Descargas de `/emitir` (Fase 7)**: `enlaceDocumento` lee el documento con la sesión
+  (RLS, filtrado por organización y empresa) y firma por 60 s (`SEGUNDOS_URL`) el XML o el
+  PDF; si el PDF falta, lo regenera con los datos guardados y el `ted_xml`, lo sube y guarda
+  la ruta en `metadata.pdf` ([guía](../02-guias/emision-boletas.md#descargas)).
 
 ### Errores (`ErrorAlmacen`)
 

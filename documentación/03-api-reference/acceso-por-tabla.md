@@ -1,7 +1,7 @@
 ---
 title: "Acceso por tabla (PostgREST + RLS)"
 description: "Qué puede hacer cada rol en cada tabla: select, insert, update, delete."
-keywords: [RLS, PostgREST, políticas, grant, revoke, privilegios por columna, anon, authenticated, service_role, lector, emisor, administrador, propietario, select, insert, update, delete, "new row violates row-level security policy", "permission denied for table", 42501, folios_anulados, anular_folios, migración 0011]
+keywords: [RLS, PostgREST, políticas, grant, revoke, privilegios por columna, anon, authenticated, service_role, lector, emisor, administrador, propietario, select, insert, update, delete, "new row violates row-level security policy", "permission denied for table", 42501, folios_anulados, anular_folios, migración 0011, borrador, alta_borrador, edicion_borrador, receptores, upsert, emisión, P0001]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "01-fundamentos/tenancy-y-roles.md", "03-api-reference/rpc-organizacion.md", "05-pruebas/probar-el-esquema.md"]
 source: ["supabase_saas_sii.sql §17", "supabase/verificaciones/rls-fase2-tenancy.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/verificaciones/rls-fase3-empresas.sql"]
 ---
@@ -85,8 +85,8 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
 
 | Tabla | anon | lector | emisor | administrador | propietario | service_role |
 |---|---|---|---|---|---|---|
-| `receptores` | — | S | SIU | SIUD | SIUD | SIUD |
-| `productos` | — | S | SIU | SIUD | SIUD | SIUD |
+| `receptores` | — | S | SIU ²⁰ | SIUD ²⁰ | SIUD ²⁰ | SIUD |
+| `productos` | — | S | SIU ²⁰ | SIUD ²⁰ | SIUD ²⁰ | SIUD |
 | `documentos` | — | S | S + IUD ⁹ | S + IUD ⁹ | S + IUD ⁹ | SIUD |
 | `documento_detalles` | — | S | S + IUD ¹⁰ | S + IUD ¹⁰ | S + IUD ¹⁰ | SIUD |
 
@@ -134,8 +134,16 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
    cambiarlos en un `update` lanza error (`tg_proteger_autorizacion`).
 9. `puede_emitir`: insertar, editar y borrar solo filas con `estado = 'borrador'` y
    `folio is null`. Un documento con folio solo lo cambia el backend. `organizacion_id`
-   se hereda de la empresa (`tg_heredar_organizacion`).
-10. `puede_emitir` y el documento padre en `estado = 'borrador'`.
+   se hereda de la empresa (`tg_heredar_organizacion`). Además, `tg_validar_documento`
+   rechaza con `P0001` **todo** `insert` de producción (también un borrador sin folio) si
+   la empresa no está autorizada o el plan no permite producción. La Fase 7 lo usa así:
+   «Guardar borrador» y el guardado previo a emitir van con la **sesión**
+   (`guardarEnSesion`, `.eq('estado', 'borrador')`), y todo lo que fija el folio (el
+   `update` a `firmado`, después `enviado` o `anulado`, y `metadata` con las rutas del PDF)
+   va con `service_role` filtrando por organización
+   ([emisión](../02-guias/emision-boletas.md#borradores)).
+10. `puede_emitir` y el documento padre en `estado = 'borrador'`. La emisión reemplaza las
+    líneas de un borrador (borra e inserta) con la sesión.
 11. `tg_proteger_proceso`: en el `insert` la etapa queda `borrador` y el estado SII en
     `null`; cambiar `etapa`, `codigo_estado_sii` o `paso_sii` en un `update` lanza error.
 12. Solo las columnas `nombre`, `revocada_en` y `expira_en`. Se crean con `crear_api_key()`.
@@ -183,6 +191,10 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
     `solicitudes_folios` las escribe solo el backend (`registrar_caf`, `asignar_folio`,
     `solicitarEnSii`); con la 0011, el trigger `trg_20_caf_sin_traslape` rechaza CAF
     traslapados (`23P01`).
+20. `receptores` y `productos`: alta y edición con `puede_emitir`, borrado con `es_admin`.
+    La emisión (Fase 7) hace `upsert` de `receptores` por `(empresa_id, rut)` con la sesión
+    del emisor (necesita las dos políticas, `alta` y `edicion`); los productos solo se
+    leen (autocompletado). La Fase 7 no trae pantalla de catálogo.
 
 `operaciones_sii` la escribe solo la capa SII con `service_role` (`ejecutarOperacion`,
 `marcarInciertaRevisada`); los miembros la leen y, con la migración 0006, reciben sus
@@ -197,7 +209,9 @@ cambios por Realtime ([Realtime](../06-integraciones/realtime-y-storage.md#realt
   segmento de la ruta es una organización de la que es miembro
   (`<organizacion_id>/<empresa_id>/<ambiente>/<archivo>`). Solo el backend sube archivos,
   con `AlmacenDocumentos` (`server/sii/almacen.ts`)
-  ([Storage](../06-integraciones/realtime-y-storage.md#storage-documentos-xml)).
+  ([Storage](../06-integraciones/realtime-y-storage.md#storage-documentos-xml)). Las
+  descargas de `/emitir` (Fase 7) leen el documento con la sesión y firman la URL (60 s)
+  con el almacén de la organización (`service_role`).
 
 ## Verificación
 

@@ -66,7 +66,7 @@ organización, empresa, operación, ambiente, `confirmada = true` y
 | `solicitar_revision` | ⚠️ sí | no |
 | `declarar` | ⚠️ sí | **sí** |
 | `enviar_rcof` 🕰️ | ⚠️ sí | no |
-| `emitir` | ⚠️ sí | no aquí: por documento (`envios.incierto`, Fase 7) |
+| `emitir` | ⚠️ sí | no aquí: por documento (`envios.incierto`; el documento `incierto` no se reemite) y, en la pantalla, por sesión del navegador (Fase 7) |
 | `consultar_envio`, `seguimiento` | 🔁 no | no |
 | `verificar_autorizacion` (migración `0010_verificar_autorizacion`, aplicada el 2026-11-14; `verificarAutorizacion`) | 🔁 no | no |
 
@@ -122,6 +122,15 @@ SII** deja una fila `confirmada = false` que sí salió al SII (no timbra; la so
 
 Los ensayos del asistente no dejan fila
 ([guía](../02-guias/certificacion-empresa.md#ensayo-y-confirmación)).
+
+**La emisión (Fase 7)** deja una fila `emitir` por boleta confirmada (`canal = 'rest'`,
+`confirmada = true`, en el ambiente del borrador), con la columna `documento_id` (por eso
+llama a `ejecutarOperacion` directo) y `envio_id` (el envío del último intento). En
+`detalle`: `documento_id`, `tipo_dte`, `folio`, `caf_id`, `intentos` (sube con cada folio
+anulado en paralelo, hasta 3) y, según cómo termine, `track_id`, `incierto: true` o
+`folios_anulados` (la **lista** de folios anulados, no la cantidad como en `enviar_set`).
+El ensayo no deja fila; tampoco una validación previa que falla ni «Guardar borrador»
+([guía](../02-guias/emision-boletas.md#qué-queda-en-operaciones_sii)).
 
 ### Ciclo de vida de una fila
 

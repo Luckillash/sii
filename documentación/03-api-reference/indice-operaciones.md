@@ -1,16 +1,39 @@
 ---
 title: "Índice de operaciones"
 description: "Todas las funciones RPC, vistas y servicios del SII, con quién puede llamarlos."
-keywords: [índice, operaciones, asistente de certificación, server/certificacion, Server Actions, postular, descargarSet, solicitarFoliosSet, enviarSet, consultarEstadoSet, solicitarRevision, consultarEstadoDeclaracion, declarar, marcarRevisada, leerAsistente, guardarDatosPostulacion, guardarDatosDeclaracion, registrar_caf, guardar_set_pruebas, folios, server/folios, leerFolios, solicitarFolios, subirCaf, anularFolios, puedeEmitir, alertaDespuesDeAsignar, alertarSiCruza, anular_folios, encolar_evento, folios.por_agotarse, migración 0011]
-related: ["03-api-reference/acceso-por-tabla.md", "03-api-reference/servicios-sii.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "03-api-reference/rpc-backend.md"]
-source: ["supabase_saas_sii.sql §15 §16 §17", "apps/web/src/server/certificacion/index.ts", "apps/web/src/app/[org]/certificacion/acciones.ts", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/folios/index.ts", "apps/web/src/app/[org]/folios/acciones.ts", "supabase/migrations/0011_folios.sql"]
+keywords: [índice, operaciones, asistente de certificación, server/certificacion, Server Actions, postular, descargarSet, solicitarFoliosSet, enviarSet, consultarEstadoSet, solicitarRevision, consultarEstadoDeclaracion, declarar, marcarRevisada, leerAsistente, guardarDatosPostulacion, guardarDatosDeclaracion, registrar_caf, guardar_set_pruebas, folios, server/folios, leerFolios, solicitarFolios, subirCaf, anularFolios, puedeEmitir, alertaDespuesDeAsignar, alertarSiCruza, anular_folios, encolar_evento, folios.por_agotarse, migración 0011, emisión, server/emision, emitirDocumento, emitir, guardarBorrador, borrarBorrador, leerVistaEmision, buscarReceptores, buscarProductos, enlaceDocumento, ResultadoEmision]
+related: ["03-api-reference/acceso-por-tabla.md", "03-api-reference/servicios-sii.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "02-guias/emision-boletas.md", "03-api-reference/rpc-backend.md"]
+source: ["apps/web/src/server/emision/index.ts", "apps/web/src/app/[org]/emitir/acciones.ts", "supabase_saas_sii.sql §15 §16 §17", "apps/web/src/server/certificacion/index.ts", "apps/web/src/app/[org]/certificacion/acciones.ts", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/folios/index.ts", "apps/web/src/app/[org]/folios/acciones.ts", "supabase/migrations/0011_folios.sql"]
 ---
 
 # Índice de operaciones
 
 > **Úsalo cuando:** buscas una operación por su función.
 
-<!-- TODO: índice completo de RPC, vistas y servicios (Fases 2–4 y 7 en adelante). -->
+<!-- TODO: índice completo de RPC, vistas y servicios (Fases 2–4 y 8 en adelante). -->
+
+## Emisión de boletas (Fase 7)
+
+Todo vive en `apps/web/src/server/emision/` (API en `index.ts`) y se llama desde las
+Server Actions de `apps/web/src/app/[org]/emitir/acciones.ts`, que exigen membresía, rol
+**propietario, administrador o emisor** (`puedeEmitir`) y que la empresa sea de la
+organización, y validan con `esquemaBorrador`. Un lector ve solo el aviso. Detalle en
+[emisión de boletas](../02-guias/emision-boletas.md). Sin código desplegado ni migración
+nueva (usa la 0001 y la 0012).
+
+| Función de la API | Server Action | Sale al SII | `operacion_sii` | Escribe |
+|---|---|---|---|---|
+| `leerVistaEmision(ctx, { borradorId? })` | (la usa `page.tsx`) | no | — | nada (sesión, RLS; `plan_vigente` con service_role) |
+| `emitirDocumento(ctx, { nivel: 'ensayo', borrador, borradorId? })` | `emitir` | no | — | nada (sin folio ni filas) |
+| `emitirDocumento(ctx, { nivel: 'emitir', borrador, borradorId? })` | `emitir` | ⚠️ (usa un folio; REST `apicert`/`api` y `pangal`/`rahue`) | `emitir`, `canal = 'rest'`, `confirmada = true`, con `documento_id` y `envio_id` | sesión: `documentos` (borrador), `documento_detalles`, `receptores`; service_role: `asignar_folio` 🔒, `leer_secreto` 🔒, Storage (DTE y sobre), `envios`, `documentos` (`firmado` → `enviado`); si falla, `folios_anulados` y `envios.error` o `envios.incierto`; después, PDF a Storage, `documentos.metadata` y correo |
+| `guardarBorrador(ctx, borrador, borradorId?)` | `guardarBorrador` | no | — | sesión (RLS): `documentos` (`borrador`), `documento_detalles`, `receptores` |
+| `borrarBorrador(ctx, borradorId)` | `borrarBorrador` | no | — | sesión: `delete` de un documento `borrador` |
+| `buscarReceptores(ctx, texto)` / `buscarProductos(ctx, texto)` | `buscarReceptores` / `buscarProductos` (desde 2 letras) | no | — | nada (sesión, `ilike` saneado, hasta 8) |
+| `enlaceDocumento(ctx, documentoId, 'xml' \| 'pdf_carta' \| 'pdf_rollo')` | `enlaceDocumento` | no | — | nada, salvo un PDF que falte: lo regenera, lo sube y guarda la ruta en `metadata.pdf` (service_role); devuelve una URL firmada de 60 s |
+
+`ctx` es `ContextoEmision` (`organizacionId`, `empresaId`, `usuarioId`). Las acciones de
+emisión y borrador devuelven `ResultadoEmision` (`@/lib/emision`). Estados por camino en la
+[guía](../02-guias/emision-boletas.md#cómo-termina-una-emisión).
 
 ## Folios (Fase 6)
 
@@ -29,8 +52,8 @@ organización. Lector y emisor ven la página. Detalle en
 | `subirCaf(ctx, { ambiente, contenido })` | `subirCaf` (`FormData`) | no | — | `registrar_caf` 🔒 (Vault + `cafs`; resuelve una `incierta` que calce) y `operaciones_sii.detalle.revisada_en` de su operación |
 | `anularFolios(ctx, { cafId, desde, hasta, motivo })` | `anularFolios` | no | — | `anular_folios` (migración 0011, **aplicada el 2026-11-15**; cliente de sesión): `folios_anulados` y, si es la cola, el CAF `anulado`; después la alerta |
 | `marcarRevisada(ctx, operacionId)` de `server/certificacion` | `marcarRevisada` | no | — | `operaciones_sii.detalle.revisada_en` (vía `marcarInciertaRevisada`) |
-| `puedeEmitir(cliente, clave)` | (Fase 7) | no | — | nada (service_role) |
-| `alertaDespuesDeAsignar(deps, cliente, clave, asignado)` / `alertarSiCruza(…)` | (Fase 7 / interna) | no | — | `encolar_evento` 🔒 (`folios.por_agotarse`) y correo por Resend |
+| `puedeEmitir(cliente, clave)` | (ninguna; la emisión de la Fase 7 no la usa: valida con `foliosDisponibles` y la vista con `leerCafs` + `disponibilidadDe`) | no | — | nada (service_role) |
+| `alertaDespuesDeAsignar(deps, cliente, clave, asignado)` / `alertarSiCruza(…)` | (`emitirDocumento` después de un `ok` / interna) | no | — | `encolar_evento` 🔒 (`folios.por_agotarse`) y correo por Resend |
 
 `ctx` es `ContextoFolios` (`organizacionId`, `empresaId`, `usuarioId`). Todas las acciones
 devuelven `ResultadoFolios` (`@/lib/folios`). RPC de la fase:

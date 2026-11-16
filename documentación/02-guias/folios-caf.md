@@ -249,8 +249,8 @@ Sentry ni de vuelta al navegador (tampoco su nombre).
 ## Anular folios
 
 `anularFolios(ctx, { cafId, desde, hasta, motivo })` (`server/folios/anular.ts`), desde la
-Server Action `anularFolios`. Llama a la RPC `anular_folios` (migración 0011, **pendiente
-de aplicar**; [contrato](../03-api-reference/rpc-backend.md#anular_folios-migración-0011))
+Server Action `anularFolios`. Llama a la RPC `anular_folios` (migración 0011, **aplicada el
+2026-11-15**; [contrato](../03-api-reference/rpc-backend.md#anular_folios-migración-0011))
 con el cliente de **sesión**: la base verifica el rol con `auth.uid()` y deja
 `anulado_por` con el id del usuario. No es una operación del SII.
 
@@ -285,7 +285,7 @@ tipo, **cruzan** el umbral del 15 % o se agotan.
 | Tema | Regla |
 |---|---|
 | Cuándo | `decidirAlerta(antes, despues)`: `por_agotarse` al pasar de `sello` a `aviso`; `agotado` al llegar a cero desde cualquier estado con folios. Sin folios antes, nada |
-| Disparadores | `alertarSiCruza` después de anular una cola (aquí) y `alertaDespuesDeAsignar` después de `asignar_folio` (enganche de la **Fase 7**: reconstruye el «antes» sin otra lectura) |
+| Disparadores | `alertarSiCruza` después de anular una cola (aquí) y `alertaDespuesDeAsignar` después de una emisión `ok` de la **Fase 7** (`emitirDocumento`, con el CAF y el folio usados: reconstruye el «antes» sin otra lectura) |
 | Correo | `correoFoliosPorAgotarse` a los propietarios y administradores (correos de `perfiles`, sin duplicados), con enlace a `/<slug>/folios?empresa=<id>`; sin `NEXT_PUBLIC_APP_URL` no se envía (aviso en consola) |
 | `Idempotency-Key` (Resend) | `folios.por_agotarse/<empresa>/<ambiente>/<tipo>/<CAF en uso>/<15\|agotado>` (determinista, sin datos sensibles) |
 | Webhook | `encolar_evento(org, 'folios.por_agotarse', datos)` con `service_role` ([payload](../06-integraciones/webhooks.md#foliospor_agotarse-fase-6)) |
@@ -303,22 +303,32 @@ Además: `anular_folios` exige `es_admin` en la base (`42501`); `registrar_caf` 
 `encolar_evento` son solo `service_role` y la app los llama después de verificar membresía
 y rol; las Server Actions confirman que la empresa es de la organización.
 
-## Puntos de enganche para la Fase 7 (emisión)
+## Cómo los usa la emisión (Fase 7)
 
-- `puedeEmitir(cliente, clave)` → `{ puede: true, disponibles, aviso }` o `{ puede: false,
-  motivo: 'sin_caf' | 'agotado' }`: deshabilitar el botón de emitir sin folios.
-- `alertaDespuesDeAsignar(deps, cliente, clave, { cafId, folio })` después de cada
-  `asignar_folio`.
-- **Folio anulado entre `asignar_folio` y el documento:** un folio ya asignado cuyo
-  documento todavía no se inserta se puede anular (la RPC solo ve los documentos que
-  existen). La migración 0012 (**aplicada el 2026-11-15**) lo cierra en la base:
-  `tg_validar_documento` rechaza con `23514` («El folio N está anulado…») el `insert` del
-  documento, o el `update` que le fija el folio a un borrador, si `(caf_id, folio)` está en
-  `folios_anulados`. La emisión tiene que tratar ese `23514`: pedir otro folio con
-  `asignar_folio` y volver a armar (el folio anulado ya quedó informado para el RCOF; no se
-  anula de nuevo). Un `update` de `estado` sobre un documento ya emitido no se revisa
-  ([trampas](../07-referencia/trampas-conocidas.md#folios-caf-fase-6),
+Lo que la Fase 6 dejó como enganche y cómo quedó en la
+[emisión](emision-boletas.md):
+
+- **Folios disponibles.** La emisión **no** usa `puedeEmitir(cliente, clave)` (sigue
+  exportada desde `server/folios`): la vista de `/emitir` calcula los folios con `leerCafs`
+  + `disponibilidadDe` (sesión) y la validación previa con `foliosDisponibles`
+  (service_role). Las dos siguen la regla de `asignar_folio`; sin folios, el botón «Emitir
+  boleta» queda deshabilitado con la guía a Folios (CAF), y el servidor responde «No quedan
+  folios» sin abrir la operación.
+- **Alerta.** `alertaDespuesDeAsignar(deps, cliente, clave, { cafId, folio })` se llama
+  después de cada emisión `ok`, fuera de la operación. Una emisión que termina en error no
+  la llama.
+- **Folio anulado entre `asignar_folio` y el documento.** La migración 0012 (**aplicada el
+  2026-11-15**) hace que `tg_validar_documento` rechace con `23514` («El folio N está
+  anulado…») el `update` que le fija el folio al borrador si `(caf_id, folio)` está en
+  `folios_anulados`. La emisión lo trata: pide otro folio con `asignar_folio` y vuelve a
+  armar, hasta 3 intentos (`INTENTOS_FOLIO`); el folio anulado no se anula de nuevo. Un
+  `update` de `estado` sobre un documento ya emitido no se revisa
+  ([trampas](../07-referencia/trampas-conocidas.md#emisión-de-boletas-fase-7),
   [triggers](../08-esquema-supabase/triggers-y-logica.md#tg_validar_documento-migración-0012)).
+- **Folios que la emisión anula.** Cuando una emisión falla con el folio ya asignado y la
+  boleta no llegó al SII (falla antes de enviar, cuota, 0 filas, rechazo 4xx), el folio va a
+  `folios_anulados` con `insert` directo (service_role), como en el set de pruebas. Un
+  envío incierto **no** anula su folio.
 
 ## Prueba real en *Production* (criterio de aceptación)
 

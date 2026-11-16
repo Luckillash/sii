@@ -2,6 +2,7 @@
 // HTML con estilos en línea y texto plano. El envío está en apps/web/src/server/correo.
 
 export { type CorreoAuth, PLANTILLAS_AUTH, type PlantillaAuth } from './auth';
+export { correoBoleta, type DatosBoleta } from './boleta';
 export { correoCertificacion, type DatosCertificacion } from './certificacion';
 export { correoFoliosPorAgotarse, type DatosFoliosPorAgotarse } from './folios';
 export { correoInvitacion, type DatosInvitacion } from './invitacion';

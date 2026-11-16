@@ -3,7 +3,7 @@ title: "Librería: mapeo con las tablas"
 description: "Qué clase o método de @winex/certificacion corresponde a cada tabla y columna, y qué módulo de la capa SII hace la traducción."
 keywords: [mapeo, TokenStore, ClaveToken, TokenGuardado, tokens_sii, SesionSii, aArreglo, desdeArreglo, sesiones_sii, Certificado, desdeContenido, FirmaElectronica, huellaCertificado, certificados, empresa_certificados, Vault, SiiError, resultado_operacion, operaciones_sii, detalle, ErrorTransporte, ErrorRespuestaSii, FoliosSinCafError, FolioInicialRequeridoError, DeclaracionInciertaError, TransporteUndici, documentos-xml, xml_path, CODIGOS, DatosPostulacion, DatosDeclaracion, EstadoDeclaracion, parsearSetPruebas, CasoSetPruebas, ArmadorBoleta, EnvioBoleta, EstadoEnvioRest, procesos_certificacion, set_pruebas_casos, registrar_caf, guardar_set_pruebas, server/folios, solicitarEnSii, TransporteSinTimbrar, simulada, validarCaf, Timbre, RSAPK, datosAmbiente, anular_folios, folios_anulados]
 related: ["03-api-reference/servicios-sii.md", "09-libreria/backend-service-role.md", "04-objetos/objetos-empresas-y-credenciales.md", "04-objetos/objetos-auditoria-e-integraciones.md", "04-objetos/objetos-folios.md"]
-source: ["supabase_saas_sii.sql (cabecera)", "certificacion-node/docs/core.md", "apps/web/src/server/sii/", "packages/certificacion/packages/core/src/comun/errores.ts", "packages/certificacion/apps/cli/src/errores.ts", "apps/web/src/server/certificacion/", "apps/web/src/server/folios/"]
+source: ["supabase_saas_sii.sql (cabecera)", "certificacion-node/docs/core.md", "apps/web/src/server/sii/", "packages/certificacion/packages/core/src/comun/errores.ts", "packages/certificacion/apps/cli/src/errores.ts", "apps/web/src/server/certificacion/", "apps/web/src/server/folios/", "apps/web/src/server/emision/"]
 ---
 
 # Librería: mapeo con las tablas
@@ -97,4 +97,27 @@ Lo traduce `apps/web/src/server/folios/`, en certificación o producción. Colum
 Lo que **nunca** se guarda tampoco aquí: el XML del CAF subido fuera de Vault (ni su nombre
 de archivo), la `<RSASK>` en mensajes de error ni en logs.
 
-<!-- TODO (Fases 7–8): documentos y documento_detalles de emisión, envíos y estadísticas del seguimiento. -->
+## Emisión (Fase 7)
+
+Lo traduce `apps/web/src/server/emision/`, en certificación o producción. Columnas en
+[objetos de documentos](../04-objetos/objetos-documentos.md) y
+[de envíos](../04-objetos/objetos-envios-y-rcof.md); flujo en la
+[guía](../02-guias/emision-boletas.md).
+
+| Librería | Módulo | Tabla y columnas |
+|---|---|---|
+| (la app) `Borrador` validado con `esquemaBorrador` + `calcularTotales` | `borradores.ts` (`guardarEnSesion`, sesión) | `documentos` (`estado = 'borrador'`, `origen = 'panel'`, receptor, totales, descuento, `metadata.receptor_correo`, `creado_por`); `documento_detalles` (reemplazadas, con `descuento_monto` y `monto_item`); `receptores` (upsert por empresa y RUT) |
+| `ClienteBoletaRest.obtenerToken()` | `emitir.ts` | `tokens_sii` (vía `TokenStoreSupabase`) |
+| `asignar_folio` (base) | `emitir.ts` | `cafs.siguiente_folio`; si la boleta no llega al SII, `folios_anulados` (`caf_id`, `folio`, `motivo`, `anulado_por`) |
+| `ArmadorBoleta.armar()` → DTE firmado | `emitir.ts`, `representacion.ts` (`leerDte`) | Storage `DTE-<tipo>-F<folio>.xml`; en un solo `update`: `documentos.folio`, `caf_id`, `ted_xml` (texto `latin1`), `timbrado_en`, `firmado_en`, `xml_path`, `mnt_neto`/`mnt_exe`/`iva`/`mnt_total` (del DTE), `descuento_aplicado`, `fecha_emision`, `envio_id`, `estado = 'firmado'` |
+| `EnvioBoleta.empaquetar()` → sobre | `emitir.ts` | Storage `EnvioBOLETA-<tipo>-F<folio>.xml`; `envios` (`proposito = 'emision'`, `canal = 'rest'`, `rut_envia`, `certificado_id`, `nro_resol`, `fch_resol`, `tmst_firma`, `nombre_archivo = NOMBRE_ARCHIVO_BOLETA`, `xml_path`) |
+| `RespuestaEnvioRest` (`trackId`, `estado`, `json`) | `emitir.ts` | `envios.track_id`, `enviado_en`, `respuesta_subida`, `estado_sii` (solo de subida); `documentos.estado = 'enviado'` |
+| error después de salir (salvo `ErrorValidacion` y HTTP < 500) | `emitir.ts` (`envioIncierto`) | `envios.incierto = true`, `envios.error` (el trigger deja el documento `incierto`) |
+| `ErrorTransporte` HTTP < 500 o `ErrorValidacion` después de salir | `emitir.ts` | `documentos.estado = 'anulado'`, `folios_anulados`, `envios.error`; con 401, `olvidarToken` |
+| (la app) `generarPdf` carta y rollo | `representacion.ts`, `server/pdf/` | Storage `DTE-<tipo>-F<folio>-carta.pdf` / `-rollo.pdf`; `documentos.metadata.pdf` |
+| (la app) correo con el PDF (Resend) | `representacion.ts`, `server/correo/boleta.ts` | `documentos.metadata.correo` (`id`, `enviado_en`) |
+
+Lo que **nunca** se guarda: el XML del CAF fuera de Vault, la `<RSASK>`, el token ni el
+PEM/clave del certificado (ni en `operaciones_sii`, `envios.error` o logs).
+
+<!-- TODO (Fase 8): envíos y estadísticas del seguimiento automático. -->

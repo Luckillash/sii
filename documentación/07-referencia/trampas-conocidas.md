@@ -1,9 +1,9 @@
 ---
 title: "Trampas conocidas"
 description: "Comportamientos no obvios del SII, de la librería y del esquema."
-keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna, ad_empresa1, ad_empresa2, Actualización de datos del contribuyente, representante legal, no está autorizado para operar en esta modalidad, verificar_autorizacion, ConsultaAutorizacion, situación tributaria de terceros, STC, stc/noauthz, getConsultaData, timbrajes, documentos autorizados, reCAPTCHA, SituacionTributaria, Fase 6, folios, migración 0011, anular_folios, cola completa, trg_20_caf_sin_traslape, 23P01, revisión con el SII, simulada, TransporteSinTimbrar, of_genera_folio, revisionId, folios.por_agotarse, Idempotency-Key, denominador, folio asignado sin documento, política alta, subirCaf, RSAPK]
-related: ["08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md"]
-source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/", "supabase/migrations/0011_folios.sql", "apps/web/src/server/folios/", "apps/web/src/app/[org]/folios/"]
+keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna, ad_empresa1, ad_empresa2, Actualización de datos del contribuyente, representante legal, no está autorizado para operar en esta modalidad, verificar_autorizacion, ConsultaAutorizacion, situación tributaria de terceros, STC, stc/noauthz, getConsultaData, timbrajes, documentos autorizados, reCAPTCHA, SituacionTributaria, Fase 6, folios, migración 0011, anular_folios, cola completa, trg_20_caf_sin_traslape, 23P01, revisión con el SII, simulada, TransporteSinTimbrar, of_genera_folio, revisionId, folios.por_agotarse, Idempotency-Key, denominador, folio asignado sin documento, política alta, subirCaf, RSAPK, Fase 7, emisión, emitirDocumento, FABRICA_REST_EMISION, FABRICAS_SII.rest, documentoId, doble clic, borradorId, clave_idempotencia, sessionStorage, Ya la revisé, esFolioAnulado, INTENTOS_FOLIO, PDF417, bwip-js, bwip-js/node, binarytext, pdfkit, serverExternalPackages, AFM, ted_xml, latin1, instructivo de representación impresa, enlaceDocumento, uso_mensual.envios]
+related: ["08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md", "02-guias/emision-boletas.md"]
+source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/", "supabase/migrations/0011_folios.sql", "apps/web/src/server/folios/", "apps/web/src/app/[org]/folios/", "apps/web/src/server/emision/", "apps/web/src/server/pdf/", "apps/web/src/app/[org]/emitir/", "apps/web/next.config.ts"]
 ---
 
 # Trampas conocidas
@@ -170,7 +170,9 @@ source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas
   organización. Marcar como revisada desbloquea un reintento que puede quemar folios: la
   Server Action que la llame tiene que exigir membresía y rol antes.
 - **`emitir` no se bloquea por incierto en `ejecutarOperacion`.** Su incierto es por
-  documento (`envios.incierto`, Fase 7). Solo `solicitar_folios`, `postular` y `declarar`
+  documento (`envios.incierto`; el documento queda `incierto` y no se puede reemitir con su
+  `borradorId`) y, en la pantalla, por sesión del navegador
+  ([Fase 7](#emisión-de-boletas-fase-7)). Solo `solicitar_folios`, `postular` y `declarar`
   se bloquean aquí.
 - **Un ensayo no es un ensayo si `fn` graba.** `confirmada: false` solo cambia la
   auditoría (no hay `getUser()` ni bloqueo por incierto). Que no salga nada irreversible
@@ -494,8 +496,8 @@ librería y lo usa `verificarAutorizacion` de la app como apoyo del mensaje.
   emisión asigna el folio y el documento entra después, un administrador puede anularlo
   entre medio. Con la 0012, `tg_validar_documento` rechaza con `23514` («El folio N está
   anulado…», pista: pedir otro folio) el documento que fija un folio anulado, al
-  insertarlo o al ponerle el folio a un borrador. La emisión de la Fase 7 tiene que tratar
-  ese `23514` pidiendo otro folio. El trigger lee el CAF con `for key share` **antes** de
+  insertarlo o al ponerle el folio a un borrador. La emisión de la Fase 7 trata ese `23514`
+  pidiendo otro folio, hasta 3 intentos ([emisión](#emisión-de-boletas-fase-7)). El trigger lee el CAF con `for key share` **antes** de
   mirar `folios_anulados`, así se serializa con el `for update` de `anular_folios`: gane
   quien gane, la otra transacción ve lo que confirmó la primera (en READ COMMITTED cada
   sentencia toma su propia foto). Un `update` que no cambia folio ni CAF (el
@@ -568,6 +570,105 @@ librería y lo usa `verificarAutorizacion` de la app como apoyo del mensaje.
   bajar del 15 % es un cruce nuevo (con otro CAF en uso, otra clave).
 - **Anular folios bajo `siguiente_folio` no cambia la disponibilidad**, así que no dispara
   la alerta; anular la cola sí.
-- **Hoy solo la dispara la anulación de una cola.** El disparo después de cada
-  `asignar_folio` es el enganche de la Fase 7 (`alertaDespuesDeAsignar`); `enviarSet` (Fase
-  5) no lo llama.
+- **La disparan la anulación de una cola y la emisión.** Desde la Fase 7, cada boleta
+  emitida con `ok` llama a `alertaDespuesDeAsignar` con el folio usado (fuera de la
+  operación: si falla, no cambia el `ok`). `enviarSet` (Fase 5) no la llama, y una emisión
+  que termina en error tampoco, aunque haya consumido o anulado folios.
+
+## Emisión de boletas (Fase 7)
+
+Detalle en la [guía de emisión](../02-guias/emision-boletas.md).
+
+### Decisiones
+
+- **Cliente REST propio, con ambiente.** `deps.sii.rest` (`FABRICAS_SII.rest` de
+  `server/certificacion/dependencias.ts`) crea el `ClienteBoletaRest` **siempre en
+  certificación** (era para el set de pruebas). La emisión usa su propia fábrica,
+  `FABRICA_REST_EMISION` (`server/emision/dependencias.ts`, inyectable como `rest`), que
+  recibe el ambiente del borrador. Si alguien la cambia por la de certificación, las
+  boletas de producción saldrían a `apicert`/`pangal` con el certificado y los folios de
+  producción.
+- **`ejecutarOperacion` directo, no `ejecutar` de certificación.** El helper `ejecutar` de
+  `server/certificacion/comun.ts` no pasa `documentoId`; la emisión llama a
+  `ejecutarOperacion` con `documentoId`, `ambiente` y `canal: 'rest'` para que la fila de
+  `operaciones_sii` quede enlazada a su documento (y a su envío con `enlazarOperacion`).
+- **Token antes del folio.** `obtenerToken` va antes de `asignar_folio`: una falla del
+  token no consume folios. Lo que falla después de asignar y antes de enviar anula el folio
+  (`folios_anulados`) y deja el documento en `borrador`.
+- **Un solo `update` a `firmado`.** Folio, `caf_id`, TED, rutas, montos del DTE,
+  `envio_id` y `estado = 'firmado'` van en un solo `update` con `.eq('estado',
+  'borrador')`: el documento nunca queda con folio a medias, y 0 filas significa que el
+  borrador se borró o se emitió en paralelo (folio anulado, `uso`).
+- **Los montos del documento salen del DTE**, no de `calcularTotales`: `leerDte` lee
+  `<MntNeto>`, `<MntExe>`, `<IVA>` y `<MntTotal>` de lo que escribió la librería. Si la
+  paridad de `calcularTotales` se rompiera, el borrador mostraría otra cifra, pero la boleta
+  emitida queda con la de la librería (y `emision.test.ts` falla).
+- **No usa `conBloqueoCertificado`.** El REST no abre sesiones AUT2000 y `asignar_folio` ya
+  es atómico (`for update` sobre el CAF).
+
+### Trampas
+
+- **Doble clic sin `borradorId` emitiría dos boletas.** El panel no usa
+  `documentos.clave_idempotencia` (es de la API, Fase 11): cada llamada a `emitir` sin
+  `borradorId` inserta un documento nuevo y lo emite con otro folio. Lo único que lo evita
+  es la pantalla (la referencia `corriendo` y el `Dialogo` en `cargando`). Con `borradorId`
+  la segunda llamada choca con el borrador ya emitido («Este borrador ya se emitió» o
+  «…cambió mientras lo emitíamos», con su folio anulado). Un cliente nuevo de
+  `emitirDocumento` (API, script) tiene que traer su propia idempotencia.
+- **El reintento después de una falla crea otro borrador.** La emisión guarda el borrador
+  antes de la operación; si falla sin dejar documento con folio (token, falla antes de
+  enviar, cuota…), el resultado `error` no trae el id del borrador recién creado, así que
+  la pantalla sigue sin `borradorId` y el reintento inserta otro. El anterior queda en
+  «Borradores» (se puede borrar).
+- **El bloqueo de un incierto: en la UI por sesión del navegador, en el servidor por
+  documento.** La pantalla bloquea emitir con `incierta` guardado en `sessionStorage` (por
+  pestaña) hasta «Ya la revisé»; otra pestaña, otro navegador u otro usuario no lo ven. El
+  servidor solo impide reemitir **ese** documento (ya no está en `borrador`):
+  `ejecutarOperacion` no bloquea `emitir` por un `incierto` anterior
+  (`OPERACIONES_EFECTO_GLOBAL` no la incluye), así que una boleta nueva por la misma venta
+  sí sale. El seguimiento de los inciertos es de la Fase 8.
+- **Un `23514` que no es de folio anulado es una falla genérica.** `esFolioAnulado` exige
+  `23514` **y** «anulad» en el mensaje (el de `tg_validar_documento` de la 0012). Un
+  `23514` de un `CHECK` de `documentos` (p. ej. `mnt_total = mnt_neto + iva + mnt_exe`) no
+  se reintenta: el folio se anula y el usuario ve el mensaje genérico. Si se cambia el texto
+  de la excepción en la base, el reintento deja de funcionar.
+- **Cada intento deja su envío y sus XML.** Con un `23514` de folio anulado se arma de
+  nuevo con otro folio: el intento anterior deja su fila en `envios` (con `error`, sin
+  Track ID) y sus dos XML en Storage. Lo mismo cualquier falla antes de enviar: los
+  archivos no se borran. Y como `trg_60_contar_uso` suma `uso_mensual.envios` al
+  **insertar** el envío, ese contador cuenta también envíos que nunca salieron.
+- **El PDF guardado no se regenera si cambia la empresa.** El PDF se genera al emitir con
+  los datos de ese momento y se sobrescribe solo si falta. Si después cambia la razón
+  social, el giro o la dirección, el PDF guardado sigue con los datos viejos (lo correcto:
+  son los del DTE). Pero un PDF que se **regenera** porque faltaba (`enlaceDocumento`) usa
+  los datos **actuales** de la empresa, que pueden no calzar con el XML firmado.
+- **Los parámetros del timbre PDF417 no están contrastados con el documento oficial.**
+  Nivel de seguridad 5, Y:X = 3, X ≥ 0,0067", área entre 2 × 5 y 4 × 9 cm y las leyendas
+  salen del conocimiento del instructivo de representación impresa del SII, que **no está
+  en el repositorio**. Conviene contrastarlos con el instructivo oficial antes de imprimir
+  boletas reales. Lo que sí está probado es que el código decodifica a los bytes exactos del
+  TED y que su `<FRMT>` verifica.
+- **El TED va como texto `latin1`, no como Unicode.** `leerDte` toma el `<TED>` de
+  `dte.toString('latin1')` y así se guarda en `documentos.ted_xml`; el PDF417 lo codifica
+  con `binarytext: true`. Decodificarlo como UTF-8 o ISO-8859-1 «bien» antes de pasarlo
+  cambia los bytes y el timbre deja de verificar (`validarTed` rechaza un carácter sobre
+  U+00FF, pero no detecta una doble codificación que quede bajo U+00FF).
+- **`pdfkit` y `bwip-js` van en `serverExternalPackages`** (`next.config.ts`). pdfkit lee
+  sus fuentes AFM con `fs` desde su propia carpeta (`__dirname/data/*.afm`): empaquetado,
+  esa ruta no existe y el PDF falla en Vercel aunque las pruebas pasen. bwip-js va aparte
+  por tamaño y porque tiene su build propio para Node.
+- **Se importa `bwip-js/node`, no `bwip-js`**, por los tipos (es la entrada de Node, con
+  `toBuffer`). Las opciones propias del PDF417 (`eclevel`, `rowmult`, `columns`) no
+  están en los tipos de bwip-js y se declaran a mano (`OpcionesBwipPdf417`).
+- **Un borrador de producción no se guarda sin autorización.** `tg_validar_documento`
+  revisa la autorización y el plan en **todo** `insert` de producción, también de un
+  borrador sin folio (`P0001`). La UI lo anticipa (`bloqueoGuardado`) y el servidor lo
+  traduce; con un `update` de un borrador ya guardado no se revisa.
+- **La cuota se revisa dos veces.** `prepararEmision` compara `uso_mensual` con
+  `max_boletas_mes` antes de asignar folio; si dos emisiones pasan juntas ese control, el
+  trigger `tg_contar_uso_documento` rechaza la que se pasa (`P0001`) en el `update` a
+  `firmado` y ese folio se anula.
+- **Track ID con incierto: el `check` de `envios` manda.** `envios` no admite `incierto =
+  true` con `track_id`: si el Track ID quedó guardado y falló el `update` del documento, el
+  envío no se marca incierto (el documento puede quedar `firmado`) aunque la operación diga
+  `incierto`.

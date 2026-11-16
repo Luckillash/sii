@@ -1,0 +1,553 @@
+/* Emitir boleta, Fase 7: formulario, resumen lateral, resultado y borradores.
+   Solo tokens del design system (nada de colores literales). */
+
+.cabeceraFila {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+
+.selectorEmpresa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.accionAlerta {
+  margin-top: var(--space-2);
+}
+
+.nota {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.subtitulo {
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}
+
+.avisos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.avisos:empty {
+  display: none;
+}
+
+.listaAvisos {
+  margin: 0;
+  padding-left: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.enfocable:focus {
+  outline: none;
+}
+
+.enfocable:focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-md);
+}
+
+/* Formulario y resumen: lado a lado si caben; en móvil el resumen va debajo. */
+.disposicion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  align-items: flex-start;
+}
+
+.formulario {
+  flex: 999 1 540px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.lateral {
+  flex: 1 1 320px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  position: sticky;
+  top: var(--space-4);
+}
+
+.seccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.seccionCabecera {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+/* Opciones (tipo y ambiente) como tarjetas con radio. */
+.opciones {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.leyenda {
+  padding: 0;
+  margin-bottom: var(--space-2);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--text-label-weight);
+}
+
+.opcionesFila {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--space-2);
+}
+
+.opcion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  transition: border-color var(--duracion-rapida);
+}
+
+.opcion:has(input:checked) {
+  border-color: var(--sello);
+  background: var(--sello-soft);
+}
+
+.opcion:has(input:focus-visible) {
+  box-shadow: var(--focus-ring);
+}
+
+.opcion:has(input:disabled) {
+  background: var(--surface-sunken);
+}
+
+.opcionEtiqueta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.opcion:has(input:disabled) .opcionEtiqueta {
+  cursor: not-allowed;
+  color: var(--ink-muted);
+}
+
+.radio {
+  margin: 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--sello);
+  flex: none;
+}
+
+.opcionTexto {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+.enlaceChico {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+}
+
+.opcionBloqueo {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink);
+}
+
+/* Receptor. */
+.receptorFijo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.opcionCatalogo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.opcionCatalogoFila {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.opcionCatalogoDetalle {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+  overflow-wrap: anywhere;
+}
+
+/* Líneas: tarjetas apiladas en angosto, filas de tabla en ancho. */
+.lineas {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.encabezado {
+  display: none;
+}
+
+.linea {
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "nombre nombre"
+    "cantidad unidad"
+    "precio precio"
+    "exento subtotal"
+    "acciones acciones";
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.leyendaLinea {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.celda {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.celda input:not([type="checkbox"]) {
+  width: 100%;
+}
+
+.cNombre {
+  grid-area: nombre;
+}
+
+.cCantidad {
+  grid-area: cantidad;
+}
+
+.cUnidad {
+  grid-area: unidad;
+}
+
+.cPrecio {
+  grid-area: precio;
+}
+
+.cExento {
+  grid-area: exento;
+}
+
+.cSubtotal {
+  grid-area: subtotal;
+  align-items: flex-end;
+}
+
+.cAcciones {
+  grid-area: acciones;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: var(--space-1);
+}
+
+.etiquetaLinea {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  font-weight: 500;
+  color: var(--ink-muted);
+}
+
+.numero {
+  text-align: right;
+}
+
+.casilla {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 36px;
+  font-size: var(--text-label-size);
+  cursor: pointer;
+}
+
+.casilla input {
+  margin: 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--sello);
+}
+
+.casilla:has(input:disabled) {
+  cursor: not-allowed;
+  color: var(--ink-muted);
+}
+
+.subtotal {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.errorCampo {
+  margin: 0;
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--error);
+}
+
+@container (min-width: 760px) {
+  .encabezado,
+  .linea {
+    grid-template-columns: minmax(0, 1fr) 84px 64px 128px 64px 112px 112px;
+    grid-template-areas: "nombre cantidad unidad precio exento subtotal acciones";
+    column-gap: var(--space-2);
+  }
+
+  .encabezado {
+    display: grid;
+    padding: 0 var(--space-3);
+    font-size: var(--text-caption-size);
+    line-height: var(--text-caption-line);
+    font-weight: 500;
+    color: var(--ink-muted);
+  }
+
+  .encabezado .numero {
+    text-align: right;
+  }
+
+  .linea {
+    padding: var(--space-2) var(--space-3);
+    row-gap: var(--space-1);
+  }
+
+  /* Con encabezado visible, las etiquetas quedan solo para lectores de pantalla. */
+  .etiquetaLinea {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+/* Resumen lateral. */
+.resumen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.filaResumen {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-3);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+.filaResumen > span:first-child {
+  color: var(--ink-muted);
+}
+
+.folio {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--ocre);
+  color: var(--on-ocre);
+}
+
+.totales {
+  margin: 0;
+  background: var(--surface-sunken);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px var(--space-4);
+  align-items: baseline;
+}
+
+.totales dt {
+  font-size: var(--text-label-size);
+  color: var(--ink-muted);
+}
+
+.totales dd {
+  margin: 0;
+  text-align: right;
+}
+
+.total {
+  display: contents;
+}
+
+.total dt {
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+  font-size: var(--text-body-size);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.total dd {
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}
+
+.botonesResumen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.botonPrincipal {
+  height: 44px;
+  font-size: var(--text-body-size);
+}
+
+/* Datos (resumen del ensayo y resultado). */
+.datos {
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  gap: var(--space-2) var(--space-4);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+.dato {
+  display: contents;
+}
+
+.dato dt {
+  color: var(--ink-muted);
+}
+
+.dato dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.ensayo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Resultado. */
+.resultado {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 760px;
+}
+
+/* Borradores. */
+.bloque {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.accionesFila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+@media (max-width: 720px) {
+  .lateral {
+    position: static;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .opcion {
+    transition: none;
+  }
+}

@@ -1,0 +1,64 @@
+/* Campo con sugerencias (combobox + listbox). El campo usa las clases de Input. */
+
+.contenedor {
+  position: relative;
+  min-width: 0;
+}
+
+.input {
+  width: 100%;
+}
+
+.lista {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  right: 0;
+  min-width: min(320px, 90vw);
+  max-height: 280px;
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--space-1);
+  list-style: none;
+  background: var(--surface-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.lista[hidden] {
+  display: none;
+}
+
+.opcion {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+.activa {
+  background: var(--sello-soft);
+  color: var(--ink);
+}
+
+.vacio {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+/* Solo para lectores de pantalla. */
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

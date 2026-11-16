@@ -57,6 +57,7 @@ por fase están en `PLAN-SAAS.md`, en la raíz del repositorio.
 | ⚠️ e incierto | Las operaciones que graban tienen ensayo y confirmación, y confirman la sesión con `getUser()`. Un `incierto` no se repite a ciegas: bloquea `solicitar_folios`, `postular` y `declarar` (y, en el asistente de certificación, `enviar_set`) hasta marcarlo como revisado ([errores](01-fundamentos/errores-y-resultados.md#la-regla-del-incierto)) |
 | Certificación | El asistente (`/<org>/certificacion`) muestra 5 pasos sobre las 8 etapas de `procesos_certificacion`; `por_declarar` (P90) y `autorizada` (P91) las pone un trigger, nunca la app. Su ensayo no sale al SII ni deja filas ([guía](02-guias/certificacion-empresa.md)) |
 | Folios | `/<org>/folios` pide folios en tres niveles: ensayo (sin red ni filas), revisión con el SII (sale, no timbra, solicitud `simulada`; **obligatoria antes de timbrar en producción**, el servidor exige su `revisionId`) y timbrado ⚠️. El CAF solo entra por `registrar_caf` (Vault + `cafs`); los folios no usados se anulan con `anular_folios` (la cola, completa). La migración `0011` está **aplicada** (2026-11-15; [guía](02-guias/folios-caf.md)) |
+| Emisión | `/<org>/emitir` (Fase 7, sin desplegar): ensayo sin folio, red ni filas y emisión ⚠️ en una operación `emitir` con `documento_id`; token antes del folio, un solo `update` a `firmado`, envío REST. Un error después de salir es `incierto` (salvo 4xx o validación) y su folio no se anula; lo que no llegó al SII anula el folio. El incierto se bloquea por documento en el servidor y por sesión del navegador en la UI. PDF y correo, después del `ok` y sin poder cambiarlo ([guía](02-guias/emision-boletas.md)) |
 | Secretos | .pfx, clave, CAF, tokens y cookies nunca en mensajes, logs, Sentry ni `operaciones_sii`; credenciales y transporte se crean por invocación, nunca globales ([vault](08-esquema-supabase/vault-y-secretos.md)) |
 | Tenancy | Todo dato de negocio lleva `organizacion_id`, heredado del padre por `trg_00_organizacion`; RLS es la autoridad y la UI solo oculta acciones ([RLS](08-esquema-supabase/rls-y-privilegios.md)) |
 | Campos del sistema | `autorizada_produccion`, la etapa y el estado SII del proceso solo los cambia el sistema (triggers `trg_05_proteger_*`) ([triggers](08-esquema-supabase/triggers-y-logica.md)) |
@@ -82,7 +83,7 @@ por fase están en `PLAN-SAAS.md`, en la raíz del repositorio.
 | Alta de cliente, equipo, plan, certificado | [02-guias/onboarding-organizacion.md](02-guias/onboarding-organizacion.md) |
 | **Certificar una empresa ante el SII** | [02-guias/certificacion-empresa.md](02-guias/certificacion-empresa.md) |
 | **Pedir, subir o anular CAF; alerta de folios bajos; asignar folios** | [02-guias/folios-caf.md](02-guias/folios-caf.md) |
-| **Emitir una boleta** | [02-guias/emision-boletas.md](02-guias/emision-boletas.md) |
+| **Emitir una boleta** (pantalla, flujo, estados por camino, PDF, correo, borradores) | [02-guias/emision-boletas.md](02-guias/emision-boletas.md) |
 | **Seguir el estado de los envíos** | [02-guias/seguimiento-envios.md](02-guias/seguimiento-envios.md) |
 | Secuencia resumida de un caso de uso | [02-guias/flujos-tipicos.md](02-guias/flujos-tipicos.md) |
 | Buscar una RPC, vista o servicio por función | [03-api-reference/indice-operaciones.md](03-api-reference/indice-operaciones.md) |
@@ -211,13 +212,14 @@ documentación/
 
 | Fuente | Qué aporta | Fuente de verdad para |
 |---|---|---|
-| `supabase/migrations/` (0001–0011 aplicadas; la 0011, el 2026-11-15) | Esquema aplicado en producción | Tablas, RLS, triggers y RPC |
+| `supabase/migrations/` (0001–0012 aplicadas; la 0011 y la 0012, el 2026-11-15) | Esquema aplicado en producción | Tablas, RLS, triggers y RPC |
 | `08-esquema-supabase/supabase_saas_sii.sql` | Esquema original (= `0001`), comentado | Intención de diseño de la `0001` |
 | `apps/web/src/server/` | Capa SII, certificación y Supabase | Comportamiento del backend |
 | `packages/certificacion` (`@winex/certificacion`, de `certificacion-node`) | Librería y CLI `sii`, con sus `docs/` | Protocolo con el SII y códigos de error |
 | `PLAN-SAAS.md` | Fases, decisiones y estado | Qué está hecho y qué falta |
 
-Análisis inicial: 2026-11-10; actualizado por fase hasta la Fase 6 (2026-11-15; código sin
-desplegar; migración 0011 aplicada el 2026-11-15). Si un
+Análisis inicial: 2026-11-10; actualizado por fase hasta la Fase 7 (2026-11-16; código de
+la Fase 7 sin desplegar y criterio de aceptación pendiente; sin migración nueva: usa la 0012,
+aplicada el 2026-11-15). Si un
 archivo de esta carpeta contradice a las migraciones o al código, mandan las migraciones y
 el código: corrige el archivo.

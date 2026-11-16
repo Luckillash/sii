@@ -12,6 +12,9 @@
 //     `leer_secreto`, los bloqueos y el TokenStore;
 //   - Fase 6: `anular_folios` y `tg_caf_sin_traslape` (0011, 23P01), `plan_vigente` (desde
 //     `suscripciones` + `planes`) y `encolar_evento` (queda en `escrituras`).
+//   - Fase 7: el folio anulado de `tg_validar_documento` (0012, 23514), la cuota de
+//     `tg_contar_uso_documento` (P0001, `uso_mensual`), `ilike` / `or` (búsquedas) y
+//     `delete().select()`.
 //
 // No pretende ser Postgres: solo lo suficiente para probar la capa sin red ni base. Todo
 // lo que se escribe queda en `escrituras` para buscar secretos.
@@ -42,6 +45,20 @@ const ETAPAS = [
 ];
 
 const EFECTO_GLOBAL = ['solicitar_folios', 'postular', 'declarar'];
+
+/** Patrón de `ilike` (con `\` como escape y `*` como `%`, igual que PostgREST) a RegExp. */
+function patronIlike(patron: string): RegExp {
+  let re = '';
+  for (let i = 0; i < patron.length; i++) {
+    const c = patron[i] as string;
+    if (c === '\\' && i + 1 < patron.length) {
+      re += (patron[++i] as string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    } else if (c === '%' || c === '*') re += '.*';
+    else if (c === '_') re += '.';
+    else re += c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+  return new RegExp(`^${re}$`, 'is');
+}
 
 /** Igual que `public.clasificar_envio()`. */
 export function clasificarEnvio(e: Fila): string {
@@ -264,6 +281,45 @@ export function supabaseFalso(opciones: OpcionesFalso = {}) {
       if (Number(nueva.mnt_total ?? 0) !== total) {
         return { code: '23514', message: 'documentos: mnt_total' };
       }
+      // 0012: un documento que fija un folio anulado se rechaza.
+      const fija =
+        nueva.folio != null &&
+        (!anterior || nueva.folio !== anterior.folio || nueva.caf_id !== anterior.caf_id);
+      if (
+        fija &&
+        tabla('folios_anulados').some((f) => f.caf_id === nueva.caf_id && f.folio === nueva.folio)
+      ) {
+        return {
+          code: '23514',
+          message: `El folio ${String(nueva.folio)} está anulado: no se puede usar en un documento`,
+        };
+      }
+      // tg_contar_uso_documento: cuenta al recibir folio; en producción, contra el plan.
+      if (nueva.folio != null && (anterior?.folio ?? null) === null) {
+        const periodo = `${new Date(reloj).toISOString().slice(0, 7)}-01`;
+        let uso = tabla('uso_mensual').find(
+          (u) => u.organizacion_id === nueva.organizacion_id && u.periodo === periodo,
+        );
+        const columna =
+          nueva.ambiente === 'produccion' ? 'boletas_produccion' : 'boletas_certificacion';
+        const usadas = Number(uso?.[columna] ?? 0) + 1;
+        if (nueva.ambiente === 'produccion') {
+          const plan = rpcImpl.plan_vigente?.({ p_organizacion: nueva.organizacion_id })
+            .data as Fila | null;
+          const limite = plan?.max_boletas_mes;
+          if (typeof limite === 'number' && usadas > limite) {
+            return {
+              code: 'P0001',
+              message: `Se alcanzó el límite de ${limite} boletas del mes en el plan vigente`,
+            };
+          }
+        }
+        if (!uso) {
+          uso = { organizacion_id: nueva.organizacion_id, periodo };
+          tabla('uso_mensual').push(uso);
+        }
+        uso[columna] = usadas;
+      }
     }
     if (nombre === 'envio_rechazos' && nueva.documento_id == null) {
       const e = porId('envios', nueva.envio_id);
@@ -395,8 +451,9 @@ export function supabaseFalso(opciones: OpcionesFalso = {}) {
       }
       if (accion === 'delete') {
         escrituras.push({ tabla: nombre, accion, datos: null });
+        const borradas = tabla(nombre).filter(cumple);
         db[nombre] = tabla(nombre).filter((f) => !cumple(f));
-        return { data: null, error: null };
+        return { data: devolver ? borradas.map((f) => structuredClone(f)) : null, error: null };
       }
       let resultado = tabla(nombre).filter(cumple);
       if (orden) {
@@ -469,6 +526,23 @@ export function supabaseFalso(opciones: OpcionesFalso = {}) {
       },
       is(c: string, v: unknown) {
         filtros.push((f) => (v === null ? f[c] == null : f[c] === v));
+        return builder;
+      },
+      ilike(c: string, patron: string) {
+        const re = patronIlike(patron);
+        filtros.push((f) => typeof f[c] === 'string' && re.test(f[c] as string));
+        return builder;
+      },
+      /** Solo `col.ilike.patrón` separados por coma (lo que usan las búsquedas). */
+      or(expresion: string) {
+        const partes = expresion.split(',').map((p) => {
+          const m = /^([a-z_]+)\.ilike\.(.*)$/.exec(p);
+          if (!m) throw new Error(`or no implementado: ${p}`);
+          return { columna: m[1] as string, re: patronIlike(m[2] as string) };
+        });
+        filtros.push((f) =>
+          partes.some((p) => typeof f[p.columna] === 'string' && p.re.test(f[p.columna] as string)),
+        );
         return builder;
       },
       not(c: string, operador: string, valor: string) {

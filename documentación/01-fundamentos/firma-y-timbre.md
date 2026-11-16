@@ -1,9 +1,9 @@
 ---
 title: "Firma XML, timbre (TED) y codificación"
 description: "XML-DSig, C14N, ISO-8859-1, el TED firmado con la llave del CAF y los reparos que evita la librería."
-keywords: [FirmaElectronica, firmarDte, firmarSemilla, Timbre, generarTed, ArmadorBoleta, EnvioBoleta, XML-DSig, RSA-SHA1, C14N, ISO-8859-1, TED, DD, FRMT, RSASK, TSTED, TmstFirma, SetDoc, "#F{folio}T39", reparo 510, RFR, ErrorFirma, ErrorTimbre, aIso88591, desdeIso88591, 66666666-6]
+keywords: [FirmaElectronica, firmarDte, firmarSemilla, Timbre, generarTed, ArmadorBoleta, EnvioBoleta, XML-DSig, RSA-SHA1, C14N, ISO-8859-1, TED, DD, FRMT, RSASK, TSTED, TmstFirma, SetDoc, "#F{folio}T39", reparo 510, RFR, ErrorFirma, ErrorTimbre, aIso88591, desdeIso88591, 66666666-6, PDF417, bwip-js, binarytext, latin1, ted_xml, leerDte, validarTed, timbreParaArea]
 related: ["04-objetos/objetos-xml-y-json.md", "02-guias/emision-boletas.md"]
-source: ["certificacion-node/docs/core.md"]
+source: ["certificacion-node/docs/core.md", "apps/web/src/server/pdf/timbre.ts", "apps/web/src/server/emision/representacion.ts"]
 ---
 
 # Firma XML, timbre (TED) y codificación
@@ -52,7 +52,21 @@ EnvioBoleta.empaquetar([dtes]) → <EnvioBOLETA> firmado con '#SetDoc' → Clien
 
 El `<CAF>` se copia **tal cual** (sin reserializar, para no alterar el `<DA>` firmado por el
 SII). Resultado: `<TED version="1.0">{DD}<FRMT algoritmo="SHA1withRSA">…</FRMT></TED>`.
-El TED también va impreso como PDF417 en la representación impresa (`server/pdf/`, Fase 7).
+El TED también va impreso como PDF417 en la representación impresa (`server/pdf/`, Fase 7):
+
+- **Los bytes exactos.** `leerDte` (`server/emision/representacion.ts`) toma el `<TED>` de
+  `dte.toString('latin1')`: un carácter por byte ISO-8859-1. Así se guarda en
+  `documentos.ted_xml` y así lo codifica `bwip-js` con `binarytext: true` (cada carácter
+  como un byte, no UTF-8). Si se reconvierte, la `<FRMT>` deja de verificar. `validarTed`
+  rechaza un TED con caracteres sobre U+00FF.
+- **Parámetros del código**: nivel de seguridad 5, filas de 3 módulos (Y:X = 3), dimensión X
+  ≥ 0,0067" (≈ 0,17 mm), zona de silencio de 2 módulos y área de hasta 4 × 9 cm; debajo,
+  «Timbre Electrónico SII», la resolución y «Verifique documento: www.sii.cl». Salen del
+  instructivo de representación impresa del SII, que no está en el repositorio
+  ([trampa](../07-referencia/trampas-conocidas.md#emisión-de-boletas-fase-7)).
+- Probado decodificando el PNG y verificando la `<FRMT>` contra el CAF
+  (`server/pdf/timbre.test.ts`); detalle en
+  [emisión de boletas](../02-guias/emision-boletas.md#el-timbre-pdf417).
 
 ## Codificación ISO-8859-1
 

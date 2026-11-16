@@ -6,7 +6,10 @@ const config: NextConfig = {
   poweredByHeader: false,
   // La librería del SII usa node-forge (firma) y undici (TLS mutuo): se cargan
   // desde node_modules en tiempo de ejecución, sin empaquetarlas.
-  serverExternalPackages: ['node-forge', 'undici'],
+  // pdfkit (PDF de la boleta) lee sus fuentes AFM con `fs` desde su propia carpeta
+  // (`__dirname/data/*.afm`): empaquetado, esa ruta deja de existir. bwip-js (PDF417)
+  // también va aparte: es un módulo grande con su build propio para Node.
+  serverExternalPackages: ['node-forge', 'undici', 'pdfkit', 'bwip-js'],
   experimental: {
     serverActions: {
       // Un .pfx o un CAF caben sobrados (PLAN-SAAS §4.1).
