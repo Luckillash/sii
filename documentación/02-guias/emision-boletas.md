@@ -488,23 +488,44 @@ guardada (`E2E_SESION`, `E2E_ORG`), el formulario, los totales, la boleta exenta
 (WCAG 2.1 AA) y el ancho en móvil, **sin** pulsar «Emitir boleta» ni «Guardar borrador» (la
 prueba falla si sale un POST de Server Action).
 
-Todavía no se ha emitido ninguna boleta real, ni en certificación ni en producción.
+La primera boleta real se emitió en certificación el 2026-11-16, para el criterio de
+aceptación (ver abajo). En producción todavía no se ha emitido ninguna.
 
-## Criterio de aceptación (pendiente)
+## Criterio de aceptación (cumplido el 2026-11-16)
 
-**Pendiente**: la fase no está desplegada y la prueba no se ha hecho. El criterio
-(PLAN-SAAS Fase 7):
+El criterio (PLAN-SAAS Fase 7):
 
 > En certificación, una boleta emitida desde la UI llega a EPR aceptada y su PDF muestra un
 > PDF417 que `sii util verificar-ted` valida.
 
-Qué revisar cuando se haga (sin resultados todavía):
+Cómo se hizo, en *Production* (deploy `4cb6e9f`), con la sesión del propietario y la
+empresa del piloto (20.630.500-2):
 
-1. Emitir una boleta de certificación desde `/[org]/emitir` (ensayo y confirmación): `ok`
-   con Track ID.
-2. En la base: documento `enviado` con folio, `ted_xml`, `xml_path` y `metadata.pdf`;
-   `envios` con `track_id`; `operaciones_sii` `ok` con `documento_id` y `envio_id`; sin
-   secretos en `operaciones_sii`.
-3. Consultar el estado del envío hasta EPR aceptado (la consulta automática es de la
-   Fase 8).
-4. Descargar el PDF y validar su PDF417 con `sii util verificar-ted`.
+1. **Requisito previo.** Se registró la resolución de certificación de la empresa (N.º 0 del
+   06-11-2026, el `SII_FCH_RESOL` del `.env` de `certificacion-node`) en Configuración →
+   Empresas. Sin ella, la pantalla bloquea certificación con el motivo `sin_resolucion`. La
+   empresa se autorizó fuera de Boletéame y nunca postuló aquí, que es el paso que registra
+   esa resolución sola.
+2. **Emisión.** Boleta 39 con una línea de $ 1.190 (neto $ 1.000, IVA $ 190) al receptor
+   genérico. Ensayo con el folio previsto N.º 41 y, al confirmar, resultado `ok`: folio 41,
+   Track ID 34015200.
+3. **En la base:**
+   - documento `enviado`, con `ted_xml`, `xml_path` y `metadata.pdf` (carta y rollo);
+   - envío con `track_id` 34015200, `estado_sii` `REC` y sin `incierto`;
+   - `operaciones_sii` `emitir` `ok` con un solo intento y sin secretos;
+   - CAF con `siguiente_folio = 42`, sin folios anulados;
+   - `uso_mensual.boletas_certificacion` = 1.
+4. **Estado en el SII.** `sii produccion consultar 34015200 --ambiente certificacion`
+   (desde `certificacion-node`) dio **EPR**: 1 informado, 1 aceptado, 0 rechazados y 0
+   reparos. El documento sigue `enviado` en la base hasta que la Fase 8 consulte los envíos
+   y propague el estado.
+5. **PDF417.** Un script local:
+   - descargó de Storage el PDF carta y el rollo;
+   - extrajo la imagen del timbre de cada uno y la decodificó con `zxing-wasm`. En los dos,
+     los bytes leídos son idénticos a `ted_xml`;
+   - armó el DTE con el TED reemplazado por lo leído del PDF carta y corrió
+     `sii util verificar-ted` con el CAF 41–45 leído de Vault a un archivo temporal, que se
+     borró al terminar. El resultado: `OK TED de TipoDTE: 39 | Folio: 41`, 1 de 1 OK.
+
+No hubo errores de consola ni de runtime en Vercel. El receptor era el genérico, sin
+correo, así que no se envió correo.
