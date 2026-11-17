@@ -1099,6 +1099,68 @@ export type Database = {
           },
         ]
       }
+      notificaciones: {
+        Row: {
+          actualizado_en: string
+          clave: string
+          creado_en: string
+          datos: Json
+          destinatarios: string[]
+          enviado_en: string | null
+          error: string | null
+          estado: string
+          grupo: string | null
+          id: string
+          intentos: number
+          organizacion_id: string
+          referencia_id: string | null
+          resend_id: string | null
+          tipo: string
+        }
+        Insert: {
+          actualizado_en?: string
+          clave: string
+          creado_en?: string
+          datos?: Json
+          destinatarios?: string[]
+          enviado_en?: string | null
+          error?: string | null
+          estado?: string
+          grupo?: string | null
+          id?: string
+          intentos?: number
+          organizacion_id: string
+          referencia_id?: string | null
+          resend_id?: string | null
+          tipo: string
+        }
+        Update: {
+          actualizado_en?: string
+          clave?: string
+          creado_en?: string
+          datos?: Json
+          destinatarios?: string[]
+          enviado_en?: string | null
+          error?: string | null
+          estado?: string
+          grupo?: string | null
+          id?: string
+          intentos?: number
+          organizacion_id?: string
+          referencia_id?: string | null
+          resend_id?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notificaciones_organizacion_id_fkey"
+            columns: ["organizacion_id"]
+            isOneToOne: false
+            referencedRelation: "organizaciones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       operaciones_sii: {
         Row: {
           ambiente: Database["public"]["Enums"]["ambiente_sii"]
@@ -2388,6 +2450,43 @@ export type Database = {
     }
     Functions: {
       aceptar_invitacion: { Args: { p_token: string }; Returns: string }
+      alertas_certificados_por_vencer: {
+        Args: { p_limite?: number }
+        Returns: {
+          cn: string
+          dias_restantes: number
+          id: string
+          nombre_titular: string
+          organizacion_id: string
+          rut_titular: string
+          umbral: number
+          vigente_hasta: string
+        }[]
+      }
+      alertas_documentos_rechazados: {
+        Args: { p_desde: string; p_limite?: number }
+        Returns: {
+          ambiente: Database["public"]["Enums"]["ambiente_sii"]
+          empresa_id: string
+          envio_id: string
+          fecha_emision: string
+          folio: number
+          id: string
+          mnt_total: number
+          organizacion_id: string
+          tipo_dte: number
+        }[]
+      }
+      alertas_envios_inciertos: {
+        Args: { p_desde: string; p_limite?: number }
+        Returns: {
+          ambiente: Database["public"]["Enums"]["ambiente_sii"]
+          creado_en: string
+          empresa_id: string
+          id: string
+          organizacion_id: string
+        }[]
+      }
       anular_folios: {
         Args: {
           p_caf: string
@@ -2488,6 +2587,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      notificacion_cerrada: { Args: { p_clave: string }; Returns: boolean }
       plan_vigente: {
         Args: { p_organizacion: string }
         Returns: {
@@ -2512,6 +2612,20 @@ export type Database = {
         }
       }
       puede_emitir: { Args: { p_organizacion: string }; Returns: boolean }
+      reclamar_notificacion: {
+        Args: {
+          p_clave: string
+          p_datos?: Json
+          p_organizacion: string
+          p_referencia?: string
+          p_tipo: string
+        }
+        Returns: {
+          grupo: string
+          id: string
+          intentos: number
+        }[]
+      }
       registrar_caf: {
         Args: {
           p_ambiente: Database["public"]["Enums"]["ambiente_sii"]

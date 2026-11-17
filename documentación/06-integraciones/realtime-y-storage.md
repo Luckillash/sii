@@ -1,9 +1,9 @@
 ---
 title: "Realtime y Storage"
 description: "Tablas publicadas en Realtime (incluida la migración 0006), bucket documentos-xml, rutas, AlmacenDocumentos, content-type y URLs firmadas."
-keywords: [Realtime, supabase_realtime, postgres_changes, replica identity, migración 0006, operaciones_sii, solicitudes_folios, documentos, envios, procesos_certificacion, RLS, Storage, documentos-xml, bucket, AlmacenDocumentos, rutaDocumento, subirXml, subirPdf, urlFirmada, createSignedUrl, MAXIMO_SEGUNDOS_URL, MAXIMO_BYTES, ErrorAlmacen, content-type, application/xml, text/xml, application/pdf, charset, ISO-8859-1, xml_path, uuid_o_nulo, storage.foldername, EnVivo, router.refresh, asistente de certificación, DTE-39-F, EnvioBOLETA-set, folios, /folios, migración 0011, cafs, folios_anulados, emisión, EnvioBOLETA-39-F, DTE-39-F41-carta.pdf, rollo, metadata.pdf, receptor_correo, metadata.correo, enlaceDocumento, SEGUNDOS_URL, nombresArchivos, nombrePdfDeXml]
+keywords: [Realtime, supabase_realtime, postgres_changes, replica identity, migración 0006, operaciones_sii, solicitudes_folios, documentos, envios, procesos_certificacion, RLS, Storage, documentos-xml, bucket, AlmacenDocumentos, rutaDocumento, subirXml, subirPdf, urlFirmada, createSignedUrl, MAXIMO_SEGUNDOS_URL, MAXIMO_BYTES, ErrorAlmacen, content-type, application/xml, text/xml, application/pdf, charset, ISO-8859-1, xml_path, uuid_o_nulo, storage.foldername, EnVivo, router.refresh, asistente de certificación, DTE-39-F, EnvioBOLETA-set, folios, /folios, migración 0011, cafs, folios_anulados, emisión, EnvioBOLETA-39-F, DTE-39-F41-carta.pdf, rollo, metadata.pdf, receptor_correo, metadata.correo, enlaceDocumento, SEGUNDOS_URL, nombresArchivos, nombrePdfDeXml, Fase 8, useEnVivoStore, ProveedorEnVivo, filtrosRealtime, estadoVigente, envioVigente, actualizado_en, documentos/EnVivo.tsx]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "04-objetos/objetos-auditoria-e-integraciones.md", "09-libreria/backend-service-role.md", "03-api-reference/acceso-por-tabla.md", "07-referencia/trampas-conocidas.md"]
-source: ["supabase_saas_sii.sql §18 §19", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/verificaciones/0006_realtime_operaciones.sql", "supabase/migrations/0011_folios.sql", "apps/web/src/server/sii/almacen.ts", "apps/web/src/app/[org]/certificacion/EnVivo.tsx", "apps/web/src/server/certificacion/envio-set.ts", "apps/web/src/server/emision/representacion.ts", "apps/web/src/server/emision/enlaces.ts"]
+source: ["supabase_saas_sii.sql §18 §19", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/verificaciones/0006_realtime_operaciones.sql", "supabase/migrations/0011_folios.sql", "apps/web/src/server/sii/almacen.ts", "apps/web/src/app/[org]/certificacion/EnVivo.tsx", "apps/web/src/server/certificacion/envio-set.ts", "apps/web/src/server/emision/representacion.ts", "apps/web/src/server/emision/enlaces.ts", "apps/web/src/app/[org]/documentos/EnVivo.tsx", "apps/web/src/stores/enVivo.ts", "apps/web/src/stores/ProveedorEnVivo.tsx"]
 ---
 
 # Realtime y Storage
@@ -16,8 +16,8 @@ source: ["supabase_saas_sii.sql §18 §19", "supabase/migrations/0006_realtime_o
 
 | Tabla | Publicada por | Para qué |
 |---|---|---|
-| `documentos` | `0001` §19 | estado de cada boleta en el panel |
-| `envios` | `0001` §19 | estado de los envíos (seguimiento) |
+| `documentos` | `0001` §19 | estado de cada boleta en el panel (Documentos emitidos y el envío, Fase 8) |
+| `envios` | `0001` §19 | estado de los envíos: lo escucha `/documentos` y `/envios/[id]` (Fase 8) mientras el seguimiento los consulta |
 | `procesos_certificacion` | `0001` §19 | etapa del asistente de certificación |
 | `operaciones_sii` | **`0006_realtime_operaciones`** (aplicada el 2026-11-13) | avance y resultado de las operaciones largas (solicitud de folios, postulación, declaración) |
 | `solicitudes_folios` | **`0006_realtime_operaciones`** (aplicada el 2026-11-13) | estado de cada solicitud de folios |
@@ -127,7 +127,35 @@ Segundo uso (Fase 6): `apps/web/src/app/[org]/folios/EnVivo.tsx`, mismo patrón.
 
 `/emitir` (Fase 7) **no** usa Realtime: la emisión es una sola Server Action que devuelve
 el resultado, y después revalida `/emitir` y `/folios` (`revalidatePath`). El cambio de
-estado de una boleta después de la subida (aceptada, rechazada) es de la Fase 8.
+estado de una boleta después de la subida (aceptada, rechazada) lo muestran Documentos
+emitidos y la página del envío (Fase 8, abajo).
+
+### Documentos emitidos y envíos (Fase 8)
+
+Tercer uso: `apps/web/src/app/[org]/documentos/EnVivo.tsx`, en `/[org]/documentos` y en
+`/[org]/envios/[id]`. **A diferencia de Certificación y Folios, sí guarda lo que llega**,
+en un store de Zustand (`useEnVivoStore`, `stores/enVivo.ts`), porque el criterio de la fase
+es que el badge cambie sin recargar aunque el refresco tarde o falle.
+
+- Escucha `documentos` y `envios` (publicadas desde la `0001`, sin migración nueva). En la
+  lista, las dos con `filter: organizacion_id=eq.<id>`; en la página de un envío, solo ese
+  envío (`id=eq.<envioId>`) y sus documentos (`envio_id=eq.<envioId>`), para no refrescar
+  por cualquier cambio de la organización (`filtrosRealtime`).
+- Cada evento (salvo `DELETE`) se guarda en el store con su `actualizado_en`
+  (`aplicarDocumento`, `aplicarEnvio`; descarta lo que no entiende y un evento más viejo
+  que el guardado) y programa un `router.refresh()` con 400 ms de espera.
+- Los badges, el panel y la página del envío muestran el más nuevo entre lo del servidor y
+  lo del store (`estadoVigente`, `envioVigente`, por `actualizado_en`): un refresco más
+  nuevo gana sobre un evento viejo.
+- El store es uno por montaje (`ProveedorEnVivo`, `useState`), nunca un singleton de
+  módulo; fuera del proveedor `useEnVivoStore` usa uno vacío y el componente muestra lo del
+  servidor.
+- Reconexión y aviso de canal caído, igual que en las otras dos.
+- `documentos` llega con la fila completa (Realtime no filtra columnas), incluido
+  `ted_xml`: es lo mismo que el miembro ya puede leer con un `select` (RLS `es_miembro`);
+  nada de Vault.
+- Cada consulta del seguimiento sube `envios.consultas` y `actualizado_en`, así que también
+  una consulta sin cambio de estado manda un evento de `envios` y un refresco.
 
 ### Verificación
 

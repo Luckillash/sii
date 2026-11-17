@@ -1,9 +1,9 @@
 ---
 title: "Esquema: triggers y lógica"
 description: "Cada trigger, su orden de ejecución y lo que hace."
-keywords: [tg_resolucion_autoriza_produccion, trg_50_resolucion_autoriza_produccion, autorizada_produccion, autorizada_en, resoluciones, tg_proteger_autorizacion, tg_certificacion_autorizada, autorizada fuera de Boletéame, migración 0009, trg_20_caf_sin_traslape, tg_caf_sin_traslape, 23P01, traslape, migración 0011, tg_validar_documento, folio anulado, for key share, migración 0012]
+keywords: [tg_resolucion_autoriza_produccion, trg_50_resolucion_autoriza_produccion, autorizada_produccion, autorizada_en, resoluciones, tg_proteger_autorizacion, tg_certificacion_autorizada, autorizada fuera de Boletéame, migración 0009, trg_20_caf_sin_traslape, tg_caf_sin_traslape, 23P01, traslape, migración 0011, tg_validar_documento, folio anulado, for key share, migración 0012, sincronizar_documentos_envio, trg_50_envio_actualizado, trg_50_envio_rechazo_sincronizar, orden de escritura, seguimiento, Fase 8, documento.aceptado, notificaciones]
 related: ["02-guias/seguimiento-envios.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "04-objetos/objetos-certificacion.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/despliegue.md"]
-source: ["supabase_saas_sii.sql §15", "supabase/migrations/0009_autorizacion_externa.sql", "supabase/migrations/0011_folios.sql", "supabase/migrations/0012_folio_anulado.sql"]
+source: ["supabase_saas_sii.sql §15", "supabase/migrations/0009_autorizacion_externa.sql", "supabase/migrations/0011_folios.sql", "supabase/migrations/0012_folio_anulado.sql", "supabase/migrations/0013_notificaciones.sql", "apps/web/src/server/seguimiento/persistencia.ts"]
 ---
 
 # Esquema: triggers y lógica
@@ -21,7 +21,7 @@ prefijo numérico (`trg_00_…` primero, `trg_90_…` al final). Los `before` co
 | Trigger | Tablas | Cuándo | Qué hace |
 |---|---|---|---|
 | `trg_00_organizacion` (`tg_heredar_organizacion(padre, columna)`, `security definer`) | `resoluciones`, `empresa_certificados`, `cafs`, `solicitudes_folios`, `receptores`, `productos`, `envios`, `documentos`, `rcof`, `procesos_certificacion` (padre `empresas`); `folios_anulados` (`cafs`); `envio_estadisticas`, `consultas_envio`, `envio_rechazos` (`envios`); `documento_detalles` (`documentos`); `set_pruebas_casos` (`procesos_certificacion`) | `before insert or update` | Copia `organizacion_id` del padre: nadie puede colgar filas de otra organización. FK nula → error; padre inexistente → `foreign_key_violation` |
-| `trg_90_actualizado_en` (`tg_actualizado_en`) | `perfiles`, `organizaciones`, `suscripciones`, `empresas`, `certificados`, `cafs`, `receptores`, `productos`, `envios`, `documentos`, `procesos_certificacion`, `webhooks` | `before update` | `actualizado_en = now()` |
+| `trg_90_actualizado_en` (`tg_actualizado_en`) | `perfiles`, `organizaciones`, `suscripciones`, `empresas`, `certificados`, `cafs`, `receptores`, `productos`, `envios`, `documentos`, `procesos_certificacion`, `webhooks`; también `notificaciones` (migración 0013, aplicada el 2026-11-17) | `before update` | `actualizado_en = now()`. Lo usan las ventanas de 48 h de las alertas y el Realtime de la Fase 8 para quedarse con el estado más nuevo |
 | `trg_borrar_secretos` (`tg_borrar_secretos(columnas…)`, `security definer`) | `certificados` (`pfx_secret_id`, `clave_secret_id`), `cafs` (`caf_secret_id`), `webhooks` (`secreto_secret_id`) | `after delete` | Borra esos secretos de `vault.secrets`: no quedan huérfanos |
 
 ### Tenancy y plan
@@ -51,9 +51,31 @@ prefijo numérico (`trg_00_…` primero, `trg_90_…` al final). Los `before` co
 | `trg_20_contar_uso` (`tg_contar_uso_documento`) | `documentos` | `before insert or update of folio` | Suma en `uso_mensual` cuando el documento recibe folio (no los borradores); las de producción se controlan contra `max_boletas_mes` |
 | `trg_60_contar_uso` (`tg_contar_uso_otros`) | `cafs`, `envios` | `after insert` | Suma `folios_timbrados` y `envios` en `uso_mensual` |
 | `trg_50_evento_documento` | `documentos` | `after update of estado`, si cambió | Encola un evento de webhook (`encolar_evento`) |
-| `trg_50_envio_actualizado` | `envios` | `after update` de `estado_sii`, `incierto` o los contadores, si cambiaron | Lleva el estado del envío a sus documentos (`sincronizar_documentos_envio`) |
+| `trg_50_envio_actualizado` | `envios` | `after update` de `estado_sii`, `incierto` o los contadores, si cambiaron (no `consultas` ni `ultima_consulta_en`) | Lleva el estado del envío a sus documentos (`sincronizar_documentos_envio`) y encola `envio.actualizado` |
 | `trg_10_envio_rechazo` (`security definer`) | `envio_rechazos` | `before insert` | Si falta `documento_id`, lo busca por empresa, ambiente, tipo y folio del envío |
 | `trg_50_envio_rechazo_sincronizar` (`security definer`) | `envio_rechazos` | `after insert or update` | Llama a `sincronizar_documentos_envio(envio_id)` |
+
+### Cómo los aprovecha el seguimiento (Fase 8)
+
+`sincronizar_documentos_envio` decide el estado de cada documento con la clasificación del
+envío y, con `EPR`, con lo que haya en `envio_rechazos` **en ese momento**
+([contrato](../03-api-reference/rpc-backend.md#sincronizar_documentos_envio)). El
+seguimiento (`guardarRespuesta`) escribe en este orden:
+
+1. `envio_estadisticas` (sin triggers);
+2. `envio_rechazos`: `trg_10_envio_rechazo` enlaza el documento y
+   `trg_50_envio_rechazo_sincronizar` sincroniza con el envío **todavía en su estado
+   anterior** (en proceso o pendiente), así que los documentos quedan `enviado` o sin
+   cambio;
+3. `envios`: si cambian estado o conteos, `trg_50_envio_actualizado` sincroniza ya con los
+   rechazos guardados y encola `envio.actualizado`; `trg_50_evento_documento` encola
+   `documento.<estado>` por cada documento que cambia;
+4. `consultas_envio` (sin triggers).
+
+Con el orden inverso, un `EPR` con rechazos dejaría primero todos los documentos `aceptado`
+y encolaría webhooks `documento.aceptado` falsos (comprobado en PGlite). Un intento fallido
+solo cambia `consultas` y `ultima_consulta_en`, que no disparan `trg_50_envio_actualizado`
+([seguimiento](../02-guias/seguimiento-envios.md#qué-se-escribe-por-consulta-y-en-qué-orden)).
 
 ## `tg_validar_documento` (migración 0012)
 

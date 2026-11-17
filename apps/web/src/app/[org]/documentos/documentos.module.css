@@ -1,0 +1,210 @@
+/* Documentos emitidos y detalle del envío (Fase 8), según la plantilla «Documentos
+   emitidos». Solo tokens del design system (nada de colores literales). */
+
+.cabeceraFila {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+
+.accionAlerta {
+  margin-top: var(--space-2);
+}
+
+.nota {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.cifras {
+  font-variant-numeric: tabular-nums;
+}
+
+.quiebre {
+  overflow-wrap: anywhere;
+}
+
+/* Filtros: en fila mientras quepan (plantilla: período, tipo, estado y búsqueda). */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-4);
+  align-items: flex-end;
+}
+
+.filtro {
+  flex: 1 1 160px;
+}
+
+.filtroAncho {
+  flex: 1 1 220px;
+}
+
+.filtroBusqueda {
+  flex: 2 1 240px;
+}
+
+.botonesFiltro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Tabla y panel lado a lado si caben; si no, el panel baja. */
+.contenido {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  align-items: flex-start;
+}
+
+.columnaTabla {
+  flex: 999 1 520px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.panel {
+  flex: 1 1 340px;
+  min-width: 0;
+}
+
+.cabeceraDetalle {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.tituloDetalle {
+  font-size: var(--text-title-size);
+  line-height: var(--text-title-line);
+  font-weight: var(--text-title-weight);
+  font-variant-numeric: tabular-nums;
+}
+
+.tituloDetalle:focus {
+  outline: none;
+}
+
+.tituloDetalle:focus-visible {
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+.datos {
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  gap: var(--space-2) var(--space-4);
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-line);
+}
+
+.datos dt {
+  color: var(--ink-muted);
+}
+
+.datos dd {
+  margin: 0;
+  min-width: 0;
+}
+
+.totales {
+  background: var(--surface-sunken);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px var(--space-4);
+  align-items: baseline;
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  color: var(--ink-muted);
+}
+
+.totales > :nth-child(even) {
+  text-align: right;
+}
+
+.total {
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.totalMonto {
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+  text-align: right;
+}
+
+.tablaLineas caption {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+.acciones,
+.consulta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Rechazos y reparos con sus errores. */
+.observaciones {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.observacion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.observacionTitulo {
+  font-weight: 600;
+}
+
+.errores {
+  margin: 0;
+  padding-left: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.donde {
+  font-weight: 500;
+}
+
+.codigo {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-muted);
+}

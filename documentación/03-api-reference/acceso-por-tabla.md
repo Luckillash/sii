@@ -1,7 +1,7 @@
 ---
 title: "Acceso por tabla (PostgREST + RLS)"
 description: "Qué puede hacer cada rol en cada tabla: select, insert, update, delete."
-keywords: [RLS, PostgREST, políticas, grant, revoke, privilegios por columna, anon, authenticated, service_role, lector, emisor, administrador, propietario, select, insert, update, delete, "new row violates row-level security policy", "permission denied for table", 42501, folios_anulados, anular_folios, migración 0011, borrador, alta_borrador, edicion_borrador, receptores, upsert, emisión, P0001]
+keywords: [RLS, PostgREST, políticas, grant, revoke, privilegios por columna, anon, authenticated, service_role, lector, emisor, administrador, propietario, select, insert, update, delete, "new row violates row-level security policy", "permission denied for table", 42501, folios_anulados, anular_folios, migración 0011, borrador, alta_borrador, edicion_borrador, receptores, upsert, emisión, P0001, notificaciones, migración 0013, rls-fase8-notificaciones, seguimiento]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "01-fundamentos/tenancy-y-roles.md", "03-api-reference/rpc-organizacion.md", "05-pruebas/probar-el-esquema.md"]
 source: ["supabase_saas_sii.sql §17", "supabase/verificaciones/rls-fase2-tenancy.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/verificaciones/rls-fase3-empresas.sql"]
 ---
@@ -110,6 +110,7 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
 | `api_keys` | — | — | — | S U ¹² D | S U ¹² D | SIUD |
 | `webhooks` | — | — | — | S U ¹³ D | S U ¹³ D | SIUD |
 | `webhook_entregas` | — | — | — | S | S | SIUD |
+| `notificaciones` ²¹ | — | S | S | S | S | SIUD |
 
 ### Notas
 
@@ -195,6 +196,17 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
     La emisión (Fase 7) hace `upsert` de `receptores` por `(empresa_id, rut)` con la sesión
     del emisor (necesita las dos políticas, `alta` y `edicion`); los productos solo se
     leen (autocompletado). La Fase 7 no trae pantalla de catálogo.
+21. `notificaciones` llega con la migración 0013 (**aplicada el 2026-11-17**). Política
+    `lectura` (`es_miembro`): cualquier miembro lee los avisos de su organización (ids,
+    estado, umbral y los correos de los administradores, que ya ve en `perfiles`). Se
+    revocan a `authenticated` `insert`, `update`, `delete`, `truncate`, `references` y
+    `trigger`, y a `anon` todo: la escribe solo el backend, con `reclamar_notificacion` y
+    `update` de `service_role` desde `/api/cron/alertas`. No está en Realtime.
+
+La Fase 8 (seguimiento) escribe `envios`, `envio_estadisticas`, `envio_rechazos`,
+`consultas_envio` y `operaciones_sii` con `service_role`, filtrando por organización; las
+páginas Documentos emitidos y Envío los leen con la sesión del miembro (RLS), igual que el
+Tablero para los envíos por verificar.
 
 `operaciones_sii` la escribe solo la capa SII con `service_role` (`ejecutarOperacion`,
 `marcarInciertaRevisada`); los miembros la leen y, con la migración 0006, reciben sus
@@ -232,3 +244,6 @@ cambios por Realtime ([Realtime](../06-integraciones/realtime-y-storage.md#realt
   `supabase/verificaciones/rls-fase6-folios.sql` (27, incluye que un administrador con su
   sesión no escribe directo en `folios_anulados`). Requiere la migración 0011, aplicada el
   2026-11-15; corrida en producción ese día (27/27).
+- `notificaciones` y sus RPC por rol (administrador, lector, otra organización, `anon`,
+  `service_role`): `supabase/verificaciones/rls-fase8-notificaciones.sql` (26). Requiere la
+  migración 0013, aplicada el 2026-11-17; corrida en producción ese día (26/26).

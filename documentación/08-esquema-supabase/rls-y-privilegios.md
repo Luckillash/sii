@@ -1,9 +1,9 @@
 ---
 title: "Esquema: RLS y privilegios"
 description: "Políticas por tabla, grants de columnas y funciones, y protección de campos del sistema."
-keywords: [RLS, políticas, es_miembro, tiene_rol, es_admin, puede_emitir, comparte_organizacion, anon, service_role, grants de columnas, tg_proteger_autorizacion, tg_proteger_proceso, tokens_sii, sesiones_sii, registrar_certificado, registrar_resolucion, fijar_certificado_predeterminado, security definer, security invoker, grant execute, anular_folios, tg_caf_sin_traslape, migración 0011, folios_anulados]
+keywords: [RLS, políticas, es_miembro, tiene_rol, es_admin, puede_emitir, comparte_organizacion, anon, service_role, grants de columnas, tg_proteger_autorizacion, tg_proteger_proceso, tokens_sii, sesiones_sii, registrar_certificado, registrar_resolucion, fijar_certificado_predeterminado, security definer, security invoker, grant execute, anular_folios, tg_caf_sin_traslape, migración 0011, folios_anulados, notificaciones, migración 0013, reclamar_notificacion, notificacion_cerrada, alertas_documentos_rechazados, alertas_envios_inciertos, alertas_certificados_por_vencer]
 related: ["03-api-reference/acceso-por-tabla.md"]
-source: ["supabase_saas_sii.sql §17"]
+source: ["supabase_saas_sii.sql §17", "supabase/migrations/0013_notificaciones.sql"]
 ---
 
 # Esquema: RLS y privilegios
@@ -48,6 +48,7 @@ agregan funciones y tablas con sus propios grants (abajo, la `0005`; las demás 
 | `webhook_entregas` | admin | — | — | — |
 | `suscripciones`, `uso_mensual`, `certificados`, `cafs`, `solicitudes_folios`, `envios`, `envio_estadisticas`, `consultas_envio`, `envio_rechazos`, `rcof`, `set_pruebas_casos`, `operaciones_sii` | miembro | backend | backend | backend |
 | `tokens_sii`, `sesiones_sii` | backend | backend | backend | backend |
+| `notificaciones` (migración 0013, aplicada el 2026-11-17) | miembro | backend (`reclamar_notificacion`) | backend | backend |
 
 ¹ Solo un `propietario` puede dar, cambiar o quitar el rol `propietario`; además,
 `tg_proteger_ultimo_propietario` impide dejar la organización sin propietario.
@@ -119,3 +120,27 @@ backend escribe con `service_role`. *Advisors* listará `anular_folios` en
 Lo comprueban `supabase/verificaciones/0011_folios.sql` (4–7, 10, 13 y 14) y
 `rls-fase6-folios.sql` (12–15 y 26)
 ([contratos](../03-api-reference/rpc-backend.md#anular_folios-migración-0011)).
+
+## Tabla y funciones de la migración 0013 (aplicada el 2026-11-17)
+
+`notificaciones` (alertas por correo de la Fase 8):
+
+- RLS activo con una sola política, `lectura` (`for select to authenticated using
+  (es_miembro(organizacion_id))`): cualquier miembro, también un lector, ve los avisos de su
+  organización.
+- `revoke all` a `anon`; a `authenticated` se le revocan `insert`, `update`, `delete`,
+  `truncate`, `references` y `trigger` (los tenía por los grants por defecto de Supabase) y
+  queda `select`; `grant all` a `service_role`. Nadie escribe con su sesión.
+- No está en `supabase_realtime`.
+
+| Función | Seguridad | `execute` | Por qué |
+|---|---|---|---|
+| `reclamar_notificacion(uuid, text, text, uuid, jsonb)` | `security definer`, `search_path = ''` | solo `service_role` (`revoke` a `public`, `anon`, `authenticated`) | insert/update atómico sobre la clave única; la llama el cron con el cliente de servicio |
+| `notificacion_cerrada(text)` | `stable`, invoker, `search_path = ''` | solo `service_role` | la usan las tres de candidatos |
+| `alertas_documentos_rechazados(timestamptz, integer)`, `alertas_envios_inciertos(timestamptz, integer)`, `alertas_certificados_por_vencer(integer)` | `stable`, invoker, `search_path = ''` | solo `service_role` | leen `documentos`, `envios` y `v_certificados_estado` de todas las organizaciones (service_role salta RLS); un administrador con su sesión recibe `42501` |
+
+*Advisors* no debería listar ninguna en `authenticated_security_definer_function_executable`
+(ninguna la ejecuta `authenticated`). Lo comprueban
+`supabase/verificaciones/0013_notificaciones.sql` (7, 8, 11, 12 y 15) y
+`rls-fase8-notificaciones.sql` (15–20 y 26), que en producción dieron 18/18 y 26/26 el
+2026-11-17 ([contratos](../03-api-reference/rpc-backend.md#notificaciones-migración-0013)).

@@ -108,7 +108,7 @@ Sin Track ID numérico, `ClienteDtews.enviarDte` lanza `ErrorRespuestaSii` con e
 | `ESTADO -11` sin glosa (SOAP, `QueryEstUp`) | El envío se subió por REST, o por DTEUpload hace muy poco | Consultar por el canal con que se subió, o esperar unos minutos |
 | «No existe recurso» (REST) | El Track ID es de un envío por DTEUpload | Consultar por SOAP |
 | HTTP 503 en maullin | Saturado o en mantención | Reintentar más tarde (`transporte`) |
-| `RPR` | Aceptado con reparos; `QueryEstUp` no trae el detalle (llega por correo y al portal) | **No está en el catálogo `estados_sii`** de la `0001`: tenerlo en cuenta en la Fase 8 |
+| `RPR` | Aceptado con reparos; `QueryEstUp` no trae el detalle (llega por correo y al portal) | **No está en el catálogo `estados_sii`** de la `0001`. El seguimiento de la Fase 8 solo guarda los 10 códigos del catálogo (lista blanca): un `RPR` como estado del envío es una falla de esa consulta y no se guarda (si no, `clasificar_envio` lo daría `rechazado`). Como `estado` de un documento en `detalle_rep_rech` sí se guarda, y marca un reparo ([seguimiento](../02-guias/seguimiento-envios.md#antes-de-escribir-las-guardas)) |
 
 ### Reparos y rechazos conocidos
 

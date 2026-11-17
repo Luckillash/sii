@@ -370,4 +370,28 @@ Lo que cambia respecto de los anteriores:
 
 Detalle en [emisión de boletas](../02-guias/emision-boletas.md).
 
-<!-- TODO (Fases 8 y 11): workers y cron (seguimiento, webhooks), uso desde la API pública (apiKeyId). -->
+## Seguimiento y cron (Fase 8)
+
+`server/seguimiento/` usa la misma capa sin sesión de usuario (código sin desplegar):
+
+- **Rutas `/api/cron/*`** (`runtime = 'nodejs'`): `autorizarCron` compara el Bearer con
+  `CRON_SECRET` en tiempo constante (503 sin secreto, 401 con otro) y `conMonitorCron`
+  envuelve el trabajo en un *cron monitor* de Sentry. `pg_cron` las llama con `pg_net`
+  (migración `0014_cron`, pendiente de aplicar).
+- **`ejecutarOperacion` con `usuarioId: null`**: una operación `seguimiento` por grupo
+  (organización + empresa + ambiente + canal), `confirmada: true`. No pasa por `getUser()`
+  (no está en `OPERACIONES_QUE_GRABAN`) ni la bloquea un incierto. «Consultar estado en el
+  SII» abre una `consultar_envio` con `envioId` y el usuario.
+- **Dependencias por invocación** (`resolverDependenciasSeguimiento`): `clienteServicio`,
+  `crearTransporte` (uno por grupo, `await using`), `crearCredenciales`,
+  `TokenStoreSupabase` y las fábricas `clienteBoletaRest` / `clienteDtews` de
+  `server/sii/clientes.ts`, con el ambiente del envío. Sin `conBloqueoCertificado` ni
+  sesiones AUT2000 (REST y DTEWS no las usan).
+- **Todo con `service_role` filtrando por `organizacion_id`**: la empresa, los envíos y cada
+  escritura.
+- **Presupuesto de tiempo** bajo `maxDuration = 300` y `cerrarAbandonadas` para las filas
+  que quedan `en_curso` si Vercel corta la función.
+
+Detalle en [seguimiento de envíos](../02-guias/seguimiento-envios.md).
+
+<!-- TODO (Fase 11): worker de webhooks (/api/cron/webhooks) y uso desde la API pública (apiKeyId). -->

@@ -1,7 +1,7 @@
 ---
 title: "Probar el esquema (RLS, triggers, cuotas)"
 description: "Cómo verificar el esquema y simular roles en la única base (producción) sin dejar rastro."
-keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp, 0006_realtime_operaciones.sql, 0007_bloqueos_sii.sql, rls-fase4-bloqueos.sql, bloqueos_sii, arriendo, 0008_certificacion.sql, rls-fase5-certificacion.sql, registrar_caf, guardar_set_pruebas, CAF de mentira, 0009_autorizacion_externa.sql, rls-fase5-autorizacion-externa.sql, tg_resolucion_autoriza_produccion, autorizada_produccion, 0010_verificar_autorizacion.sql, rls-fase5-verificar-autorizacion.sql, verificar_autorizacion, PGlite, 0011_folios.sql, rls-fase6-folios.sql, anular_folios, trg_20_caf_sin_traslape, 23P01, 0012_folio_anulado.sql, rls-fase7-folio-anulado.sql, tg_validar_documento, folio anulado, for key share]
+keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp, 0006_realtime_operaciones.sql, 0007_bloqueos_sii.sql, rls-fase4-bloqueos.sql, bloqueos_sii, arriendo, 0008_certificacion.sql, rls-fase5-certificacion.sql, registrar_caf, guardar_set_pruebas, CAF de mentira, 0009_autorizacion_externa.sql, rls-fase5-autorizacion-externa.sql, tg_resolucion_autoriza_produccion, autorizada_produccion, 0010_verificar_autorizacion.sql, rls-fase5-verificar-autorizacion.sql, verificar_autorizacion, PGlite, 0011_folios.sql, rls-fase6-folios.sql, anular_folios, trg_20_caf_sin_traslape, 23P01, 0012_folio_anulado.sql, rls-fase7-folio-anulado.sql, tg_validar_documento, folio anulado, for key share, 0013_notificaciones.sql, rls-fase8-notificaciones.sql, notificaciones, reclamar_notificacion, 0014_cron.sql, pg_cron, cron_token]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "08-esquema-supabase/despliegue.md"]
 source: ["supabase_saas_sii.sql §15 §17", "supabase/verificaciones/", "supabase/verificaciones/rls-fase2-tenancy.sql"]
 ---
@@ -30,6 +30,8 @@ comprobación con `ok = true/false` y, si falla, el `detalle`. No escribe nada.
 | `0010_verificar_autorizacion.sql` | 6 comprobaciones: `operacion_sii` tiene `verificar_autorizacion`; es el último valor, justo después de `seguimiento`; los 15 anteriores siguen en su orden (16 en total); el índice único `operaciones_sii_efecto_global_en_curso` (0007) sigue válido y con exactamente `solicitar_folios`, `postular` y `declarar`; ninguna fila `verificar_autorizacion` abandonada en curso (más de 15 minutos); migración registrada como `0010`. Usa `operacion::text` para poder correr antes de migrar. Aplicada el 2026-11-14: 6/6 `ok` ([despliegue](../08-esquema-supabase/despliegue.md#fase-5-migración-0010)); en PGlite: 6/6 con la 0010, 2/6 sin ella |
 | `0011_folios.sql` | 18 comprobaciones: 1–9 de `anular_folios` (firma `(uuid, integer, integer, text)` y `integer` con `to_regprocedure`; nombres de parámetros `p_caf`, `p_desde`, `p_hasta`, `p_motivo`; `plpgsql`, `security definer`, `search_path` vacío; la ejecutan `service_role` y `authenticated`, no `anon` ni PUBLIC; comentario; cuerpo: permiso `service_role` o `es_admin`, `for update`, documentos no anulados con `23503`, `on conflict`, cierre del CAF en la cola completa); 10–11 del trigger (`tg_caf_sin_traslape()` `security definer` con `for no key update` y `23P01`, sin `EXECUTE` para PUBLIC, `anon` ni `authenticated`; `trg_20_caf_sin_traslape` en `cafs`: `before`, por fila, `insert` y `update of` las 5 columnas, activo); 12 ningún par de CAF traslapado en los datos; 13–14 `folios_anulados` sin la política `alta` (solo `lectura`) y `authenticated` sin `insert`, `update`, `delete` ni `truncate` (sí `select`), `anon` sin nada; 15 `cafs` y `folios_anulados` en `supabase_realtime` (`insert`/`update`/`delete`) sin sacar a las 5 de la 0001 y la 0006; 16 Realtime aplica RLS en las dos (RLS activo, `lectura` con `es_miembro`, `select` para `authenticated`, nada para `anon`, *replica identity* por defecto); 17 `cafs` sin columnas de XML ni llave (`caf_secret_id` es un uuid); 18 migración registrada como `0011`. Aplicada el 2026-11-15: 18/18 `ok` ([despliegue](../08-esquema-supabase/despliegue.md#fase-6-migración-0011)); antes de migrar daba 3/18 (12, 16 y 17), igual que en PGlite sin la 0011 (18/18 con ella) |
 | `0012_folio_anulado.sql` | 7 comprobaciones: `tg_validar_documento()` existe, devuelve `trigger`, `plpgsql`, `security definer`, `search_path` vacío; cuerpo de la 0012 (lee el CAF con `for key share` **antes** de `folios_anulados`, solo cuando el documento fija su folio —`new.folio is distinct from old.folio` o `new.caf_id is distinct from old.caf_id`—, `23514`); conserva las reglas de la 0001 (CAF obligatorio, ambiente y tipo, rango, P91 y plan); sin `EXECUTE` para PUBLIC, `anon` ni `authenticated`; `trg_10_validar_documento` sin cambios (`before`, por fila, `insert` y `update of` `ambiente`, `caf_id`, `folio`, `tipo_dte`); ningún documento vivo con folio anulado; migración registrada como `0012`. Aplicada el 2026-11-15: 7/7 `ok` ([despliegue](../08-esquema-supabase/despliegue.md#fase-7-migración-0012)); antes de migrar daba 5/7 (2 y 7 en `false`), igual que en PGlite sin la 0012 (7/7 con ella) |
+| `0013_notificaciones.sql` | 18 comprobaciones: 1–8 la tabla `notificaciones` (15 columnas con sus tipos y `not null`; PK y clave única; FK a `organizaciones` en cascada; los `check` de tipo, clave, estado, enviada con fecha, intentos, datos, destinatarios y textos; índice `notificaciones_organizacion`; trigger `trg_90_actualizado_en`; RLS con una sola política `lectura`; `authenticated` solo lee, `anon` nada, `service_role` escribe); 9–13 `reclamar_notificacion` (las 5 funciones con su firma; nombres de parámetros; `plpgsql`, `security definer`, `search_path` vacío; solo `service_role` ejecuta las 5; cuerpo con `on conflict`, misma organización, menos de 5 intentos, fallida o pendiente de más de 15 minutos y el `grupo`); 14–17 `notificacion_cerrada` y las de candidatos (negación de reclamar; `sql`, `stable`, invoker, `search_path` vacío; excluyen lo avisado y reparten por turnos; umbral 1/7/15/30); 18 fuera de Realtime y migración registrada. **Aplicada el 2026-11-17**: en producción 18/18 (antes de migrar sale todo `false`); en PGlite 18/18 con la 0013 y 0/18 sin ella |
+| `0014_cron.sql` | 12 comprobaciones (no muestra el secreto: de Vault solo cuenta filas, y la 9 compara dentro de la consulta): 1 `pg_cron` y `pg_net`; 2 `cron_token` existe una vez; 3 los 4 jobs con su horario; 4–5 los dos `net.http_post` (URL de *Production*, JSON, Bearer leído de `vault.decrypted_secrets` en tiempo de ejecución, timeout; ningún literal después de `'Bearer '`); 6–7 las dos limpiezas; 8 activos, base y usuario `postgres`; 9 ningún job contiene el valor de `cron_token`; 10 nada más llama a `/api/cron`; 11 sin corridas fallidas en la última hora; 12 migración registrada. **Pendiente de aplicar**: antes de migrar salen true 1, 2, 9, 10 y 11; en PGlite 11/12 (la 1 no aplica). Además, después de aplicarla, mirar `net._http_response` y los monitores de Sentry |
 
 Se ejecuta pegándolo en el SQL Editor o con el MCP `execute_sql`. Cada migración nueva trae
 el suyo.
@@ -466,7 +468,51 @@ folios anulados, documentos y secretos `caf:11111111-1:%`), `vault.secrets` qued
 mismos 4 secretos que antes, y el CAF real de certificación (41–45 de la empresa del piloto)
 siguió intacto: `activo`, `siguiente_folio = 41`, 0 anulados.
 
-## 11. Lo que no se prueba con SQL
+## 11. Simulación de alertas de la Fase 8 (`rls-fase8-notificaciones.sql`)
+
+`supabase/verificaciones/rls-fase8-notificaciones.sql` prueba la migración 0013: la
+deduplicación de alertas por correo. **Requiere la 0013 aplicada** (lo está desde el
+2026-11-17): sin ella el
+script corre igual y solo la 1 sale `true` (`42883` / `42P01`).
+
+Mismo patrón que las anteriores. Como `postgres` crea usuarios ficticios
+(`notif-…@ejemplo.invalid`: propietario, administrador y lector de A; propietario de B), las
+organizaciones `zz-prueba-notif-fase8…`, dos empresas, envíos, un CAF de mentira por
+`registrar_caf`, documentos (insertados ya `rechazado` o `aceptado`, sin `update` de estado,
+así que no encolan webhooks), certificados sin archivo y notificaciones de prueba. No envía
+correos ni llama a `pg_net`.
+
+| # | Comprobación |
+|---|---|
+| 1 | preparación |
+| 2–3 | una clave nueva devuelve su id (`pendiente`, 1 intento); reclamarla otra vez (pendiente reciente) no devuelve nada |
+| 4–7 | una `fallida` se vuelve a tomar (2 intentos, sin error); una `enviada` no; una fallida con 5 intentos no; una `pendiente` de hace 20 minutos sí, con los datos nuevos |
+| 8 | el mismo certificado con otro umbral es otra clave |
+| 9–10 | otra organización con la misma clave no recibe nada; B reclama la suya |
+| 11–14 | formatos inválidos → `23514`; faltan datos → `22004`; organización inexistente → `23503`; una `enviada` sin `enviado_en` o un estado fuera de los 3 → `23514` |
+| 15–20 | el administrador de A ve solo las de A, no inserta, edita ni borra (`42501`) ni ejecuta `reclamar_notificacion`; el lector también lee; B ve solo la suya; `anon` no lee |
+| 21–22 | `reclamar` devuelve intentos y el mismo `grupo` al reintentar; `notificacion_cerrada` es la negación de reclamar |
+| 23–25 | candidatos: inciertos sin el ya avisado, el no incierto, el viejo ni el del set, por turnos entre organizaciones; rechazados sin el avisado, el aceptado, el fuera de la ventana ni el del set; certificados con su umbral, sin el que vence en 40 días, el ya avisado ni el revocado, el más urgente primero |
+| 26 | el administrador no ejecuta las de candidatos ni `notificacion_cerrada` (`42501`) |
+
+Cómo correrlo: el archivo **completo**, tal cual (como `postgres`). Debe dar 26/26. Después,
+la consulta de control del encabezado en 0:
+
+```sql
+select
+  (select count(*) from auth.users where email like 'notif-%@ejemplo.invalid') as usuarios,
+  (select count(*) from public.organizaciones where slug like 'zz-prueba-notif-fase8%') as organizaciones,
+  (select count(*) from public.empresas where razon_social like 'Empresa notificaciones fase 8%') as empresas,
+  (select count(*) from public.certificados where id::text like '00000000-0000-4000-8000-0000000008%') as certificados,
+  (select count(*) from vault.secrets where description like 'caf:11111111-1:%') as secretos,
+  (select count(*) from public.notificaciones where clave like '%:00000000-0000-4000-8000-0000000008%') as notificaciones;
+-- todo en 0 (secretos: el mismo número que antes)
+```
+
+Probada en PGlite: 26/26 con la 0013 y 1/26 sin ella. En producción, el 2026-11-17: 26/26, con la consulta de control en 0 antes
+y después, `vault.secrets` con los mismos 4 secretos y `notificaciones` sin filas.
+
+## 12. Lo que no se prueba con SQL
 
 El aislamiento entre organizaciones y los permisos por rol también se prueban de punta a
 punta con la app (Fase 2): dos usuarios de organizaciones distintas, cada uno con su

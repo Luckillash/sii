@@ -1,10 +1,10 @@
 import 'server-only';
-import {
-  type Certificado,
+import type {
+  Certificado,
   ClienteBoletaRest,
-  type Reloj,
-  type TokenStore,
-  type TransporteHttp,
+  Reloj,
+  TokenStore,
+  TransporteHttp,
 } from '@winex/certificacion';
 import type { AmbienteSii } from '@/lib/folios';
 import {
@@ -13,6 +13,7 @@ import {
 } from '../certificacion/dependencias';
 import { enviarBoletaPorCorreo } from '../correo/boleta';
 import { generarPdf } from '../pdf';
+import { clienteBoletaRest } from '../sii/clientes';
 
 // Dependencias de la emisión (PLAN-SAAS Fase 7), inyectables para probar sin red ni base.
 // Son las de la certificación (service_role, sesión, reloj, transporte, credenciales,
@@ -45,13 +46,9 @@ export type FabricaRestEmision = (
   opciones: OpcionesRestEmision,
 ) => ClienteRestEmision;
 
+/** El cliente REST del ambiente del borrador (`server/sii/clientes.ts`, compartido con la Fase 8). */
 export const FABRICA_REST_EMISION: FabricaRestEmision = (certificado, opciones) =>
-  new ClienteBoletaRest(certificado, {
-    ambiente: opciones.ambiente,
-    transporte: opciones.transporte,
-    reloj: opciones.reloj,
-    tokenStore: opciones.tokenStore,
-  });
+  clienteBoletaRest(certificado, opciones);
 
 export interface DependenciasEmision extends DependenciasCertificacion {
   rest: FabricaRestEmision;

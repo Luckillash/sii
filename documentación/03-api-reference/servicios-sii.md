@@ -1,9 +1,9 @@
 ---
 title: "Servicios del SII que usa el backend"
 description: "Endpoints REST, SOAP, AUT2000, asistentes y portal GWT, con el método de la librería y la operación de auditoría; cómo los llama la capa SII."
-keywords: [servicios del SII, REST, SOAP, DTEWS, AUT2000, asistente, portal, ClienteBoletaRest, ClienteDtews, SolicitudFolios, PostulacionSii, TokenStore, SesionSii, operacion_sii, canal_sii, ejecutarOperacion, conBloqueoCertificado, conSesionReutilizada, crearTransporte, DeclaracionBoletas, verificarPortal, descargarSetPruebas, solicitarRevisionSet, declarar, enviarBoleta, consultarEnvio, www4, FABRICAS_SII, asistente de certificación, ad_empresa, ConsultaAutorizacion, verificar_autorizacion, STC, getConsultaData, SituacionTributaria, timbrajes, folios de producción, palena, of_genera_folio, TransporteSinTimbrar, DetenidoAntesDeTimbrar, revisión con el SII, solicitarEnSii, OpcionesClienteFolios, emisión, emitirDocumento, FABRICA_REST_EMISION, envioIncierto, olvidarToken, rahue, api.sii.cl]
+keywords: [servicios del SII, REST, SOAP, DTEWS, AUT2000, asistente, portal, ClienteBoletaRest, ClienteDtews, SolicitudFolios, PostulacionSii, TokenStore, SesionSii, operacion_sii, canal_sii, ejecutarOperacion, conBloqueoCertificado, conSesionReutilizada, crearTransporte, DeclaracionBoletas, verificarPortal, descargarSetPruebas, solicitarRevisionSet, declarar, enviarBoleta, consultarEnvio, www4, FABRICAS_SII, asistente de certificación, ad_empresa, ConsultaAutorizacion, verificar_autorizacion, STC, getConsultaData, SituacionTributaria, timbrajes, folios de producción, palena, of_genera_folio, TransporteSinTimbrar, DetenidoAntesDeTimbrar, revisión con el SII, solicitarEnSii, OpcionesClienteFolios, emisión, emitirDocumento, FABRICA_REST_EMISION, envioIncierto, olvidarToken, rahue, api.sii.cl, seguimiento, Fase 8, consultar_envio, ejecutarSeguimiento, consultarEnvio, EstadoEnvioRest, EstadoEnvio, QueryEstUp, estadoEnvio, ErrorTokenSoap, ErrorEstadoDesconocido, server/sii/clientes.ts, clienteBoletaRest, clienteDtews, maullin]
 related: ["01-fundamentos/ambientes-y-credenciales.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md", "09-libreria/mapeo-libreria-tablas.md", "04-objetos/objetos-auditoria-e-integraciones.md", "02-guias/folios-caf.md"]
-source: ["certificacion-node/docs/canales.md", "certificacion-node/docs/folios.md", "certificacion-node/docs/postulacion.md", "apps/web/src/server/sii/", "apps/web/src/server/certificacion/", "apps/web/src/server/folios/sii.ts", "apps/web/src/server/emision/emitir.ts", "apps/web/src/server/emision/dependencias.ts"]
+source: ["certificacion-node/docs/canales.md", "certificacion-node/docs/folios.md", "certificacion-node/docs/postulacion.md", "apps/web/src/server/sii/", "apps/web/src/server/certificacion/", "apps/web/src/server/folios/sii.ts", "apps/web/src/server/emision/emitir.ts", "apps/web/src/server/emision/dependencias.ts", "apps/web/src/server/sii/clientes.ts", "apps/web/src/server/seguimiento/"]
 ---
 
 # Servicios del SII que usa el backend
@@ -95,7 +95,8 @@ ambiente })` (`OpcionesClienteFolios`: certificación por defecto, producción d
 
 Lo que llama `apps/web/src/server/emision/emitir.ts` (`emitirDocumento`, nivel `emitir`),
 en el ambiente del borrador. El cliente sale de `FABRICA_REST_EMISION`
-(`server/emision/dependencias.ts`), no de `FABRICAS_SII.rest`, que fija certificación
+(`server/emision/dependencias.ts`, que desde la Fase 8 delega en `clienteBoletaRest` de
+`server/sii/clientes.ts`), no de `FABRICAS_SII.rest`, que fija certificación
 ([trampa](../07-referencia/trampas-conocidas.md#emisión-de-boletas-fase-7)). Transporte por
 invocación y `TokenStoreSupabase`; sin bloqueo del certificado ni sesión AUT2000.
 
@@ -105,10 +106,35 @@ invocación y `TokenStoreSupabase`; sin bloqueo del certificado ni sesión AUT20
 | subida del sobre | `pangal.sii.cl` / `rahue.sii.cl` | `ClienteBoletaRest.enviarBoleta(token, rut, rutEnvia, sobre)` | `emitir`, `canal = 'rest'`, `confirmada = true`, con `documento_id` | ⚠️ (usa un folio; boleta real en producción) | regla de `envioIncierto()` de la CLI: `ErrorValidacion` o `ErrorTransporte` con HTTP < 500 → el SII no la recibió (documento `anulado`, folio anulado; un 401 además `olvidarToken`); cualquier otro error después de salir (red, 5xx, sin `trackid`) → `incierto` (6), sin anular |
 
 - **Ensayo sin red**: `nivel: 'ensayo'` valida en la base y resume, sin token ni folio.
-- La consulta del estado del envío (`consultarEnvio`, `estado_envio`) y el seguimiento
-  automático son de la Fase 8; hoy solo los usa el asistente para el set
-  ([arriba](#asistente-de-certificación-fase-5)).
+- El estado del envío después de la subida lo consulta el seguimiento de la Fase 8
+  ([abajo](#seguimiento-fase-8)).
 - Flujo completo y estados por camino en la
   [guía de emisión](../02-guias/emision-boletas.md#flujo-del-servidor-emitirdocumento).
 
-<!-- TODO (Fase 8): endpoint por endpoint del seguimiento (método HTTP, ruta, método de la librería, operacion_sii, si es repetible 🔁 o ⚠️, errores que lanza). -->
+## Seguimiento (Fase 8)
+
+Lo que llaman `apps/web/src/server/seguimiento/cron.ts` (`ejecutarSeguimiento`, desde
+`/api/cron/seguimiento`) y `consultar-envio.ts` (`consultarEnvio`, desde «Consultar estado
+en el SII»), en el **ambiente y el canal de cada envío**. Los clientes salen de
+`server/sii/clientes.ts` (`clienteBoletaRest`, `clienteDtews`), nunca de
+`FABRICAS_SII.rest`, que fija certificación. Transporte por invocación (uno por grupo o por
+consulta) y `TokenStoreSupabase`; sin bloqueo del certificado ni sesión AUT2000. Solo
+lectura: no envía ni firma nada. Código **sin desplegar**.
+
+| Paso | Host | Método de la librería | `operacion_sii` | Tipo | Errores que importan |
+|---|---|---|---|---|---|
+| token REST (uno por grupo) | `apicert.sii.cl` / `api.sii.cl` | `ClienteBoletaRest.obtenerToken(rut)` (cacheado en `tokens_sii`) | dentro de `seguimiento` (cron, una por organización + empresa + ambiente + canal) o `consultar_envio` (panel, con `envio_id`) | 🔁 | si falla, el grupo se omite (`gruposOmitidos`) o el panel muestra el error |
+| estado REST | `apicert.sii.cl` / `api.sii.cl` (`GET …/boleta.electronica.envio/{rut}-{dv}-{trackId}`) | `ClienteBoletaRest.consultarEnvio(token, rut, trackId)` → `EstadoEnvioRest` | ídem | 🔁 | **401** → olvidar el token, pedir otro **una vez** y repetir; `ErrorTransporte` (red, HTTP ≠ 200) o `ErrorRespuestaSii` (sin `estado`) → falla de esa consulta en `consultas_envio.error`; estado fuera de la lista blanca → `ErrorEstadoDesconocido` (5), no se guarda |
+| token DTEWS (uno por grupo) | `maullin.sii.cl` / `palena.sii.cl` | `ClienteDtews.obtenerToken(rut)` | ídem | 🔁 | ídem |
+| estado SOAP (envíos `canal = 'soap'`) | `maullin.sii.cl` / `palena.sii.cl` (`/DTEWS/QueryEstUp.jws`) | `ClienteDtews.estadoEnvio(token, rut, trackId)` → `EstadoEnvio` | ídem | 🔁 | token vencido = HTTP 200 con `ESTADO` `001`–`003` o glosa con «token» → `ErrorTokenSoap`, se renueva una vez; `-11` (aún no registra, o Track ID de REST) → desconocido, se reintenta; sin detalle por documento: un `EPR` con rechazos o reparos **no se guarda** |
+
+- **Cada envío por su canal.** La consulta REST no conoce los envíos de `DTEUpload` («No
+  existe recurso») y QueryEstUp responde `-11` a un Track ID de REST
+  (`certificacion-node/docs/canales.md`). El canal separa los grupos del cron
+  porque los tokens REST y DTEWS son distintos.
+- **Una renovación por grupo.** Después de renovar, otro rechazo del token posterga el resto
+  del grupo; si no queda tiempo para renovar (3 peticiones de 45 s), también.
+- **Lista blanca**: solo `REC`, `SOK`, `CRT`, `FOK`, `PRD`, `EPR`, `RSC`, `RFR`, `RCT` y `RCH`
+  llegan a `envios.estado_sii`.
+- Qué se escribe por respuesta, en qué orden y por qué, en la
+  [guía de seguimiento](../02-guias/seguimiento-envios.md#qué-se-escribe-por-consulta-y-en-qué-orden).

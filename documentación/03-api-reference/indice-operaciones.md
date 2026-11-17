@@ -1,9 +1,9 @@
 ---
 title: "Índice de operaciones"
 description: "Todas las funciones RPC, vistas y servicios del SII, con quién puede llamarlos."
-keywords: [índice, operaciones, asistente de certificación, server/certificacion, Server Actions, postular, descargarSet, solicitarFoliosSet, enviarSet, consultarEstadoSet, solicitarRevision, consultarEstadoDeclaracion, declarar, marcarRevisada, leerAsistente, guardarDatosPostulacion, guardarDatosDeclaracion, registrar_caf, guardar_set_pruebas, folios, server/folios, leerFolios, solicitarFolios, subirCaf, anularFolios, puedeEmitir, alertaDespuesDeAsignar, alertarSiCruza, anular_folios, encolar_evento, folios.por_agotarse, migración 0011, emisión, server/emision, emitirDocumento, emitir, guardarBorrador, borrarBorrador, leerVistaEmision, buscarReceptores, buscarProductos, enlaceDocumento, ResultadoEmision]
-related: ["03-api-reference/acceso-por-tabla.md", "03-api-reference/servicios-sii.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "02-guias/emision-boletas.md", "03-api-reference/rpc-backend.md"]
-source: ["apps/web/src/server/emision/index.ts", "apps/web/src/app/[org]/emitir/acciones.ts", "supabase_saas_sii.sql §15 §16 §17", "apps/web/src/server/certificacion/index.ts", "apps/web/src/app/[org]/certificacion/acciones.ts", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/folios/index.ts", "apps/web/src/app/[org]/folios/acciones.ts", "supabase/migrations/0011_folios.sql"]
+keywords: [índice, operaciones, asistente de certificación, server/certificacion, Server Actions, postular, descargarSet, solicitarFoliosSet, enviarSet, consultarEstadoSet, solicitarRevision, consultarEstadoDeclaracion, declarar, marcarRevisada, leerAsistente, guardarDatosPostulacion, guardarDatosDeclaracion, registrar_caf, guardar_set_pruebas, folios, server/folios, leerFolios, solicitarFolios, subirCaf, anularFolios, puedeEmitir, alertaDespuesDeAsignar, alertarSiCruza, anular_folios, encolar_evento, folios.por_agotarse, migración 0011, emisión, server/emision, emitirDocumento, emitir, guardarBorrador, borrarBorrador, leerVistaEmision, buscarReceptores, buscarProductos, enlaceDocumento, ResultadoEmision, Fase 8, seguimiento, ejecutarSeguimiento, consultarEnvio, consultarEstado, consultar_envio, ejecutarAlertas, marcarEnvioRevisado, marcarRevisado, reenviarAlReceptor, enlaceArchivo, listarDocumentos, leerEnvio, enviosInciertos, reclamar_notificacion, /api/cron/seguimiento, /api/cron/alertas]
+related: ["03-api-reference/acceso-por-tabla.md", "03-api-reference/servicios-sii.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "02-guias/emision-boletas.md", "02-guias/seguimiento-envios.md", "03-api-reference/rpc-backend.md"]
+source: ["apps/web/src/server/seguimiento/index.ts", "apps/web/src/server/documentos/index.ts", "apps/web/src/server/alertas/index.ts", "apps/web/src/app/[org]/documentos/acciones.ts", "apps/web/src/app/api/cron/", "apps/web/src/server/emision/index.ts", "apps/web/src/app/[org]/emitir/acciones.ts", "supabase_saas_sii.sql §15 §16 §17", "apps/web/src/server/certificacion/index.ts", "apps/web/src/app/[org]/certificacion/acciones.ts", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/folios/index.ts", "apps/web/src/app/[org]/folios/acciones.ts", "supabase/migrations/0011_folios.sql"]
 ---
 
 # Índice de operaciones
@@ -12,13 +12,39 @@ source: ["apps/web/src/server/emision/index.ts", "apps/web/src/app/[org]/emitir/
 
 <!-- TODO: índice completo de RPC, vistas y servicios (Fases 2–4 y 8 en adelante). -->
 
+## Seguimiento de envíos y documentos (Fase 8)
+
+El seguimiento vive en `apps/web/src/server/seguimiento/` (API en `index.ts`); la lectura y
+las acciones del panel en `apps/web/src/server/documentos/`; las alertas en
+`apps/web/src/server/alertas/`. Las Server Actions están en
+`apps/web/src/app/[org]/documentos/acciones.ts` (las usa también `/[org]/envios/[id]`) y
+exigen membresía; las que marcan o envían algo, además `puedeEmitir`. Detalle en
+[seguimiento de envíos](../02-guias/seguimiento-envios.md). Código **sin desplegar**;
+migración `0013_notificaciones` **aplicada** (2026-11-17) y `0014_cron` **pendiente de
+aplicar** (después del deploy).
+
+| Función | Quién la llama | Sale al SII | `operacion_sii` | Escribe |
+|---|---|---|---|---|
+| `ejecutarSeguimiento()` | `POST`/`GET /api/cron/seguimiento` (Bearer `CRON_SECRET`; `pg_cron` cada 5 min con la 0014) | 🔁 (token y estado, REST o SOAP) | `seguimiento`, una por organización + empresa + ambiente + canal, `usuario_id` nulo | service_role: `envio_estadisticas`, `envio_rechazos`, `envios` (los triggers sincronizan `documentos` y encolan `envio.actualizado` y `documento.*`), `consultas_envio`; cierra las `seguimiento`/`consultar_envio` abandonadas |
+| `consultarEnvio(ctx)` | Server Action `consultarEstado(slug, envioId)`, cualquier miembro | 🔁, salvo incierto, sin Track ID, final o consultado hace menos de 30 s | `consultar_envio`, con `envio_id` y `usuario_id` | lo mismo que el cron, para un envío |
+| `ejecutarAlertas()` | `POST`/`GET /api/cron/alertas` (Bearer; `pg_cron` cada 10 min con la 0014) | no | — | `notificaciones` (`reclamar_notificacion` 🔒 y `update` con service_role) y correos por Resend |
+| `listarDocumentos`, `leerDetalleDocumento`, `leerEnvio`, `ambientePorDefecto`, `enviosInciertos` | `page.tsx` de `/documentos`, `/envios/[id]` y el Tablero | no | — | nada (sesión, RLS) |
+| `marcarEnvioRevisado(ctx, envioId)` | Server Action `marcarRevisado` («Ya lo revisé»), `puedeEmitir` | no | — | `operaciones_sii.detalle.revisada_en` de las operaciones inciertas del envío (vía `marcarInciertaRevisada`, service_role) |
+| `reenviarAlReceptor(ctx, documentoId)` | Server Action `reenviarAlReceptor`, `puedeEmitir` | no | — | correo por Resend y `documentos.metadata.correo` (service_role) |
+| `enlaceDocumento(ctx, documentoId, archivo)` de `server/emision` | Server Action `enlaceArchivo` | no | — | lo de la Fase 7 (URL firmada; regenera un PDF que falte) |
+
+`consultarEstado` devuelve `ResultadoConsultaEnvio` (`@/lib/seguimiento`: `consultado`,
+`sin_track_id`, `final` o `error`); `marcarRevisado` y `reenviarAlReceptor`, `{ ok,
+mensaje }`. RPC de la fase (migración 0013, solo `service_role`):
+[`reclamar_notificacion`, `notificacion_cerrada` y las tres de candidatos](rpc-backend.md#notificaciones-migración-0013).
+
 ## Emisión de boletas (Fase 7)
 
 Todo vive en `apps/web/src/server/emision/` (API en `index.ts`) y se llama desde las
 Server Actions de `apps/web/src/app/[org]/emitir/acciones.ts`, que exigen membresía, rol
 **propietario, administrador o emisor** (`puedeEmitir`) y que la empresa sea de la
 organización, y validan con `esquemaBorrador`. Un lector ve solo el aviso. Detalle en
-[emisión de boletas](../02-guias/emision-boletas.md). Sin código desplegado ni migración
+[emisión de boletas](../02-guias/emision-boletas.md). Desplegado (`4cb6e9f`); sin migración
 nueva (usa la 0001 y la 0012).
 
 | Función de la API | Server Action | Sale al SII | `operacion_sii` | Escribe |

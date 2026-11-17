@@ -1,9 +1,9 @@
 ---
 title: "Objetos: envíos y RCOF"
-description: "Columnas de envios, envio_estadisticas, consultas_envio, envio_rechazos, rcof y v_envios_por_consultar; clasificacion, incierto y cómo los escriben el set de pruebas y la emisión."
-keywords: [envios, envio_estadisticas, consultas_envio, envio_rechazos, rcof, v_envios_por_consultar, clasificacion_envio, clasificar_envio, proposito_envio, emision, set_pruebas, track_id, incierto, estado_sii, respuesta_subida, respuesta_estado, xml_path, EnvioBOLETA, nombre_archivo, envio.xml, sincronizar_documentos_envio, trg_50_envio_actualizado, envio.actualizado, Fase 7]
+description: "Columnas de envios, envio_estadisticas, consultas_envio, envio_rechazos, rcof y v_envios_por_consultar; clasificacion, incierto y cómo los escriben el set de pruebas, la emisión y el seguimiento."
+keywords: [envios, envio_estadisticas, consultas_envio, envio_rechazos, rcof, v_envios_por_consultar, clasificacion_envio, clasificar_envio, proposito_envio, emision, set_pruebas, track_id, incierto, estado_sii, respuesta_subida, respuesta_estado, xml_path, EnvioBOLETA, nombre_archivo, envio.xml, sincronizar_documentos_envio, trg_50_envio_actualizado, envio.actualizado, Fase 7, Fase 8, seguimiento, guardarRespuesta, orden de escritura, lista blanca, inconsistente, consultas, ultima_consulta_en, backoff]
 related: ["02-guias/seguimiento-envios.md", "02-guias/emision-boletas.md", "04-objetos/objetos-documentos.md", "05-pruebas/set-de-pruebas.md", "09-libreria/mapeo-libreria-tablas.md"]
-source: ["supabase_saas_sii.sql §9 §11 §16", "supabase/migrations/0001_esquema_inicial.sql", "apps/web/src/server/emision/emitir.ts", "apps/web/src/server/certificacion/envio-set.ts"]
+source: ["supabase_saas_sii.sql §9 §11 §16", "supabase/migrations/0001_esquema_inicial.sql", "apps/web/src/server/emision/emitir.ts", "apps/web/src/server/certificacion/envio-set.ts", "apps/web/src/server/seguimiento/persistencia.ts", "apps/web/src/server/seguimiento/cron.ts"]
 ---
 
 # Objetos: envíos y RCOF
@@ -83,8 +83,11 @@ Detalle en [emisión de boletas](../02-guias/emision-boletas.md#cómo-termina-un
 ## `consultas_envio`
 
 Bitácora de consultas de estado (`--bitacora` de `seguimiento`): `consultado_en`,
-`estado_sii`, `glosa_sii`, conteos, `error` (falla de red o HTTP, saneada) y `respuesta`
-(JSON).
+`estado_sii`, `glosa_sii`, conteos, `error` y `respuesta` (JSON saneado, sin claves
+sensibles ni el token). `error` sin `estado_sii` es una consulta que no respondió (red,
+HTTP, token, estado desconocido); con `estado_sii`, una nota sobre una respuesta que sí
+llegó y no se guardó (EPR sin detalle por documento). La página del envío muestra las 50
+más recientes.
 
 ## `envio_rechazos`
 
@@ -104,7 +107,34 @@ sec_envio)`.
 ## `v_envios_por_consultar`
 
 `security_invoker`. Los envíos que el seguimiento tiene que consultar: `clasificacion =
-'en_proceso'`, o `pendiente` con `track_id`. La usa el cron de la Fase 8
-([seguimiento](../02-guias/seguimiento-envios.md)).
+'en_proceso'`, o `pendiente` con `track_id`. La usa el cron de la Fase 8, que además lee
+aparte los `inconsistente` (la vista no los trae) y aplica el *backoff* en el filtro de la
+consulta ([seguimiento](../02-guias/seguimiento-envios.md#qué-envíos-toca-consultar-el-backoff)).
 
-<!-- TODO (Fase 8): cómo escribe el seguimiento automático envio_estadisticas, consultas_envio y envio_rechazos. -->
+## Cómo los escribe el seguimiento (Fase 8)
+
+`guardarRespuesta` (`server/seguimiento/persistencia.ts`), con `service_role`, por cada
+respuesta del SII (cron o «Consultar estado en el SII»), **en este orden**:
+
+| # | Tabla | Qué escribe |
+|---|---|---|
+| 1 | `envio_estadisticas` | upsert por `(envio_id, tipo_dte)` con la `estadistica` (solo REST) |
+| 2 | `envio_rechazos` | upsert por `(envio_id, tipo_dte, folio)` del `detalle_rep_rech` sin repetidos (solo REST), con `tipo_observacion` y errores saneados; con `EPR`, borra las filas que el SII ya no informa |
+| 3 | `envios` | `estado_sii`, `glosa_sii`, conteos, `respuesta_estado`, `ultima_consulta_en`, `consultas + 1`, solo si la clasificación no es final (filtro en el mismo `update`) |
+| 4 | `consultas_envio` | la bitácora: estado, glosa, conteos y `respuesta` saneada |
+
+Rechazos antes que el envío para que `sincronizar_documentos_envio` nunca deje un documento
+`aceptado` de paso (y un webhook `documento.aceptado` falso). Antes de escribir:
+
+- un estado fuera de la lista blanca (los 10 de `estados_sii`) no se guarda: solo una fila
+  en `consultas_envio` con `error`, y `consultas` / `ultima_consulta_en` suben;
+- un `EPR` con rechazos o reparos sin detalle suficiente (siempre por SOAP) tampoco: fila en
+  `consultas_envio` con la respuesta y el `error` explicativo, y suben `consultas` /
+  `ultima_consulta_en`;
+- un envío que ya quedó `aceptado`, `aceptado_con_reparos` o `rechazado` no se pisa: solo
+  la bitácora.
+
+Una falla (red, HTTP, token) deja la fila de `consultas_envio` con `error` y sube
+`consultas` y `ultima_consulta_en` (sin tocar estado ni conteos, así que no dispara
+triggers). `consultas` alimenta el *backoff*: cuenta también los intentos fallidos.
+Detalle en la [guía](../02-guias/seguimiento-envios.md#qué-se-escribe-por-consulta-y-en-qué-orden).

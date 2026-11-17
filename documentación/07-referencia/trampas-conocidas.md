@@ -1,9 +1,9 @@
 ---
 title: "Trampas conocidas"
 description: "Comportamientos no obvios del SII, de la librería y del esquema."
-keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna, ad_empresa1, ad_empresa2, Actualización de datos del contribuyente, representante legal, no está autorizado para operar en esta modalidad, verificar_autorizacion, ConsultaAutorizacion, situación tributaria de terceros, STC, stc/noauthz, getConsultaData, timbrajes, documentos autorizados, reCAPTCHA, SituacionTributaria, Fase 6, folios, migración 0011, anular_folios, cola completa, trg_20_caf_sin_traslape, 23P01, revisión con el SII, simulada, TransporteSinTimbrar, of_genera_folio, revisionId, folios.por_agotarse, Idempotency-Key, denominador, folio asignado sin documento, política alta, subirCaf, RSAPK, Fase 7, emisión, emitirDocumento, FABRICA_REST_EMISION, FABRICAS_SII.rest, documentoId, doble clic, borradorId, clave_idempotencia, sessionStorage, Ya la revisé, esFolioAnulado, INTENTOS_FOLIO, PDF417, bwip-js, bwip-js/node, binarytext, pdfkit, serverExternalPackages, AFM, ted_xml, latin1, instructivo de representación impresa, enlaceDocumento, uso_mensual.envios]
-related: ["08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md", "02-guias/emision-boletas.md"]
-source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/", "supabase/migrations/0011_folios.sql", "apps/web/src/server/folios/", "apps/web/src/app/[org]/folios/", "apps/web/src/server/emision/", "apps/web/src/server/pdf/", "apps/web/src/app/[org]/emitir/", "apps/web/next.config.ts"]
+keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna, ad_empresa1, ad_empresa2, Actualización de datos del contribuyente, representante legal, no está autorizado para operar en esta modalidad, verificar_autorizacion, ConsultaAutorizacion, situación tributaria de terceros, STC, stc/noauthz, getConsultaData, timbrajes, documentos autorizados, reCAPTCHA, SituacionTributaria, Fase 6, folios, migración 0011, anular_folios, cola completa, trg_20_caf_sin_traslape, 23P01, revisión con el SII, simulada, TransporteSinTimbrar, of_genera_folio, revisionId, folios.por_agotarse, Idempotency-Key, denominador, folio asignado sin documento, política alta, subirCaf, RSAPK, Fase 7, emisión, emitirDocumento, FABRICA_REST_EMISION, FABRICAS_SII.rest, documentoId, doble clic, borradorId, clave_idempotencia, sessionStorage, Ya la revisé, esFolioAnulado, INTENTOS_FOLIO, PDF417, bwip-js, bwip-js/node, binarytext, pdfkit, serverExternalPackages, AFM, ted_xml, latin1, instructivo de representación impresa, enlaceDocumento, uso_mensual.envios, Fase 8, seguimiento, ejecutarSeguimiento, consultarEnvio, consultar_envio, server/sii/clientes.ts, backoff, filtroPorConsultar, inconsistente, lista blanca, ESTADOS_CONOCIDOS, -11, RPR, ErrorTokenSoap, QueryEstUp, detalleIncompleto, orden de escritura, documento.aceptado falso, ya_final, cerrarAbandonadas, envio_sin_cerrar, Ya lo revisé, notificaciones, reclamar_notificacion, migración 0013, migración 0014, pg_cron, cron_token, CRON_SECRET, PRESUPUESTO_MS, LIMITE_MS]
+related: ["08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md", "02-guias/emision-boletas.md", "02-guias/seguimiento-envios.md"]
+source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/", "supabase/migrations/0011_folios.sql", "apps/web/src/server/folios/", "apps/web/src/app/[org]/folios/", "apps/web/src/server/emision/", "apps/web/src/server/pdf/", "apps/web/src/app/[org]/emitir/", "apps/web/next.config.ts", "apps/web/src/server/seguimiento/", "apps/web/src/server/alertas/", "apps/web/src/server/documentos/", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql"]
 ---
 
 # Trampas conocidas
@@ -561,8 +561,9 @@ librería y lo usa `verificarAutorizacion` de la app como apoyo del mensaje.
 ### Alerta `folios.por_agotarse`
 
 - **Solo al cruzar.** Avisa al pasar de `sello` a `aviso` (15 %) o al llegar a cero, no
-  mientras se está bajo el umbral. No hay tabla de deduplicación (es de la Fase 8): repetir
-  la misma alerta la frena la `Idempotency-Key` de Resend
+  mientras se está bajo el umbral. No usa la tabla `notificaciones` (Fase 8, migración
+  0013, solo para rechazos, inciertos y certificados): repetir la misma alerta la frena la
+  `Idempotency-Key` de Resend
   (`folios.por_agotarse/<empresa>/<ambiente>/<tipo>/<CAF>/<15|agotado>`), que dura 24 h.
   El webhook no tiene esa protección.
 - **El denominador es el tamaño de los CAF activos con folios libres**, no el último CAF
@@ -585,7 +586,8 @@ Detalle en la [guía de emisión](../02-guias/emision-boletas.md).
   `server/certificacion/dependencias.ts`) crea el `ClienteBoletaRest` **siempre en
   certificación** (era para el set de pruebas). La emisión usa su propia fábrica,
   `FABRICA_REST_EMISION` (`server/emision/dependencias.ts`, inyectable como `rest`), que
-  recibe el ambiente del borrador. Si alguien la cambia por la de certificación, las
+  recibe el ambiente del borrador; desde la Fase 8 delega en `clienteBoletaRest` de
+  `server/sii/clientes.ts`, compartido con el seguimiento. Si alguien la cambia por la de certificación, las
   boletas de producción saldrían a `apicert`/`pangal` con el certificado y los folios de
   producción.
 - **`ejecutarOperacion` directo, no `ejecutar` de certificación.** El helper `ejecutar` de
@@ -626,7 +628,9 @@ Detalle en la [guía de emisión](../02-guias/emision-boletas.md).
   servidor solo impide reemitir **ese** documento (ya no está en `borrador`):
   `ejecutarOperacion` no bloquea `emitir` por un `incierto` anterior
   (`OPERACIONES_EFECTO_GLOBAL` no la incluye), así que una boleta nueva por la misma venta
-  sí sale. El seguimiento de los inciertos es de la Fase 8.
+  sí sale. Desde la Fase 8 los inciertos aparecen en el Tablero, llegan por correo y se
+  marcan con «Ya lo revisé» en la página del envío
+  ([seguimiento](../02-guias/seguimiento-envios.md#envíos-inciertos-y-ya-lo-revisé)).
 - **Un `23514` que no es de folio anulado es una falla genérica.** `esFolioAnulado` exige
   `23514` **y** «anulad» en el mensaje (el de `tg_validar_documento` de la 0012). Un
   `23514` de un `CHECK` de `documentos` (p. ej. `mnt_total = mnt_neto + iva + mnt_exe`) no
@@ -672,3 +676,133 @@ Detalle en la [guía de emisión](../02-guias/emision-boletas.md).
   true` con `track_id`: si el Track ID quedó guardado y falló el `update` del documento, el
   envío no se marca incierto (el documento puede quedar `firmado`) aunque la operación diga
   `incierto`.
+
+## Seguimiento de envíos (Fase 8)
+
+Detalle en la [guía de seguimiento](../02-guias/seguimiento-envios.md). La migración
+`0013_notificaciones` está **aplicada** (2026-11-17); la `0014_cron`, **escrita, pendiente
+de aplicar** después del deploy.
+
+### Decisiones
+
+- **Una operación por grupo, no por consulta.** El cron abre una operación `seguimiento` por
+  organización + empresa + ambiente + canal, con los conteos en `detalle`; el detalle de cada
+  envío queda en `consultas_envio`. Una por consulta serían hasta 28.800 filas al día en
+  `operaciones_sii`. La consulta del panel sí es una `consultar_envio` por envío, con
+  `envio_id` y el usuario.
+- **Un token por grupo, una renovación.** El canal separa los grupos porque el token REST y
+  el DTEWS son distintos. Si el SII rechaza el token (401 en REST; HTTP 200 con un `ESTADO` de
+  token en QueryEstUp), se pide otro **una vez**; otro rechazo posterga el resto del grupo.
+- **Lotes de 100 y presupuesto de tiempo.** Hasta 100 envíos por corrida; antes de cada paso
+  que sale al SII se exige que su peor caso (45 s por petición) termine antes del segundo
+  280 de los 300 de `maxDuration`. Lo que no cabe queda en `postergados`.
+- **Backoff sin migración**, por `envios.consultas` (que cuenta también los intentos
+  fallidos): 4, 15 y 60 minutos y 6 horas por tramos (0–11, 12–23, 24–47, 48 o más), y una
+  vez al día para los envíos con más de 7 días. Va como un `or()` de PostgREST en la
+  consulta, no filtrando en JS después del `limit` (eso dejaba con hambre a los envíos
+  nuevos).
+- **`inconsistente` se sigue consultando** (el cron lo lee aparte de
+  `v_envios_por_consultar`, que no lo trae, y el panel lo deja consultar): el SII puede
+  corregir sus cifras y no hay otra forma de cerrarlo.
+- **Lista blanca de estados.** Solo se guardan los 10 códigos de `estados_sii`. Un código
+  desconocido es una falla de esa consulta y `estado_sii` no se toca.
+- **Orden de escritura: estadísticas → rechazos → envío → bitácora.** Ver la trampa de
+  abajo sobre webhooks falsos.
+- **«Ya lo revisé» sin migración**: reutiliza `marcarInciertaRevisada` sobre las
+  operaciones inciertas enlazadas al envío (`operaciones_sii.detalle.revisada_en`). El envío y
+  sus documentos siguen `incierto`.
+- **Alertas: candidatos en la base, no con `.limit()`**. Las funciones de la 0013 excluyen
+  lo ya avisado y reparten por turnos entre organizaciones.
+- **Los jobs leen el Bearer de Vault en cada corrida**; el secreto nunca queda en
+  `cron.job.command`.
+
+### Trampas
+
+- **El orden inverso encola webhooks `documento.aceptado` falsos.** Si se guarda el envío
+  (`EPR` con rechazos) antes que `envio_rechazos`, `trg_50_envio_actualizado` sincroniza los
+  documentos sin rechazos que mirar, los deja **todos** `aceptado` y `tg_evento_documento`
+  encola `documento.aceptado`; después el rechazo los pasa a `rechazado`. El estado final
+  queda bien, pero el webhook ya salió. Se comprobó en PGlite. `guardarRespuesta` escribe
+  los rechazos primero: el trigger de `envio_rechazos` sincroniza con el envío todavía en
+  proceso (documentos `enviado`) y el `update` del envío hace la sincronización final.
+- **Un EPR con rechazos sin detalle por documento dejaría aceptadas boletas rechazadas.**
+  `sincronizar_documentos_envio` solo mira `envio_rechazos`. QueryEstUp (SOAP) nunca trae el
+  detalle, y el REST podría traerlo incompleto. Por eso un `EPR` con más rechazos o reparos en
+  los contadores que en el detalle no se guarda (`detalleIncompleto`): queda la consulta con
+  la nota y el envío sigue como estaba, para revisarlo en el portal del SII. Un envío SOAP con
+  rechazos **nunca** cierra solo: se consulta con *backoff* hasta los 7 días y después una vez
+  al día.
+- **`clasificar_envio` da `rechazado` a cualquier código desconocido.** QueryEstUp responde
+  `-11` (sin glosa) a un envío que todavía no registra y a un Track ID de la API REST, `RPR`
+  a un RCOF, y códigos de error con HTTP 200. Guardarlos dejaría el envío y sus documentos
+  `rechazado`. La lista blanca (`ESTADOS_CONOCIDOS`) lo evita.
+- **El token DTEWS vencido no da 401.** QueryEstUp contesta HTTP 200 con un `ESTADO` de
+  error. `ErrorTokenSoap` lo reconoce por `001`–`003` o por «token» en la glosa: heurística
+  sin contrastar con el SII. Si se equivoca hacia un lado, pide un token de más; hacia el
+  otro, ese `ESTADO` cae fuera de la lista blanca y se reintenta con el *backoff*.
+- **No pisar estados finales.** El cron y el panel pueden consultar el mismo envío a la vez.
+  El `update` del envío lleva `clasificacion not in (aceptado, aceptado_con_reparos,
+  rechazado)` y, si no devuelve fila, la respuesta solo va a la bitácora. Además, solo un
+  `EPR` borra rechazos guardados: una respuesta en proceso que llegue tarde no borra el
+  detalle de un `EPR`.
+- **`consultas + 1` no es atómico.** Se calcula con el valor leído: dos consultas
+  simultáneas pueden contar una. Solo afecta al *backoff*.
+- **Las operaciones del seguimiento cortadas por Vercel quedan `en_curso`.** No bloquean nada
+  (son de lectura), pero ensucian la auditoría. `cerrarAbandonadas` las cierra como `error`
+  (`detalle = { abandonada: true }`, que reemplaza el `detalle` anterior) al empezar cada
+  corrida, pasados 15 minutos.
+- **El aviso `envio_sin_cerrar` no sale en producción.** `avisarSinCerrar` llama a
+  `deps.operacion.registrar?.(…)`, pero `resolverDependenciasSeguimiento` no pone
+  `registrar` (solo el reloj; el `registrarEnSentry` por defecto se resuelve dentro de
+  `ejecutarOperacion`). Con las dependencias reales es `undefined` y el aviso se omite sin
+  error; las pruebas lo ven porque inyectan el doble. Hallazgo de la documentación, sin
+  corregir.
+- **Un incierto sin operación enlazada no se puede marcar revisado.** «Ya lo revisé» busca
+  las operaciones `incierto` o `en_curso` con ese `envio_id`. Si no hay (un envío incierto
+  creado fuera de `emitirDocumento`), responde «No encontramos la operación…» y el envío
+  sigue apareciendo en el Tablero.
+- **«Ya lo revisé» no cambia el envío.** El documento sigue `incierto` en Documentos
+  emitidos (filtro «Por verificar»); solo deja de salir en el Tablero. El correo de alerta ya
+  salió y no se repite.
+- **El Tablero muestra solo la empresa activa**, en los dos ambientes; los correos de
+  inciertos cubren todas las empresas de la organización.
+- **El cron también consulta el envío del set de pruebas.** `v_envios_por_consultar` no
+  filtra por `proposito`, así que un envío `set_pruebas` en proceso se consulta y sus
+  documentos se sincronizan solos. La etapa del proceso (`set_aceptado`) **no** avanza con
+  eso: solo la mueve «Consultar estado» del asistente (`consultarEstadoSet`, que consulta
+  aunque el envío ya esté final). Las alertas y el Tablero excluyen el set.
+- **Cualquier miembro puede consultar el estado en el SII**, también un lector: es una
+  lectura que no cambia la boleta, pero sí sale al SII y deja una operación
+  `consultar_envio`. Lo frena la ventana de 30 s entre consultas del mismo envío.
+- **Ventana de 48 h en las alertas.** Rechazos e inciertos se avisan solo si su
+  `actualizado_en` es de las últimas 48 h: al estrenar las alertas no llegan correos viejos.
+  Un envío incierto no se vuelve a tocar, así que si las alertas estuvieron caídas más de
+  48 h ese aviso se pierde.
+- **`notificaciones` la leen todos los miembros.** Solo lleva ids, empresa, ambiente, umbral
+  y los correos de los administradores (que los miembros ya ven en `perfiles`). Nunca el
+  cuerpo del correo ni la API key.
+- **Sin la 0013, la ruta de alertas no envía nada.** Las funciones de candidatos y
+  `reclamar_notificacion` no existen (`PGRST202`): cada categoría queda con error en el
+  resumen y en Sentry. Aplicarla antes del deploy (se hizo el 2026-11-17).
+- **`pnpm db:tipos` marca como no nulos los retornos de funciones.** Postgres no informa la
+  nulabilidad de las columnas que devuelve una función (`returns table` o `setof`), así que
+  el generador las tipa como `string` o `number` sin `null`. Con la 0013 eso dio 7 líneas
+  distintas de lo agregado a mano en `server/supabase/tipos.ts`, en los retornos de
+  `alertas_*` y `reclamar_notificacion`: `cn`, `dias_restantes`, `nombre_titular`,
+  `rut_titular`, `envio_id`, `folio` y `grupo`. Se versionó lo generado (typecheck, pruebas de
+  alertas y Biome en verde), pero esos campos pueden venir nulos en tiempo de ejecución:
+  `server/alertas/` los sigue
+  tratando como posiblemente nulos. No confiar en el tipo generado para esos campos ni
+  «limpiar» esas comprobaciones.
+- **La 0014 antes del deploy hace ruido.** Desde que se aplica, `pg_cron` llama a las rutas
+  cada 5 y 10 minutos; sin el deploy responden 404. Sin `CRON_SECRET` en Vercel, 503, y
+  también con uno de menos de 16 caracteres (`envCron()` lo trata como ausente, sin error).
+  Con `cron_token` distinto de `CRON_SECRET`, 401. La 0014 se niega a correr sin `cron_token` en
+  Vault (`55000`).
+- **Horarios sincronizados a mano.** `HORARIO_SEGUIMIENTO` y `HORARIO_ALERTAS` tienen que
+  coincidir con los jobs de la 0014 y con los *cron monitors* de Sentry, o el monitor avisará
+  de corridas perdidas que no lo son.
+- **El comentario de `maxDuration` en la ruta del seguimiento está desactualizado.** Dice
+  «Ver `PRESUPUESTO_MS` en server/seguimiento/cron.ts: deja de empezar consultas a los
+  240 s»; el código usa `LIMITE_MS` = 280 s y los peores casos de la
+  [guía](../02-guias/seguimiento-envios.md#presupuesto-de-tiempo).

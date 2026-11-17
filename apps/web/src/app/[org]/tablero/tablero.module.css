@@ -1,5 +1,14 @@
-/* Tablero: avisos de certificados (Fase 3) con su acción, como en la plantilla. */
+/* Tablero: avisos de certificados (Fase 3) con su acción, como en la plantilla, y envíos
+   por verificar (Fase 8). */
 
 .accionAviso {
   margin-top: var(--space-2);
+}
+
+.listaInciertos {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
 }

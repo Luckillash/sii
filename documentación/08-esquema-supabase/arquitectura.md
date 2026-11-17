@@ -1,7 +1,7 @@
 ---
 title: "Esquema: arquitectura"
 description: "Secciones del SQL, relaciones entre tablas y decisiones de diseño."
-keywords: [secciones, migraciones, 0001_esquema_inicial, organizacion_id, relaciones, empresas, tenant, Vault, secret_id, ambiente, aditiva, verificaciones, 0010_verificar_autorizacion, 0011_folios]
+keywords: [secciones, migraciones, 0001_esquema_inicial, organizacion_id, relaciones, empresas, tenant, Vault, secret_id, ambiente, aditiva, verificaciones, 0010_verificar_autorizacion, 0011_folios, 0012_folio_anulado, 0013_notificaciones, notificaciones, 0014_cron]
 related: ["01-fundamentos/vision-general.md"]
 source: ["supabase_saas_sii.sql"]
 ---
@@ -54,9 +54,13 @@ solo lectura en `supabase/verificaciones/` ([despliegue](despliegue.md)).
 | `0011_folios` (**aplicada el 2026-11-15**) | RPC `anular_folios` y trigger `trg_20_caf_sin_traslape` en `cafs`; quita la política `alta` de `folios_anulados` (solo se escribe con la RPC o `service_role`); publica `cafs` y `folios_anulados` en Realtime ([despliegue](despliegue.md#fase-6-migración-0011)) |
 | `0012_folio_anulado` (**aplicada el 2026-11-15**) | `tg_validar_documento` lee el CAF con `for key share` y rechaza (`23514`) un documento que fija un folio anulado ([triggers](triggers-y-logica.md#tg_validar_documento-migración-0012)) |
 
-Aplicadas en producción: `0001`–`0012` (la `0011` y la `0012`, el 2026-11-15). Las previstas de
-las fases siguientes se corren respecto del plan original (`0013_notificaciones`,
-`0014_planes_comerciales`…).
+| `0013_notificaciones` (**aplicada el 2026-11-17**, antes del deploy de la Fase 8) | Tabla `notificaciones` (deduplicación de alertas por correo) y las RPC `reclamar_notificacion`, `notificacion_cerrada`, `alertas_documentos_rechazados`, `alertas_envios_inciertos` y `alertas_certificados_por_vencer`, solo `service_role` ([despliegue](despliegue.md#fase-8-migraciones-0013-y-0014)) |
+| `0014_cron` (**pendiente de aplicar**, después del deploy de la Fase 8) | Jobs de `pg_cron`: `seguimiento-envios`, `alertas`, `limpiar-tokens-sii`, `limpiar-historial-cron` (Bearer leído de Vault) |
+
+Aplicadas en producción: `0001`–`0013` (la `0011` y la `0012`, el 2026-11-15; la `0013`, el
+2026-11-17). Escrita y pendiente de aplicar: `0014` (Fase 8, después del deploy). Las previstas de las fases siguientes se
+corren respecto del plan original (`0015_planes_comerciales`, `0016_pagos`,
+`0017_indices_fk`, provisorios).
 
 ## Relaciones
 

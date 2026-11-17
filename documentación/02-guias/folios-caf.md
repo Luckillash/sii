@@ -289,7 +289,7 @@ tipo, **cruzan** el umbral del 15 % o se agotan.
 | Correo | `correoFoliosPorAgotarse` a los propietarios y administradores (correos de `perfiles`, sin duplicados), con enlace a `/<slug>/folios?empresa=<id>`; sin `NEXT_PUBLIC_APP_URL` no se envía (aviso en consola) |
 | `Idempotency-Key` (Resend) | `folios.por_agotarse/<empresa>/<ambiente>/<tipo>/<CAF en uso>/<15\|agotado>` (determinista, sin datos sensibles) |
 | Webhook | `encolar_evento(org, 'folios.por_agotarse', datos)` con `service_role` ([payload](../06-integraciones/webhooks.md#foliospor_agotarse-fase-6)) |
-| Deduplicación | descansa en que el cruce ocurre una sola vez y en la `Idempotency-Key` (Resend no repite en 24 h); la tabla `notificaciones` es de la Fase 8 |
+| Deduplicación | descansa en que el cruce ocurre una sola vez y en la `Idempotency-Key` (Resend no repite en 24 h); no usa la tabla `notificaciones` (Fase 8, migración 0013), que es solo para rechazos, inciertos y certificados |
 | Fallas | nunca lanza ni frena la anulación o la emisión: queda un aviso en consola sin datos |
 
 ## Permisos

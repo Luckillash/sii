@@ -1,9 +1,9 @@
 ---
 title: "RPC del backend (service_role)"
-description: "registrar_certificado, registrar_caf, guardar_set_pruebas, anular_folios (también administradores) y el trigger trg_20_caf_sin_traslape, token_*, leer_secreto, tomar/liberar_bloqueo_certificado, asignar_folio, guardar_secreto, encolar_evento, plan_vigente."
-keywords: [service_role, registrar_certificado, registrar_caf, guardar_set_pruebas, migración 0008, CAF, RSASK, "caf:<rut>", idempotente, for no key update, set_pruebas_casos, set_descargado, P0002, "La empresa no existe en la organización", "El IDK del CAF no corresponde al ambiente", "Ya hay un CAF que empieza en el folio", Vault, vault.create_secret, guardar_secreto, leer_secreto, pfx_secret_id, clave_secret_id, huella_sha256, "certificado:<huella>:pfx", 23503, 22023, 23505, 22004, "El certificado ya está registrado en la organización", "permission denied for function", token_obtener, token_guardar, token_borrar, TokenStoreSupabase, tomar_bloqueo_certificado, liberar_bloqueo_certificado, bloqueos_sii, arriendo, titular, conBloqueoCertificado, "La duración del bloqueo debe estar entre 1 y 900 segundos", migración 0007, anular_folios, migración 0011, folios_anulados, cola completa, "El CAF no existe", "Solo un administrador de la organización puede anular folios", "ya tiene un documento emitido", tg_caf_sin_traslape, trg_20_caf_sin_traslape, 23P01, "se traslapa con otro CAF", asignar_folio, "No quedan folios", encolar_evento, folios.por_agotarse]
+description: "registrar_certificado, registrar_caf, guardar_set_pruebas, anular_folios (también administradores) y el trigger trg_20_caf_sin_traslape, token_*, leer_secreto, tomar/liberar_bloqueo_certificado, asignar_folio, guardar_secreto, encolar_evento, plan_vigente, sincronizar_documentos_envio y las de notificaciones (migración 0013: reclamar_notificacion, notificacion_cerrada, alertas_*)."
+keywords: [service_role, registrar_certificado, registrar_caf, guardar_set_pruebas, migración 0008, CAF, RSASK, "caf:<rut>", idempotente, for no key update, set_pruebas_casos, set_descargado, P0002, "La empresa no existe en la organización", "El IDK del CAF no corresponde al ambiente", "Ya hay un CAF que empieza en el folio", Vault, vault.create_secret, guardar_secreto, leer_secreto, pfx_secret_id, clave_secret_id, huella_sha256, "certificado:<huella>:pfx", 23503, 22023, 23505, 22004, "El certificado ya está registrado en la organización", "permission denied for function", token_obtener, token_guardar, token_borrar, TokenStoreSupabase, tomar_bloqueo_certificado, liberar_bloqueo_certificado, bloqueos_sii, arriendo, titular, conBloqueoCertificado, "La duración del bloqueo debe estar entre 1 y 900 segundos", migración 0007, anular_folios, migración 0011, folios_anulados, cola completa, "El CAF no existe", "Solo un administrador de la organización puede anular folios", "ya tiene un documento emitido", tg_caf_sin_traslape, trg_20_caf_sin_traslape, 23P01, "se traslapa con otro CAF", asignar_folio, "No quedan folios", encolar_evento, folios.por_agotarse, sincronizar_documentos_envio, migración 0013, notificaciones, reclamar_notificacion, notificacion_cerrada, alertas_documentos_rechazados, alertas_envios_inciertos, alertas_certificados_por_vencer, grupo, Idempotency-Key, por turnos]
 related: ["09-libreria/backend-service-role.md", "08-esquema-supabase/vault-y-secretos.md", "04-objetos/objetos-empresas-y-credenciales.md", "04-objetos/objetos-folios.md", "02-guias/folios-caf.md", "02-guias/onboarding-organizacion.md", "01-fundamentos/autenticacion-sii.md"]
-source: ["supabase_saas_sii.sql §15 §17", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0011_folios.sql", "apps/web/src/server/sii/", "apps/web/src/server/certificacion/", "apps/web/src/server/folios/"]
+source: ["supabase_saas_sii.sql §15 §17", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0011_folios.sql", "supabase/migrations/0013_notificaciones.sql", "apps/web/src/server/sii/", "apps/web/src/server/certificacion/", "apps/web/src/server/folios/", "apps/web/src/server/alertas/datos.ts"]
 ---
 
 # RPC del backend (service_role)
@@ -20,7 +20,111 @@ Una excepción: [`anular_folios`](#anular_folios-migración-0011) (migración 00
 llama con su sesión y la función revisa el rol por dentro. Está aquí porque escribe en
 `cafs`, tabla del backend.
 
-<!-- TODO (Fase 8): sincronizar_documentos_envio. -->
+La Fase 8 suma las funciones de la migración
+[`0013_notificaciones`](#notificaciones-migración-0013) (**aplicada el 2026-11-17**), todas
+solo `service_role`.
+
+## `sincronizar_documentos_envio`
+
+Viene en la §15 de `0001`. Solo `service_role`; en la práctica no se llama a mano: la
+llaman los triggers `trg_50_envio_actualizado` (al cambiar `estado_sii`, `incierto` o los
+contadores de `envios`) y `trg_50_envio_rechazo_sincronizar` (al insertar o actualizar
+`envio_rechazos`).
+
+```sql
+public.sincronizar_documentos_envio(p_envio uuid) returns void
+-- plpgsql · security definer · search_path = ''
+```
+
+- No hace nada con un envío `rcof` o que no existe.
+- Pone a los documentos del envío que no están `anulado`: `incierto` si el envío es
+  `incierto`; `enviado` si está `en_proceso` o `inconsistente`; sin cambio si está
+  `pendiente`; con `EPR`, `rechazado` si el documento tiene una fila de rechazo en
+  `envio_rechazos`, `aceptado_con_reparos` si tiene una de reparo y `aceptado` si no tiene
+  ninguna; con cualquier otro estado (rechazo del sobre), `rechazado`.
+- Cada cambio de `documentos.estado` dispara `trg_50_evento_documento`, que encola
+  `documento.<estado>` (aceptado, aceptado con reparos, rechazado, incierto).
+- **Por eso el seguimiento escribe los rechazos antes que el envío**: si el envío llega a
+  `EPR` sin los rechazos guardados, todos sus documentos pasan un momento por `aceptado` y se
+  encola un `documento.aceptado` falso
+  ([seguimiento](../02-guias/seguimiento-envios.md#qué-se-escribe-por-consulta-y-en-qué-orden)).
+
+## `notificaciones` (migración 0013)
+
+**Estado: aplicada el 2026-11-17** (antes del deploy de la Fase 8, que todavía no se hace;
+[despliegue](../08-esquema-supabase/despliegue.md#fase-8-migraciones-0013-y-0014)). Las usa
+`server/alertas/datos.ts` desde `/api/cron/alertas`, con `service_role`. Las cinco tienen
+`revoke execute` a `public`, `anon` y `authenticated` (`42501` a un administrador con su
+sesión).
+
+### `reclamar_notificacion`
+
+```sql
+public.reclamar_notificacion(
+  p_organizacion uuid, p_tipo text, p_clave text,
+  p_referencia uuid default null, p_datos jsonb default '{}'::jsonb
+) returns table (id uuid, intentos integer, grupo text)
+-- plpgsql · security definer · search_path = ''
+```
+
+- Un solo `insert … on conflict (clave) do update … where` (atómico, como
+  `tomar_bloqueo_certificado`). Clave nueva → fila `pendiente`, `intentos = 1`, `grupo`
+  nulo, y la devuelve.
+- Clave existente → la vuelve a tomar (`pendiente`, `intentos + 1`, `error` nulo, `datos`
+  nuevos) y devuelve su `grupo` **solo si** es de la misma organización, tiene menos de 5
+  intentos y está `fallida` o `pendiente` hace más de 15 minutos (abandonada). Si no,
+  ninguna fila: ya enviada, en curso, de otra organización o sin más intentos.
+- Dos corridas simultáneas se ordenan en el índice único: solo una recibe la fila.
+- Errores: `22004` falta la organización, el tipo o la clave; `23514` tipo o clave con
+  formato inválido (los `check` de la tabla); `23503` la organización no existe.
+- Fijar `grupo` y cerrar la fila (`enviada` con `enviado_en`, `resend_id` y
+  `destinatarios`, o `fallida` con `error`) son `update` directos del mismo cliente, con
+  `.eq('estado', 'pendiente')` para no pisar una que otra corrida cerró.
+
+### `notificacion_cerrada`
+
+```sql
+public.notificacion_cerrada(p_clave text) returns boolean   -- sql · stable · search_path = ''
+```
+
+La negación exacta de «se puede reclamar»: hay fila y está `enviada`, o usó sus 5 intentos,
+o está `pendiente` hace menos de 15 minutos.
+
+### Candidatos de cada alerta
+
+```sql
+public.alertas_documentos_rechazados(p_desde timestamptz, p_limite integer default 200)
+  returns table (id, organizacion_id, empresa_id, ambiente, tipo_dte, folio, mnt_total, fecha_emision, envio_id)
+public.alertas_envios_inciertos(p_desde timestamptz, p_limite integer default 200)
+  returns table (id, organizacion_id, empresa_id, ambiente, creado_en)
+public.alertas_certificados_por_vencer(p_limite integer default 200)
+  returns table (id, organizacion_id, rut_titular, nombre_titular, cn, vigente_hasta, dias_restantes, umbral)
+-- sql · stable · security invoker · search_path = ''
+```
+
+- Excluyen lo que `notificacion_cerrada` da por cerrado (claves
+  `documento.rechazado:<id>`, `envio.incierto:<id>`, `certificado.por_vencer:<id>:<umbral>`),
+  así lo ya avisado no ocupa cupo.
+- Reparten **por turnos entre organizaciones** (`row_number() over (partition by
+  organizacion_id order by actualizado_en, id)`; en certificados, por `vigente_hasta`):
+  primero el evento más antiguo de cada organización. Con un orden global y un tope, una
+  organización con muchos eventos tapaba a las demás.
+- Rechazos: `documentos` `rechazado`, `origen <> 'set_pruebas'`, `actualizado_en >=
+  p_desde`. Inciertos: `envios` `incierto`, `proposito = 'emision'`, `actualizado_en >=
+  p_desde`. Certificados: `v_certificados_estado` `por_vencer`, con `umbral` 1, 7, 15 o 30
+  (el más chico que cubre `dias_restantes`; sincronizado con `umbralCertificado` de la app).
+- `p_limite` entre 1 y 1.000 (nulo = 200).
+
+Verificación: `supabase/verificaciones/0013_notificaciones.sql` (18) y la simulación
+`rls-fase8-notificaciones.sql` (26, con `rollback`)
+([cómo](../05-pruebas/probar-el-esquema.md#11-simulación-de-alertas-de-la-fase-8-rls-fase8-notificacionessql));
+en producción, el 2026-11-17, 18/18 y 26/26.
+
+Tipos: `pnpm db:tipos` marca como no nulas las columnas que devuelven estas funciones
+(`cn`, `dias_restantes`, `nombre_titular`, `rut_titular`, `envio_id`, `folio`, `grupo`),
+porque Postgres no informa la nulabilidad de los retornos de funciones. `server/alertas/`
+las trata igual como posiblemente nulas
+([trampa](../07-referencia/trampas-conocidas.md#seguimiento-de-envíos-fase-8)).
 
 ## `guardar_secreto`
 
@@ -471,8 +575,10 @@ public.encolar_evento(p_organizacion uuid, p_evento text, p_payload jsonb) retur
 
 Inserta una fila en `webhook_entregas` por cada webhook activo de la organización suscrito
 a `p_evento`, con payload `{ evento, creado_en, datos: p_payload }`; sin suscritos, nada. La
-llaman los triggers de documentos, envíos y certificación, y desde la Fase 6 la app para
-`folios.por_agotarse` (`server/folios/alertas.ts`, con `service_role`)
+llaman los triggers de documentos, envíos y certificación (desde la Fase 8, el seguimiento
+dispara `envio.actualizado` y `documento.<estado>` al guardar el estado de un envío), y
+desde la Fase 6 la app para `folios.por_agotarse` (`server/folios/alertas.ts`, con
+`service_role`)
 ([webhooks](../06-integraciones/webhooks.md)).
 
 ## `guardar_set_pruebas` (migración 0008)

@@ -3,7 +3,7 @@ title: "Esquema: Vault y secretos"
 description: "Qué secretos hay, dónde van, cómo se guardan, leen y borran, y qué se cifra fuera de la base."
 keywords: [Vault, vault.secrets, vault.decrypted_secrets, vault.create_secret, guardar_secreto, leer_secreto, registrar_certificado, tg_borrar_secretos, trg_borrar_secretos, pfx_secret_id, clave_secret_id, caf_secret_id, secreto_secret_id, cron_token, "certificado:<huella>:pfx", "certificado:<huella>:clave", depurar.ts, depurarEvento, beforeSend, beforeSendSpan, beforeBreadcrumb, server_action_form_data, "[Filtrado]", AES-256-GCM, SII_TOKENS_KEY, AAD, cifrado.ts, crearCredenciales, ErrorCredenciales, sanearTexto, sanearDetalle, detalleSeguro, contextoSesion, SesionesSupabase, registrar_caf, "caf:<rut>", xmlCaf, migración 0008, subirCaf, validarCaf, carga manual, CAF de producción]
 related: ["01-fundamentos/ambientes-y-credenciales.md", "03-api-reference/rpc-backend.md", "04-objetos/objetos-empresas-y-credenciales.md", "02-guias/onboarding-organizacion.md"]
-source: ["supabase_saas_sii.sql §6 §7 §14 §15", "supabase/migrations/0002_extensiones_cron.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/folios/", "apps/web/src/lib/sentry/depurar.ts", "apps/web/src/server/cifrado.ts", "PLAN-SAAS.md §2 §4.4 §4.8"]
+source: ["supabase_saas_sii.sql §6 §7 §14 §15", "supabase/migrations/0002_extensiones_cron.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0014_cron.sql", "apps/web/src/server/folios/", "apps/web/src/lib/sentry/depurar.ts", "apps/web/src/server/cifrado.ts", "PLAN-SAAS.md §2 §4.4 §4.8"]
 ---
 
 # Esquema: Vault y secretos
@@ -30,7 +30,7 @@ solo como hash sha256: `invitaciones.token_hash`, `api_keys.clave_hash`.
 | Clave del .pfx | `certificados.clave_secret_id` | ídem | `certificado:<huella>:clave` | 3 (0005) |
 | XML del CAF (con `RSASK`) | `cafs.caf_secret_id` | `registrar_caf()` → `guardar_secreto()` | `caf:<rut>:<ambiente>:<tipo>:<desde>-<hasta>` | 5 (0008, aplicada el 2026-11-13) |
 | Secreto HMAC del webhook | `webhooks.secreto_secret_id` | `crear_webhook()` llama directo a `vault.create_secret` | `webhook <url>` | 11 |
-| `cron_token` | ninguna (secreto con nombre) | a mano en el SQL Editor (`0002_extensiones_cron.sql`) | `Bearer para /api/cron/*` | 0 |
+| `cron_token` | ninguna (secreto con nombre) | a mano en el SQL Editor (`0002_extensiones_cron.sql`); existe en producción. Lo leen los jobs de la `0014_cron` (Fase 8, pendiente de aplicar) desde `vault.decrypted_secrets` en cada corrida; la 0014 no corre sin él | `Bearer para /api/cron/*` | 0 (uso: 8) |
 
 `<huella>` es `huella_sha256` del certificado (sha256 hex del DER de la hoja). Es
 pública: identifica el certificado, no lo abre. Por eso puede ir en la descripción, y

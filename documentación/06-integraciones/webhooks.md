@@ -66,8 +66,9 @@ la lista permitida de `webhooks.eventos` (0001).
 
 `agotado: true` con `folios_disponibles: 0` cuando se acabaron (y entonces `folios_total`
 puede ser 0: ya no queda ningún CAF con folios libres). Sin secretos. No hay deduplicación
-del lado del webhook (el correo tiene `Idempotency-Key`; la tabla `notificaciones` es de la
-Fase 8): el evento sale una vez por cruce.
+del lado del webhook (el correo tiene `Idempotency-Key`; la tabla `notificaciones` de la
+Fase 8 solo cubre los correos de rechazos, inciertos y certificados): el evento sale una vez
+por cruce.
 
 ## Eventos del set de pruebas
 
@@ -92,7 +93,7 @@ La emisión del panel tampoco encola eventos con código propio (salvo
 |---|---|
 | `envio.actualizado` | al guardar el Track ID con un `estado_sii` de subida, o al marcar el envío `incierto` |
 | `documento.incierto` | cuando el envío queda `incierto` y el trigger pasa la boleta a `incierto` |
-| `documento.aceptado`, `documento.aceptado_con_reparos`, `documento.rechazado` | todavía no desde la emisión: los pone la consulta del estado (Fase 8) |
+| `documento.aceptado`, `documento.aceptado_con_reparos`, `documento.rechazado` | no al emitir: los pone la consulta del estado del seguimiento (Fase 8, cron o «Consultar estado en el SII»), cuando el envío llega a `EPR` o a un rechazo del sobre. El seguimiento guarda los rechazos **antes** que el estado del envío para no encolar un `documento.aceptado` falso ([seguimiento](../02-guias/seguimiento-envios.md#qué-se-escribe-por-consulta-y-en-qué-orden)); `envio.actualizado` sale con cada cambio de estado o conteos |
 
 `firmado`, `enviado` y `anulado` no encolan evento (`tg_evento_documento` solo los cuatro
 de arriba).

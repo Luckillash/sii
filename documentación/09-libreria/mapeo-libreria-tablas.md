@@ -120,4 +120,19 @@ Lo traduce `apps/web/src/server/emision/`, en certificación o producción. Colu
 Lo que **nunca** se guarda: el XML del CAF fuera de Vault, la `<RSASK>`, el token ni el
 PEM/clave del certificado (ni en `operaciones_sii`, `envios.error` o logs).
 
-<!-- TODO (Fase 8): envíos y estadísticas del seguimiento automático. -->
+## Seguimiento (Fase 8)
+
+`server/seguimiento/persistencia.ts` (`guardarRespuesta`, `registrarFalla`), desde el cron y
+desde «Consultar estado en el SII». Las dos respuestas se normalizan a `RespuestaEstado`
+(`desdeRest`, `desdeSoap`) y pasan por la lista blanca de estados antes de escribir.
+
+| Librería | Dónde | Tabla y columnas |
+|---|---|---|
+| `ClienteBoletaRest.consultarEnvio()` → `EstadoEnvioRest` (`estado`, `json.glosa`, conteos, `json`) | `consulta.ts`, `persistencia.ts` | `envios` (`estado_sii`, `glosa_sii`, `informados`, `aceptados`, `rechazados`, `reparos`, `respuesta_estado` saneada, `ultima_consulta_en`, `consultas + 1`), solo si no es final; `consultas_envio` (una fila) |
+| `EstadoEnvioRest.estadistica[]` | `persistencia.ts` | `envio_estadisticas` (upsert por `envio_id, tipo_dte`), **antes** que `envios` |
+| `EstadoEnvioRest.detalleRepRech[]` | `persistencia.ts` | `envio_rechazos` (upsert por `envio_id, tipo_dte, folio`, **antes** que `envios`; con `EPR` se borran los que ya no vienen; `tipo_observacion` como en el set) |
+| `ClienteDtews.estadoEnvio()` → `EstadoEnvio` (QueryEstUp: `estado`, `glosa`, conteos sumados) | `consulta.ts`, `persistencia.ts` | lo mismo en `envios` y `consultas_envio`; sin estadística ni detalle. Un `EPR` con rechazos o reparos no se guarda (solo la bitácora con la nota) |
+| estado fuera de los 10 de `estados_sii` (`-11`, `RPR`…) | `consulta.ts` (`ErrorEstadoDesconocido`) | solo `consultas_envio.error`, más `consultas` y `ultima_consulta_en` |
+| `ErrorTransporte`, `ErrorRespuestaSii`, token | `persistencia.ts` (`registrarFalla`) | `consultas_envio.error` (saneado, sin el token) y `consultas` / `ultima_consulta_en` |
+
+Detalle y orden en la [guía de seguimiento](../02-guias/seguimiento-envios.md#qué-se-escribe-por-consulta-y-en-qué-orden).

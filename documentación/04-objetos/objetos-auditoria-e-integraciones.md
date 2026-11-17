@@ -1,9 +1,9 @@
 ---
 title: "Objetos: auditoría e integraciones"
-description: "Columnas de operaciones_sii (y qué guarda la capa SII en mensaje y detalle), api_keys, webhooks y webhook_entregas."
-keywords: [operaciones_sii, auditoría, resultado, resultado_operacion, en_curso, confirmada, ensayo, mensaje, detalle, revisada_en, revisada_por, abandonada, detalleSeguro, sanearDetalle, agregarDetalle, operacion_sii, canal_sii, api_key_id, envio_id, solicitud_id, documento_id, iniciada_en, terminada_en, Realtime, api_keys, webhooks, webhook_entregas]
+description: "Columnas de operaciones_sii (y qué guarda la capa SII en mensaje y detalle), api_keys, webhooks, webhook_entregas y notificaciones (migración 0013)."
+keywords: [operaciones_sii, auditoría, resultado, resultado_operacion, en_curso, confirmada, ensayo, mensaje, detalle, revisada_en, revisada_por, abandonada, detalleSeguro, sanearDetalle, agregarDetalle, operacion_sii, canal_sii, api_key_id, envio_id, solicitud_id, documento_id, iniciada_en, terminada_en, Realtime, api_keys, webhooks, webhook_entregas, seguimiento, consultar_envio, cerrarAbandonadas, notificaciones, migración 0013, reclamar_notificacion]
 related: ["01-fundamentos/errores-y-resultados.md", "09-libreria/backend-service-role.md", "06-integraciones/realtime-y-storage.md", "06-integraciones/overview.md", "03-api-reference/acceso-por-tabla.md"]
-source: ["supabase_saas_sii.sql §13 §14 §17", "supabase/migrations/0006_realtime_operaciones.sql", "apps/web/src/server/sii/operacion.ts", "apps/web/src/server/sii/errores.ts"]
+source: ["supabase_saas_sii.sql §13 §14 §17", "supabase/migrations/0006_realtime_operaciones.sql", "apps/web/src/server/sii/operacion.ts", "apps/web/src/server/sii/errores.ts", "apps/web/src/server/seguimiento/cron.ts", "supabase/migrations/0013_notificaciones.sql"]
 ---
 
 # Objetos: auditoría e integraciones
@@ -131,6 +131,42 @@ anulado en paralelo, hasta 3) y, según cómo termine, `track_id`, `incierto: tr
 `folios_anulados` (la **lista** de folios anulados, no la cantidad como en `enviar_set`).
 El ensayo no deja fila; tampoco una validación previa que falla ni «Guardar borrador»
 ([guía](../02-guias/emision-boletas.md#qué-queda-en-operaciones_sii)).
+
+**El seguimiento (Fase 8)** deja dos tipos de fila, ambas 🔁 y `confirmada = true`:
+
+| `operacion` | Cuándo | Columnas | `detalle` |
+|---|---|---|---|
+| `seguimiento` | una por grupo (organización + empresa + ambiente + canal) y corrida del cron | `usuario_id` nulo, `ambiente` y `canal` del grupo, sin `envio_id` | `envios`, `consultados`, `cambiados`, `errores`, `postergados`, `sinCerrar` |
+| `consultar_envio` | una por «Consultar estado en el SII» que sale al SII | `usuario_id`, `envio_id`, ambiente y canal del envío | `estado`, `informados` y `cambio`, o `sin_detalle: true` / `ya_final: true` |
+
+El resultado de `seguimiento` es `ok` si al menos una consulta respondió; si fallaron todas,
+el de la última falla (p. ej. `transporte`). Si Vercel corta la función, la fila queda
+`en_curso` y la corrida siguiente la cierra como `error` con `detalle = { abandonada: true }`
+pasados 15 minutos (`cerrarAbandonadas`). «Ya lo revisé» de un envío incierto marca
+`revisada_en` / `revisada_por` en la fila `emitir` incierta enlazada al envío
+([seguimiento](../02-guias/seguimiento-envios.md#envíos-inciertos-y-ya-lo-revisé)).
+
+## `notificaciones` (migración 0013)
+
+**Pendiente de aplicar.** Una fila por alerta por correo ya reclamada o enviada (Fase 8);
+la escribe solo el backend (`reclamar_notificacion` y `update` con `service_role`), la leen
+los miembros de la organización. Sin Realtime.
+
+| Columna | Tipo | Notas |
+|---|---|---|
+| `organizacion_id` ✔ | `uuid` | FK `organizaciones`, `on delete cascade` |
+| `tipo` ✔ | `text` | formato de evento (`documento.rechazado`, `envio.incierto`, `certificado.por_vencer`); `check` `^[a-z][a-z_]*\.[a-z][a-z_]*$`. Texto, no enum: un aviso nuevo no pide migración |
+| `referencia_id` | `uuid` | documento, envío o certificado; sin FK (apunta a tablas distintas) |
+| `clave` ✔ | `text` | única; empieza por `<tipo>:` (`documento.rechazado:<id>`, `envio.incierto:<id>`, `certificado.por_vencer:<id>:<umbral>`), hasta 200 |
+| `grupo` | `text` | `Idempotency-Key` del correo que la lleva (los rechazos de una organización, empresa y ambiente van juntos); se fija antes de enviar |
+| `datos` | `jsonb` | objeto; lo mínimo para auditar (empresa, ambiente, umbral, envío) |
+| `destinatarios` | `text[]` | hasta 50 correos |
+| `estado` | `text` | `pendiente` (reclamada, saliendo), `enviada` (con `enviado_en`, obligatorio) o `fallida` |
+| `intentos` | `integer` | 1–100; después de 5 no se reclama más |
+| `resend_id`, `error` | `text` | id de Resend; motivo acotado (≤ 500), nunca el cuerpo del correo ni la API key |
+| `creado_en`, `actualizado_en`, `enviado_en` | `timestamptz` | `actualizado_en` por `trg_90_actualizado_en` |
+
+Contratos en [RPC del backend](../03-api-reference/rpc-backend.md#notificaciones-migración-0013).
 
 ### Ciclo de vida de una fila
 

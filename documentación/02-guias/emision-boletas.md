@@ -11,14 +11,15 @@ source: ["supabase_saas_sii.sql §8 §9 §10 §15", "supabase/migrations/0001_es
 > **Úsalo cuando:** emites una boleta desde el panel, tocas `server/emision`, el PDF o el
 > correo de la boleta, o necesitas saber en qué estado queda cada fila cuando algo falla.
 
-**Estado (2026-11-16).** El código de la **Fase 7** está escrito y probado con Vitest y
-dobles (sin red ni base), **sin desplegar**. No hubo migración nueva: la emisión usa las
-tablas y triggers de la `0001` (`documentos`, `documento_detalles`, `receptores`,
-`productos`, `envios`, `tg_validar_documento`, `tg_contar_uso_documento`,
-`sincronizar_documentos_envio`) y la `0012_folio_anulado` (**aplicada el 2026-11-15**;
-[despliegue](../08-esquema-supabase/despliegue.md#fase-7-migración-0012)). El
-[criterio de aceptación](#criterio-de-aceptación-pendiente) está **pendiente**: todavía no
-se ha emitido ninguna boleta desde la UI.
+**Estado (2026-11-16).** El código de la **Fase 7** está probado con Vitest y dobles (sin
+red ni base), **desplegado** (`4cb6e9f`) y con el
+[criterio de aceptación](#criterio-de-aceptación-cumplido-el-2026-11-16) cumplido el
+2026-11-16. No hubo migración nueva: la emisión usa las tablas y triggers de la `0001`
+(`documentos`, `documento_detalles`, `receptores`, `productos`, `envios`,
+`tg_validar_documento`, `tg_contar_uso_documento`, `sincronizar_documentos_envio`) y la
+`0012_folio_anulado` (**aplicada el 2026-11-15**;
+[despliegue](../08-esquema-supabase/despliegue.md#fase-7-migración-0012)). El estado del
+envío después de la subida lo trae el [seguimiento](seguimiento-envios.md) de la Fase 8.
 
 ## Dónde vive
 
@@ -217,8 +218,9 @@ ligera:
 
 1. **`prepararEmision` otra vez** (los datos pudieron cambiar desde el ensayo).
 2. **Cliente REST** de la librería (`ClienteBoletaRest`) en el ambiente del borrador, con
-   la fábrica propia `FABRICA_REST_EMISION` (`dependencias.ts`): la de certificación
-   (`FABRICAS_SII.rest`) fija `ambiente: 'certificacion'`. Transporte por invocación
+   la fábrica propia `FABRICA_REST_EMISION` (`dependencias.ts`; desde la Fase 8 delega en
+   `clienteBoletaRest` de `server/sii/clientes.ts`, compartido con el seguimiento): la de
+   certificación (`FABRICAS_SII.rest`) fija `ambiente: 'certificacion'`. Transporte por invocación
    (`await using`) y `TokenStoreSupabase`.
 3. **Token primero** (`obtenerToken(rut)`): si falla, todavía no se asignó ningún folio.
 4. **`asignar_folio(empresa, ambiente, tipo)`** (bloquea el CAF; `P0002` → «No quedan
@@ -449,7 +451,10 @@ bloquearía) y se le pone la URL al llegar.
   `incierto` anterior. Lo que impide reemitir **ese** documento es que ya no está en
   `borrador`: volver a emitirlo con su `borradorId` da «No sabemos si el SII recibió esta
   boleta» sin salir al SII. Una boleta nueva (otro documento) sí se puede emitir.
-- El seguimiento de los envíos inciertos (consultar el SII, Tablero) es de la Fase 8
+- Desde la Fase 8 un envío incierto aparece en el Tablero, llega por correo a los
+  administradores y se marca con «Ya lo revisé» en su página; nunca se consulta ni se
+  reintenta solo ([seguimiento](seguimiento-envios.md#envíos-inciertos-y-ya-lo-revisé)). El
+  estado de una boleta `enviado` (aceptada, rechazada) lo trae el seguimiento
   ([seguimiento](seguimiento-envios.md)).
 
 ## Permisos

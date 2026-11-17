@@ -21,8 +21,13 @@ export interface MarcoAppProps {
   children: ReactNode;
 }
 
+// Secciones sin ítem propio en el menú que pertenecen a otra: `/envios/[id]` se abre
+// desde el Track ID de un documento, así que marca «Documentos emitidos».
+const SECCION_PADRE: Readonly<Record<string, string>> = { envios: 'documentos' };
+
 function claveActiva(segmento: string | null): ClaveNavegacion | undefined {
-  return NAVEGACION.find((item) => item.ruta === segmento)?.clave;
+  const ruta = segmento ? (SECCION_PADRE[segmento] ?? segmento) : segmento;
+  return NAVEGACION.find((item) => item.ruta === ruta)?.clave;
 }
 
 export function MarcoApp({ org, usuario, selectorOrganizacion, aviso, children }: MarcoAppProps) {

@@ -39,6 +39,11 @@ const esquemaTurnstile = z.object({
   TURNSTILE_SECRET_KEY: z.string().min(10),
 });
 
+// Bearer de /api/cron/*; el mismo valor que `cron_token` en Vault (lo envía pg_cron).
+const esquemaCron = z.object({
+  CRON_SECRET: z.string().min(16),
+});
+
 function validar<T extends z.ZodType>(esquema: T, nombre: string): z.infer<T> {
   const resultado = esquema.safeParse(process.env);
   if (!resultado.success) {
@@ -93,3 +98,9 @@ export const envCorreo = (): z.infer<typeof esquemaCorreo> | null => opcional(es
  */
 export const envTurnstile = (): z.infer<typeof esquemaTurnstile> | null =>
   opcional(esquemaTurnstile);
+
+/**
+ * Secreto de las rutas /api/cron/* (PLAN-SAAS §4.4). `null` si falta: la ruta responde
+ * 503 y no ejecuta nada (nunca queda abierta sin secreto).
+ */
+export const envCron = (): z.infer<typeof esquemaCron> | null => opcional(esquemaCron);

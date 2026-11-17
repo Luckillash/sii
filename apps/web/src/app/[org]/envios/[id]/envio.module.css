@@ -1,0 +1,73 @@
+/* Detalle de un envío al SII (Fase 8). Solo tokens del design system. */
+
+.volver {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+.cabecera {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.track {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.columnas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: stretch;
+}
+
+.tarjeta {
+  flex: 1 1 340px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.seccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.error {
+  color: var(--error);
+}
+
+/* JSON crudo del SII: solo como detalle plegable. */
+.crudo {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+}
+
+.crudo summary {
+  cursor: pointer;
+  color: var(--link);
+  width: fit-content;
+  border-radius: var(--radius-sm);
+}
+
+.crudo pre {
+  margin: var(--space-2) 0 0;
+  padding: var(--space-3);
+  background: var(--surface-sunken);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
