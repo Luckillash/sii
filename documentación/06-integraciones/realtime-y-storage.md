@@ -1,9 +1,9 @@
 ---
 title: "Realtime y Storage"
 description: "Tablas publicadas en Realtime (incluida la migración 0006), bucket documentos-xml, rutas, AlmacenDocumentos, content-type y URLs firmadas."
-keywords: [Realtime, supabase_realtime, postgres_changes, replica identity, migración 0006, operaciones_sii, solicitudes_folios, documentos, envios, procesos_certificacion, RLS, Storage, documentos-xml, bucket, AlmacenDocumentos, rutaDocumento, subirXml, subirPdf, urlFirmada, createSignedUrl, MAXIMO_SEGUNDOS_URL, MAXIMO_BYTES, ErrorAlmacen, content-type, application/xml, text/xml, application/pdf, charset, ISO-8859-1, xml_path, uuid_o_nulo, storage.foldername, EnVivo, router.refresh, asistente de certificación, DTE-39-F, EnvioBOLETA-set, folios, /folios, migración 0011, cafs, folios_anulados, emisión, EnvioBOLETA-39-F, DTE-39-F41-carta.pdf, rollo, metadata.pdf, receptor_correo, metadata.correo, enlaceDocumento, SEGUNDOS_URL, nombresArchivos, nombrePdfDeXml, Fase 8, useEnVivoStore, ProveedorEnVivo, filtrosRealtime, estadoVigente, envioVigente, actualizado_en, documentos/EnVivo.tsx, suscribirEnVivo, lib/supabase/realtime.ts, realtime.setAuth, phx_join, system, subscription_check_filters, carga completa]
-related: ["08-esquema-supabase/rls-y-privilegios.md", "04-objetos/objetos-auditoria-e-integraciones.md", "09-libreria/backend-service-role.md", "03-api-reference/acceso-por-tabla.md", "07-referencia/trampas-conocidas.md"]
-source: ["supabase_saas_sii.sql §18 §19", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/verificaciones/0006_realtime_operaciones.sql", "supabase/migrations/0011_folios.sql", "apps/web/src/server/sii/almacen.ts", "apps/web/src/app/[org]/certificacion/EnVivo.tsx", "apps/web/src/server/certificacion/envio-set.ts", "apps/web/src/server/emision/representacion.ts", "apps/web/src/server/emision/enlaces.ts", "apps/web/src/app/[org]/documentos/EnVivo.tsx", "apps/web/src/stores/enVivo.ts", "apps/web/src/stores/ProveedorEnVivo.tsx", "apps/web/src/lib/supabase/realtime.ts"]
+keywords: [Realtime, supabase_realtime, postgres_changes, replica identity, migración 0006, operaciones_sii, solicitudes_folios, documentos, envios, procesos_certificacion, RLS, Storage, documentos-xml, bucket, AlmacenDocumentos, rutaDocumento, subirXml, subirPdf, urlFirmada, createSignedUrl, MAXIMO_SEGUNDOS_URL, MAXIMO_BYTES, ErrorAlmacen, content-type, application/xml, text/xml, application/pdf, charset, ISO-8859-1, xml_path, uuid_o_nulo, storage.foldername, EnVivo, router.refresh, asistente de certificación, DTE-39-F, EnvioBOLETA-set, folios, /folios, migración 0011, cafs, folios_anulados, emisión, EnvioBOLETA-39-F, DTE-39-F41-carta.pdf, rollo, metadata.pdf, receptor_correo, metadata.correo, enlaceDocumento, SEGUNDOS_URL, nombresArchivos, nombrePdfDeXml, Fase 8, useEnVivoStore, ProveedorEnVivo, filtrosRealtime, estadoVigente, envioVigente, actualizado_en, documentos/EnVivo.tsx, suscribirEnVivo, lib/supabase/realtime.ts, realtime.setAuth, phx_join, system, subscription_check_filters, carga completa, Tablero, canal tablero, Fase 9]
+related: ["08-esquema-supabase/rls-y-privilegios.md", "04-objetos/objetos-auditoria-e-integraciones.md", "09-libreria/backend-service-role.md", "03-api-reference/acceso-por-tabla.md", "07-referencia/trampas-conocidas.md", "02-guias/tablero-y-reportes.md"]
+source: ["supabase_saas_sii.sql §18 §19", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/verificaciones/0006_realtime_operaciones.sql", "supabase/migrations/0011_folios.sql", "apps/web/src/server/sii/almacen.ts", "apps/web/src/app/[org]/certificacion/EnVivo.tsx", "apps/web/src/server/certificacion/envio-set.ts", "apps/web/src/server/emision/representacion.ts", "apps/web/src/server/emision/enlaces.ts", "apps/web/src/app/[org]/documentos/EnVivo.tsx", "apps/web/src/stores/enVivo.ts", "apps/web/src/stores/ProveedorEnVivo.tsx", "apps/web/src/lib/supabase/realtime.ts", "apps/web/src/app/[org]/tablero/page.tsx"]
 ---
 
 # Realtime y Storage
@@ -188,6 +188,21 @@ es que el badge cambie sin recargar aunque el refresco tarde o falle.
   nada de Vault.
 - Cada consulta del seguimiento sube `envios.consultas` y `actualizado_en`, así que también
   una consulta sin cambio de estado manda un evento de `envios` y un refresco.
+
+### Tablero (Fase 9)
+
+Cuarto uso, sin componente nuevo: `/[org]/tablero` va dentro de `ProveedorEnVivo` y monta el
+mismo `documentos/EnVivo.tsx` con el canal `tablero:<organizacionId>`.
+
+- Escucha `documentos` y `envios` de **toda la organización** (`organizacion_id=eq.<id>`),
+  no solo la empresa y el ambiente elegidos: un cambio en otra empresa también refresca
+  (inofensivo).
+- Cada evento programa un `router.refresh()` con 400 ms y el RSC vuelve a leer cifras,
+  folios, últimos documentos y alertas con RLS.
+- **No escucha `cafs`**: un CAF que sube o anula otro administrador aparece en el próximo
+  refresco o al recargar.
+- Sin migración: las dos tablas están publicadas desde la `0001`. Se suscribe con
+  `suscribirEnVivo`, así que no tiene el defecto de la carga completa.
 
 ### Verificación
 

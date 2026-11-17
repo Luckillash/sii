@@ -1,5 +1,30 @@
-/* Tablero: avisos de certificados (Fase 3) con su acción, como en la plantilla, y envíos
-   por verificar (Fase 8). */
+/* Tablero (PLAN-SAAS Fase 9), fiel a la plantilla «Tablero»: cabecera con el período,
+   filtros, avisos (certificados, folios, envíos por verificar), cifras del período en una
+   grilla de 4, medidores de folios, últimos documentos y descargas. */
+
+.cabeceraFila {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+
+/* Filtros GET (empresa, ambiente, período), como en Documentos. */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-4);
+  align-items: flex-end;
+}
+
+.filtro {
+  flex: 1 1 160px;
+}
+
+.filtroAncho {
+  flex: 1 1 220px;
+}
 
 .accionAviso {
   margin-top: var(--space-2);
@@ -11,4 +36,101 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
+}
+
+.seccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.seccionCabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.enlaceSeccion {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--text-label-weight);
+}
+
+/* `min(100%, …)`: a 360 px las tarjetas bajan a una columna sin desbordar. */
+.cifras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: var(--space-4);
+}
+
+.cifra {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.etiquetaCifra {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--text-label-weight);
+  color: var(--ink-muted);
+}
+
+/* Mismo tamaño que el `Monto` destacado, para que las 4 cifras alineen. */
+.numero {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.notaCifra {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+.medidores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: var(--space-4);
+}
+
+.sinFolios {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sinFoliosCabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.agotado {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--error);
+}
+
+.falla {
+  padding: var(--space-4);
+  color: var(--ink-muted);
+}
+
+.descargas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }

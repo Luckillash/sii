@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react';
+import { Download, Plus } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
@@ -28,6 +28,7 @@ import {
 } from '@/server/documentos/filtros';
 import { nombreAmbiente } from '@/server/documentos/presentacion';
 import { listarEmpresas } from '@/server/empresas';
+import { hrefExportar } from '@/server/reportes/filas';
 import { exigirMembresia, obtenerPerfil } from '@/server/sesion';
 import { ProveedorEnVivo } from '@/stores/ProveedorEnVivo';
 import org from '../organizacion.module.css';
@@ -229,6 +230,28 @@ export default async function PaginaDocumentos({
           ) : null}
         </div>
       </form>
+
+      {/* Exportación (Fase 9): lo mismo que muestra la lista, todas las páginas. La empresa
+          va explícita para que el archivo sea el de la tabla aunque cambie la activa. */}
+      <div className={estilos.exportar}>
+        <span className={estilos.nota}>Exportar lo filtrado:</span>
+        <a
+          href={hrefExportar(slug, { ...vigentes, empresa: empresa.id }, 'documentos', 'csv')}
+          download
+          className={clasesBoton('secundario', 'sm')}
+        >
+          <Download size={16} strokeWidth={1.5} aria-hidden="true" />
+          Exportar CSV
+        </a>
+        <a
+          href={hrefExportar(slug, { ...vigentes, empresa: empresa.id }, 'documentos', 'xlsx')}
+          download
+          className={clasesBoton('secundario', 'sm')}
+        >
+          <Download size={16} strokeWidth={1.5} aria-hidden="true" />
+          Exportar Excel
+        </a>
+      </div>
 
       <div className={estilos.contenido}>
         <div className={estilos.columnaTabla}>

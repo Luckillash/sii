@@ -1,16 +1,37 @@
 ---
 title: "Índice de operaciones"
 description: "Todas las funciones RPC, vistas y servicios del SII, con quién puede llamarlos."
-keywords: [índice, operaciones, asistente de certificación, server/certificacion, Server Actions, postular, descargarSet, solicitarFoliosSet, enviarSet, consultarEstadoSet, solicitarRevision, consultarEstadoDeclaracion, declarar, marcarRevisada, leerAsistente, guardarDatosPostulacion, guardarDatosDeclaracion, registrar_caf, guardar_set_pruebas, folios, server/folios, leerFolios, solicitarFolios, subirCaf, anularFolios, puedeEmitir, alertaDespuesDeAsignar, alertarSiCruza, anular_folios, encolar_evento, folios.por_agotarse, migración 0011, emisión, server/emision, emitirDocumento, emitir, guardarBorrador, borrarBorrador, leerVistaEmision, buscarReceptores, buscarProductos, enlaceDocumento, ResultadoEmision, Fase 8, seguimiento, ejecutarSeguimiento, consultarEnvio, consultarEstado, consultar_envio, ejecutarAlertas, marcarEnvioRevisado, marcarRevisado, reenviarAlReceptor, enlaceArchivo, listarDocumentos, leerEnvio, enviosInciertos, reclamar_notificacion, /api/cron/seguimiento, /api/cron/alertas]
-related: ["03-api-reference/acceso-por-tabla.md", "03-api-reference/servicios-sii.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "02-guias/emision-boletas.md", "02-guias/seguimiento-envios.md", "03-api-reference/rpc-backend.md"]
-source: ["apps/web/src/server/seguimiento/index.ts", "apps/web/src/server/documentos/index.ts", "apps/web/src/server/alertas/index.ts", "apps/web/src/app/[org]/documentos/acciones.ts", "apps/web/src/app/api/cron/", "apps/web/src/server/emision/index.ts", "apps/web/src/app/[org]/emitir/acciones.ts", "supabase_saas_sii.sql §15 §16 §17", "apps/web/src/server/certificacion/index.ts", "apps/web/src/app/[org]/certificacion/acciones.ts", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/folios/index.ts", "apps/web/src/app/[org]/folios/acciones.ts", "supabase/migrations/0011_folios.sql"]
+keywords: [índice, operaciones, asistente de certificación, server/certificacion, Server Actions, postular, descargarSet, solicitarFoliosSet, enviarSet, consultarEstadoSet, solicitarRevision, consultarEstadoDeclaracion, declarar, marcarRevisada, leerAsistente, guardarDatosPostulacion, guardarDatosDeclaracion, registrar_caf, guardar_set_pruebas, folios, server/folios, leerFolios, solicitarFolios, subirCaf, anularFolios, puedeEmitir, alertaDespuesDeAsignar, alertarSiCruza, anular_folios, encolar_evento, folios.por_agotarse, migración 0011, emisión, server/emision, emitirDocumento, emitir, guardarBorrador, borrarBorrador, leerVistaEmision, buscarReceptores, buscarProductos, enlaceDocumento, ResultadoEmision, Fase 8, seguimiento, ejecutarSeguimiento, consultarEnvio, consultarEstado, consultar_envio, ejecutarAlertas, marcarEnvioRevisado, marcarRevisado, reenviarAlReceptor, enlaceArchivo, listarDocumentos, leerEnvio, enviosInciertos, reclamar_notificacion, /api/cron/seguimiento, /api/cron/alertas, Fase 9, Tablero, leerCifras, leerResumenFolios, armarResumen, generarExportacion, leerPedido, hrefExportacion, hrefExportar, /reportes/exportar]
+related: ["03-api-reference/acceso-por-tabla.md", "03-api-reference/servicios-sii.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "02-guias/emision-boletas.md", "02-guias/seguimiento-envios.md", "03-api-reference/rpc-backend.md", "02-guias/tablero-y-reportes.md"]
+source: ["apps/web/src/server/seguimiento/index.ts", "apps/web/src/server/documentos/index.ts", "apps/web/src/server/alertas/index.ts", "apps/web/src/app/[org]/documentos/acciones.ts", "apps/web/src/app/api/cron/", "apps/web/src/server/emision/index.ts", "apps/web/src/app/[org]/emitir/acciones.ts", "supabase_saas_sii.sql §15 §16 §17", "apps/web/src/server/certificacion/index.ts", "apps/web/src/app/[org]/certificacion/acciones.ts", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/folios/index.ts", "apps/web/src/app/[org]/folios/acciones.ts", "supabase/migrations/0011_folios.sql", "apps/web/src/server/tablero/index.ts", "apps/web/src/server/reportes/index.ts", "apps/web/src/lib/reportes.ts", "apps/web/src/app/[org]/reportes/exportar/route.ts"]
 ---
 
 # Índice de operaciones
 
 > **Úsalo cuando:** buscas una operación por su función.
 
-<!-- TODO: índice completo de RPC, vistas y servicios (Fases 2–4 y 8 en adelante). -->
+<!-- TODO: índice completo de RPC, vistas y servicios (Fases 2–4 y 10 en adelante). -->
+
+## Tablero y reportes (Fase 9)
+
+Solo lectura, con la sesión (RLS) y sin salir al SII. Las cifras viven en
+`apps/web/src/server/tablero/`, el resumen de folios en `apps/web/src/server/folios/lectura.ts`
+y las exportaciones en `apps/web/src/server/reportes/` (contrato de la URL en
+`apps/web/src/lib/reportes.ts`). Detalle en [Tablero y reportes](../02-guias/tablero-y-reportes.md).
+Código listo, **sin desplegar**; sin migraciones.
+
+| Función | Quién la llama | Sale al SII | `operacion_sii` | Escribe |
+|---|---|---|---|---|
+| `leerCifras(ctx)` | `page.tsx` de `/tablero` | no | — | nada (sesión: `v_ventas_diarias`, el set de pruebas aceptado en certificación y 7 conteos de `documentos` con `head: true`) |
+| `leerResumenFolios(organizacionId, empresaId)` | `page.tsx` de `/tablero` | no | — | nada (sesión: una consulta a `cafs`; arma las tarjetas con `armarResumen`, la misma función de `leerFolios`) |
+| `leerFiltrosTablero`, `opcionesPeriodoTablero`, `calcularVentas`, `cifrasDocumentos`, `alertasFolios` | `page.tsx` de `/tablero` | no | — | nada (puras) |
+| `generarExportacion({ reporte, formato, ctx, rutEmpresa, filtros })` | `GET /[org]/reportes/exportar` (cualquier miembro) | no | — | nada (sesión: `documentos` paginados por *keyset* o `v_ventas_diarias`); devuelve el archivo CSV o XLSX |
+| `leerPedido(parametros, periodo)` | la misma ruta | no | — | nada (puro; 400 si el pedido no vale) |
+| `hrefExportacion(slug, p)` / `hrefExportar(slug, filtros, reporte, formato)` | Tablero / Documentos emitidos | no | — | nada (enlaces) |
+
+La ruta responde 200 con el archivo, 307 sin sesión, 400, 404 (sin membresía, empresa ajena
+o sin empresas), 413 (más de 50.000 documentos) o 500
+([códigos](../02-guias/tablero-y-reportes.md#la-ruta)).
 
 ## Seguimiento de envíos y documentos (Fase 8)
 

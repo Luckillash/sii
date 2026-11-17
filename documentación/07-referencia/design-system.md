@@ -1,8 +1,8 @@
 ---
 title: "Design system «Boletéame» en la app"
 description: "Tokens, componentes TSX con CSS Modules, layouts, catálogo /_ds y pruebas de accesibilidad."
-keywords: ["design system", "tokens", "CSS Modules", "EstadoDTE", "incierto", "Por verificar", "BannerAmbiente", "Dialogo", "LayoutApp", "axe", "/_ds", "stylelint", "Autocompletado", "combobox", "aria-activedescendant"]
-related: ["01-fundamentos/formatos-y-validaciones.md", "01-fundamentos/errores-y-resultados.md", "07-referencia/trampas-conocidas.md"]
+keywords: ["design system", "tokens", "CSS Modules", "EstadoDTE", "incierto", "Por verificar", "BannerAmbiente", "Dialogo", "LayoutApp", "axe", "/_ds", "stylelint", "Autocompletado", "combobox", "aria-activedescendant", "Tablero", "Monto", "MedidorFolios", "Fase 9"]
+related: ["01-fundamentos/formatos-y-validaciones.md", "01-fundamentos/errores-y-resultados.md", "07-referencia/trampas-conocidas.md", "02-guias/tablero-y-reportes.md"]
 source: ["PLAN-SAAS.md §4.2 y Fase 1", "design-system/boleteame/", "apps/web/src/components/boleteame/Autocompletado.tsx"]
 ---
 
@@ -57,7 +57,7 @@ Los ocho del design system mantienen la API de `design-system/boleteame/componen
 | `Monto` | no | CLP sin decimales; USD/UF con dos decimales; `destacado`, `tenue`. |
 | `CampoRut` | sí | Formatea al salir del campo y valida el dígito verificador. Las estáticas `CampoRut.formatear/validar` no cruzan al servidor: ahí se usa `@/lib/formatos`. |
 | `Alerta` | no | `error` → `role="alert"`; el resto `role="status"`. |
-| `MedidorFolios` | no | Aviso bajo el 15 % (`UMBRAL_AVISO_FOLIOS`). `calcularFolios()` es puro y sirve en el servidor para bloquear la emisión con el CAF agotado. |
+| `MedidorFolios` | no | Aviso bajo el 15 % (`UMBRAL_AVISO_FOLIOS`). `calcularFolios()` es puro y sirve en el servidor para bloquear la emisión con el CAF agotado. Lo usan Folios (el CAF en uso), Emitir y el Tablero (Fase 9: con los números de la alerta, `medidorFoliosTablero`; con varios CAF activos, un rango sintético y la nota «Suma los folios de todos los CAF activos de este tipo.»; sin CAF en uso, una `Tarjeta` «0 disponibles» en su lugar). |
 | `TablaDTE` | sí | Selección con clic, Enter o Espacio (`aria-selected`). |
 
 Componentes de soporte (equivalen a las clases `tb-*` de las plantillas):
@@ -78,6 +78,8 @@ Layouts:
 
 - **`LayoutApp`**: menú lateral (marca, empresa activa o `selectorEmpresa`, navegación, usuario) y `main`. Props `org`, `activo`, `empresa`, `usuario`, `aviso`, `banderas`. Incluye el enlace «Ir al contenido».
 - **`LayoutIngreso`**: panel `sello` con borde perforado y la columna del formulario (pantallas de la Fase 2).
+
+**Tablero (Fase 9)**, sobre la plantilla «Tablero»: cuatro `Tarjeta` de cifras (`Monto destacado` para ventas e IVA; números en `--font-mono`), `MedidorFolios`, la `ListaDocumentos` de Documentos emitidos, `Alerta` de inciertos, certificados y folios, `BannerAmbiente`, selectores con `Campo` + `Select` en un formulario GET, una sola acción `primario` («Emitir boleta») y las descargas como enlaces `<a download>` con `clasesBoton('secundario', 'sm')` e ícono `Download` de 16 px. Una sección que no se pudo leer muestra una `Tarjeta` `plana` con `role="status"` ([guía](../02-guias/tablero-y-reportes.md)).
 
 **Navegación** (`navegacion.ts`): Tablero, Emitir documento, Documentos emitidos, Folios (CAF), Certificación y Configuración. «Documentos recibidos» y «Libro de Compras y Ventas» están ocultos por las banderas `dteRecibidos` y `libroComprasVentas` hasta la Fase 14 (H2).
 

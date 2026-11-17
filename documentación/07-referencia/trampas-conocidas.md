@@ -1,9 +1,9 @@
 ---
 title: "Trampas conocidas"
 description: "Comportamientos no obvios del SII, de la librería y del esquema."
-keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna, ad_empresa1, ad_empresa2, Actualización de datos del contribuyente, representante legal, no está autorizado para operar en esta modalidad, verificar_autorizacion, ConsultaAutorizacion, situación tributaria de terceros, STC, stc/noauthz, getConsultaData, timbrajes, documentos autorizados, reCAPTCHA, SituacionTributaria, Fase 6, folios, migración 0011, anular_folios, cola completa, trg_20_caf_sin_traslape, 23P01, revisión con el SII, simulada, TransporteSinTimbrar, of_genera_folio, revisionId, folios.por_agotarse, Idempotency-Key, denominador, folio asignado sin documento, política alta, subirCaf, RSAPK, Fase 7, emisión, emitirDocumento, FABRICA_REST_EMISION, FABRICAS_SII.rest, documentoId, doble clic, borradorId, clave_idempotencia, sessionStorage, Ya la revisé, esFolioAnulado, INTENTOS_FOLIO, PDF417, bwip-js, bwip-js/node, binarytext, pdfkit, serverExternalPackages, AFM, ted_xml, latin1, instructivo de representación impresa, enlaceDocumento, uso_mensual.envios, Fase 8, seguimiento, ejecutarSeguimiento, consultarEnvio, consultar_envio, server/sii/clientes.ts, backoff, filtroPorConsultar, inconsistente, lista blanca, ESTADOS_CONOCIDOS, -11, RPR, ErrorTokenSoap, QueryEstUp, detalleIncompleto, orden de escritura, documento.aceptado falso, ya_final, cerrarAbandonadas, envio_sin_cerrar, Ya lo revisé, notificaciones, reclamar_notificacion, migración 0013, migración 0014, pg_cron, cron_token, CRON_SECRET, PRESUPUESTO_MS, LIMITE_MS]
-related: ["08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md", "02-guias/emision-boletas.md", "02-guias/seguimiento-envios.md"]
-source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/", "supabase/migrations/0011_folios.sql", "apps/web/src/server/folios/", "apps/web/src/app/[org]/folios/", "apps/web/src/server/emision/", "apps/web/src/server/pdf/", "apps/web/src/app/[org]/emitir/", "apps/web/next.config.ts", "apps/web/src/server/seguimiento/", "apps/web/src/server/alertas/", "apps/web/src/server/documentos/", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql"]
+keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna, ad_empresa1, ad_empresa2, Actualización de datos del contribuyente, representante legal, no está autorizado para operar en esta modalidad, verificar_autorizacion, ConsultaAutorizacion, situación tributaria de terceros, STC, stc/noauthz, getConsultaData, timbrajes, documentos autorizados, reCAPTCHA, SituacionTributaria, Fase 6, folios, migración 0011, anular_folios, cola completa, trg_20_caf_sin_traslape, 23P01, revisión con el SII, simulada, TransporteSinTimbrar, of_genera_folio, revisionId, folios.por_agotarse, Idempotency-Key, denominador, folio asignado sin documento, política alta, subirCaf, RSAPK, Fase 7, emisión, emitirDocumento, FABRICA_REST_EMISION, FABRICAS_SII.rest, documentoId, doble clic, borradorId, clave_idempotencia, sessionStorage, Ya la revisé, esFolioAnulado, INTENTOS_FOLIO, PDF417, bwip-js, bwip-js/node, binarytext, pdfkit, serverExternalPackages, AFM, ted_xml, latin1, instructivo de representación impresa, enlaceDocumento, uso_mensual.envios, Fase 8, seguimiento, ejecutarSeguimiento, consultarEnvio, consultar_envio, server/sii/clientes.ts, backoff, filtroPorConsultar, inconsistente, lista blanca, ESTADOS_CONOCIDOS, -11, RPR, ErrorTokenSoap, QueryEstUp, detalleIncompleto, orden de escritura, documento.aceptado falso, ya_final, cerrarAbandonadas, envio_sin_cerrar, Ya lo revisé, notificaciones, reclamar_notificacion, migración 0013, migración 0014, pg_cron, cron_token, CRON_SECRET, PRESUPUESTO_MS, LIMITE_MS, Fase 9, Tablero, v_ventas_diarias, set_pruebas, agregaciones de PostgREST, db-aggregates-enabled, max-rows, exportación, CSV, BOM, separador, inyección de fórmulas, neutralizarFormula, XLSX, inlineStr, escaparXml, serieExcel, crc32, keyset, armarResumen]
+related: ["08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md", "02-guias/emision-boletas.md", "02-guias/seguimiento-envios.md", "02-guias/tablero-y-reportes.md"]
+source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/", "supabase/migrations/0011_folios.sql", "apps/web/src/server/folios/", "apps/web/src/app/[org]/folios/", "apps/web/src/server/emision/", "apps/web/src/server/pdf/", "apps/web/src/app/[org]/emitir/", "apps/web/next.config.ts", "apps/web/src/server/seguimiento/", "apps/web/src/server/alertas/", "apps/web/src/server/documentos/", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "apps/web/src/server/tablero/", "apps/web/src/server/reportes/", "apps/web/src/app/[org]/reportes/exportar/route.ts"]
 ---
 
 # Trampas conocidas
@@ -790,8 +790,9 @@ deploy `3ade4c9`).
 - **«Ya lo revisé» no cambia el envío.** El documento sigue `incierto` en Documentos
   emitidos (filtro «Por verificar»); solo deja de salir en el Tablero. El correo de alerta ya
   salió y no se repite.
-- **El Tablero muestra solo la empresa activa**, en los dos ambientes; los correos de
-  inciertos cubren todas las empresas de la organización.
+- **El Tablero muestra solo los inciertos de la empresa elegida** (desde la Fase 9, con su
+  selector de empresa), en los dos ambientes aunque el selector de ambiente mire uno; los
+  correos de inciertos cubren todas las empresas de la organización.
 - **El cron también consulta el envío del set de pruebas.** `v_envios_por_consultar` no
   filtra por `proposito`, así que un envío `set_pruebas` en proceso se consulta y sus
   documentos se sincronizan solos. La etapa del proceso (`set_aceptado`) **no** avanza con
@@ -832,3 +833,106 @@ deploy `3ade4c9`).
   «Ver `PRESUPUESTO_MS` en server/seguimiento/cron.ts: deja de empezar consultas a los
   240 s»; el código usa `LIMITE_MS` = 280 s y los peores casos de la
   [guía](../02-guias/seguimiento-envios.md#presupuesto-de-tiempo).
+
+## Tablero y reportes (Fase 9)
+
+Detalle en la [guía del Tablero y reportes](../02-guias/tablero-y-reportes.md). Sin
+migraciones nuevas.
+
+### Decisiones
+
+- **Ventas desde `v_ventas_diarias` menos el set, sin migración.** La vista da pocas filas
+  (una por día y tipo) y el set de pruebas se resta con una consulta aparte, solo en
+  certificación. Cambiar la vista para excluir el set habría pedido una migración y la usan
+  otros (RCOF de períodos antiguos).
+- **Conteos con `count: 'exact', head: true`, uno por estado** (siete consultas sin filas),
+  con los mismos filtros que la lista de Documentos emitidos (sin el set, sin documentos sin
+  folio), para que «Ver todos» muestre lo mismo.
+- **Folios con `armarResumen` compartido.** Tablero y Folios calculan las tarjetas con la
+  misma función; el Tablero lee solo `cafs` (`leerResumenFolios`). El medidor del Tablero usa
+  los mismos números que la alerta (`medidorFoliosTablero`); la página de Folios no cambió.
+- **Cada sección falla sola** (`seguro`): una lectura que falla muestra su aviso y el resto se
+  ve; en consola solo el tipo de error.
+- **Exportación como ruta GET con `<a download>`**, no Server Action: el navegador maneja la
+  descarga y el enlace se puede copiar. Lee con la sesión (RLS), nunca con `service_role`.
+- **XLSX propio, sin dependencias**: un libro de una hoja con `inlineStr` y un ZIP mínimo
+  sobre `node:zlib` (unas 300 líneas entre `xlsx.ts` y `zip.ts`), en vez de agregar una
+  librería de hojas de cálculo.
+- **Resumen diario según el ambiente**: en producción, directo de `v_ventas_diarias` (no hay
+  set); en certificación, boleta por boleta sin el set.
+
+### Trampas
+
+- **`v_ventas_diarias` incluye el set de pruebas.** La vista agrupa los documentos
+  `aceptado` y `aceptado_con_reparos` sin mirar `origen`: en certificación suma los casos del
+  set que el SII aceptó, que no son ventas. Quien la lea en certificación tiene que restarlos
+  (`calcularVentas`) o leer `documentos` con `origen <> 'set_pruebas'`. En producción no hay
+  set (solo se crea en certificación: `envio-set.ts` fija `AMBIENTE = 'certificacion'`) y la
+  vista se puede usar tal cual.
+- **Con varios CAF activos, el medidor del Tablero dibuja un rango sintético.**
+  `medidorFoliosTablero` usa los números de la alerta (disponibles y total de todos los CAF
+  activos): con un CAF, su rango real; con varios, un rango que parte del primer folio del CAF
+  en uso con el largo del total, más la nota «Suma los folios de todos los CAF activos de este
+  tipo.». Es exacto si los CAF son consecutivos; si no, los folios «desde», «hasta» y
+  «siguiente» del medidor no existen como tales. La página de Folios muestra el CAF en uso y
+  el total en una nota: con varios CAF, los dos medidores no se ven iguales.
+- **Restar el set cuadra los montos, pero no el rango de folios.** La vista solo trae
+  `folio_min` y `folio_max` por día y tipo; si un folio del set es uno de los extremos, no hay
+  forma de corregir el rango restando. Por eso el resumen diario de certificación se arma
+  desde `documentos`.
+- **Las agregaciones de PostgREST están apagadas.** `select=mnt_neto.sum()` falla en este
+  proyecto (`db-aggregates-enabled` en falso, el valor por defecto de PostgREST). Sumar
+  trayendo filas de `documentos` choca con el `max-rows` de 1.000: un `select` sin paginar
+  devuelve las primeras 1.000 sin avisar y la suma sale corta. Usar la vista, conteos con
+  `head: true` o una RPC.
+- **Las sumas de la vista son `numeric`, no `bigint`.** `sum()` de un `bigint` da `numeric`,
+  y los tipos generados o un cliente pueden entregarlo como texto. `numero()` acepta número o
+  texto y trata `null` como 0; no sumar esas columnas con `+` directo.
+- **Inyección de fórmulas en CSV.** Una razón social que empieza con `=`, `+`, `-`, `@`,
+  tabulación o retorno de carro se evalúa como fórmula al abrir el CSV en Excel (OWASP «CSV
+  Injection»). `neutralizarFormula` le antepone `'` a toda celda de **texto** (también a los
+  títulos); quien procese el CSV con otra herramienta verá ese `'` como parte del texto. No
+  se aplica a números (un monto negativo sigue siendo número) ni al XLSX, donde un
+  `inlineStr` nunca es fórmula. Una columna nueva de texto tiene que declararse `texto` en su
+  `Columna` para quedar protegida.
+- **Separador `;` y BOM para Excel en es-CL.** En la configuración regional de Chile la coma
+  es el separador decimal y Excel espera `;` como separador de lista: con `,` todo cae en una
+  columna. Sin el BOM, Excel lee el UTF-8 como Windows-1252 y rompe tildes y eñes. Un CSV
+  para otra herramienta (o para Excel en inglés) puede necesitar otro separador.
+- **El XLSX se rompe con caracteres que XML 1.0 no admite.** Un control C0 (salvo tabulación
+  y saltos de línea), un sustituto suelto, U+FFFE o U+FFFF en una razón social dejan el
+  archivo ilegible para Excel. `escaparXml` los quita; no saltarse esa función al agregar
+  celdas.
+- **Fechas de Excel en el sistema 1900.** El número de serie cuenta desde el 30-12-1899
+  porque Excel incluye el 29-02-1900, que no existió. `serieExcel` devuelve `null` para una
+  fecha inexistente (`Date.UTC` correría el 31-02 al 03-03) y esa celda va como texto.
+- **`crc32` de `node:zlib` necesita Node 20.15 o 22.2 en adelante.** El proyecto exige Node
+  ≥ 22.19 (H7), así que está; en un runtime más viejo `zip.ts` no carga. La ruta va con
+  `runtime = 'nodejs'`: en Edge no existe `node:zlib`.
+- **Paginar por `offset` duplica o salta filas si se emite durante la exportación.** La
+  lectura pagina por *keyset* sobre (`fecha_emision`, `tipo_dte`, `folio`, `id`), y si el
+  tope de 50.000 se supera durante la lectura responde 413: nunca un archivo cortado en
+  silencio.
+- **Dos `or()` en la misma consulta.** La búsqueda (`q`) y el cursor del *keyset* son los dos
+  un `or()` de PostgREST. Se combinan en uno solo, `and(or(…),or(…))`, para no depender de
+  cómo PostgREST trata dos parámetros `or` repetidos. Los valores del cursor se validan y van
+  entre comillas dobles (`condicionCursor`): no pueden inyectar filtros.
+- **Los mensajes de error de la descarga no se ven en la página.** El enlace tiene
+  `download`: ante un 400, 404, 413 o 500 de la ruta (texto plano), según el navegador la
+  descarga falla o el texto se guarda como archivo; el usuario no lo ve en pantalla. Al
+  probar, abrir la URL directo en una pestaña muestra el mensaje.
+- **Una `empresa` ajena en la URL da 404**, no otra empresa: así un enlace viejo o manipulado
+  nunca descarga los datos de otra empresa con un nombre que no se esperaba.
+- **«Documentos emitidos» no cuenta los anulados; la lista de Documentos sí los lista.** Por
+  eso la tarjeta dice «Sin contar N anulados»: el total de «Ver todos» es el de la tarjeta más
+  los anulados.
+- **El Tablero no escucha `cafs`.** Su `EnVivo` (canal `tablero:<organizacionId>`) solo
+  escucha `documentos` y `envios`: un CAF que sube o anula otro administrador se ve en el
+  próximo refresco por otro evento o al recargar.
+- **El Tablero refresca con cualquier cambio de la organización.** El canal filtra por
+  `organizacion_id`, no por empresa ni ambiente: una boleta de otra empresa también dispara un
+  `router.refresh()` (inofensivo, relee lo mismo).
+- **«Actualizado» es la hora del render**, no la del último dato: cambia con cada refresco.
+- **El período del Tablero no admite «Todos los períodos».** Un enlace de Documentos con
+  `periodo=todos` llevado al Tablero muestra el mes actual. La exportación de documentos sí
+  lo admite; el resumen diario responde 400.

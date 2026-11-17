@@ -1,8 +1,8 @@
 ---
 title: "Folios: solicitar CAF, subirlo, anular y alertas"
 description: "Gestión de folios de la Fase 6 (/[org]/folios): disponibilidad por tipo y ambiente, solicitud en tres niveles (ensayo, revisión con el SII, timbrado), solicitud incierta, carga manual de un CAF, anulación con anular_folios, alerta folios.por_agotarse y permisos. Más los folios del set de pruebas de la Fase 5."
-keywords: [folios, CAF, /folios, Folios (CAF), server/folios, lib/folios, solicitarFolios, subirCaf, anularFolios, leerFolios, puedeEmitir, alertaDespuesDeAsignar, alertarSiCruza, solicitarFoliosSet, solicitarEnSii, TransporteSinTimbrar, DetenidoAntesDeTimbrar, of_genera_folio, SolicitudFolios, solicitar_folios, registrar_caf, anular_folios, trg_20_caf_sin_traslape, 23P01, migración 0011, Vault, RSASK, RSAPK, cafs, solicitudes_folios, folios_anulados, en_curso, simulada, timbrada, incierta, rechazada, error, revisión con el SII, revisionId, MINUTOS_REVISION_VIGENTE, ensayo, timbrar, FolioInicialRequeridoError, folio inicial, FoliosSinCafError, representante electrónico, IDK 100, IDK 300, autorizada_produccion, permite_produccion, plan_vigente, asignar_folio, Folios ya autorizados, Marcar como revisada, MedidorFolios, UMBRAL_AVISO_FOLIOS, 15 %, disponibilidadDe, decidirAlerta, folios.por_agotarse, Idempotency-Key, encolar_evento, correoFoliosPorAgotarse, cola, Anular los que quedan, RangoAnulados, ErrorFolios]
-related: ["04-objetos/objetos-folios.md", "03-api-reference/rpc-backend.md", "03-api-reference/indice-operaciones.md", "05-pruebas/set-de-pruebas.md", "02-guias/certificacion-empresa.md", "01-fundamentos/errores-y-resultados.md", "07-referencia/trampas-conocidas.md", "08-esquema-supabase/despliegue.md"]
+keywords: [folios, CAF, /folios, Folios (CAF), server/folios, lib/folios, solicitarFolios, subirCaf, anularFolios, leerFolios, puedeEmitir, alertaDespuesDeAsignar, alertarSiCruza, solicitarFoliosSet, solicitarEnSii, TransporteSinTimbrar, DetenidoAntesDeTimbrar, of_genera_folio, SolicitudFolios, solicitar_folios, registrar_caf, anular_folios, trg_20_caf_sin_traslape, 23P01, migración 0011, Vault, RSASK, RSAPK, cafs, solicitudes_folios, folios_anulados, en_curso, simulada, timbrada, incierta, rechazada, error, revisión con el SII, revisionId, MINUTOS_REVISION_VIGENTE, ensayo, timbrar, FolioInicialRequeridoError, folio inicial, FoliosSinCafError, representante electrónico, IDK 100, IDK 300, autorizada_produccion, permite_produccion, plan_vigente, asignar_folio, Folios ya autorizados, Marcar como revisada, MedidorFolios, UMBRAL_AVISO_FOLIOS, 15 %, disponibilidadDe, decidirAlerta, folios.por_agotarse, Idempotency-Key, encolar_evento, correoFoliosPorAgotarse, cola, Anular los que quedan, RangoAnulados, ErrorFolios, armarResumen, leerResumenFolios, Tablero]
+related: ["04-objetos/objetos-folios.md", "03-api-reference/rpc-backend.md", "03-api-reference/indice-operaciones.md", "05-pruebas/set-de-pruebas.md", "02-guias/certificacion-empresa.md", "01-fundamentos/errores-y-resultados.md", "07-referencia/trampas-conocidas.md", "08-esquema-supabase/despliegue.md", "02-guias/tablero-y-reportes.md"]
 source: ["supabase_saas_sii.sql §7", "certificacion-node/docs/folios.md", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0011_folios.sql", "apps/web/src/server/folios/", "apps/web/src/lib/folios.ts", "apps/web/src/app/[org]/folios/", "apps/web/src/server/certificacion/folios.ts", "apps/web/src/server/certificacion/envio-set.ts", "packages/correos/src/folios.ts"]
 ---
 
@@ -85,6 +85,13 @@ La misma regla en el resumen, el ensayo, `puedeEmitir` y la alerta (`disponibili
 Con un solo CAF el estado es exactamente el de su `MedidorFolios`. Un CAF agotado o anulado
 sale del conjunto, lo que solo puede subir la proporción. La vista distingue «Aún no hay
 folios de este tipo» (nunca hubo CAF) de «CAF agotado».
+
+Las cuatro tarjetas (39 y 41 por ambiente) las arma `armarResumen` (`server/folios/lectura.ts`),
+que comparten `leerFolios` y, desde la Fase 9, `leerResumenFolios`: el Tablero lee solo
+`cafs` y muestra las del ambiente elegido con el mismo cálculo, más las alertas de folios
+agotados o por agotarse. Esta página no cambia con la Fase 9 (medidor del CAF en uso y nota
+con el total); el medidor del Tablero, en cambio, dibuja los números de la alerta, con un
+rango sintético si hay varios CAF activos ([Tablero](tablero-y-reportes.md#folios-disponibles)).
 
 ## Solicitar folios
 

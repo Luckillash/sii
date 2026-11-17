@@ -12,7 +12,7 @@ export {
 export { anularFolios, type EntradaAnular } from './anular';
 export { type DatosCaf, leerDatosCaf, validarCaf } from './caf';
 export { disponibilidad, foliosDisponibles, puedeEmitir } from './disponibles';
-export { leerFolios } from './lectura';
+export { leerFolios, leerResumenFolios } from './lectura';
 export { type OpcionesSolicitud, solicitarFolios } from './solicitar';
 export { type EntradaSubida, subirCaf } from './subir';
 export type {

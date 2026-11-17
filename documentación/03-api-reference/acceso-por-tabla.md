@@ -1,8 +1,8 @@
 ---
 title: "Acceso por tabla (PostgREST + RLS)"
 description: "Qué puede hacer cada rol en cada tabla: select, insert, update, delete."
-keywords: [RLS, PostgREST, políticas, grant, revoke, privilegios por columna, anon, authenticated, service_role, lector, emisor, administrador, propietario, select, insert, update, delete, "new row violates row-level security policy", "permission denied for table", 42501, folios_anulados, anular_folios, migración 0011, borrador, alta_borrador, edicion_borrador, receptores, upsert, emisión, P0001, notificaciones, migración 0013, rls-fase8-notificaciones, seguimiento]
-related: ["08-esquema-supabase/rls-y-privilegios.md", "01-fundamentos/tenancy-y-roles.md", "03-api-reference/rpc-organizacion.md", "05-pruebas/probar-el-esquema.md"]
+keywords: [RLS, PostgREST, políticas, grant, revoke, privilegios por columna, anon, authenticated, service_role, lector, emisor, administrador, propietario, select, insert, update, delete, "new row violates row-level security policy", "permission denied for table", 42501, folios_anulados, anular_folios, migración 0011, borrador, alta_borrador, edicion_borrador, receptores, upsert, emisión, P0001, notificaciones, migración 0013, rls-fase8-notificaciones, seguimiento, Fase 9, Tablero, exportación, v_ventas_diarias]
+related: ["08-esquema-supabase/rls-y-privilegios.md", "01-fundamentos/tenancy-y-roles.md", "03-api-reference/rpc-organizacion.md", "05-pruebas/probar-el-esquema.md", "02-guias/tablero-y-reportes.md"]
 source: ["supabase_saas_sii.sql §17", "supabase/verificaciones/rls-fase2-tenancy.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/verificaciones/rls-fase3-empresas.sql"]
 ---
 
@@ -207,6 +207,13 @@ La Fase 8 (seguimiento) escribe `envios`, `envio_estadisticas`, `envio_rechazos`
 `consultas_envio` y `operaciones_sii` con `service_role`, filtrando por organización; las
 páginas Documentos emitidos y Envío los leen con la sesión del miembro (RLS), igual que el
 Tablero para los envíos por verificar.
+
+La Fase 9 (Tablero y exportación) **solo lee**, siempre con la sesión del miembro (RLS
+`es_miembro`, también un lector) y filtrando además por organización, empresa y ambiente:
+`v_ventas_diarias`, `documentos` (conteos con `head: true` y, en la exportación, filas sin
+`ted_xml` con el `track_id` de `envios` por el *embed* de la FK), `cafs` (sin
+`caf_secret_id`), `envios`/`operaciones_sii` (inciertos) y `v_certificados_estado`. No usa
+`service_role` ni escribe nada ([guía](../02-guias/tablero-y-reportes.md#permisos)).
 
 `operaciones_sii` la escribe solo la capa SII con `service_role` (`ejecutarOperacion`,
 `marcarInciertaRevisada`); los miembros la leen y, con la migración 0006, reciben sus

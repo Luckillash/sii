@@ -1,9 +1,9 @@
 ---
 title: "Probar el esquema (RLS, triggers, cuotas)"
 description: "Cómo verificar el esquema y simular roles en la única base (producción) sin dejar rastro."
-keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp, 0006_realtime_operaciones.sql, 0007_bloqueos_sii.sql, rls-fase4-bloqueos.sql, bloqueos_sii, arriendo, 0008_certificacion.sql, rls-fase5-certificacion.sql, registrar_caf, guardar_set_pruebas, CAF de mentira, 0009_autorizacion_externa.sql, rls-fase5-autorizacion-externa.sql, tg_resolucion_autoriza_produccion, autorizada_produccion, 0010_verificar_autorizacion.sql, rls-fase5-verificar-autorizacion.sql, verificar_autorizacion, PGlite, 0011_folios.sql, rls-fase6-folios.sql, anular_folios, trg_20_caf_sin_traslape, 23P01, 0012_folio_anulado.sql, rls-fase7-folio-anulado.sql, tg_validar_documento, folio anulado, for key share, 0013_notificaciones.sql, rls-fase8-notificaciones.sql, notificaciones, reclamar_notificacion, 0014_cron.sql, pg_cron, cron_token]
-related: ["08-esquema-supabase/rls-y-privilegios.md", "08-esquema-supabase/despliegue.md"]
-source: ["supabase_saas_sii.sql §15 §17", "supabase/verificaciones/", "supabase/verificaciones/rls-fase2-tenancy.sql"]
+keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp, 0006_realtime_operaciones.sql, 0007_bloqueos_sii.sql, rls-fase4-bloqueos.sql, bloqueos_sii, arriendo, 0008_certificacion.sql, rls-fase5-certificacion.sql, registrar_caf, guardar_set_pruebas, CAF de mentira, 0009_autorizacion_externa.sql, rls-fase5-autorizacion-externa.sql, tg_resolucion_autoriza_produccion, autorizada_produccion, 0010_verificar_autorizacion.sql, rls-fase5-verificar-autorizacion.sql, verificar_autorizacion, PGlite, 0011_folios.sql, rls-fase6-folios.sql, anular_folios, trg_20_caf_sin_traslape, 23P01, 0012_folio_anulado.sql, rls-fase7-folio-anulado.sql, tg_validar_documento, folio anulado, for key share, 0013_notificaciones.sql, rls-fase8-notificaciones.sql, notificaciones, reclamar_notificacion, 0014_cron.sql, pg_cron, cron_token, fase9-tablero-control.sql, consulta de control, Tablero, Fase 9]
+related: ["08-esquema-supabase/rls-y-privilegios.md", "08-esquema-supabase/despliegue.md", "02-guias/tablero-y-reportes.md"]
+source: ["supabase_saas_sii.sql §15 §17", "supabase/verificaciones/", "supabase/verificaciones/rls-fase2-tenancy.sql", "supabase/verificaciones/fase9-tablero-control.sql"]
 ---
 
 # Probar el esquema (RLS, triggers, cuotas)
@@ -515,7 +515,28 @@ select
 Probada en PGlite: 26/26 con la 0013 y 1/26 sin ella. En producción, el 2026-11-17: 26/26, con la consulta de control en 0 antes
 y después, `vault.secrets` con los mismos 4 secretos y `notificaciones` sin filas.
 
-## 12. Lo que no se prueba con SQL
+## 12. Consulta de control del Tablero (Fase 9, `fase9-tablero-control.sql`)
+
+`supabase/verificaciones/fase9-tablero-control.sql` no prueba una migración (la Fase 9 no
+trae): es la consulta del criterio de aceptación de la fase, «las cifras del tablero cuadran
+con una consulta SQL de control sobre `documentos` aceptados». **Solo lectura**: un `select`
+con CTE, sin crear objetos ni escribir.
+
+Calcula directo desde `documentos` (no desde `v_ventas_diarias`, que es lo que lee la app),
+con las reglas del Tablero: período por `fecha_emision`, sin el set de pruebas, ventas de
+`aceptado` y `aceptado_con_reparos`, documentos emitidos con folio y sin borradores ni
+anulados, y «esperando al SII» = `enviado`. Devuelve una fila por cifra (`orden`, `cifra`,
+`valor`), con «Empresas que calzan con los parámetros» al final (si da 0, los parámetros no
+calzan y todo sale 0).
+
+Cómo correrla: ajustar el primer CTE (slug, RUT de la empresa como se guarda, ambiente y
+período) y ejecutar el archivo completo (SQL Editor, MCP `execute_sql` o `supabase db query
+--read-only -f`). En producción, el 2026-11-17, para `servicio`, 20.630.500-2, certificación
+y noviembre de 2026: ventas netas $ 2.000, IVA $ 380, exento $ 0, total $ 2.380, 2 boletas
+aceptadas y 0 esperando al SII. La comparación con el Tablero desplegado está pendiente
+([guía](../02-guias/tablero-y-reportes.md#consulta-de-control-y-criterio-de-aceptación-pendiente)).
+
+## 13. Lo que no se prueba con SQL
 
 El aislamiento entre organizaciones y los permisos por rol también se prueban de punta a
 punta con la app (Fase 2): dos usuarios de organizaciones distintas, cada uno con su

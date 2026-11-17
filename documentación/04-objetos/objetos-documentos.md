@@ -1,9 +1,9 @@
 ---
 title: "Objetos: documentos y catálogo comercial"
 description: "Columnas de documentos, documento_detalles, receptores, productos y la vista v_ventas_diarias; qué escribe cada fase (set de pruebas, emisión del panel) y la forma de documentos.metadata."
-keywords: [documentos, documento_detalles, receptores, productos, v_ventas_diarias, estado_documento, borrador, firmado, enviado, incierto, anulado, folio, caf_id, ted_xml, xml_path, metadata, receptor_correo, metadata.pdf, metadata.correo, descuento_aplicado, mnt_neto, iva, mnt_exe, mnt_total, receptor_rut, 66666666-6, Cliente General, clave_idempotencia, origen, caso_set, precio_bruto, monto_item, descuento_monto, tg_validar_documento, tg_contar_uso_documento, trg_50_evento_documento, emisión, Fase 7]
-related: ["02-guias/emision-boletas.md", "04-objetos/objetos-envios-y-rcof.md", "04-objetos/objetos-folios.md", "03-api-reference/acceso-por-tabla.md", "08-esquema-supabase/triggers-y-logica.md", "05-pruebas/set-de-pruebas.md"]
-source: ["supabase_saas_sii.sql §8 §10 §16", "supabase/migrations/0001_esquema_inicial.sql", "supabase/migrations/0012_folio_anulado.sql", "apps/web/src/server/emision/", "apps/web/src/server/certificacion/envio-set.ts"]
+keywords: [documentos, documento_detalles, receptores, productos, v_ventas_diarias, estado_documento, borrador, firmado, enviado, incierto, anulado, folio, caf_id, ted_xml, xml_path, metadata, receptor_correo, metadata.pdf, metadata.correo, descuento_aplicado, mnt_neto, iva, mnt_exe, mnt_total, receptor_rut, 66666666-6, Cliente General, clave_idempotencia, origen, caso_set, precio_bruto, monto_item, descuento_monto, tg_validar_documento, tg_contar_uso_documento, trg_50_evento_documento, emisión, Fase 7, Fase 9, Tablero, set_pruebas, resumen diario, fase9-tablero-control.sql]
+related: ["02-guias/emision-boletas.md", "04-objetos/objetos-envios-y-rcof.md", "04-objetos/objetos-folios.md", "03-api-reference/acceso-por-tabla.md", "08-esquema-supabase/triggers-y-logica.md", "05-pruebas/set-de-pruebas.md", "02-guias/tablero-y-reportes.md"]
+source: ["supabase_saas_sii.sql §8 §10 §16", "supabase/migrations/0001_esquema_inicial.sql", "supabase/migrations/0012_folio_anulado.sql", "apps/web/src/server/emision/", "apps/web/src/server/certificacion/envio-set.ts", "apps/web/src/server/tablero/", "apps/web/src/server/reportes/lectura.ts", "supabase/verificaciones/fase9-tablero-control.sql"]
 ---
 
 # Objetos: documentos y catálogo comercial
@@ -148,4 +148,18 @@ para editarlos todavía.
 `security_invoker`: aplica el RLS de quien consulta. Ventas por organización, empresa,
 ambiente, fecha de emisión y tipo, **solo de documentos `aceptado` o
 `aceptado_con_reparos`**: `documentos` (cantidad), `mnt_neto`, `iva`, `mnt_exe`,
-`mnt_total`, `folio_min`, `folio_max`. Base del Tablero (Fase 9).
+`mnt_total`, `folio_min`, `folio_max`.
+
+**No filtra por `origen`**: en certificación incluye los documentos del set de pruebas que
+el SII aceptó, que no son ventas. Quién la usa (Fase 9,
+[guía](../02-guias/tablero-y-reportes.md)):
+
+- **Tablero**: ventas netas, IVA débito y exento del mes salen de la vista **menos** los
+  documentos `origen = 'set_pruebas'` aceptados del mismo período (solo en certificación).
+- **Resumen diario exportado**: en producción, la vista tal cual; en certificación se arma
+  desde `documentos` sin el set, porque restar el set no corrige `folio_min` y `folio_max`.
+
+Las sumas son `numeric` (`sum()` de `bigint`). Para sumar el mes no hay agregaciones de
+PostgREST (`mnt_neto.sum()` está apagado en el proyecto): se suman las filas diarias en el
+servidor. Consulta de control del Tablero, directo desde `documentos`:
+`supabase/verificaciones/fase9-tablero-control.sql`.

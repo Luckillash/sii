@@ -1,8 +1,8 @@
 ---
 title: "Onboarding: organización, miembros, plan, empresa y certificado"
 description: "Alta del tenant, invitaciones, plan y límites, empresa emisora, certificado en Vault y resolución: pasos en la UI, qué pasa en el servidor y en la base, y errores típicos."
-keywords: [onboarding, bienvenida, crear_organizacion, invitar, crear_invitacion, aceptar_invitacion, empresa, crearEmpresa, editarEmpresa, cambiarEstadoEmpresa, desactivar, registrarResolucion, registrar_resolucion, subirCertificado, registrar_certificado, analizarCertificado, revocarCertificado, eliminarCertificado, asociarCertificadoEmpresa, fijar_certificado_predeterminado, representante electrónico, predeterminado, tg_limite_empresas, getUser, confirmarSesion, pfx, p12, Vault]
-related: ["01-fundamentos/tenancy-y-roles.md", "03-api-reference/rpc-organizacion.md", "03-api-reference/rpc-backend.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/formatos-y-validaciones.md"]
+keywords: [onboarding, bienvenida, crear_organizacion, invitar, crear_invitacion, aceptar_invitacion, empresa, crearEmpresa, editarEmpresa, cambiarEstadoEmpresa, desactivar, registrarResolucion, registrar_resolucion, subirCertificado, registrar_certificado, analizarCertificado, revocarCertificado, eliminarCertificado, asociarCertificadoEmpresa, fijar_certificado_predeterminado, representante electrónico, predeterminado, tg_limite_empresas, getUser, confirmarSesion, pfx, p12, Vault, Tablero, Lo que viene]
+related: ["01-fundamentos/tenancy-y-roles.md", "03-api-reference/rpc-organizacion.md", "03-api-reference/rpc-backend.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/formatos-y-validaciones.md", "02-guias/tablero-y-reportes.md"]
 source: ["supabase_saas_sii.sql §3 §4 §6", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/app/bienvenida/", "apps/web/src/app/[org]/configuracion/", "apps/web/src/server/certificados/", "PLAN-SAAS.md Fases 2 y 3"]
 ---
 
@@ -32,6 +32,9 @@ El plan sugería un asistente `/bienvenida` de organización → empresa → cer
 (PLAN-SAAS §3.1). En el código, `/bienvenida` solo crea la organización y lleva al
 Tablero; empresa, resolución y certificado se cargan desde **Configuración**, en
 cualquier orden (el certificado puede subirse antes que la empresa y asociarse después).
+Mientras la organización no tiene empresas, el Tablero muestra «Lo que viene» con esos
+pasos (y el enlace para invitar al equipo, a los administradores); con una empresa, muestra
+el resumen del mes de la Fase 9 ([Tablero y reportes](tablero-y-reportes.md)).
 
 Todas las Server Actions empiezan con `exigirMembresia(slug)` (sesión con `getClaims()`
 y membresía) y revisan el rol con `puedeAdministrar()` para responder antes y con un

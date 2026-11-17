@@ -1,10 +1,13 @@
 import 'server-only';
 import {
   AMBIENTES_FOLIO,
+  type AmbienteSii,
   type CafRango,
   disponibilidadDe,
+  type EstadoCaf,
   estadoDisponibilidad,
   TIPOS_FOLIO,
+  type TipoFolio,
 } from '@/lib/folios';
 import { fallaBase } from '../certificacion/comun';
 import {
@@ -47,6 +50,81 @@ function traslapeDe(detalle: unknown): OperacionFolios['traslape'] {
   return typeof d.traslape_desde === 'number' && typeof d.traslape_hasta === 'number'
     ? { desde: d.traslape_desde, hasta: d.traslape_hasta }
     : {};
+}
+
+/** Un CAF como lo lee el resumen (sin `caf_secret_id`). */
+interface CafResumen {
+  id: string;
+  ambiente: AmbienteSii;
+  tipo_dte: number;
+  folio_desde: number;
+  folio_hasta: number;
+  siguiente_folio: number;
+  estado: EstadoCaf;
+}
+
+/**
+ * Las cuatro tarjetas (39 y 41 en producción y certificación) a partir de los CAF
+ * `activo` de la empresa. `huboOtro` dice si hubo algún CAF (de cualquier estado) de ese
+ * ambiente y tipo, para distinguir «agotado» de «sin folios todavía». La comparten la
+ * página de Folios y el Tablero (Fase 9), para que los dos muestren lo mismo.
+ */
+export function armarResumen(
+  activos: readonly CafResumen[],
+  huboOtro: (ambiente: AmbienteSii, tipoDte: TipoFolio) => boolean,
+): ResumenTipo[] {
+  return AMBIENTES_FOLIO.flatMap((ambiente) =>
+    TIPOS_FOLIO.map((tipoDte): ResumenTipo => {
+      const rangos: CafRango[] = activos
+        .filter((c) => c.ambiente === ambiente && c.tipo_dte === tipoDte && c.estado === 'activo')
+        .map((c) => ({
+          id: c.id,
+          desde: c.folio_desde,
+          hasta: c.folio_hasta,
+          siguiente: c.siguiente_folio,
+          estado: c.estado,
+        }));
+      const tuvoCaf = rangos.length > 0 || huboOtro(ambiente, tipoDte);
+      const d = disponibilidadDe(rangos);
+      const enUso = rangos.find((c) => c.id === d.cafEnUso) ?? null;
+      return {
+        ambiente,
+        tipoDte,
+        enUso: enUso
+          ? { id: enUso.id, desde: enUso.desde, hasta: enUso.hasta, siguiente: enUso.siguiente }
+          : null,
+        disponibles: d.restante,
+        total: d.total,
+        estado: estadoDisponibilidad(d),
+        tuvoCaf,
+        puedeEmitir: d.restante > 0,
+      };
+    }),
+  );
+}
+
+/**
+ * Solo el resumen de folios de una empresa (Tablero, Fase 9): una consulta a `cafs` en
+ * vez de todo lo que lee `leerFolios` (historial, solicitudes, operaciones, anulados,
+ * certificados y plan). Mismo cálculo (`armarResumen`). Sesión del usuario (RLS) y filtro
+ * por organización; `null` si los ids no son UUID.
+ */
+export async function leerResumenFolios(
+  organizacionId: string,
+  empresaId: string,
+  dependencias?: Partial<Pick<DependenciasCertificacion, 'sesion'>>,
+): Promise<ResumenTipo[] | null> {
+  if (!UUID.test(organizacionId) || !UUID.test(empresaId)) return null;
+  const supabase = await (dependencias?.sesion ?? resolverDependencias().sesion)();
+  const { data, error } = await supabase
+    .from('cafs')
+    .select('id, ambiente, tipo_dte, folio_desde, folio_hasta, siguiente_folio, estado')
+    .eq('organizacion_id', organizacionId)
+    .eq('empresa_id', empresaId);
+  if (error) throw fallaBase('leer los CAF', error);
+  return armarResumen(data, (ambiente, tipoDte) =>
+    data.some((c) => c.ambiente === ambiente && c.tipo_dte === tipoDte),
+  );
 }
 
 /** Estado de los folios de una empresa. `null` si la empresa no es de la organización. */
@@ -185,34 +263,8 @@ export async function leerFolios(
     deSolicitud: c.solicitud_id !== null,
   }));
 
-  const resumen: ResumenTipo[] = AMBIENTES_FOLIO.flatMap((ambiente) =>
-    TIPOS_FOLIO.map((tipoDte): ResumenTipo => {
-      const rangos: CafRango[] = activos.data
-        .filter((c) => c.ambiente === ambiente && c.tipo_dte === tipoDte)
-        .map((c) => ({
-          id: c.id,
-          desde: c.folio_desde,
-          hasta: c.folio_hasta,
-          siguiente: c.siguiente_folio,
-          estado: c.estado,
-        }));
-      const tuvoCaf =
-        rangos.length > 0 || filasCaf.some((c) => c.ambiente === ambiente && c.tipoDte === tipoDte);
-      const d = disponibilidadDe(rangos);
-      const enUso = rangos.find((c) => c.id === d.cafEnUso) ?? null;
-      return {
-        ambiente,
-        tipoDte,
-        enUso: enUso
-          ? { id: enUso.id, desde: enUso.desde, hasta: enUso.hasta, siguiente: enUso.siguiente }
-          : null,
-        disponibles: d.restante,
-        total: d.total,
-        estado: estadoDisponibilidad(d),
-        tuvoCaf,
-        puedeEmitir: d.restante > 0,
-      };
-    }),
+  const resumen = armarResumen(activos.data, (ambiente, tipoDte) =>
+    filasCaf.some((c) => c.ambiente === ambiente && c.tipoDte === tipoDte),
   );
 
   const filasSolicitud: FilaSolicitud[] = solicitudes.data.map((s) => ({
