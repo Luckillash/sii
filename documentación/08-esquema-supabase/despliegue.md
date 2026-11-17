@@ -422,9 +422,11 @@ compararlo y ese rol no tiene permiso, así que falla con `42501` en
 de seguimiento (18:35 UTC) consultó el envío 34015200: el SII respondió EPR (1 informado,
 1 aceptado), el documento pasó a `aceptado` y la operación `seguimiento` quedó `ok`.
 Alertas: `correo: "configurado"`, 0 correos. Monitores de Sentry `cron-seguimiento` y
-`cron-alertas` en `ok`. El criterio de aceptación de la Fase 8 sigue pendiente por un bug
-de Realtime corregido en el código y sin desplegar
-([guía](../02-guias/seguimiento-envios.md#criterio-de-aceptación-pendiente)).
+`cron-alertas` en `ok`. El criterio de aceptación de la Fase 8 quedó **cumplido el
+2026-11-17**, después de desplegar el arreglo de un bug de Realtime en las cargas completas
+(`b84a5b2`, deploy `326be87`): la boleta folio 42 (Track ID 34017110) pasó de «Enviado» a
+«Aceptado» sin recargar con la corrida de las 19:05 UTC
+([guía](../02-guias/seguimiento-envios.md#criterio-de-aceptación-cumplido-el-2026-11-17)).
 
 | Migración | Contenido | Qué falla si falta |
 |---|---|---|

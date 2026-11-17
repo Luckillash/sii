@@ -76,8 +76,8 @@ leyera la sesión de las cookies: el `phx_join` salía como `anon`, Realtime rec
 suscripción entera («invalid column for filter id», porque `anon` no tiene `select`) y no
 la reintentaba al llegar el JWT; el error venía como `system`, que nadie escuchaba, así que
 la página quedaba sin eventos y sin aviso. Navegando dentro de la app funcionaba, porque la
-sesión ya estaba cargada. Visto en *Production* el 2026-11-17; el arreglo está en el código,
-sin desplegar a esa fecha
+sesión ya estaba cargada. Visto en *Production* el 2026-11-17; el arreglo se desplegó el
+mismo día (`b84a5b2`, deploy `326be87`) y quedó verificado en *Production*
 ([trampa](../07-referencia/trampas-conocidas.md#realtime-en-una-carga-completa-bug-visto-en-production-2026-11-17)).
 La señal para diagnosticarlo: `realtime.subscription` vacía con la página abierta.
 
@@ -122,7 +122,7 @@ Primer uso real de Realtime en la app: `apps/web/src/app/[org]/certificacion/EnV
   el RSC vuelve a leer todo con RLS (`leerAsistente`). Así no hay dos fuentes de verdad.
 - Al reconectar (`SUBSCRIBED` después de haber estado suscrito) refresca una vez, para
   traer lo que cambió con el canal caído. Con `CHANNEL_ERROR`, `TIMED_OUT` o un `system`
-  con error (`suscribirEnVivo`, sin desplegar al 2026-11-17) muestra «No
+  con error (`suscribirEnVivo`, desplegado el 2026-11-17) muestra «No
   pudimos conectar la actualización en vivo. Recarga la página para ver el estado más
   reciente.»
 - No escucha `envios`, `solicitudes_folios` ni `set_pruebas_casos`: sus cambios ocurren
@@ -161,8 +161,8 @@ emitidos y la página del envío (Fase 8, abajo).
 ### Documentos emitidos y envíos (Fase 8)
 
 Los tres `EnVivo` (Certificación, Folios y Documentos/Envíos) se suscriben con
-`suscribirEnVivo` ([arriba](#suscribirse-desde-el-panel)); hasta ese arreglo (2026-11-17,
-sin desplegar) los tres tenían el defecto de la carga completa.
+`suscribirEnVivo` ([arriba](#suscribirse-desde-el-panel)); hasta ese arreglo (desplegado
+el 2026-11-17 en `326be87`) los tres tenían el defecto de la carga completa.
 
 Tercer uso: `apps/web/src/app/[org]/documentos/EnVivo.tsx`, en `/[org]/documentos` y en
 `/[org]/envios/[id]`. **A diferencia de Certificación y Folios, sí guarda lo que llega**,

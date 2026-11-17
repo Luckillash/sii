@@ -119,7 +119,7 @@ en el SII»), en el **ambiente y el canal de cada envío**. Los clientes salen d
 `server/sii/clientes.ts` (`clienteBoletaRest`, `clienteDtews`), nunca de
 `FABRICAS_SII.rest`, que fija certificación. Transporte por invocación (uno por grupo o por
 consulta) y `TokenStoreSupabase`; sin bloqueo del certificado ni sesión AUT2000. Solo
-lectura: no envía ni firma nada. Código **sin desplegar**.
+lectura: no envía ni firma nada. Desplegado en *Production* el 2026-11-17 (`3ade4c9`).
 
 | Paso | Host | Método de la librería | `operacion_sii` | Tipo | Errores que importan |
 |---|---|---|---|---|---|

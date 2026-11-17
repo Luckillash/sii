@@ -10,7 +10,9 @@ source: ["supabase_saas_sii.sql §7", "certificacion-node/docs/folios.md", "supa
 
 > **Úsalo cuando:** necesitas pedir o cargar un CAF, anular folios, entender la alerta de folios bajos o dar folio a una boleta.
 
-**Estado (2026-11-15).** El código de la **Fase 6** está listo y **sin desplegar**. La
+**Estado (2026-11-15).** La **Fase 6** está desplegada en *Production* (`4f26921`) y con el
+criterio de aceptación cumplido el 2026-11-15
+([prueba real](#prueba-real-en-production-criterio-de-aceptación)). La
 migración `0011_folios` (RPC `anular_folios`, trigger `trg_20_caf_sin_traslape`, sin
 política `alta` en `folios_anulados` y Realtime de `cafs` y `folios_anulados`) está
 **aplicada el 2026-11-15** en producción (verificación 18/18 y simulación 27/27;

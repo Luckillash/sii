@@ -67,8 +67,10 @@ source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas
 - **Eliminar un certificado no borra sus tokens del SII.** `tokens_sii` no tiene FK a
   `certificados`: su clave es `(canal, ambiente, rut_empresa, huella_certificado)`. La
   cascada borra `empresa_certificados` y `sesiones_sii` (y `trg_borrar_secretos`, los dos
-  secretos de Vault), pero los tokens quedan hasta vencer (~50 min) y la limpieza
-  periódica de tokens vencidos todavía no está programada. Tampoco tienen
+  secretos de Vault), pero los tokens quedan hasta vencer (~50 min); el job `limpiar-tokens-sii`
+  de `pg_cron` (migración `0014_cron`, aplicada el 2026-11-17) borra cada hora los vencidos
+  hace más de un día.
+  Tampoco tienen
   `organizacion_id`: dos organizaciones con la misma empresa y el mismo certificado
   comparten la fila del token.
 - **Revocar no quita el certificado de las empresas.** `revocado_en` deja la asociación y

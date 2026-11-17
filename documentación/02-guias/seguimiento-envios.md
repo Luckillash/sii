@@ -1,7 +1,7 @@
 ---
 title: "Seguimiento de envíos y estados del SII"
 description: "Fase 8: cron /api/cron/seguimiento (grupos empresa+ambiente+canal, un token por grupo con una renovación, lotes de 100, backoff por consultas, presupuesto de tiempo), qué se escribe por consulta y en qué orden, tabla de estados SII → clasificación → documentos, rechazos y reparos, envíos inciertos y «Ya lo revisé», «Consultar estado en el SII», Documentos emitidos y detalle del envío con Realtime, alertas por correo (notificaciones, migración 0013), pg_cron (migración 0014), monitores de Sentry y diagnóstico con SQL."
-keywords: [seguimiento, Fase 8, /api/cron/seguimiento, ejecutarSeguimiento, consultarEnvio, consultar_envio, seguimiento, operaciones_sii, v_envios_por_consultar, inconsistente, filtroPorConsultar, ESCALONES_BACKOFF, backoff, intervaloMinutos, debeConsultar, DIAS_SIN_CERRAR, envio_sin_cerrar, TOPE_ENVIOS, LIMITE_MS, MS_EMPEZAR_GRUPO, MS_RENOVAR, maxDuration, cerrarAbandonadas, agrupar, clienteEstado, consultarConRenovacion, tokenRechazado, ErrorTokenSoap, ErrorEstadoDesconocido, ESTADOS_CONOCIDOS, lista blanca, -11, RPR, QueryEstUp, ClienteDtews, ClienteBoletaRest, consultarEnvio, server/sii/clientes.ts, clienteBoletaRest, clienteDtews, guardarRespuesta, registrarFalla, detalleIncompleto, sin_detalle, ya_final, CLASIFICACIONES_FINALES, tipoObservacion, jsonSeguro, textoSeguro, envio_estadisticas, envio_rechazos, consultas_envio, sincronizar_documentos_envio, trg_50_envio_actualizado, trg_50_envio_rechazo_sincronizar, documento.aceptado, envio.actualizado, SEGUNDOS_ENTRE_CONSULTAS, ResultadoConsultaEnvio, ResumenSeguimiento, HORARIO_SEGUIMIENTO, MONITOR_SEGUIMIENTO, cron-seguimiento, cron-alertas, autorizarCron, conMonitorCron, CRON_SECRET, cron_token, envCron, Documentos emitidos, /documentos, /envios/[id], Ya lo revisé, marcarEnvioRevisado, marcarInciertaRevisada, revisada_en, enviosInciertos, Tablero, useEnVivoStore, ProveedorEnVivo, EnVivo, router.refresh, actualizado_en, Reenviar al receptor, notificaciones, reclamar_notificacion, notificacion_cerrada, alertas_documentos_rechazados, alertas_envios_inciertos, alertas_certificados_por_vencer, grupo, Idempotency-Key, ejecutarAlertas, /api/cron/alertas, correoDocumentosRechazados, correoEnvioIncierto, correoCertificadoPorVencer, migración 0013, migración 0014, pg_cron, pg_net, net.http_post, net._http_response, cron.job_run_details, limpiar-tokens-sii, limpiar-historial-cron, Track ID 34015200, criterio de aceptación]
+keywords: [seguimiento, Fase 8, /api/cron/seguimiento, ejecutarSeguimiento, consultarEnvio, consultar_envio, seguimiento, operaciones_sii, v_envios_por_consultar, inconsistente, filtroPorConsultar, ESCALONES_BACKOFF, backoff, intervaloMinutos, debeConsultar, DIAS_SIN_CERRAR, envio_sin_cerrar, TOPE_ENVIOS, LIMITE_MS, MS_EMPEZAR_GRUPO, MS_RENOVAR, maxDuration, cerrarAbandonadas, agrupar, clienteEstado, consultarConRenovacion, tokenRechazado, ErrorTokenSoap, ErrorEstadoDesconocido, ESTADOS_CONOCIDOS, lista blanca, -11, RPR, QueryEstUp, ClienteDtews, ClienteBoletaRest, consultarEnvio, server/sii/clientes.ts, clienteBoletaRest, clienteDtews, guardarRespuesta, registrarFalla, detalleIncompleto, sin_detalle, ya_final, CLASIFICACIONES_FINALES, tipoObservacion, jsonSeguro, textoSeguro, envio_estadisticas, envio_rechazos, consultas_envio, sincronizar_documentos_envio, trg_50_envio_actualizado, trg_50_envio_rechazo_sincronizar, documento.aceptado, envio.actualizado, SEGUNDOS_ENTRE_CONSULTAS, ResultadoConsultaEnvio, ResumenSeguimiento, HORARIO_SEGUIMIENTO, MONITOR_SEGUIMIENTO, cron-seguimiento, cron-alertas, autorizarCron, conMonitorCron, CRON_SECRET, cron_token, envCron, Documentos emitidos, /documentos, /envios/[id], Ya lo revisé, marcarEnvioRevisado, marcarInciertaRevisada, revisada_en, enviosInciertos, Tablero, useEnVivoStore, ProveedorEnVivo, EnVivo, router.refresh, actualizado_en, Reenviar al receptor, notificaciones, reclamar_notificacion, notificacion_cerrada, alertas_documentos_rechazados, alertas_envios_inciertos, alertas_certificados_por_vencer, grupo, Idempotency-Key, ejecutarAlertas, /api/cron/alertas, correoDocumentosRechazados, correoEnvioIncierto, correoCertificadoPorVencer, migración 0013, migración 0014, pg_cron, pg_net, net.http_post, net._http_response, cron.job_run_details, limpiar-tokens-sii, limpiar-historial-cron, Track ID 34015200, Track ID 34017110, suscribirEnVivo, criterio de aceptación]
 related: ["02-guias/emision-boletas.md", "04-objetos/objetos-envios-y-rcof.md", "04-objetos/objetos-documentos.md", "08-esquema-supabase/triggers-y-logica.md", "08-esquema-supabase/despliegue.md", "03-api-reference/servicios-sii.md", "03-api-reference/indice-operaciones.md", "03-api-reference/rpc-backend.md", "06-integraciones/realtime-y-storage.md", "06-integraciones/webhooks.md", "07-referencia/trampas-conocidas.md"]
 source: ["supabase_saas_sii.sql §9 §15 §16", "supabase/migrations/0001_esquema_inicial.sql", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "supabase/verificaciones/0013_notificaciones.sql", "supabase/verificaciones/0014_cron.sql", "supabase/verificaciones/rls-fase8-notificaciones.sql", "certificacion-node/docs/canales.md", "PLAN-SAAS.md Fase 8", "apps/web/src/lib/seguimiento.ts", "apps/web/src/server/seguimiento/", "apps/web/src/server/sii/clientes.ts", "apps/web/src/server/cron/autorizacion.ts", "apps/web/src/app/api/cron/seguimiento/route.ts", "apps/web/src/app/api/cron/alertas/route.ts", "apps/web/src/server/alertas/", "apps/web/src/server/documentos/", "apps/web/src/app/[org]/documentos/", "apps/web/src/app/[org]/envios/", "apps/web/src/app/[org]/tablero/page.tsx", "apps/web/src/stores/enVivo.ts", "apps/web/src/stores/ProveedorEnVivo.tsx", "packages/correos/src/rechazo.ts", "packages/correos/src/incierto.ts", "packages/correos/src/certificado.ts", "apps/web/e2e/documentos.spec.ts"]
 ---
@@ -20,8 +20,11 @@ funciones; verificación 18/18 y simulación 26/26 con limpieza en 0), antes del
 UTC ([orden de despliegue](#orden-de-despliegue)). El cron ya corre: la primera corrida de
 seguimiento (18:35 UTC) dejó el único envío real (Track ID 34015200, de la Fase 7) en EPR y
 su documento `aceptado`. Al probar el criterio apareció un bug de Realtime en las cargas
-completas de página, ya corregido en el código (`suscribirEnVivo`) pero **sin desplegar**;
-el [criterio de aceptación](#criterio-de-aceptación-pendiente) sigue **pendiente**.
+completas de página, corregido (`suscribirEnVivo`), **desplegado** (`b84a5b2`, deploy
+`326be87`) y verificado en *Production*. El
+[criterio de aceptación](#criterio-de-aceptación-cumplido-el-2026-11-17) quedó **cumplido**
+el 2026-11-17 con la boleta folio 42 (Track ID 34017110); el rechazo real sigue cubierto
+solo por pruebas.
 
 ## Dónde vive
 
@@ -34,7 +37,7 @@ el [criterio de aceptación](#criterio-de-aceptación-pendiente) sigue **pendien
 | Alertas por correo | `apps/web/src/server/alertas/`: `index.ts` (`ejecutarAlertas`), `datos.ts` (repositorio), `constantes.ts`; plantillas `packages/correos/src/{rechazo,incierto,certificado,alertas-comun}.ts` |
 | Lectura y acciones del panel | `apps/web/src/server/documentos/`: `lectura.ts` (lista, detalle, envío, inciertos; con la sesión), `filtros.ts`, `presentacion.ts` (textos), `revisar.ts` + `revision.ts` («Ya lo revisé»), `reenviar.ts` |
 | Páginas | `apps/web/src/app/[org]/documentos/` (lista, panel, `acciones.ts`, `EnVivo.tsx`), `apps/web/src/app/[org]/envios/[id]/` (detalle y `MarcarRevisado.tsx`), `apps/web/src/app/[org]/tablero/page.tsx` (alerta de inciertos) |
-| Realtime | `apps/web/src/stores/enVivo.ts` (`useEnVivoStore`) y `ProveedorEnVivo.tsx`; la suscripción, con `suscribirEnVivo` de `apps/web/src/lib/supabase/realtime.ts` (arreglo sin desplegar) |
+| Realtime | `apps/web/src/stores/enVivo.ts` (`useEnVivoStore`) y `ProveedorEnVivo.tsx`; la suscripción, con `suscribirEnVivo` de `apps/web/src/lib/supabase/realtime.ts` (arreglo desplegado en `326be87`) |
 | Base | `supabase/migrations/0013_notificaciones.sql`, `0014_cron.sql`; verificaciones `supabase/verificaciones/0013_notificaciones.sql`, `0014_cron.sql`, `rls-fase8-notificaciones.sql` |
 | Pruebas | `*.test.ts` junto a cada módulo (el escenario con dobles es `server/seguimiento/escenario-prueba.ts`), `packages/correos/src/alertas-fase8.test.ts`, `apps/web/e2e/documentos.spec.ts` |
 
@@ -401,8 +404,8 @@ reconectar refresca una vez; con `CHANNEL_ERROR` o `TIMED_OUT`, «No pudimos con
 actualización en vivo…». Así «un envío pasa de `enviado` a `aceptado` sin recargar» aunque
 uno de los dos caminos falle.
 
-La suscripción va por `suscribirEnVivo` (`lib/supabase/realtime.ts`, sin desplegar al
-2026-11-17): espera `supabase.realtime.setAuth()` antes de crear el canal, para que el
+La suscripción va por `suscribirEnVivo` (`lib/supabase/realtime.ts`, desplegado el
+2026-11-17 en `326be87`): espera `supabase.realtime.setAuth()` antes de crear el canal, para que el
 `phx_join` salga con el JWT de la sesión, y trata un mensaje `system` con `status: 'error'`
 como desconexión (muestra el mismo aviso). Sin eso, en una carga completa el canal se unía
 como `anon`, Realtime rechazaba el filtro y la página no recibía nada ni avisaba (visto en
@@ -677,7 +680,7 @@ al SII: sin sesión, la redirección a `/ingresar`; con una sesión guardada (`E
 `E2E_ORG`), la lista, los filtros en la URL, el panel y axe, sin pulsar «Consultar estado en
 el SII», «Reenviar al receptor» ni las descargas.
 
-## Criterio de aceptación (pendiente)
+## Criterio de aceptación (cumplido el 2026-11-17)
 
 El criterio (PLAN-SAAS Fase 8):
 
@@ -699,11 +702,17 @@ Se hace en *Production* con el envío real de la Fase 7: boleta 39 folio 41, **T
   ([trampa](../07-referencia/trampas-conocidas.md#realtime-en-una-carga-completa-bug-visto-en-production-2026-11-17)).
   Para reproducirlo se hizo, con el OK del usuario, un `update envios set actualizado_en =
   now()` sobre el envío 34015200, sin cambiar el estado.
-- **Arreglo en el código, sin desplegar**: `suscribirEnVivo` (`lib/supabase/realtime.ts`),
-  usado por los `EnVivo` de Certificación, Folios y Documentos/Envíos; 7 pruebas nuevas.
-- **Falta**: desplegar el arreglo y repetir el criterio. Como el envío 34015200 ya está
-  `aceptado`, para ver el cambio de badge hace falta otro evento sobre el envío o sus
-  documentos con la página abierta desde una carga completa.
+- **Arreglo desplegado** (`b84a5b2`, deploy `326be87`): `suscribirEnVivo`
+  (`lib/supabase/realtime.ts`), usado por los `EnVivo` de Certificación, Folios y
+  Documentos/Envíos; 7 pruebas nuevas. Con la página en carga completa, las suscripciones
+  quedan `authenticated` y el mismo `update` llegó como `postgres_changes` en 0,33 s.
+- **Criterio cumplido** (con el OK del usuario): boleta 39 de $ 1.190 emitida desde la UI en
+  certificación, folio 42, **Track ID 34017110**. Con `/servicio/envios/<id>` abierta desde
+  una carga completa, el cron de las 19:05 UTC la consultó (EPR, 1 informado y 1 aceptado) y
+  la página pasó, sin recargar, de «Enviado» / «REC · Recibido» / 0 consultas a «Aceptado» /
+  «EPR · Envío procesado» / 1 consulta. Documento `aceptado`, operaciones `emitir` y
+  `seguimiento` `ok`, sin secretos en `operaciones_sii` ni `consultas_envio`, sin errores de
+  consola ni de runtime.
 
 Pasos del criterio:
 

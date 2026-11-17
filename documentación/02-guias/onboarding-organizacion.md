@@ -285,6 +285,6 @@ Fase 8 (desplegada y con el cron corriendo desde el 2026-11-17;
   `empresas-errores.test.ts`, `certificados/acciones.test.ts`,
   `server/certificados/analizar.test.ts` (con material de prueba de `test/pfx-prueba.ts`
   y los .pfx de `packages/certificacion/paridad/material/`) y `estado.test.ts`.
-- Pendiente para cerrar la Fase 3 (criterio del plan): subir un `.pfx` real en
-  *Production* y comprobar la fila, los dos secretos en Vault y ningún rastro del archivo
-  ni de la clave en logs ni en Sentry.
+- Criterio de aceptación de la Fase 3, cumplido el 2026-11-13: un `.pfx` real subido en
+  *Production* dejó su fila en `certificados`, los dos secretos en Vault y el RUT extraído
+  del certificado, sin rastros del archivo ni de la clave en logs ni en Sentry.

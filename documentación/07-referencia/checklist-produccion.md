@@ -20,9 +20,10 @@ nadie se entera de un rechazo o de un envío incierto. Detalle en la
 [despliegue](../08-esquema-supabase/despliegue.md#fase-8-migraciones-0013-y-0014).
 
 Estado al 2026-11-17: Fase 8 desplegada (`3ade4c9`), migraciones 0013 y 0014 aplicadas y
-cron verificado en producción. Falta el criterio de aceptación: el arreglo de Realtime en
-cargas completas está en el código, sin desplegar
-([trampa](trampas-conocidas.md#realtime-en-una-carga-completa-bug-visto-en-production-2026-11-17)).
+cron verificado en producción. El arreglo de Realtime en cargas completas está desplegado
+(`b84a5b2`, deploy `326be87`) y verificado
+([trampa](trampas-conocidas.md#realtime-en-una-carga-completa-bug-visto-en-production-2026-11-17)),
+y el criterio de aceptación quedó cumplido.
 
 - [x] `cron_token` en Vault (una fila; no se lee su valor para comprobarlo).
 - [x] `CRON_SECRET` en Vercel *Production* (*Sensitive*), igual a `cron_token`, 16
@@ -44,6 +45,8 @@ cargas completas está en el código, sin desplegar
       (2026-11-17) dijo `correo: "configurado"`, con 0 correos.
 - [ ] Al menos un propietario o administrador con correo en cada organización (son los
       destinatarios de las alertas).
-- [ ] Criterio de aceptación de la Fase 8 cumplido (Track ID 34015200 de `enviado` a
-      `aceptado` sin recargar). Pendiente: desplegar el arreglo de Realtime
-      (`suscribirEnVivo`) y repetirlo.
+- [x] Criterio de aceptación de la Fase 8 cumplido (2026-11-17): boleta folio 42 (Track ID
+      34017110) de «Enviado» a «Aceptado» sin recargar, con la página abierta desde una carga
+      completa y la corrida del cron de las 19:05 UTC
+      ([guía](../02-guias/seguimiento-envios.md#criterio-de-aceptación-cumplido-el-2026-11-17)).
+      El rechazo real sigue cubierto solo por pruebas.

@@ -372,7 +372,8 @@ Detalle en [emisión de boletas](../02-guias/emision-boletas.md).
 
 ## Seguimiento y cron (Fase 8)
 
-`server/seguimiento/` usa la misma capa sin sesión de usuario (código sin desplegar):
+`server/seguimiento/` usa la misma capa sin sesión de usuario (desplegado el 2026-11-17,
+`3ade4c9`):
 
 - **Rutas `/api/cron/*`** (`runtime = 'nodejs'`): `autorizarCron` compara el Bearer con
   `CRON_SECRET` en tiempo constante (503 sin secreto, 401 con otro) y `conMonitorCron`
