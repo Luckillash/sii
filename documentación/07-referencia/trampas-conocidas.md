@@ -680,8 +680,32 @@ Detalle en la [guía de emisión](../02-guias/emision-boletas.md).
 ## Seguimiento de envíos (Fase 8)
 
 Detalle en la [guía de seguimiento](../02-guias/seguimiento-envios.md). La migración
-`0013_notificaciones` está **aplicada** (2026-11-17); la `0014_cron`, **escrita, pendiente
-de aplicar** después del deploy.
+`0013_notificaciones` y `0014_cron` están **aplicadas** (2026-11-17; la 0014 después del
+deploy `3ade4c9`).
+
+### Realtime en una carga completa (bug visto en Production, 2026-11-17)
+
+- **Síntoma:** con `/servicio/envios/<id>` abierto, el cron dejó el envío en EPR y el
+  documento `aceptado`, pero la página siguió en «Enviado» sin mostrar ningún aviso.
+  `realtime.subscription` no tenía filas.
+- **Causa:** en una carga completa, el `useEffect` suscribía el canal antes de que el cliente
+  del navegador leyera la sesión de las cookies. El `phx_join` salía sin `access_token` y
+  Realtime lo trataba como `anon`. Como `anon` no tiene SELECT sobre `envios`,
+  `realtime.subscription_check_filters` no encontraba la columna (usa `has_column_privilege`
+  con el rol de los claims) y rechazaba **toda** la suscripción del canal con
+  «invalid column for filter id». Cuando el JWT llegaba después (`INITIAL_SESSION` →
+  `realtime.setAuth`), los `postgres_changes` no se reintentaban. El error llega como
+  mensaje `system` con `status: 'error'`, no como `CHANNEL_ERROR`, así que la UI no avisaba.
+  Navegando dentro de la app sí funcionaba, porque la sesión ya estaba cargada.
+- **Arreglo:** `lib/supabase/realtime.ts` (`suscribirEnVivo`) espera
+  `supabase.realtime.setAuth()` (sin argumento usa el callback de supabase-js, que espera
+  `auth.getSession()`) antes de crear el canal, y trata un `system` con error como
+  desconexión. Lo usan los tres `EnVivo` (Certificación, Folios y Documentos/Envíos), que
+  tenían el mismo defecto desde las Fases 5 y 6.
+- **Cómo diagnosticarlo:** que `realtime.subscription` esté vacía con la página abierta es la
+  señal. Para ver el `phx_join` de la carga inicial, abre la página en un iframe del mismo
+  origen e intercepta su `WebSocket` antes de que hidrate (el registro de consola y red de
+  la extensión no captura los frames).
 
 ### Decisiones
 

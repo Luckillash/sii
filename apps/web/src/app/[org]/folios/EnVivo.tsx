@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { clienteNavegador } from '@/lib/supabase/navegador';
+import { suscribirEnVivo } from '@/lib/supabase/realtime';
 import estilos from './folios.module.css';
 
 /** Espera para juntar varios cambios seguidos (operación + solicitud + CAF) en un refresh. */
@@ -43,35 +44,25 @@ export function EnVivo({
     };
     const porEmpresa = `empresa_id=eq.${empresaId}`;
     const porOrganizacion = `organizacion_id=eq.${organizacionId}`;
-    let suscritoAntes = false;
-
-    let canal = supabase.channel(`folios:${empresaId}`);
-    for (const [tabla, filtro] of [
-      ['solicitudes_folios', porEmpresa],
-      ['operaciones_sii', porEmpresa],
-      ['cafs', porEmpresa],
-      ['folios_anulados', porOrganizacion],
-    ] as const) {
-      canal = canal.on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: tabla, filter: filtro },
-        refrescar,
-      );
-    }
-    canal.subscribe((estado) => {
-      if (estado === 'SUBSCRIBED') {
-        setDesconectado(false);
+    const limpiar = suscribirEnVivo(
+      supabase,
+      `folios:${empresaId}`,
+      [
+        { tabla: 'solicitudes_folios', filtro: porEmpresa, alCambiar: refrescar },
+        { tabla: 'operaciones_sii', filtro: porEmpresa, alCambiar: refrescar },
+        { tabla: 'cafs', filtro: porEmpresa, alCambiar: refrescar },
+        { tabla: 'folios_anulados', filtro: porOrganizacion, alCambiar: refrescar },
+      ],
+      (estado) => {
+        setDesconectado(estado === 'desconectado');
         // Al reconectar, trae lo que cambió mientras el canal estuvo caído.
-        if (suscritoAntes) refrescar();
-        suscritoAntes = true;
-      } else if (estado === 'CHANNEL_ERROR' || estado === 'TIMED_OUT') {
-        setDesconectado(true);
-      }
-    });
+        if (estado === 'reconectado') refrescar();
+      },
+    );
 
     return () => {
       if (temporizador.current) clearTimeout(temporizador.current);
-      void supabase.removeChannel(canal);
+      limpiar();
     };
   }, [empresaId, organizacionId, router]);
 

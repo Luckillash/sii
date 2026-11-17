@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { clienteNavegador } from '@/lib/supabase/navegador';
+import { suscribirEnVivo } from '@/lib/supabase/realtime';
 import { filtrosRealtime } from '@/stores/enVivo';
 import { useEnVivoStore } from '@/stores/ProveedorEnVivo';
 import estilos from './documentos.module.css';
@@ -54,39 +55,37 @@ export function EnVivo({
       temporizador.current = setTimeout(() => router.refresh(), ESPERA_MS);
     };
     const filtro = filtrosRealtime(organizacionId, envioId);
-    let suscritoAntes = false;
 
-    const suscripcion = supabase
-      .channel(`${canal}:${envioId ?? organizacionId}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'documentos', filter: filtro.documentos },
-        (p) => {
-          if (p.eventType !== 'DELETE') aplicarDocumento(p.new);
-          refrescar();
+    const limpiar = suscribirEnVivo(
+      supabase,
+      `${canal}:${envioId ?? organizacionId}`,
+      [
+        {
+          tabla: 'documentos',
+          filtro: filtro.documentos,
+          alCambiar: (p) => {
+            if (p.eventType !== 'DELETE') aplicarDocumento(p.new);
+            refrescar();
+          },
         },
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'envios', filter: filtro.envios },
-        (p) => {
-          if (p.eventType !== 'DELETE') aplicarEnvio(p.new);
-          refrescar();
+        {
+          tabla: 'envios',
+          filtro: filtro.envios,
+          alCambiar: (p) => {
+            if (p.eventType !== 'DELETE') aplicarEnvio(p.new);
+            refrescar();
+          },
         },
-      )
-      .subscribe((estado) => {
-        if (estado === 'SUBSCRIBED') {
-          setDesconectado(false);
-          if (suscritoAntes) refrescar();
-          suscritoAntes = true;
-        } else if (estado === 'CHANNEL_ERROR' || estado === 'TIMED_OUT') {
-          setDesconectado(true);
-        }
-      });
+      ],
+      (estado) => {
+        setDesconectado(estado === 'desconectado');
+        if (estado === 'reconectado') refrescar();
+      },
+    );
 
     return () => {
       if (temporizador.current) clearTimeout(temporizador.current);
-      void supabase.removeChannel(suscripcion);
+      limpiar();
     };
   }, [organizacionId, canal, envioId, router, aplicarDocumento, aplicarEnvio]);
 

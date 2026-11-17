@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { clienteNavegador } from '@/lib/supabase/navegador';
+import { suscribirEnVivo } from '@/lib/supabase/realtime';
 import estilos from './certificacion.module.css';
 
 /** Espera para juntar varios cambios seguidos (fila de operación + proceso) en un refresh. */
@@ -33,34 +34,24 @@ export function EnVivo({ empresaId }: { empresaId: string }) {
       temporizador.current = setTimeout(() => router.refresh(), ESPERA_MS);
     };
     const filtro = `empresa_id=eq.${empresaId}`;
-    let suscritoAntes = false;
 
-    const canal = supabase
-      .channel(`certificacion:${empresaId}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'procesos_certificacion', filter: filtro },
-        refrescar,
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'operaciones_sii', filter: filtro },
-        refrescar,
-      )
-      .subscribe((estado) => {
-        if (estado === 'SUBSCRIBED') {
-          setDesconectado(false);
-          // Al reconectar, trae lo que cambió mientras el canal estuvo caído.
-          if (suscritoAntes) refrescar();
-          suscritoAntes = true;
-        } else if (estado === 'CHANNEL_ERROR' || estado === 'TIMED_OUT') {
-          setDesconectado(true);
-        }
-      });
+    const limpiar = suscribirEnVivo(
+      supabase,
+      `certificacion:${empresaId}`,
+      [
+        { tabla: 'procesos_certificacion', filtro, alCambiar: refrescar },
+        { tabla: 'operaciones_sii', filtro, alCambiar: refrescar },
+      ],
+      (estado) => {
+        setDesconectado(estado === 'desconectado');
+        // Al reconectar, trae lo que cambió mientras el canal estuvo caído.
+        if (estado === 'reconectado') refrescar();
+      },
+    );
 
     return () => {
       if (temporizador.current) clearTimeout(temporizador.current);
-      void supabase.removeChannel(canal);
+      limpiar();
     };
   }, [empresaId, router]);
 
