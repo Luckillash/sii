@@ -18,7 +18,7 @@ Solo lectura, con la sesión (RLS) y sin salir al SII. Las cifras viven en
 `apps/web/src/server/tablero/`, el resumen de folios en `apps/web/src/server/folios/lectura.ts`
 y las exportaciones en `apps/web/src/server/reportes/` (contrato de la URL en
 `apps/web/src/lib/reportes.ts`). Detalle en [Tablero y reportes](../02-guias/tablero-y-reportes.md).
-Código listo, **sin desplegar**; sin migraciones.
+Desplegado en *Production* (`f5f8927`) y con el criterio de aceptación cumplido; sin migraciones.
 
 | Función | Quién la llama | Sale al SII | `operacion_sii` | Escribe |
 |---|---|---|---|---|

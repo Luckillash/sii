@@ -533,8 +533,9 @@ Cómo correrla: ajustar el primer CTE (slug, RUT de la empresa como se guarda, a
 período) y ejecutar el archivo completo (SQL Editor, MCP `execute_sql` o `supabase db query
 --read-only -f`). En producción, el 2026-11-17, para `servicio`, 20.630.500-2, certificación
 y noviembre de 2026: ventas netas $ 2.000, IVA $ 380, exento $ 0, total $ 2.380, 2 boletas
-aceptadas y 0 esperando al SII. La comparación con el Tablero desplegado está pendiente
-([guía](../02-guias/tablero-y-reportes.md#consulta-de-control-y-criterio-de-aceptación-pendiente)).
+aceptadas y 0 esperando al SII. El Tablero desplegado mostró las mismas cifras (criterio
+cumplido el 2026-11-17;
+[guía](../02-guias/tablero-y-reportes.md#consulta-de-control-y-criterio-de-aceptación)).
 
 ## 13. Lo que no se prueba con SQL
 

@@ -11,12 +11,11 @@ source: ["supabase/migrations/0001_esquema_inicial.sql (v_ventas_diarias)", "sup
 > **Úsalo cuando:** tocas el Tablero (`/[org]/tablero`), las descargas CSV o Excel, o
 > necesitas explicar por qué una cifra del Tablero no calza con otra fuente.
 
-**Estado (2026-11-17).** El código de la **Fase 9** está listo y probado en local, **sin
-desplegar**. No trae migraciones: todo sale de lo que ya existe (`v_ventas_diarias`,
-`documentos`, `cafs`, `envios`, `v_certificados_estado`). La consulta SQL de control ya
-corrió en producción (solo lectura) y dio las cifras de la empresa del piloto en noviembre
-de 2026; falta el deploy a *Production* y comparar esas cifras con el Tablero desplegado
-([criterio de aceptación](#consulta-de-control-y-criterio-de-aceptación-pendiente)).
+**Estado (2026-11-17).** La **Fase 9** está desplegada en *Production* (`f5f8927`) y su
+[criterio de aceptación](#consulta-de-control-y-criterio-de-aceptación) está cumplido: el
+Tablero muestra las mismas cifras que la consulta SQL de control. No trae migraciones: todo
+sale de lo que ya existe (`v_ventas_diarias`, `documentos`, `cafs`, `envios`,
+`v_certificados_estado`).
 
 ## Dónde vive
 
@@ -379,7 +378,7 @@ se arma entero en memoria antes de responder (no hay *streaming*).
 
 Ver [acceso por tabla](../03-api-reference/acceso-por-tabla.md).
 
-## Consulta de control y criterio de aceptación (pendiente)
+## Consulta de control y criterio de aceptación
 
 El criterio (PLAN-SAAS Fase 9):
 
@@ -424,11 +423,22 @@ que el Tablero: período por `fecha_emision`, sin el set de pruebas, ventas de `
 
 Son las dos boletas de $ 1.190 de las Fases 7 y 8 (folios 41 y 42), las dos aceptadas.
 
-**Pendiente:** desplegar la Fase 9 a *Production*, abrir `/servicio/tablero` con la sesión del
-propietario en esa empresa, certificación y noviembre de 2026, y comprobar que las tarjetas
-muestran exactamente esas cifras; además, descargar los cuatro archivos con la sesión y
-comprobar que abren en Excel (tildes, columnas separadas, fechas y montos como tales) y que la
-fila «Total» del resumen da $ 2.000 / $ 0 / $ 380 / $ 2.380.
+**Criterio cumplido (2026-11-17, deploy `f5f8927`).** Con la sesión del propietario,
+`/servicio/tablero?ambiente=certificacion&periodo=2026-11` mostró ventas netas $ 2.000, IVA
+débito $ 380, Documentos emitidos 2 («2 aceptados · 0 con reparos · 0 rechazados») y
+Esperando al SII 0. La consulta, corrida otra vez en ese momento, dio lo mismo (además 0
+anulados y 0 enviados). Sin errores de consola ni de runtime en Vercel.
+
+**Descargas con sesión** (con `fetch` desde la página, sin guardar archivos): las cuatro del
+Tablero y las dos de Documentos emitidos respondieron 200, con `attachment`, el nombre
+`boletas-20630500-2-certificacion-2026-11.csv|xlsx` o `resumen-diario-…` y `no-store`. El CSV
+trae BOM, `;` y CRLF, con los folios 41 y 42 y sus Track ID; la fila «Total» del resumen da
+`Total;;2;;;2000;0;380;2380`. Los XLSX tienen sus 6 partes, la hoja parsea y las fechas son
+series de Excel (46342 = 16-11-2026). En producción, sin boletas, el resumen sale de
+`v_ventas_diarias` con «Total» en 0. Los errores responden con su código y texto: empresa
+ajena 404, resumen con `periodo=todos` 400, reporte o formato inválido 400. El usuario abrió
+en Excel el de boletas del período (las 12 columnas con sus datos) y el del resumen diario
+por tipo, y los dos se ven bien.
 
 ## Cómo se probó
 
