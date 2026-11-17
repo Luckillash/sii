@@ -1,9 +1,9 @@
 ---
 title: "Realtime y Storage"
 description: "Tablas publicadas en Realtime (incluida la migración 0006), bucket documentos-xml, rutas, AlmacenDocumentos, content-type y URLs firmadas."
-keywords: [Realtime, supabase_realtime, postgres_changes, replica identity, migración 0006, operaciones_sii, solicitudes_folios, documentos, envios, procesos_certificacion, RLS, Storage, documentos-xml, bucket, AlmacenDocumentos, rutaDocumento, subirXml, subirPdf, urlFirmada, createSignedUrl, MAXIMO_SEGUNDOS_URL, MAXIMO_BYTES, ErrorAlmacen, content-type, application/xml, text/xml, application/pdf, charset, ISO-8859-1, xml_path, uuid_o_nulo, storage.foldername, EnVivo, router.refresh, asistente de certificación, DTE-39-F, EnvioBOLETA-set, folios, /folios, migración 0011, cafs, folios_anulados, emisión, EnvioBOLETA-39-F, DTE-39-F41-carta.pdf, rollo, metadata.pdf, receptor_correo, metadata.correo, enlaceDocumento, SEGUNDOS_URL, nombresArchivos, nombrePdfDeXml, Fase 8, useEnVivoStore, ProveedorEnVivo, filtrosRealtime, estadoVigente, envioVigente, actualizado_en, documentos/EnVivo.tsx]
+keywords: [Realtime, supabase_realtime, postgres_changes, replica identity, migración 0006, operaciones_sii, solicitudes_folios, documentos, envios, procesos_certificacion, RLS, Storage, documentos-xml, bucket, AlmacenDocumentos, rutaDocumento, subirXml, subirPdf, urlFirmada, createSignedUrl, MAXIMO_SEGUNDOS_URL, MAXIMO_BYTES, ErrorAlmacen, content-type, application/xml, text/xml, application/pdf, charset, ISO-8859-1, xml_path, uuid_o_nulo, storage.foldername, EnVivo, router.refresh, asistente de certificación, DTE-39-F, EnvioBOLETA-set, folios, /folios, migración 0011, cafs, folios_anulados, emisión, EnvioBOLETA-39-F, DTE-39-F41-carta.pdf, rollo, metadata.pdf, receptor_correo, metadata.correo, enlaceDocumento, SEGUNDOS_URL, nombresArchivos, nombrePdfDeXml, Fase 8, useEnVivoStore, ProveedorEnVivo, filtrosRealtime, estadoVigente, envioVigente, actualizado_en, documentos/EnVivo.tsx, suscribirEnVivo, lib/supabase/realtime.ts, realtime.setAuth, phx_join, system, subscription_check_filters, carga completa]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "04-objetos/objetos-auditoria-e-integraciones.md", "09-libreria/backend-service-role.md", "03-api-reference/acceso-por-tabla.md", "07-referencia/trampas-conocidas.md"]
-source: ["supabase_saas_sii.sql §18 §19", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/verificaciones/0006_realtime_operaciones.sql", "supabase/migrations/0011_folios.sql", "apps/web/src/server/sii/almacen.ts", "apps/web/src/app/[org]/certificacion/EnVivo.tsx", "apps/web/src/server/certificacion/envio-set.ts", "apps/web/src/server/emision/representacion.ts", "apps/web/src/server/emision/enlaces.ts", "apps/web/src/app/[org]/documentos/EnVivo.tsx", "apps/web/src/stores/enVivo.ts", "apps/web/src/stores/ProveedorEnVivo.tsx"]
+source: ["supabase_saas_sii.sql §18 §19", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/verificaciones/0006_realtime_operaciones.sql", "supabase/migrations/0011_folios.sql", "apps/web/src/server/sii/almacen.ts", "apps/web/src/app/[org]/certificacion/EnVivo.tsx", "apps/web/src/server/certificacion/envio-set.ts", "apps/web/src/server/emision/representacion.ts", "apps/web/src/server/emision/enlaces.ts", "apps/web/src/app/[org]/documentos/EnVivo.tsx", "apps/web/src/stores/enVivo.ts", "apps/web/src/stores/ProveedorEnVivo.tsx", "apps/web/src/lib/supabase/realtime.ts"]
 ---
 
 # Realtime y Storage
@@ -61,21 +61,48 @@ siempre (la llave primaria, `id`):
 
 ### Suscribirse desde el panel
 
+**Regla: suscribir siempre con `suscribirEnVivo`** (`apps/web/src/lib/supabase/realtime.ts`),
+nunca con `.channel(…).on(…).subscribe()` directo en un `useEffect`. La función:
+
+- **espera la sesión antes del `phx_join`**: llama a `supabase.realtime.setAuth()` (sin
+  argumento usa el callback de supabase-js, que espera `auth.getSession()`) y recién
+  entonces crea el canal, para que la unión salga con el JWT del usuario;
+- **trata un mensaje `system` con `status: 'error'` como desconexión** (`desconectado`),
+  igual que `CHANNEL_ERROR` o `TIMED_OUT`, para que la UI muestre el aviso;
+- devuelve la limpieza para el `useEffect`, segura aunque el canal todavía no exista.
+
+Sin eso, en una carga completa de la página el canal se unía antes de que el cliente
+leyera la sesión de las cookies: el `phx_join` salía como `anon`, Realtime rechazaba la
+suscripción entera («invalid column for filter id», porque `anon` no tiene `select`) y no
+la reintentaba al llegar el JWT; el error venía como `system`, que nadie escuchaba, así que
+la página quedaba sin eventos y sin aviso. Navegando dentro de la app funcionaba, porque la
+sesión ya estaba cargada. Visto en *Production* el 2026-11-17; el arreglo está en el código,
+sin desplegar a esa fecha
+([trampa](../07-referencia/trampas-conocidas.md#realtime-en-una-carga-completa-bug-visto-en-production-2026-11-17)).
+La señal para diagnosticarlo: `realtime.subscription` vacía con la página abierta.
+
 Con el cliente del navegador (`clienteNavegador()` de `src/lib/supabase/navegador.ts`, que
 lleva la sesión del usuario):
 
 ```ts
-const canal = clienteNavegador()
-  .channel(`operaciones:${organizacionId}`)
-  .on(
-    'postgres_changes',
-    { event: '*', schema: 'public', table: 'operaciones_sii', filter: `organizacion_id=eq.${organizacionId}` },
-    (cambio) => {
-      // cambio.new: la fila completa (resultado, mensaje, detalle, terminada_en…)
+useEffect(() => {
+  return suscribirEnVivo(
+    clienteNavegador(),
+    `operaciones:${organizacionId}`,
+    [
+      {
+        tabla: 'operaciones_sii',
+        filtro: `organizacion_id=eq.${organizacionId}`,
+        alCambiar: (cambio) => {
+          // cambio.new: la fila completa (resultado, mensaje, detalle, terminada_en…)
+        },
+      },
+    ],
+    (estado) => {
+      // 'conectado' | 'reconectado' (refrescar una vez) | 'desconectado' (mostrar el aviso)
     },
-  )
-  .subscribe();
-// al desmontar: clienteNavegador().removeChannel(canal)
+  );
+}, [organizacionId]);
 ```
 
 El filtro reduce el tráfico; la seguridad la pone RLS (sin filtro, igual llegan solo las
@@ -94,7 +121,8 @@ Primer uso real de Realtime en la app: `apps/web/src/app/[org]/certificacion/EnV
   400 ms de espera (junta el cambio de la operación y el del proceso en un solo refresco) y
   el RSC vuelve a leer todo con RLS (`leerAsistente`). Así no hay dos fuentes de verdad.
 - Al reconectar (`SUBSCRIBED` después de haber estado suscrito) refresca una vez, para
-  traer lo que cambió con el canal caído. Con `CHANNEL_ERROR` o `TIMED_OUT` muestra «No
+  traer lo que cambió con el canal caído. Con `CHANNEL_ERROR`, `TIMED_OUT` o un `system`
+  con error (`suscribirEnVivo`, sin desplegar al 2026-11-17) muestra «No
   pudimos conectar la actualización en vivo. Recarga la página para ver el estado más
   reciente.»
 - No escucha `envios`, `solicitudes_folios` ni `set_pruebas_casos`: sus cambios ocurren
@@ -131,6 +159,10 @@ estado de una boleta después de la subida (aceptada, rechazada) lo muestran Doc
 emitidos y la página del envío (Fase 8, abajo).
 
 ### Documentos emitidos y envíos (Fase 8)
+
+Los tres `EnVivo` (Certificación, Folios y Documentos/Envíos) se suscriben con
+`suscribirEnVivo` ([arriba](#suscribirse-desde-el-panel)); hasta ese arreglo (2026-11-17,
+sin desplegar) los tres tenían el defecto de la carga completa.
 
 Tercer uso: `apps/web/src/app/[org]/documentos/EnVivo.tsx`, en `/[org]/documentos` y en
 `/[org]/envios/[id]`. **A diferencia de Certificación y Folios, sí guarda lo que llega**,

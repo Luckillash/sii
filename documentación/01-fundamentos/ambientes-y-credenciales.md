@@ -158,7 +158,7 @@ Reglas para el desarrollo:
 | `SII_TOKENS_KEY`, `SUPABASE_SECRET_KEY`, `CRON_SECRET` | variables de entorno de Vercel (*sensitive*) | `process.env`; `SUPABASE_SECRET_KEY` se valida en `src/server/env.ts` y `SII_TOKENS_KEY` en `leerLlave()` de `src/server/cifrado.ts` (32 bytes en base64) |
 | `TURNSTILE_SECRET_KEY` | variable de entorno de Vercel (*sensitive*) **y** Supabase Auth → *Attack Protection* | `siteverify` en `src/server/turnstile.ts` (invitación, contacto, y los formularios de acceso cuando hay `SUPABASE_SECRET_KEY`); Supabase la usa para validar `captchaToken` en Auth |
 | `SUPABASE_SECRET_KEY` (`sb_secret_…`), segundo uso | la misma variable | `src/server/supabase/clave-auth.ts`: llamadas a `supabase.auth.*` en nombre de la persona con `sb-forwarded-for` (su IP real), para que los límites por IP de Auth no vean solo la IP de Vercel. Con esta clave Auth omite el captcha (la app verifica Turnstile) y la Data API correría como service_role: nunca usar esos clientes para datos |
-| `cron_token` | Supabase Vault (secreto con nombre, creado a mano; existe en producción) | los jobs de `pg_cron` de la `0014_cron` (pendiente de aplicar) lo leen de `vault.decrypted_secrets` **en cada corrida** y lo envían como `Authorization: Bearer` a `/api/cron/*`; nunca queda en `cron.job.command`. Igual a `CRON_SECRET` |
+| `cron_token` | Supabase Vault (secreto con nombre, creado a mano; existe en producción) | los jobs de `pg_cron` de la `0014_cron` (aplicada el 2026-11-17) lo leen de `vault.decrypted_secrets` **en cada corrida** y lo envían como `Authorization: Bearer` a `/api/cron/*`; nunca queda en `cron.job.command`. Igual a `CRON_SECRET` |
 | `CRON_SECRET` (detalle) | variable de entorno de Vercel (*Production*, *sensitive*) y `.env.local` | `envCron()` de `src/server/env.ts` (mínimo 16 caracteres; opcional: sin ella las rutas `/api/cron/*` responden **503** y no ejecutan nada). `autorizarCron` (`src/server/cron/autorizacion.ts`) compara el Bearer en tiempo constante (SHA-256 de los dos lados y `timingSafeEqual`); otro valor → **401**. Rotar: cambiar `cron_token` en Vault y `CRON_SECRET` en Vercel a la vez y redesplegar, sin migración |
 
 ### Cifrado de tokens y cookies
@@ -183,8 +183,9 @@ La lista completa está en `apps/web/.env.example` y en PLAN-SAAS §5. En el Saa
 en Vault.
 
 `CRON_SECRET` (Fase 8) la usan solo las rutas `/api/cron/seguimiento` y `/api/cron/alertas`;
-tiene que estar en Vercel *Production* antes de aplicar la migración `0014_cron`, o cada
-llamada de `pg_cron` recibirá 503
+tenía que estar en Vercel *Production* antes de aplicar la migración `0014_cron` (así se
+hizo el 2026-11-17), o cada llamada de `pg_cron` recibe 503; si se borra o se rota solo de
+un lado, lo mismo (503 o 401)
 ([seguimiento](../02-guias/seguimiento-envios.md#orden-de-despliegue)).
 
 ## Spike de conectividad (Fase 0, retirado)

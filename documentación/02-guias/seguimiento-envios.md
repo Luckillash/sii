@@ -12,15 +12,16 @@ source: ["supabase_saas_sii.sql §9 §15 §16", "supabase/migrations/0001_esquem
 > Documentos emitidos y Envío, las alertas por correo, o necesitas saber por qué una boleta
 > sigue `enviado`.
 
-**Estado (2026-11-17).** El código de la **Fase 8** está escrito y probado con Vitest y
-dobles (sin red ni base), **sin desplegar**. Trae dos migraciones: `0013_notificaciones`
-(tabla de deduplicación de alertas y sus funciones), **aplicada en producción el
-2026-11-17** (verificación 18/18 y simulación 26/26 con limpieza en 0), y `0014_cron` (los
-jobs de `pg_cron`), escrita y probada en PGlite, **pendiente de aplicar** después del
-deploy ([orden de despliegue](#orden-de-despliegue)). Hoy en producción no hay
-ningún job de `pg_cron` y el único envío real (Track ID 34015200, de la Fase 7) sigue
-`en_proceso` con su documento `enviado`. El
-[criterio de aceptación](#criterio-de-aceptación-pendiente) está **pendiente**.
+**Estado (2026-11-17).** La **Fase 8** está desplegada en *Production* (`3ade4c9`, READY,
+con humo y pantallas con sesión verificados). Trae dos migraciones, las dos **aplicadas en
+producción el 2026-11-17**: `0013_notificaciones` (tabla de deduplicación de alertas y sus
+funciones; verificación 18/18 y simulación 26/26 con limpieza en 0), antes del deploy, y
+`0014_cron` (los jobs de `pg_cron`; verificación 12/12), después del deploy, a las 18:31
+UTC ([orden de despliegue](#orden-de-despliegue)). El cron ya corre: la primera corrida de
+seguimiento (18:35 UTC) dejó el único envío real (Track ID 34015200, de la Fase 7) en EPR y
+su documento `aceptado`. Al probar el criterio apareció un bug de Realtime en las cargas
+completas de página, ya corregido en el código (`suscribirEnVivo`) pero **sin desplegar**;
+el [criterio de aceptación](#criterio-de-aceptación-pendiente) sigue **pendiente**.
 
 ## Dónde vive
 
@@ -33,7 +34,7 @@ ningún job de `pg_cron` y el único envío real (Track ID 34015200, de la Fase 
 | Alertas por correo | `apps/web/src/server/alertas/`: `index.ts` (`ejecutarAlertas`), `datos.ts` (repositorio), `constantes.ts`; plantillas `packages/correos/src/{rechazo,incierto,certificado,alertas-comun}.ts` |
 | Lectura y acciones del panel | `apps/web/src/server/documentos/`: `lectura.ts` (lista, detalle, envío, inciertos; con la sesión), `filtros.ts`, `presentacion.ts` (textos), `revisar.ts` + `revision.ts` («Ya lo revisé»), `reenviar.ts` |
 | Páginas | `apps/web/src/app/[org]/documentos/` (lista, panel, `acciones.ts`, `EnVivo.tsx`), `apps/web/src/app/[org]/envios/[id]/` (detalle y `MarcarRevisado.tsx`), `apps/web/src/app/[org]/tablero/page.tsx` (alerta de inciertos) |
-| Realtime | `apps/web/src/stores/enVivo.ts` (`useEnVivoStore`) y `ProveedorEnVivo.tsx` |
+| Realtime | `apps/web/src/stores/enVivo.ts` (`useEnVivoStore`) y `ProveedorEnVivo.tsx`; la suscripción, con `suscribirEnVivo` de `apps/web/src/lib/supabase/realtime.ts` (arreglo sin desplegar) |
 | Base | `supabase/migrations/0013_notificaciones.sql`, `0014_cron.sql`; verificaciones `supabase/verificaciones/0013_notificaciones.sql`, `0014_cron.sql`, `rls-fase8-notificaciones.sql` |
 | Pruebas | `*.test.ts` junto a cada módulo (el escenario con dobles es `server/seguimiento/escenario-prueba.ts`), `packages/correos/src/alertas-fase8.test.ts`, `apps/web/e2e/documentos.spec.ts` |
 
@@ -400,6 +401,15 @@ reconectar refresca una vez; con `CHANNEL_ERROR` o `TIMED_OUT`, «No pudimos con
 actualización en vivo…». Así «un envío pasa de `enviado` a `aceptado` sin recargar» aunque
 uno de los dos caminos falle.
 
+La suscripción va por `suscribirEnVivo` (`lib/supabase/realtime.ts`, sin desplegar al
+2026-11-17): espera `supabase.realtime.setAuth()` antes de crear el canal, para que el
+`phx_join` salga con el JWT de la sesión, y trata un mensaje `system` con `status: 'error'`
+como desconexión (muestra el mismo aviso). Sin eso, en una carga completa el canal se unía
+como `anon`, Realtime rechazaba el filtro y la página no recibía nada ni avisaba (visto en
+*Production* con el envío 34015200; detalle en
+[trampas](../07-referencia/trampas-conocidas.md#realtime-en-una-carga-completa-bug-visto-en-production-2026-11-17)).
+Los `EnVivo` de Certificación y Folios usan la misma función.
+
 ## Alertas por correo
 
 `/api/cron/alertas` (`maxDuration = 60`, monitor `cron-alertas`, horario `*/10 * * * *`,
@@ -464,7 +474,7 @@ sin exclamaciones ni emoji; qué pasó y qué hacer; sin secretos.
 
 ## pg_cron y monitores (migración 0014)
 
-`0014_cron.sql` agenda 4 jobs (UTC):
+`0014_cron.sql` (**aplicada el 2026-11-17**, 18:31 UTC) agenda 4 jobs (UTC):
 
 | Job | Horario | Qué hace |
 |---|---|---|
@@ -499,12 +509,18 @@ sin exclamaciones ni emoji; qué pasó y qué hacer; sin secretos.
    de alertas corriera sin ella, no enviaría nada (no puede leer candidatos ni reclamar) y la
    corrida quedaría con error en el resumen y en Sentry.
 2. **`CRON_SECRET`** en Vercel (*Production*, *Sensitive*), con el mismo valor que
-   `cron_token` en Vault. Sin él, las rutas responden 503.
-3. **Deploy** de la app.
+   `cron_token` en Vault. Sin él, las rutas responden 503. **Hecho el 2026-11-17.**
+3. **Deploy** de la app. **Hecho el 2026-11-17**: `3ade4c9` READY, con humo (rutas del cron
+   sin Bearer o con uno inválido → 401) y pantallas con sesión.
 4. **Aplicar la 0014** (después del deploy): desde ese momento `pg_cron` llama a las rutas.
-   Antes del deploy responderían 404 cada 5 minutos (sin daño, pero ruido).
+   Antes del deploy responderían 404 cada 5 minutos (sin daño, pero ruido). **Hecho el
+   2026-11-17, 18:31 UTC**: el `--dry-run` listó solo la 0014; `db push --yes`.
 5. Verificar: `0014_cron.sql`, `net._http_response` con 200 y los monitores de Sentry en
-   verde. Pasos detallados en [despliegue](../08-esquema-supabase/despliegue.md#fase-8-migraciones-0013-y-0014).
+   verde. **Hecho el 2026-11-17**: `0014_cron.sql` 12/12 (con el MCP `execute_sql` como
+   `postgres`; con `supabase db query --read-only` falla la 9, ver
+   [despliegue](../08-esquema-supabase/despliegue.md#fase-8-migraciones-0013-y-0014));
+   `seguimiento-envios` 3 corridas y `alertas` 1, todas `succeeded`; `net._http_response`
+   200 en las dos rutas; monitores `cron-seguimiento` y `cron-alertas` en `ok`.
 
 ## Permisos
 
@@ -651,7 +667,8 @@ como en las fases anteriores; nada toca la base real):
 `0013_notificaciones.sql` **18/18** (0/18 sin la 0013) y `rls-fase8-notificaciones.sql`
 **26/26** (1/26 sin ella); `0014_cron.sql` **11/12** (la 1, extensiones `pg_cron` y
 `pg_net`, no aplica en PGlite). **En producción** (2026-11-17): `0013_notificaciones.sql`
-**18/18** y `rls-fase8-notificaciones.sql` **26/26**; la 0014, pendiente. Además el orden
+**18/18** y `rls-fase8-notificaciones.sql` **26/26**; `0014_cron.sql` **12/12** (con
+`execute_sql` como `postgres`). Además el orden
 de escritura: con el orden inverso se
 encolan webhooks `documento.aceptado` falsos.
 
@@ -667,13 +684,31 @@ El criterio (PLAN-SAAS Fase 8):
 > Un envío pasa de `enviado` a `aceptado` en la UI sin recargar, y un rechazo muestra el
 > error del SII con el texto del design system.
 
-Se hará en *Production* con el envío real de la Fase 7: boleta 39 folio 41, **Track ID
-34015200**, certificación. Hoy el envío está `en_proceso` (`estado_sii` `REC`, 0 consultas)
-y su documento `enviado`; el SII ya lo dio por **EPR** aceptado (consulta con la CLI del
-2026-11-16). Pasos previstos, después del [orden de despliegue](#orden-de-despliegue):
+Se hace en *Production* con el envío real de la Fase 7: boleta 39 folio 41, **Track ID
+34015200**, certificación.
+
+**Estado al 2026-11-17:**
+
+- **Cron verificado.** La primera corrida de seguimiento (18:35 UTC) consultó el envío:
+  `{"envios":1,"consultados":1,"cambiados":1,"errores":0}`, el SII respondió **EPR**
+  (1 informado, 1 aceptado), el documento pasó a `aceptado` y la operación `seguimiento`
+  quedó `ok`. Alertas: `correo: "configurado"`, 0 correos, `notificaciones` vacía.
+- **El badge no cambió.** Con la página del envío abierta desde una carga completa, el cambio
+  de las 18:35 no llegó por Realtime: el canal se había unido como `anon` y la suscripción
+  quedó rechazada sin aviso
+  ([trampa](../07-referencia/trampas-conocidas.md#realtime-en-una-carga-completa-bug-visto-en-production-2026-11-17)).
+  Para reproducirlo se hizo, con el OK del usuario, un `update envios set actualizado_en =
+  now()` sobre el envío 34015200, sin cambiar el estado.
+- **Arreglo en el código, sin desplegar**: `suscribirEnVivo` (`lib/supabase/realtime.ts`),
+  usado por los `EnVivo` de Certificación, Folios y Documentos/Envíos; 7 pruebas nuevas.
+- **Falta**: desplegar el arreglo y repetir el criterio. Como el envío 34015200 ya está
+  `aceptado`, para ver el cambio de badge hace falta otro evento sobre el envío o sus
+  documentos con la página abierta desde una carga completa.
+
+Pasos del criterio:
 
 1. Abrir Documentos emitidos (certificación) o la página del envío con la sesión del
-   propietario, sin recargar.
+   propietario (carga completa, que es el caso que fallaba), sin recargar después.
 2. Esperar la primera corrida del cron (o pulsar «Consultar estado en el SII»): el badge
    tiene que pasar de `enviado` a `aceptado` por Realtime.
 3. Comprobar en la base: envío `aceptado` con `EPR` 1/1/0/0, `envio_estadisticas` del tipo

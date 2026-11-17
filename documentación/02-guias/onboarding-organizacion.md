@@ -273,7 +273,7 @@ El Tablero y la página de certificados leen `v_certificados_estado` y muestran 
 próximos 30 días (con el enlace «Cargar certificado» para administradores o «Ver
 certificados» para el resto). Si la lectura falla, el Tablero se muestra igual, sin
 avisos. Los correos de aviso (30, 15, 7 y 1 días) los envía `/api/cron/alertas` desde la
-Fase 8 (código sin desplegar;
+Fase 8 (desplegada y con el cron corriendo desde el 2026-11-17;
 [alertas](seguimiento-envios.md#alertas-por-correo)).
 
 ## Verificación

@@ -19,23 +19,31 @@ nadie se entera de un rechazo o de un envío incierto. Detalle en la
 [guía de seguimiento](../02-guias/seguimiento-envios.md) y los pasos en
 [despliegue](../08-esquema-supabase/despliegue.md#fase-8-migraciones-0013-y-0014).
 
-Estado al 2026-11-17: código listo sin desplegar; de esta lista están hechos solo
-`cron_token` en Vault y la migración 0013.
+Estado al 2026-11-17: Fase 8 desplegada (`3ade4c9`), migraciones 0013 y 0014 aplicadas y
+cron verificado en producción. Falta el criterio de aceptación: el arreglo de Realtime en
+cargas completas está en el código, sin desplegar
+([trampa](trampas-conocidas.md#realtime-en-una-carga-completa-bug-visto-en-production-2026-11-17)).
 
 - [x] `cron_token` en Vault (una fila; no se lee su valor para comprobarlo).
-- [ ] `CRON_SECRET` en Vercel *Production* (*Sensitive*), igual a `cron_token`, 16
-      caracteres o más.
+- [x] `CRON_SECRET` en Vercel *Production* (*Sensitive*), igual a `cron_token`, 16
+      caracteres o más (2026-11-17).
 - [x] Migración `0013_notificaciones` aplicada **antes** del deploy (2026-11-17);
       verificación 18/18 y `rls-fase8-notificaciones.sql` 26/26 con limpieza en 0.
-- [ ] Deploy de la Fase 8; `/api/cron/seguimiento` y `/api/cron/alertas` sin Bearer → 401.
-- [ ] Migración `0014_cron` aplicada **después** del deploy; verificación 12/12.
-- [ ] `net._http_response` con `status_code` 200 en las dos rutas y `cron.job_run_details`
-      sin fallas.
+- [x] Deploy de la Fase 8; `/api/cron/seguimiento` y `/api/cron/alertas` sin Bearer → 401
+      (`3ade4c9`, 2026-11-17).
+- [x] Migración `0014_cron` aplicada **después** del deploy; verificación 12/12 (2026-11-17,
+      18:31 UTC; la verificación, como `postgres` con `execute_sql`).
+- [x] `net._http_response` con `status_code` 200 en las dos rutas y `cron.job_run_details`
+      sin fallas (2026-11-17: `seguimiento-envios` 3 corridas y `alertas` 1, todas
+      `succeeded`).
 - [ ] *Cron monitors* `cron-seguimiento` y `cron-alertas` en verde en Sentry, con alerta si
-      un cron no corre.
-- [ ] Resend y `NEXT_PUBLIC_APP_URL` configurados (sin ellos las alertas cuentan pero no
-      envían: el resumen dice `sin_configurar` o `sin_url`).
+      un cron no corre (los dos en `ok` el 2026-11-17; la alerta por corrida perdida, sin
+      confirmar).
+- [x] Resend y `NEXT_PUBLIC_APP_URL` configurados (sin ellos las alertas cuentan pero no
+      envían: el resumen dice `sin_configurar` o `sin_url`). La primera corrida de alertas
+      (2026-11-17) dijo `correo: "configurado"`, con 0 correos.
 - [ ] Al menos un propietario o administrador con correo en cada organización (son los
       destinatarios de las alertas).
 - [ ] Criterio de aceptación de la Fase 8 cumplido (Track ID 34015200 de `enviado` a
-      `aceptado` sin recargar).
+      `aceptado` sin recargar). Pendiente: desplegar el arreglo de Realtime
+      (`suscribirEnVivo`) y repetirlo.

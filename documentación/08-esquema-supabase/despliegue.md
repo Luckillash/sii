@@ -1,7 +1,7 @@
 ---
 title: "Esquema: despliegue"
 description: "Cómo se aplican las migraciones en la única base (Supabase en la nube, producción), requisitos (Vault, Realtime, pg_cron, pg_net) y tareas programadas."
-keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, aplicadas, 0008_certificacion, registrar_caf, guardar_set_pruebas, rls-fase5-certificacion, 0009_autorizacion_externa, tg_resolucion_autoriza_produccion, rls-fase5-autorizacion-externa, 0010_verificar_autorizacion, verificar_autorizacion, operacion_sii, rls-fase5-verificar-autorizacion, 0011_folios, anular_folios, trg_20_caf_sin_traslape, tg_caf_sin_traslape, rls-fase6-folios, Fase 6, 0012_folio_anulado, Fase 8, 0013_notificaciones, notificaciones, reclamar_notificacion, rls-fase8-notificaciones, 0014_cron, cron.schedule, seguimiento-envios, alertas, limpiar-tokens-sii, limpiar-historial-cron, net._http_response, cron.job_run_details, CRON_SECRET, pendientes de aplicar, db:tipos, nulabilidad, retornos de funciones]
+keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, aplicadas, 0008_certificacion, registrar_caf, guardar_set_pruebas, rls-fase5-certificacion, 0009_autorizacion_externa, tg_resolucion_autoriza_produccion, rls-fase5-autorizacion-externa, 0010_verificar_autorizacion, verificar_autorizacion, operacion_sii, rls-fase5-verificar-autorizacion, 0011_folios, anular_folios, trg_20_caf_sin_traslape, tg_caf_sin_traslape, rls-fase6-folios, Fase 6, 0012_folio_anulado, Fase 8, 0013_notificaciones, notificaciones, reclamar_notificacion, rls-fase8-notificaciones, 0014_cron, cron.schedule, seguimiento-envios, alertas, limpiar-tokens-sii, limpiar-historial-cron, net._http_response, cron.job_run_details, CRON_SECRET, execute_sql, 42501, _crypto_aead_det_decrypt, db:tipos, nulabilidad, retornos de funciones]
 related: ["02-guias/quickstart.md", "05-pruebas/probar-el-esquema.md", "08-esquema-supabase/vault-y-secretos.md"]
 source: ["supabase_saas_sii.sql (cabecera, opcional pg_cron)", "PLAN-SAAS.md §4.4 §6", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql"]
 ---
@@ -33,7 +33,7 @@ Viven en `supabase/migrations/` con prefijo **secuencial de 4 dígitos** (no tim
 |---|---|
 | `0001_esquema_inicial.sql` | `supabase_saas_sii.sql` **byte a byte** (19 secciones: tipos, tablas, RLS, Vault, Storage, Realtime). Nunca se edita |
 | `0002_extensiones_cron.sql` | `pg_cron` (schema `pg_catalog`) y `pg_net` (schema `extensions`) |
-| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, y la `0010_verificar_autorizacion`, aplicada el 2026-11-14, son de la Fase 5: ver [abajo](#fase-5-migración-0008); la `0011_folios`, de la Fase 6, se aplicó el 2026-11-15: ver [abajo](#fase-6-migración-0011); la `0012_folio_anulado`, de la Fase 7, se aplicó el 2026-11-15: ver [abajo](#fase-7-migración-0012); la `0013_notificaciones`, de la Fase 8, se aplicó el 2026-11-17, y la `0014_cron`, también de la Fase 8, está escrita y **pendiente de aplicar** (después del deploy): ver [abajo](#fase-8-migraciones-0013-y-0014)) |
+| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, y la `0010_verificar_autorizacion`, aplicada el 2026-11-14, son de la Fase 5: ver [abajo](#fase-5-migración-0008); la `0011_folios`, de la Fase 6, se aplicó el 2026-11-15: ver [abajo](#fase-6-migración-0011); la `0012_folio_anulado`, de la Fase 7, se aplicó el 2026-11-15: ver [abajo](#fase-7-migración-0012); la `0013_notificaciones` y la `0014_cron`, de la Fase 8, se aplicaron el 2026-11-17 (la 0014 después del deploy): ver [abajo](#fase-8-migraciones-0013-y-0014)) |
 
 Reglas, todas derivadas de que la única base es producción:
 
@@ -396,9 +396,8 @@ en el estado de arriba):
 
 ### Fase 8: migraciones 0013 y 0014
 
-**Estado: la 0013 aplicada el 2026-11-17, con autorización del usuario; la 0014 escrita y
-probada en PGlite, pendiente de aplicar (después del deploy de la Fase 8).** Antes de
-migrar: migraciones `0001`–`0012`, sin la tabla `notificaciones`, **0 jobs** en `cron.job`,
+**Estado: las dos aplicadas el 2026-11-17, con autorización del usuario: la 0013 antes del
+deploy de la Fase 8 y la 0014 después, a las 18:31 UTC.** Antes de migrar: migraciones `0001`–`0012`, sin la tabla `notificaciones`, **0 jobs** en `cron.job`,
 el secreto `cron_token` presente en Vault (una fila) y `pg_net.ttl` en 6 horas (consultado
 el 2026-11-17). Para aplicar solo la 0013, la 0014 se sacó de `supabase/migrations/`
 durante el push (y se devolvió después): `db push --remote=rbrntkztzijaxsnpgpqn --dry-run`
@@ -408,8 +407,24 @@ Después, en producción: `supabase/verificaciones/0013_notificaciones.sql` **18
 `rls-fase8-notificaciones.sql` **26/26**, con la consulta de limpieza del encabezado en 0
 antes y después, `vault.secrets` con los mismos 4 secretos antes y después y
 `notificaciones` sin filas. `pnpm db:tipos` difiere en 7 líneas de lo agregado a mano (los
-retornos de funciones salen no nulos; ver la nota de abajo); se versionó lo generado. El
-código de la Fase 8 sigue sin desplegar y `cron.job` sigue con 0 jobs.
+retornos de funciones salen no nulos; ver la nota de abajo); se versionó lo generado.
+
+Después, `CRON_SECRET` en Vercel *Production* y el deploy de la Fase 8 (`3ade4c9`, READY,
+humo y pantallas con sesión verificados en *Production*). Luego la **0014**: `db push
+--remote=rbrntkztzijaxsnpgpqn --dry-run` listó solo `0014` y `db push --yes` la aplicó a
+las 18:31 UTC. `supabase/verificaciones/0014_cron.sql` **12/12**, corrida con el MCP
+`execute_sql` (rol `postgres`). **Con `supabase db query --remote --read-only` no se puede
+correr**: la comprobación 9 (ningún comando con el secreto) descifra `cron_token` para
+compararlo y ese rol no tiene permiso, así que falla con `42501` en
+`_crypto_aead_det_decrypt`; no es un error de la migración. Cron verificado en producción:
+`seguimiento-envios` corrió 3 veces y `alertas` 1, todas `succeeded` en
+`cron.job_run_details`, y `net._http_response` con 200 en las dos rutas. La primera corrida
+de seguimiento (18:35 UTC) consultó el envío 34015200: el SII respondió EPR (1 informado,
+1 aceptado), el documento pasó a `aceptado` y la operación `seguimiento` quedó `ok`.
+Alertas: `correo: "configurado"`, 0 correos. Monitores de Sentry `cron-seguimiento` y
+`cron-alertas` en `ok`. El criterio de aceptación de la Fase 8 sigue pendiente por un bug
+de Realtime corregido en el código y sin desplegar
+([guía](../02-guias/seguimiento-envios.md#criterio-de-aceptación-pendiente)).
 
 | Migración | Contenido | Qué falla si falta |
 |---|---|---|
@@ -433,8 +448,9 @@ publicación; nada toca la base real):
 | `supabase/verificaciones/rls-fase8-notificaciones.sql` (con `rollback`, 26) | 26/26 | 1/26 (solo la preparación) |
 | `supabase/verificaciones/0014_cron.sql` (solo lectura, 12) | 11/12 (la 1, extensiones `pg_cron` y `pg_net`, no aplica en PGlite) | — |
 
-En producción (2026-11-17): `0013_notificaciones.sql` 18/18 y
-`rls-fase8-notificaciones.sql` 26/26; la 0014, sin correr todavía.
+En producción (2026-11-17): `0013_notificaciones.sql` 18/18,
+`rls-fase8-notificaciones.sql` 26/26 y `0014_cron.sql` 12/12 (con `execute_sql` como
+`postgres`; con `db query --read-only` la 9 da `42501`).
 
 **Tipos generados y retornos de funciones.** `pnpm db:tipos` marca como no nulas (`string`,
 `number`) todas las columnas que devuelven `alertas_documentos_rechazados`,
@@ -447,8 +463,8 @@ lo generado (typecheck, pruebas de alertas y Biome en verde) y el código de
 Al comparar los tipos después de una migración con funciones nuevas, esa diferencia es
 esperable y no indica un error de la migración.
 
-Pasos, **con autorización del usuario** (el 3 se siguió el 2026-11-17; los resultados, en
-el estado de arriba):
+Pasos, **con autorización del usuario** (todos se siguieron el 2026-11-17; los resultados,
+en el estado de arriba):
 
 1. Leer las dos migraciones completas y revisar el respaldo (panel → *Database → Backups*).
 2. Antes de migrar, `0013_notificaciones.sql` tiene que dar **todo `false`** y
@@ -471,13 +487,15 @@ el estado de arriba):
    Bearer → 401. Con el Bearer (a mano, sin mostrar el secreto) → 200 con el resumen, pero
    eso ya es una corrida real: consulta el SII (solo lectura) y puede enviar alertas.
 6. **0014**: `db push --remote=… --dry-run` debe listar **solo `0014`**; `db push`; luego
-   `0014_cron.sql` **12/12** (la 11 solo dice algo pasados unos minutos).
+   `0014_cron.sql` **12/12** (la 11 solo dice algo pasados unos minutos). Correrla como
+   `postgres` (MCP `execute_sql` o SQL Editor), no con `supabase db query --read-only`: la
+   comprobación 9 descifra `cron_token` y ese rol da `42501` en `_crypto_aead_det_decrypt`.
 7. Después de 10–15 minutos: `net._http_response` con `status_code` 200 en las dos rutas,
    `cron.job_run_details` sin fallas, los monitores `cron-seguimiento` y `cron-alertas` en
    verde en Sentry, y una operación `seguimiento` `ok` en `operaciones_sii`
    ([diagnóstico](../02-guias/seguimiento-envios.md#cómo-diagnosticar)).
 8. Actualizar la documentación («pendiente de aplicar» → «aplicada el AAAA-MM-DD», con
-   los resultados reales; hecho para la 0013 el 2026-11-17, queda la 0014): esta sección y la tabla de Migraciones,
+   los resultados reales; hecho para las dos el 2026-11-17): esta sección y la tabla de Migraciones,
    `08-esquema-supabase/arquitectura.md`, `rls-y-privilegios.md`, `triggers-y-logica.md`,
    `03-api-reference/rpc-backend.md`, `acceso-por-tabla.md`, `indice-operaciones.md`,
    `02-guias/seguimiento-envios.md` (estado, pg_cron), `05-pruebas/probar-el-esquema.md`
@@ -516,7 +534,7 @@ falta `cron_token`. Rotarlo: cambiar el secreto en Vault (`vault.update_secret`)
 `pg_cron` + `pg_net` llaman a rutas Node.js de Vercel, no a Edge Functions (la librería es
 solo Node). Siempre a la URL de **Production** de Vercel, el único entorno que se usa. Cada
 `cron.schedule` se agrega en una migración de la fase que crea su ruta. Los de la Fase 8
-están en `0014_cron.sql` (**pendiente de aplicar**, después del deploy;
+están en `0014_cron.sql` (**aplicada el 2026-11-17**, después del deploy;
 [arriba](#fase-8-migraciones-0013-y-0014)), con este patrón:
 
 ```sql
@@ -539,10 +557,10 @@ select cron.schedule(
 
 | Job | Frecuencia (UTC) | Fase | Migración |
 |---|---|---|---|
-| `seguimiento-envios` → `/api/cron/seguimiento` | `*/5 * * * *` | 8 | `0014_cron` (pendiente) |
-| `alertas` → `/api/cron/alertas` (documento rechazado, envío incierto, certificado por vencer; la de folios sale sin cron desde la Fase 6, al cruzar el 15 %) | `*/10 * * * *` | 8 | `0014_cron` (pendiente) |
-| `limpiar-tokens-sii` (tokens vencidos hace más de un día) | `17 * * * *` | 8 | `0014_cron` (pendiente) |
-| `limpiar-historial-cron` (`cron.job_run_details` de más de 7 días) | `23 3 * * *` | 8 | `0014_cron` (pendiente) |
+| `seguimiento-envios` → `/api/cron/seguimiento` | `*/5 * * * *` | 8 | `0014_cron` (aplicada) |
+| `alertas` → `/api/cron/alertas` (documento rechazado, envío incierto, certificado por vencer; la de folios sale sin cron desde la Fase 6, al cruzar el 15 %) | `*/10 * * * *` | 8 | `0014_cron` (aplicada) |
+| `limpiar-tokens-sii` (tokens vencidos hace más de un día) | `17 * * * *` | 8 | `0014_cron` (aplicada) |
+| `limpiar-historial-cron` (`cron.job_run_details` de más de 7 días) | `23 3 * * *` | 8 | `0014_cron` (aplicada) |
 | `/api/cron/webhooks` | cada minuto | 11 | — |
 
 `net._http_response` no necesita limpieza: `pg_net` borra las respuestas de más de

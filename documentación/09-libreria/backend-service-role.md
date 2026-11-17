@@ -377,7 +377,7 @@ Detalle en [emisión de boletas](../02-guias/emision-boletas.md).
 - **Rutas `/api/cron/*`** (`runtime = 'nodejs'`): `autorizarCron` compara el Bearer con
   `CRON_SECRET` en tiempo constante (503 sin secreto, 401 con otro) y `conMonitorCron`
   envuelve el trabajo en un *cron monitor* de Sentry. `pg_cron` las llama con `pg_net`
-  (migración `0014_cron`, pendiente de aplicar).
+  (migración `0014_cron`, aplicada el 2026-11-17).
 - **`ejecutarOperacion` con `usuarioId: null`**: una operación `seguimiento` por grupo
   (organización + empresa + ambiente + canal), `confirmada: true`. No pasa por `getUser()`
   (no está en `OPERACIONES_QUE_GRABAN`) ni la bloquea un incierto. «Consultar estado en el

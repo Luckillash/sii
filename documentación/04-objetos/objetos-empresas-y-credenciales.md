@@ -267,7 +267,7 @@ Quién la usa: la página de certificados (`listarCertificados`, que completa co
 (`estadosCertificados`, solo `por_vencer` y `vencido`). `alertasCertificados()` arma un
 `Alerta` `error` si hay vencidos y uno `aviso` si hay por vencer (el más próximo
 primero); los revocados no avisan. Las alertas por correo (30, 15, 7 y 1 días) son de la
-Fase 8 (`/api/cron/alertas`, sin desplegar): un correo por certificado y umbral, deduplicado
+Fase 8 (`/api/cron/alertas`, cada 10 minutos desde el 2026-11-17): un correo por certificado y umbral, deduplicado
 con `notificaciones` (migración 0013, aplicada el 2026-11-17), y sin aviso si ya se subió el
 reemplazo ([seguimiento](../02-guias/seguimiento-envios.md#alertas-por-correo)).
 

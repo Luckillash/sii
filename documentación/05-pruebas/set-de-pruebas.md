@@ -186,7 +186,7 @@ Sin ensayo (solo lectura). Necesita `envio_set_id` con Track ID. Sale a `apicert
 | rechazo (`EPR` con rechazos u otro estado) | `error`, `motivo: 'set_rechazado'`: revisar el detalle y reenviar | sin cambio |
 
 En todos esos casos la operación queda `ok` en `operaciones_sii`: la consulta funcionó; el
-`error` es del set. El seguimiento automático de la Fase 8 (cron, sin desplegar) también
+`error` es del set. El seguimiento automático de la Fase 8 (cron, en producción desde el 2026-11-17) también
 consulta el envío del set mientras esté en proceso y sincroniza sus boletas, pero **no**
 avanza la etapa del proceso: `set_aceptado` solo lo pone este botón del paso 3
 ([seguimiento](../02-guias/seguimiento-envios.md)).

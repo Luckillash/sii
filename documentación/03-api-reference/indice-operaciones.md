@@ -19,9 +19,9 @@ las acciones del panel en `apps/web/src/server/documentos/`; las alertas en
 `apps/web/src/server/alertas/`. Las Server Actions están en
 `apps/web/src/app/[org]/documentos/acciones.ts` (las usa también `/[org]/envios/[id]`) y
 exigen membresía; las que marcan o envían algo, además `puedeEmitir`. Detalle en
-[seguimiento de envíos](../02-guias/seguimiento-envios.md). Código **sin desplegar**;
-migración `0013_notificaciones` **aplicada** (2026-11-17) y `0014_cron` **pendiente de
-aplicar** (después del deploy).
+[seguimiento de envíos](../02-guias/seguimiento-envios.md). Código **desplegado**
+(`3ade4c9`, 2026-11-17); migraciones `0013_notificaciones` y `0014_cron` **aplicadas**
+(2026-11-17, la 0014 después del deploy), con el cron corriendo en producción.
 
 | Función | Quién la llama | Sale al SII | `operacion_sii` | Escribe |
 |---|---|---|---|---|
