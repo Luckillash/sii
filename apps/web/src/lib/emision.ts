@@ -505,6 +505,11 @@ export interface VistaEmision {
   borradores: BorradorGuardado[];
   /** El borrador pedido con `?borrador=<id>`, ya en la forma del formulario. */
   borrador: { id: string; datos: Borrador } | null;
+  /**
+   * Cupo de boletas de producción del mes del plan vigente (Fase 10). `maximo` null = sin
+   * límite; ausente o null si no se pudo leer (entonces decide la base al emitir).
+   */
+  cuotaProduccion?: { plan: string | null; usadas: number; maximo: number | null } | null;
 }
 
 export interface ReceptorCatalogo {

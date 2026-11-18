@@ -1,9 +1,9 @@
 ---
 title: "Ambientes del SII y credenciales"
 description: "Certificación vs producción, hosts del SII, IDK del CAF, certificado digital, roles y claves API de Supabase, sesiones y su revocación, y dónde vive cada secreto."
-keywords: [ambiente, certificacion, produccion, maullin, palena, apicert, pangal, rahue, herculesr, zeusr, IDK, service_role, Vault, SII_TOKENS_KEY, variables de entorno, spike, sb_publishable, sb_secret, claves legadas, JWKS, getClaims, getUser, revocación, jwt_expiry, CRON_SECRET, cron_token, envCron, autorizarCron, /api/cron]
-related: ["01-fundamentos/autenticacion-sii.md", "08-esquema-supabase/vault-y-secretos.md", "07-referencia/herramientas.md"]
-source: ["supabase_saas_sii.sql §1 §6 §7", "certificacion-node/docs/canales.md", "PLAN-SAAS.md §4.4 §5", "apps/web/src/server/env.ts", "apps/web/src/server/cron/autorizacion.ts", "supabase/migrations/0014_cron.sql"]
+keywords: [ambiente, certificacion, produccion, maullin, palena, apicert, pangal, rahue, herculesr, zeusr, IDK, service_role, Vault, SII_TOKENS_KEY, variables de entorno, spike, sb_publishable, sb_secret, claves legadas, JWKS, getClaims, getUser, revocación, jwt_expiry, CRON_SECRET, cron_token, envCron, autorizarCron, /api/cron, FLOW_API_KEY, FLOW_SECRET_KEY, FLOW_API_URL, envFlow, Flow, sandbox]
+related: ["01-fundamentos/autenticacion-sii.md", "08-esquema-supabase/vault-y-secretos.md", "07-referencia/herramientas.md", "02-guias/planes-y-pagos.md"]
+source: ["supabase_saas_sii.sql §1 §6 §7", "certificacion-node/docs/canales.md", "PLAN-SAAS.md §4.4 §5", "apps/web/src/server/env.ts", "apps/web/src/server/cron/autorizacion.ts", "supabase/migrations/0014_cron.sql", "apps/web/src/server/pagos/flow.ts"]
 ---
 
 # Ambientes del SII y credenciales
@@ -160,6 +160,7 @@ Reglas para el desarrollo:
 | `SUPABASE_SECRET_KEY` (`sb_secret_…`), segundo uso | la misma variable | `src/server/supabase/clave-auth.ts`: llamadas a `supabase.auth.*` en nombre de la persona con `sb-forwarded-for` (su IP real), para que los límites por IP de Auth no vean solo la IP de Vercel. Con esta clave Auth omite el captcha (la app verifica Turnstile) y la Data API correría como service_role: nunca usar esos clientes para datos |
 | `cron_token` | Supabase Vault (secreto con nombre, creado a mano; existe en producción) | los jobs de `pg_cron` de la `0014_cron` (aplicada el 2026-11-17) lo leen de `vault.decrypted_secrets` **en cada corrida** y lo envían como `Authorization: Bearer` a `/api/cron/*`; nunca queda en `cron.job.command`. Igual a `CRON_SECRET` |
 | `CRON_SECRET` (detalle) | variable de entorno de Vercel (*Production*, *sensitive*) y `.env.local` | `envCron()` de `src/server/env.ts` (mínimo 16 caracteres; opcional: sin ella las rutas `/api/cron/*` responden **503** y no ejecutan nada). `autorizarCron` (`src/server/cron/autorizacion.ts`) compara el Bearer en tiempo constante (SHA-256 de los dos lados y `timingSafeEqual`); otro valor → **401**. Rotar: cambiar `cron_token` en Vault y `CRON_SECRET` en Vercel a la vez y redesplegar, sin migración |
+| `FLOW_API_KEY`, `FLOW_SECRET_KEY` (Fase 10) | variables de entorno de Vercel (*Production*, *sensitive*) y `.env.local`. **Pendiente: aún no están cargadas** | `envFlow()` de `src/server/env.ts` (mínimo 10 caracteres cada una). Solo `server/pagos/flow.ts` las usa: la `apiKey` va en cada llamada y la secreta firma los parámetros (HMAC-SHA256, parámetro `s`); ninguna de las dos va a logs ni a Sentry (`s`, `apiKey` y `token` se filtran en las query strings) |
 
 ### Cifrado de tokens y cookies
 
@@ -186,7 +187,30 @@ en Vault.
 tenía que estar en Vercel *Production* antes de aplicar la migración `0014_cron` (así se
 hizo el 2026-11-17), o cada llamada de `pg_cron` recibe 503; si se borra o se rota solo de
 un lado, lo mismo (503 o 401)
-([seguimiento](../02-guias/seguimiento-envios.md#orden-de-despliegue)).
+([seguimiento](../02-guias/seguimiento-envios.md#orden-de-despliegue)). Desde la Fase 10
+también la usa `/api/cron/suscripciones` (job de la migración `0017`).
+
+### Pasarela de pagos: `FLOW_*` (Fase 10)
+
+| Variable | Valores | Notas |
+|---|---|---|
+| `FLOW_API_KEY` | la *apiKey* de la cuenta de Flow | *sensitive*; del mismo ambiente que la URL |
+| `FLOW_SECRET_KEY` | la *secretKey* de la cuenta de Flow | *sensitive*; firma cada llamada |
+| `FLOW_API_URL` | **solo** `https://sandbox.flow.cl/api` o `https://www.flow.cl/api` | el esquema de `env.ts` rechaza cualquier otro valor (`URLS_FLOW`) |
+
+Las tres son opcionales en conjunto: si falta una, `envFlow()` devuelve `null` y la app
+sigue funcionando sin pagos. La página Configuración → Plan muestra la grilla sin los
+botones de contratar (con el aviso «Los pagos todavía no están habilitados»), las Server
+Actions responden ese mismo mensaje y `/api/pagos/flow/registro`,
+`/api/pagos/flow/confirmacion` y `/api/cron/suscripciones` responden **503**. La pasarela
+también necesita `NEXT_PUBLIC_APP_URL`: con ella arma la URL de retorno del registro de
+tarjeta y el `urlCallback` de los planes, que Flow tiene que poder alcanzar desde internet.
+
+Durante la Fase 10 las tres de *Production* apuntan al **sandbox** (decisión D4); se pasan
+a producción en el lanzamiento ([checklist](../07-referencia/checklist-produccion.md)).
+Las claves de sandbox y de producción son distintas: no se mezclan con la otra URL. Al
+2026-11-17 no están cargadas ni en `.env.local` ni en Vercel, y `apps/web/.env.example`
+todavía no las lista ([planes y pagos](../02-guias/planes-y-pagos.md#variables-de-entorno)).
 
 ## Spike de conectividad (Fase 0, retirado)
 

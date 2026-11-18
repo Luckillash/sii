@@ -1,9 +1,9 @@
 ---
 title: "Trampas conocidas"
 description: "Comportamientos no obvios del SII, de la librería y del esquema."
-keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna, ad_empresa1, ad_empresa2, Actualización de datos del contribuyente, representante legal, no está autorizado para operar en esta modalidad, verificar_autorizacion, ConsultaAutorizacion, situación tributaria de terceros, STC, stc/noauthz, getConsultaData, timbrajes, documentos autorizados, reCAPTCHA, SituacionTributaria, Fase 6, folios, migración 0011, anular_folios, cola completa, trg_20_caf_sin_traslape, 23P01, revisión con el SII, simulada, TransporteSinTimbrar, of_genera_folio, revisionId, folios.por_agotarse, Idempotency-Key, denominador, folio asignado sin documento, política alta, subirCaf, RSAPK, Fase 7, emisión, emitirDocumento, FABRICA_REST_EMISION, FABRICAS_SII.rest, documentoId, doble clic, borradorId, clave_idempotencia, sessionStorage, Ya la revisé, esFolioAnulado, INTENTOS_FOLIO, PDF417, bwip-js, bwip-js/node, binarytext, pdfkit, serverExternalPackages, AFM, ted_xml, latin1, instructivo de representación impresa, enlaceDocumento, uso_mensual.envios, Fase 8, seguimiento, ejecutarSeguimiento, consultarEnvio, consultar_envio, server/sii/clientes.ts, backoff, filtroPorConsultar, inconsistente, lista blanca, ESTADOS_CONOCIDOS, -11, RPR, ErrorTokenSoap, QueryEstUp, detalleIncompleto, orden de escritura, documento.aceptado falso, ya_final, cerrarAbandonadas, envio_sin_cerrar, Ya lo revisé, notificaciones, reclamar_notificacion, migración 0013, migración 0014, pg_cron, cron_token, CRON_SECRET, PRESUPUESTO_MS, LIMITE_MS, Fase 9, Tablero, v_ventas_diarias, set_pruebas, agregaciones de PostgREST, db-aggregates-enabled, max-rows, exportación, CSV, BOM, separador, inyección de fórmulas, neutralizarFormula, XLSX, inlineStr, escaparXml, serieExcel, crc32, keyset, armarResumen]
-related: ["08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md", "02-guias/emision-boletas.md", "02-guias/seguimiento-envios.md", "02-guias/tablero-y-reportes.md"]
-source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/", "supabase/migrations/0011_folios.sql", "apps/web/src/server/folios/", "apps/web/src/app/[org]/folios/", "apps/web/src/server/emision/", "apps/web/src/server/pdf/", "apps/web/src/app/[org]/emitir/", "apps/web/next.config.ts", "apps/web/src/server/seguimiento/", "apps/web/src/server/alertas/", "apps/web/src/server/documentos/", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "apps/web/src/server/tablero/", "apps/web/src/server/reportes/", "apps/web/src/app/[org]/reportes/exportar/route.ts"]
+keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna, ad_empresa1, ad_empresa2, Actualización de datos del contribuyente, representante legal, no está autorizado para operar en esta modalidad, verificar_autorizacion, ConsultaAutorizacion, situación tributaria de terceros, STC, stc/noauthz, getConsultaData, timbrajes, documentos autorizados, reCAPTCHA, SituacionTributaria, Fase 6, folios, migración 0011, anular_folios, cola completa, trg_20_caf_sin_traslape, 23P01, revisión con el SII, simulada, TransporteSinTimbrar, of_genera_folio, revisionId, folios.por_agotarse, Idempotency-Key, denominador, folio asignado sin documento, política alta, subirCaf, RSAPK, Fase 7, emisión, emitirDocumento, FABRICA_REST_EMISION, FABRICAS_SII.rest, documentoId, doble clic, borradorId, clave_idempotencia, sessionStorage, Ya la revisé, esFolioAnulado, INTENTOS_FOLIO, PDF417, bwip-js, bwip-js/node, binarytext, pdfkit, serverExternalPackages, AFM, ted_xml, latin1, instructivo de representación impresa, enlaceDocumento, uso_mensual.envios, Fase 8, seguimiento, ejecutarSeguimiento, consultarEnvio, consultar_envio, server/sii/clientes.ts, backoff, filtroPorConsultar, inconsistente, lista blanca, ESTADOS_CONOCIDOS, -11, RPR, ErrorTokenSoap, QueryEstUp, detalleIncompleto, orden de escritura, documento.aceptado falso, ya_final, cerrarAbandonadas, envio_sin_cerrar, Ya lo revisé, notificaciones, reclamar_notificacion, migración 0013, migración 0014, pg_cron, cron_token, CRON_SECRET, PRESUPUESTO_MS, LIMITE_MS, Fase 9, Tablero, v_ventas_diarias, set_pruebas, agregaciones de PostgREST, db-aggregates-enabled, max-rows, exportación, CSV, BOM, separador, inyección de fórmulas, neutralizarFormula, XLSX, inlineStr, escaparXml, serieExcel, crc32, keyset, armarResumen, Fase 10, Flow, pagos, suscripciones, SameSite=Lax, retorno sin cookies, callback sin firma, token, morose, status, instanteFlow, diaFlow, asegurarPlan, precio distinto, urlCallback, suscripciones_externa_unica, ya terminó, planes.lectura, plan_vigente, proveedor_pago, firma s, eventos_pasarela, cuotaProduccion]
+related: ["02-guias/planes-y-pagos.md", "08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md", "02-guias/emision-boletas.md", "02-guias/seguimiento-envios.md", "02-guias/tablero-y-reportes.md"]
+source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/", "supabase/migrations/0011_folios.sql", "apps/web/src/server/folios/", "apps/web/src/app/[org]/folios/", "apps/web/src/server/emision/", "apps/web/src/server/pdf/", "apps/web/src/app/[org]/emitir/", "apps/web/next.config.ts", "apps/web/src/server/seguimiento/", "apps/web/src/server/alertas/", "apps/web/src/server/documentos/", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "apps/web/src/server/tablero/", "apps/web/src/server/reportes/", "apps/web/src/app/[org]/reportes/exportar/route.ts", "apps/web/src/server/pagos/", "apps/web/src/app/api/pagos/flow/", "supabase/migrations/0015_planes_comerciales.sql", "supabase/migrations/0016_pagos.sql"]
 ---
 
 # Trampas conocidas
@@ -936,3 +936,89 @@ migraciones nuevas.
 - **El período del Tablero no admite «Todos los períodos».** Un enlace de Documentos con
   `periodo=todos` llevado al Tablero muestra el mes actual. La exportación de documentos sí
   lo admite; el resumen diario responde 400.
+
+## Pagos y suscripciones (Fase 10)
+
+Código en `apps/web/src/server/pagos/`; migraciones `0015`, `0016` y `0017` **pendientes de
+aplicar** y sin probar contra el sandbox de Flow todavía. Guía:
+[planes y pagos](../02-guias/planes-y-pagos.md).
+
+- **El retorno del registro de tarjeta llega sin cookies de sesión.** Flow devuelve el
+  navegador con un POST desde `flow.cl` a `/api/pagos/flow/registro`; las cookies de Supabase
+  son `SameSite=Lax` y no viajan en un POST cruzado. Esa ruta no puede usar
+  `exigirMembresia` ni el cliente de sesión: confirma el `token` con Flow (firmado), saca la
+  organización del `customerId` (`clientes_pago.cliente_externo`) y el plan de
+  `clientes_pago.plan_pendiente_id`, que dejó antes un administrador con su sesión. Después
+  redirige con **303** (el navegador hace GET y ahí sí van las cookies) a
+  `/<slug>/configuracion/plan?pago=<resultado>`. Sin `token` válido redirige a `/bienvenida`.
+- **El callback de Flow no viene firmado: solo trae `token`.** La autenticidad la da
+  consultar el pago con ese token por la API firmada (`payment/getStatus`); nunca se confía
+  en otro dato del POST. La ruta responde **200 siempre que el token tenga forma válida**,
+  aunque el proceso falle: Flow no reintenta el estado por un 5xx, solo manda un correo de
+  «problema de integración», y el aviso queda en `eventos_pasarela` para que el cron
+  reconcilie. Hay que responder en menos de 15 s (`maxDuration = 15`).
+- **Flow manda números como string.** `"20000.0000"`, `status: "1"`, `morose: "0"`: todo pasa
+  por `numero()` de `flow-pasarela.ts`. Comparar `status === 1` con el JSON crudo falla en
+  silencio.
+- **Las fechas de Flow vienen en hora de Chile y sin zona.** `AAAA-MM-DD hh:mm:ss` (algunas
+  `DD-MM-AAAA`, y `0000-00-00` como vacío). `instanteFlow` las pasa a instante UTC con la zona
+  `America/Santiago` (dos pasadas por el cambio de horario) y `diaFlow` a día `AAAA-MM-DD`;
+  `new Date(texto)` las leería como hora local del servidor (UTC en Vercel) y correría
+  `periodo_fin` 3 o 4 horas. Que un importe esté `vencido` lo decide la app comparando
+  `due_date` con el día de hoy en Chile.
+- **`morose` no es `status`.** Una suscripción con un importe impago sigue con `status = 1`
+  (activa). La mora va en `morose`: `1` = importe vencido (pasó `days_until_due`, 7 días, tras
+  los 3 reintentos de cobro) → `morosa`; `2` = impago dentro de plazo → sigue `activa` (es la
+  gracia, decisión D4); `0` = al día. `status = 4` es cancelada (el cron la devuelve a
+  Certificación con `activar_suscripcion`), `2` en prueba y `0` no iniciada. Flow **no avisa**
+  los cobros fallidos ni el fin de una cancelación: los trae la sincronización (callback de
+  pago o cron horario).
+- **`morosa` corta todo lo que mira `plan_vigente()`.** Devuelve nulo (no «ilimitado»): sin
+  producción (`plan_sin_produccion`, «Tu plan no incluye producción o tiene un pago
+  vencido»), sin empresas ni usuarios nuevos (`aceptar_invitacion` rechaza con «La
+  organización no tiene una suscripción vigente»; Equipo lo avisa antes). La certificación sigue. La página de plan sí muestra el plan, porque lee la
+  suscripción directo.
+- **Un plan con precio distinto en Flow bloquea contratar y cambiar.** `asegurarPlan` lee
+  `plans/get` de `boleteame-<codigo>` y, si el `amount` no es `precio_mensual_clp`, falla
+  (`rechazado` → «Flow rechazó la operación»). No se cambia `precio_mensual_clp` en la base sin
+  alinear antes el plan en Flow. Los planes se crean **bajo demanda** en la primera
+  contratación, con el `urlCallback` que sale de `NEXT_PUBLIC_APP_URL` en ese momento:
+  `asegurarPlan` no lo actualiza después. Si el primer plan se crea desde un equipo con
+  `NEXT_PUBLIC_APP_URL=http://localhost:…`, el callback de ese plan queda apuntando ahí;
+  revisarlo con `plans/get` antes de dar por buena una prueba. Las cuentas de sandbox y de
+  producción de Flow son distintas: los planes se vuelven a crear al cambiar de ambiente.
+- **`suscripciones_externa_unica` incluye las canceladas.** El índice único parcial es
+  `where id_externo is not null`, sin mirar el estado: un `subscriptionId` ya usado no se puede
+  volver a insertar. `activar_suscripcion` lo revisa antes y responde `22023` («La suscripción
+  externa … ya terminó») en vez del `23505` genérico; así un aviso tardío de Flow no revive una
+  suscripción cancelada. Otra organización con el mismo id sí da `23505`.
+- **`planes.lectura using (activo)` oculta los planes inactivos a la UI.** Con la 0015,
+  `emprendedor` queda inactivo: una organización que estuviera en él conserva sus límites
+  (`plan_vigente()` no filtra por `activo`), pero con su sesión no lee la fila del plan y la
+  página de plan muestra la grilla sin «Tu plan». Al 2026-11-17 nadie está en un plan inactivo.
+- **`plan_vigente` no la ejecuta `authenticated`.** Leer el plan con la sesión es leer
+  `suscripciones` + `planes` (RLS); para los límites con la misma regla que los triggers, la
+  app la llama con `service_role` (`planPermiteProduccion`, `cuotaProduccion`).
+- **En `suscripciones` la columna es `proveedor_pago`, no `proveedor`.** Viene de la 0001. Las
+  tablas nuevas de la 0016 (`clientes_pago`, `pagos`, `eventos_pasarela`) usan `proveedor`. Un
+  `.eq('proveedor', 'flow')` sobre `suscripciones` da error de columna.
+- **La firma `s` de Flow va en la query de los GET.** `flow.ts` manda `apiKey`, `token` y `s` en
+  la URL de los GET; `lib/sentry/depurar.ts` filtra `s` (además de `token` y `apikey`) en las
+  query strings. Al agregar un parámetro sensible nuevo a una llamada GET, sumarlo a ese filtro.
+- **Crear la suscripción y activarla no son atómicos.** Si `subscription/create` responde y
+  `activar_suscripcion` falla, Flow ya va a cobrar: el aviso queda `fallido` con
+  `datos.suscripcion_externa`, un reintento del mismo token la reusa en vez de crear otra, y
+  Sentry recibe «suscripción creada en Flow sin activar en la base». No borrar filas de
+  `eventos_pasarela` para «reintentar limpio»: se perdería ese id y se cobraría dos veces.
+- **Un cambio de plan puede quedar programado.** Si Flow no aplica el plan nuevo de inmediato,
+  `subscription/get` sigue informando el anterior y la app dice «Flow programó el cambio…
+  para el <fecha>»; `plan_id` cambia cuando la sincronización vea el `planId` nuevo.
+- **Bajar de plan revisa empresas y usuarios, no boletas.** `limitesExcedidos` impide elegir un
+  plan donde no caben las empresas o los usuarios actuales, antes de llamar a Flow. Las boletas
+  del mes no lo impiden: el cupo nuevo rige para las siguientes.
+- **El aviso del 100 % en Emitir es solo un aviso.** La autoridad es el trigger
+  `tg_contar_uso_documento`: si `cuotaProduccion` no se pudo leer, Emitir no bloquea y decide
+  la base al emitir.
+- **Desde la 0017, la comprobación 10 de `0014_cron.sql` sale `false`.** «Ningún otro job llama
+  a `/api/cron`» se escribió para los jobs de la Fase 8; `sincronizar-suscripciones` también
+  llama a `/api/cron/suscripciones`. Es esperado.

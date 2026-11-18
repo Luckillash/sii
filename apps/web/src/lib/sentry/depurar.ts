@@ -52,9 +52,10 @@ const PATRONES_TEXTO: readonly [RegExp, string][] = [
   [/\b(Bearer|Basic)\s+[A-Za-z0-9._~+/=-]+/g, `$1 ${FILTRADO}`],
   // JWT (por ejemplo, claves de Supabase).
   [/\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b/g, FILTRADO],
-  // Parámetros de query con nombre sensible (?token=..., &clave=...).
+  // Parámetros de query con nombre sensible (?token=..., &clave=...). `s` es la firma
+  // HMAC de las llamadas GET a Flow (`?apiKey=…&token=…&s=…`, server/pagos/flow.ts).
   [
-    /([?&](?:token|clave|password|secret|secreto|api_key|apikey|key|invitacion)=)[^&#\s]+/gi,
+    /([?&](?:token|clave|password|secret|secreto|api_key|apikey|key|invitacion|s)=)[^&#\s]+/gi,
     `$1${FILTRADO}`,
   ],
   // Token de invitación en la ruta (`/invitacion/<token>`), también codificado dentro de

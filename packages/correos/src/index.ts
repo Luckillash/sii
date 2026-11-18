@@ -14,3 +14,4 @@ export {
   type DatosDocumentosRechazados,
   type DocumentoRechazado,
 } from './rechazo';
+export { correoSuscripcionMorosa, type DatosSuscripcionMorosa } from './suscripcion';

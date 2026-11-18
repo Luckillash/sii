@@ -1,4 +1,4 @@
-import { Building2, KeyRound, type LucideIcon, Users } from 'lucide-react';
+import { Building2, CreditCard, KeyRound, type LucideIcon, Users } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Tarjeta } from '@/components/boleteame';
@@ -7,8 +7,8 @@ import org from '../organizacion.module.css';
 
 export const metadata: Metadata = { title: 'Configuración · Boletéame' };
 
-// Empresas, certificados y equipo (Fases 2 y 3); plan, API y webhooks llegan en las
-// fases siguientes (PLAN-SAAS §3.1).
+// Empresas, certificados y equipo (Fases 2 y 3) y plan (Fase 10); API y webhooks llegan
+// en la Fase 11 (PLAN-SAAS §3.1).
 
 type Seccion = {
   id: string;
@@ -44,6 +44,14 @@ const SECCIONES: readonly Seccion[] = [
     texto: 'Invita a tu equipo, asigna roles y revisa las invitaciones pendientes.',
     enlace: 'Ir a Equipo',
     icono: Users,
+  },
+  {
+    id: 'plan',
+    ruta: 'configuracion/plan',
+    titulo: 'Plan',
+    texto: 'Revisa tu plan, el uso del mes y tus pagos, y cambia de plan cuando lo necesites.',
+    enlace: 'Ir a Plan',
+    icono: CreditCard,
   },
 ];
 

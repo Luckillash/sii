@@ -1,8 +1,8 @@
 ---
 title: "Multi-tenancy, roles y funciones de acceso"
 description: "Organizaciones como tenant, roles de miembro, funciones de acceso y herencia de organizacion_id."
-keywords: [tenant, organización, organizacion_id, miembros_organizacion, rol_miembro, propietario, administrador, emisor, lector, es_miembro, tiene_rol, es_admin, puede_emitir, comparte_organizacion, tg_heredar_organizacion, tg_proteger_ultimo_propietario, max_usuarios, exigir_cupo_usuarios, plan_vigente, RLS]
-related: ["08-esquema-supabase/rls-y-privilegios.md", "03-api-reference/acceso-por-tabla.md", "03-api-reference/rpc-organizacion.md", "05-pruebas/probar-el-esquema.md"]
+keywords: [tenant, organización, organizacion_id, miembros_organizacion, rol_miembro, propietario, administrador, emisor, lector, es_miembro, tiene_rol, es_admin, puede_emitir, comparte_organizacion, tg_heredar_organizacion, tg_proteger_ultimo_propietario, max_usuarios, exigir_cupo_usuarios, plan_vigente, grilla, morosa, RLS]
+related: ["08-esquema-supabase/rls-y-privilegios.md", "03-api-reference/acceso-por-tabla.md", "03-api-reference/rpc-organizacion.md", "05-pruebas/probar-el-esquema.md", "02-guias/planes-y-pagos.md"]
 source: ["supabase_saas_sii.sql §4 §5 §15 §17", "supabase/verificaciones/rls-fase2-tenancy.sql"]
 ---
 
@@ -46,6 +46,7 @@ Las organizaciones se crean solo con `crear_organizacion()` y los miembros entra
 | Pedir folios (CAF), subir un CAF y anular folios (`/folios`; anular con `anular_folios`, migración 0011, aplicada el 2026-11-15) | sí | sí | no | no |
 | Editar la organización (nombre, slug) | sí | sí | no | no |
 | Ver, crear y borrar invitaciones, API keys y webhooks | sí | sí | no | no |
+| Contratar, cambiar o cancelar el plan (Flow) y ver la tarjeta y los pagos (`clientes_pago`, `pagos`; Fase 10) | sí | sí | no | no |
 | Cambiar el rol o dar de baja a miembros que **no** son propietarios | sí | sí | no | no |
 | Nombrar o quitar propietarios | sí | no | no | no |
 | Borrar la organización | sí | no | no | no |
@@ -141,14 +142,27 @@ borra o cambia de rol, y no hay otro propietario, lanza
 ## Cupos de usuarios y empresas por plan
 
 `plan_vigente(org)` devuelve el plan de la suscripción más reciente en estado `prueba` o
-`activa`. Valores actuales de `planes` (de ejemplo, PLAN-SAAS D5):
+`activa`. Grilla comercial de la migración `0015_planes_comerciales` (PLAN-SAAS D5,
+2026-11-17; **escrita, pendiente de aplicar en producción**: hasta entonces rigen los
+valores de ejemplo de la `0001`, con `emprendedor` activo y `pyme` de 5 usuarios y 3
+empresas):
 
-| Plan (`codigo`) | `max_usuarios` | `max_empresas` |
-|---|---|---|
-| `certificacion` | 2 | 1 |
-| `emprendedor` | 2 | 1 |
-| `pyme` | 5 | 3 |
-| `empresa` | sin límite | sin límite |
+| Plan (`codigo`) | $/mes (IVA incl.) | `max_usuarios` | `max_empresas` | `max_boletas_mes` | Producción | API y webhooks | Autoservicio |
+|---|--:|--:|--:|--:|:-:|:-:|:-:|
+| `certificacion` | 0 | 2 | 1 | 0 | no | no | no (el gratis, por defecto) |
+| `pyme` | 14.990 | 3 | 1 | 1.000 | sí | no | sí |
+| `contador` | 49.990 | 10 | 15 | 10.000 (de toda la organización) | sí | no | sí |
+| `api` | 39.990 | 5 | 3 | 20.000 | sí | sí | sí |
+| `empresa` | a medida | sin límite | sin límite | sin límite | sí | sí | no (lo asigna `service_role`) |
+
+`emprendedor` queda con `activo = false` (se fusiona con `pyme`). Toda organización nace
+en `certificacion`/`prueba` **sin plazo** (`periodo_fin` nulo desde la `0015`; antes eran 30
+días que nada hacía cumplir). Los planes de autoservicio se contratan y se cobran con
+Flow desde Configuración → Plan ([planes y pagos](../02-guias/planes-y-pagos.md)).
+
+- **Mora.** Cuando Flow informa un importe vencido, la suscripción pasa a `morosa` y
+  `plan_vigente` devuelve nulo: sin producción, sin empresas ni usuarios nuevos. La
+  certificación sigue. Al pagar vuelve a `activa` con la misma fila.
 
 - **Usuarios.** `exigir_cupo_usuarios(org)` cuenta las filas de `miembros_organizacion`
   (el propietario incluido; las invitaciones pendientes no cuentan) y lanza
@@ -170,3 +184,8 @@ borra o cambia de rol, y no hay otro propietario, lanza
 
 Verificación: `supabase/verificaciones/rls-fase2-tenancy.sql` prueba todo lo anterior
 con usuarios ficticios y `rollback` ([cómo correrlo](../05-pruebas/probar-el-esquema.md)).
+Desde la Fase 10 su sección 2 sube a la organización de prueba al plan `empresa` (sin
+tope) en vez de `pyme`, porque con la grilla de la `0015` Pyme admite 3 usuarios y el
+cuarto miembro del script ya no cabría; así sirve con y sin la `0015`. Los cambios de
+plan con Flow y el cupo de boletas del plan nuevo los prueba
+`supabase/verificaciones/rls-fase10-pagos.sql`.

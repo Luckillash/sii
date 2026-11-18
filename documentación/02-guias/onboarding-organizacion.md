@@ -1,8 +1,8 @@
 ---
 title: "Onboarding: organización, miembros, plan, empresa y certificado"
 description: "Alta del tenant, invitaciones, plan y límites, empresa emisora, certificado en Vault y resolución: pasos en la UI, qué pasa en el servidor y en la base, y errores típicos."
-keywords: [onboarding, bienvenida, crear_organizacion, invitar, crear_invitacion, aceptar_invitacion, empresa, crearEmpresa, editarEmpresa, cambiarEstadoEmpresa, desactivar, registrarResolucion, registrar_resolucion, subirCertificado, registrar_certificado, analizarCertificado, revocarCertificado, eliminarCertificado, asociarCertificadoEmpresa, fijar_certificado_predeterminado, representante electrónico, predeterminado, tg_limite_empresas, getUser, confirmarSesion, pfx, p12, Vault, Tablero, Lo que viene]
-related: ["01-fundamentos/tenancy-y-roles.md", "03-api-reference/rpc-organizacion.md", "03-api-reference/rpc-backend.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/formatos-y-validaciones.md", "02-guias/tablero-y-reportes.md"]
+keywords: [onboarding, bienvenida, crear_organizacion, invitar, crear_invitacion, aceptar_invitacion, empresa, crearEmpresa, editarEmpresa, cambiarEstadoEmpresa, desactivar, registrarResolucion, registrar_resolucion, subirCertificado, registrar_certificado, analizarCertificado, revocarCertificado, eliminarCertificado, asociarCertificadoEmpresa, fijar_certificado_predeterminado, representante electrónico, predeterminado, tg_limite_empresas, getUser, confirmarSesion, pfx, p12, Vault, Tablero, Lo que viene, Configuración → Plan, Flow, cambio de plan, morosa]
+related: ["02-guias/planes-y-pagos.md", "01-fundamentos/tenancy-y-roles.md", "03-api-reference/rpc-organizacion.md", "03-api-reference/rpc-backend.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/formatos-y-validaciones.md", "02-guias/tablero-y-reportes.md"]
 source: ["supabase_saas_sii.sql §3 §4 §6", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/app/bienvenida/", "apps/web/src/app/[org]/configuracion/", "apps/web/src/server/certificados/", "PLAN-SAAS.md Fases 2 y 3"]
 ---
 
@@ -21,7 +21,7 @@ resolución, el certificado y el predeterminado) se aplicó en producción el 20
 | # | Paso (UI) | Quién | Servidor | Base |
 |---|---|---|---|---|
 | 1 | Crear cuenta (`/crear-cuenta`) | cualquiera | `crearCuenta` (Turnstile + `signUp`) | `auth.users` → `trg_nuevo_usuario` crea `perfiles` |
-| 2 | Crear organización (`/bienvenida`) | usuario sin organización | `crearOrganizacion` | `crear_organizacion()`: organización, suscripción `certificacion` en `prueba` (30 días), propietario |
+| 2 | Crear organización (`/bienvenida`) | usuario sin organización | `crearOrganizacion` | `crear_organizacion()`: organización, suscripción `certificacion` en `prueba` (sin plazo desde la `0015`; antes, 30 días), propietario |
 | 3 | Invitar al equipo (`/<org>/configuracion/equipo`) | administradores | `invitar` (+ correo por Resend) | `crear_invitacion()`; al aceptar, `aceptar_invitacion()` |
 | 4 | Agregar empresa (`/<org>/configuracion/empresas/nueva`) | administradores | `crearEmpresa` | `insert` en `empresas` (RLS + `tg_limite_empresas`) |
 | 5 | Registrar resolución (ficha de la empresa) | administradores | `registrarResolucion` | `registrar_resolucion()` (0005) |
@@ -64,8 +64,10 @@ lo mismo (no revela qué correos existen).
 
 `crearOrganizacion` llama a `crear_organizacion(p_nombre, p_slug)`, que en una
 transacción crea la organización, la suscripción al plan **Certificación** en estado
-`prueba` por 30 días y la membresía de **propietario**. Luego redirige a
-`/<slug>/tablero`.
+`prueba` y la membresía de **propietario**. Luego redirige a `/<slug>/tablero`. La
+`0001` le ponía `periodo_fin = now() + 30 días`, que nada hacía cumplir (`plan_vigente()`
+no mira `periodo_fin`); la `0015_planes_comerciales` (Fase 10, **pendiente de aplicar**) la
+deja sin plazo: Certificación es gratis y no vence.
 
 | Error | Mensaje en la UI |
 |---|---|
@@ -91,9 +93,24 @@ Contratos en [RPC de organización](../03-api-reference/rpc-organizacion.md).
 
 ### Plan y límites
 
-La organización parte en Certificación (2 usuarios, 1 empresa, sin producción). El
-cambio de plan y el cobro son de la Fase 10: hoy solo `service_role` cambia una
-suscripción. Cupos y comportamiento sin suscripción vigente en
+La organización parte en Certificación (gratis y sin plazo: 2 usuarios, 1 empresa, sin
+producción). Desde la Fase 10, un propietario o un administrador contrata un plan pagado
+en **Configuración → Plan** (`/<org>/configuracion/plan`): elige Pyme, Contador o API, Flow
+le pide la tarjeta, y al volver el plan nuevo ya rige; Flow cobra el primer mes al crear la
+suscripción y después cada mes, y envía el comprobante al correo del pagador. Con una
+suscripción pagada, cambiar de plan muestra antes el prorrateo que calcula Flow, y la
+cancelación rige al fin del período pagado (después vuelve a Certificación). Antes de
+llamar a Flow, la app revisa que las empresas y usuarios actuales quepan en el plan
+elegido. El plan `empresa` (a medida) no se contrata desde la app: lo asigna `service_role`.
+Flujo completo, mora y pruebas en [planes y pagos](planes-y-pagos.md). **Estado:** código
+escrito; migraciones `0015` y `0016` pendientes de aplicar, credenciales de Flow sin cargar
+y sin deploy. Hasta entonces, solo `service_role` cambia una suscripción.
+
+Si la suscripción queda `morosa` (Flow informó un importe vencido) o sin plan vigente, la
+organización no puede emitir en producción ni agregar empresas o usuarios: Empresas y
+Equipo lo avisan (Equipo: «La organización no tiene un plan vigente…»; las invitaciones no
+se podrán aceptar hasta regularizarlo). La certificación sigue funcionando. Cupos y
+comportamiento sin suscripción vigente en
 [tenancy y roles](../01-fundamentos/tenancy-y-roles.md#cupos-de-usuarios-y-empresas-por-plan).
 
 ---

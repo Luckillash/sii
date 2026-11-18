@@ -44,6 +44,19 @@ const esquemaCron = z.object({
   CRON_SECRET: z.string().min(16),
 });
 
+// Pasarela de pagos (PLAN-SAAS D4: Flow). La URL elige el ambiente: sandbox mientras
+// dure la Fase 10, producción al lanzar (PLAN-SAAS §5). Solo esas dos.
+export const URLS_FLOW = {
+  sandbox: 'https://sandbox.flow.cl/api',
+  produccion: 'https://www.flow.cl/api',
+} as const;
+
+const esquemaFlow = z.object({
+  FLOW_API_KEY: z.string().min(10),
+  FLOW_SECRET_KEY: z.string().min(10),
+  FLOW_API_URL: z.enum([URLS_FLOW.sandbox, URLS_FLOW.produccion]),
+});
+
 function validar<T extends z.ZodType>(esquema: T, nombre: string): z.infer<T> {
   const resultado = esquema.safeParse(process.env);
   if (!resultado.success) {
@@ -104,3 +117,11 @@ export const envTurnstile = (): z.infer<typeof esquemaTurnstile> | null =>
  * 503 y no ejecuta nada (nunca queda abierta sin secreto).
  */
 export const envCron = (): z.infer<typeof esquemaCron> | null => opcional(esquemaCron);
+
+export type ConfiguracionFlow = z.infer<typeof esquemaFlow>;
+
+/**
+ * Flow (`server/pagos/`). `null` si falta alguna variable: la página de plan muestra
+ * la grilla sin el botón de contratar, y las rutas de la pasarela responden 503.
+ */
+export const envFlow = (): ConfiguracionFlow | null => opcional(esquemaFlow);

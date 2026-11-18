@@ -1,16 +1,45 @@
 ---
 title: "Índice de operaciones"
 description: "Todas las funciones RPC, vistas y servicios del SII, con quién puede llamarlos."
-keywords: [índice, operaciones, asistente de certificación, server/certificacion, Server Actions, postular, descargarSet, solicitarFoliosSet, enviarSet, consultarEstadoSet, solicitarRevision, consultarEstadoDeclaracion, declarar, marcarRevisada, leerAsistente, guardarDatosPostulacion, guardarDatosDeclaracion, registrar_caf, guardar_set_pruebas, folios, server/folios, leerFolios, solicitarFolios, subirCaf, anularFolios, puedeEmitir, alertaDespuesDeAsignar, alertarSiCruza, anular_folios, encolar_evento, folios.por_agotarse, migración 0011, emisión, server/emision, emitirDocumento, emitir, guardarBorrador, borrarBorrador, leerVistaEmision, buscarReceptores, buscarProductos, enlaceDocumento, ResultadoEmision, Fase 8, seguimiento, ejecutarSeguimiento, consultarEnvio, consultarEstado, consultar_envio, ejecutarAlertas, marcarEnvioRevisado, marcarRevisado, reenviarAlReceptor, enlaceArchivo, listarDocumentos, leerEnvio, enviosInciertos, reclamar_notificacion, /api/cron/seguimiento, /api/cron/alertas, Fase 9, Tablero, leerCifras, leerResumenFolios, armarResumen, generarExportacion, leerPedido, hrefExportacion, hrefExportar, /reportes/exportar]
-related: ["03-api-reference/acceso-por-tabla.md", "03-api-reference/servicios-sii.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "02-guias/emision-boletas.md", "02-guias/seguimiento-envios.md", "03-api-reference/rpc-backend.md", "02-guias/tablero-y-reportes.md"]
-source: ["apps/web/src/server/seguimiento/index.ts", "apps/web/src/server/documentos/index.ts", "apps/web/src/server/alertas/index.ts", "apps/web/src/app/[org]/documentos/acciones.ts", "apps/web/src/app/api/cron/", "apps/web/src/server/emision/index.ts", "apps/web/src/app/[org]/emitir/acciones.ts", "supabase_saas_sii.sql §15 §16 §17", "apps/web/src/server/certificacion/index.ts", "apps/web/src/app/[org]/certificacion/acciones.ts", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/folios/index.ts", "apps/web/src/app/[org]/folios/acciones.ts", "supabase/migrations/0011_folios.sql", "apps/web/src/server/tablero/index.ts", "apps/web/src/server/reportes/index.ts", "apps/web/src/lib/reportes.ts", "apps/web/src/app/[org]/reportes/exportar/route.ts"]
+keywords: [índice, operaciones, asistente de certificación, server/certificacion, Server Actions, postular, descargarSet, solicitarFoliosSet, enviarSet, consultarEstadoSet, solicitarRevision, consultarEstadoDeclaracion, declarar, marcarRevisada, leerAsistente, guardarDatosPostulacion, guardarDatosDeclaracion, registrar_caf, guardar_set_pruebas, folios, server/folios, leerFolios, solicitarFolios, subirCaf, anularFolios, puedeEmitir, alertaDespuesDeAsignar, alertarSiCruza, anular_folios, encolar_evento, folios.por_agotarse, migración 0011, emisión, server/emision, emitirDocumento, emitir, guardarBorrador, borrarBorrador, leerVistaEmision, buscarReceptores, buscarProductos, enlaceDocumento, ResultadoEmision, Fase 8, seguimiento, ejecutarSeguimiento, consultarEnvio, consultarEstado, consultar_envio, ejecutarAlertas, marcarEnvioRevisado, marcarRevisado, reenviarAlReceptor, enlaceArchivo, listarDocumentos, leerEnvio, enviosInciertos, reclamar_notificacion, /api/cron/seguimiento, /api/cron/alertas, Fase 9, Tablero, leerCifras, leerResumenFolios, armarResumen, generarExportacion, leerPedido, hrefExportacion, hrefExportar, /reportes/exportar, Fase 10, server/pagos, iniciarContratacion, activarDespuesDeRegistro, previsualizarCambio, cambiarDePlan, cancelarSuscripcion, procesarAvisoPago, sincronizarTodas, avisarMorosas, cuotaProduccion, leerVistaPlan, /api/pagos/flow/registro, /api/pagos/flow/confirmacion, /api/cron/suscripciones]
+related: ["03-api-reference/acceso-por-tabla.md", "03-api-reference/servicios-sii.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "02-guias/emision-boletas.md", "02-guias/seguimiento-envios.md", "03-api-reference/rpc-backend.md", "02-guias/tablero-y-reportes.md", "02-guias/planes-y-pagos.md"]
+source: ["apps/web/src/server/pagos/", "apps/web/src/app/[org]/configuracion/plan/acciones.ts", "apps/web/src/app/api/pagos/flow/", "apps/web/src/server/seguimiento/index.ts", "apps/web/src/server/documentos/index.ts", "apps/web/src/server/alertas/index.ts", "apps/web/src/app/[org]/documentos/acciones.ts", "apps/web/src/app/api/cron/", "apps/web/src/server/emision/index.ts", "apps/web/src/app/[org]/emitir/acciones.ts", "supabase_saas_sii.sql §15 §16 §17", "apps/web/src/server/certificacion/index.ts", "apps/web/src/app/[org]/certificacion/acciones.ts", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/folios/index.ts", "apps/web/src/app/[org]/folios/acciones.ts", "supabase/migrations/0011_folios.sql", "apps/web/src/server/tablero/index.ts", "apps/web/src/server/reportes/index.ts", "apps/web/src/lib/reportes.ts", "apps/web/src/app/[org]/reportes/exportar/route.ts"]
 ---
 
 # Índice de operaciones
 
 > **Úsalo cuando:** buscas una operación por su función.
 
-<!-- TODO: índice completo de RPC, vistas y servicios (Fases 2–4 y 10 en adelante). -->
+<!-- TODO: índice completo de RPC, vistas y servicios (Fases 2–4 y 11 en adelante). -->
+
+## Planes y pagos (Fase 10)
+
+El dominio vive en `apps/web/src/server/pagos/` (`suscripciones.ts`, exportado por
+`index.ts`; la pasarela Flow en `flow.ts` y `flow-pasarela.ts`; el correo de mora en
+`avisos.ts`). Las Server Actions están en `apps/web/src/app/[org]/configuracion/plan/acciones.ts`:
+exigen membresía, rol **propietario o administrador** (`puedeAdministrar`) y confirman la
+sesión con `getUser()` antes de llamar a Flow. Ninguna sale al SII ni usa `operaciones_sii`.
+Detalle en [planes y pagos](../02-guias/planes-y-pagos.md). Código escrito; migraciones
+`0015`, `0016` y `0017` **pendientes de aplicar**, sin deploy.
+
+| Función | Quién la llama | Sale a Flow | Escribe |
+|---|---|---|---|
+| `leerVistaPlan(organizacionId, admin)` (`lectura.ts`) | `page.tsx` de `/configuracion/plan`, cualquier miembro | no | nada (sesión: `suscripciones`, `planes`, uso; `clientes_pago` y `pagos` solo si es administrador) |
+| `iniciarContratacion(deps, { organizacion, usuario, planCodigo })` | Server Action `contratar(slug, plan)` | `plans/get` (y `plans/create`), `customer/create`, `customer/register` | service_role: `clientes_pago` (cliente y `plan_pendiente_*`); devuelve la URL de Flow, o `cambio` si ya tiene suscripción de Flow |
+| `activarDespuesDeRegistro(deps, token)` | `POST`/`GET /api/pagos/flow/registro` (retorno del navegador, sin sesión) | `customer/getRegisterStatus`, `plans/get`, `subscription/create` (o `subscription/get` en un reintento) | service_role: `eventos_pasarela` (`registro`), `clientes_pago` (tarjeta, limpia el plan pendiente), `activar_suscripcion` 🔒, `pagos` |
+| `previsualizarCambio(deps, organizacionId, plan)` | Server Action `vistaPreviaCambio` | `plans/get`, `subscription/changePlanPreview` | nada |
+| `cambiarDePlan(deps, organizacionId, plan)` | Server Action `cambiarPlan` | `plans/get`, `subscription/changePlan`, `subscription/get` | service_role: `suscripciones` (`update` por la sincronización), `pagos` |
+| `cancelarSuscripcion(deps, organizacionId)` | Server Action `cancelarPlan` | `subscription/cancel` con `at_period_end = 1` | service_role: `suscripciones` (`cancelar_al_fin_periodo`), `pagos` |
+| `procesarAvisoPago(deps, token)` | `POST /api/pagos/flow/confirmacion` (callback de los planes) | `payment/getStatus`, `invoice/get` si `commerceOrder` es numérico, `subscription/get` | service_role: `eventos_pasarela` (`pago`) y lo que escribe la sincronización |
+| `sincronizarSuscripcion` / `sincronizarTodas(deps, { limite, presupuestoMs })` | cron, callback y cambio de plan | `subscription/get` | service_role: `pagos` (upsert), `suscripciones` (estado, plan, período, `cancelar_al_fin_periodo`, `sincronizada_en`); cancelada en Flow → `activar_suscripcion` 🔒 a `certificacion` |
+| `avisarMorosas(db, resultados)` (`avisos.ts`) | `POST`/`GET /api/cron/suscripciones`, después de sincronizar | no | `notificaciones` (`reclamar_notificacion` 🔒, tipo `suscripcion.morosa`) y correo por Resend |
+| `cuotaProduccion(cliente, organizacionId, ahora)` (`server/folios/plan.ts`) | `leerVistaEmision` (Emitir) | no | nada (service_role: `plan_vigente` y `uso_mensual`) |
+| `dependenciasPagos()` / `pasarelaConfigurada()` | rutas, acciones y la página | no | nada (`null` / `false` sin `FLOW_*`) |
+
+Las acciones devuelven `{ ok: true, … }` o `{ ok: false, error: MensajeError }` (textos de
+`server/pagos/errores.ts`). Rutas y respuestas en la
+[guía](../02-guias/planes-y-pagos.md#qué-responde-cada-ruta). RPC de la fase (migración
+0016, solo `service_role`): [`activar_suscripcion`](rpc-backend.md#activar_suscripcion-migración-0016).
 
 ## Tablero y reportes (Fase 9)
 

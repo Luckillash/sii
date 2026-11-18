@@ -1,9 +1,9 @@
 ---
 title: "Probar el esquema (RLS, triggers, cuotas)"
 description: "Cómo verificar el esquema y simular roles en la única base (producción) sin dejar rastro."
-keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp, 0006_realtime_operaciones.sql, 0007_bloqueos_sii.sql, rls-fase4-bloqueos.sql, bloqueos_sii, arriendo, 0008_certificacion.sql, rls-fase5-certificacion.sql, registrar_caf, guardar_set_pruebas, CAF de mentira, 0009_autorizacion_externa.sql, rls-fase5-autorizacion-externa.sql, tg_resolucion_autoriza_produccion, autorizada_produccion, 0010_verificar_autorizacion.sql, rls-fase5-verificar-autorizacion.sql, verificar_autorizacion, PGlite, 0011_folios.sql, rls-fase6-folios.sql, anular_folios, trg_20_caf_sin_traslape, 23P01, 0012_folio_anulado.sql, rls-fase7-folio-anulado.sql, tg_validar_documento, folio anulado, for key share, 0013_notificaciones.sql, rls-fase8-notificaciones.sql, notificaciones, reclamar_notificacion, 0014_cron.sql, pg_cron, cron_token, fase9-tablero-control.sql, consulta de control, Tablero, Fase 9]
-related: ["08-esquema-supabase/rls-y-privilegios.md", "08-esquema-supabase/despliegue.md", "02-guias/tablero-y-reportes.md"]
-source: ["supabase_saas_sii.sql §15 §17", "supabase/verificaciones/", "supabase/verificaciones/rls-fase2-tenancy.sql", "supabase/verificaciones/fase9-tablero-control.sql"]
+keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp, 0006_realtime_operaciones.sql, 0007_bloqueos_sii.sql, rls-fase4-bloqueos.sql, bloqueos_sii, arriendo, 0008_certificacion.sql, rls-fase5-certificacion.sql, registrar_caf, guardar_set_pruebas, CAF de mentira, 0009_autorizacion_externa.sql, rls-fase5-autorizacion-externa.sql, tg_resolucion_autoriza_produccion, autorizada_produccion, 0010_verificar_autorizacion.sql, rls-fase5-verificar-autorizacion.sql, verificar_autorizacion, PGlite, 0011_folios.sql, rls-fase6-folios.sql, anular_folios, trg_20_caf_sin_traslape, 23P01, 0012_folio_anulado.sql, rls-fase7-folio-anulado.sql, tg_validar_documento, folio anulado, for key share, 0013_notificaciones.sql, rls-fase8-notificaciones.sql, notificaciones, reclamar_notificacion, 0014_cron.sql, pg_cron, cron_token, fase9-tablero-control.sql, consulta de control, Tablero, Fase 9, Fase 10, 0015_planes_comerciales.sql, 0016_pagos.sql, rls-fase10-pagos.sql, activar_suscripcion, clientes_pago, pagos, eventos_pasarela]
+related: ["08-esquema-supabase/rls-y-privilegios.md", "08-esquema-supabase/despliegue.md", "02-guias/tablero-y-reportes.md", "02-guias/planes-y-pagos.md"]
+source: ["supabase_saas_sii.sql §15 §17", "supabase/verificaciones/", "supabase/verificaciones/rls-fase2-tenancy.sql", "supabase/verificaciones/fase9-tablero-control.sql", "supabase/verificaciones/rls-fase10-pagos.sql"]
 ---
 
 # Probar el esquema (RLS, triggers, cuotas)
@@ -31,7 +31,9 @@ comprobación con `ok = true/false` y, si falla, el `detalle`. No escribe nada.
 | `0011_folios.sql` | 18 comprobaciones: 1–9 de `anular_folios` (firma `(uuid, integer, integer, text)` y `integer` con `to_regprocedure`; nombres de parámetros `p_caf`, `p_desde`, `p_hasta`, `p_motivo`; `plpgsql`, `security definer`, `search_path` vacío; la ejecutan `service_role` y `authenticated`, no `anon` ni PUBLIC; comentario; cuerpo: permiso `service_role` o `es_admin`, `for update`, documentos no anulados con `23503`, `on conflict`, cierre del CAF en la cola completa); 10–11 del trigger (`tg_caf_sin_traslape()` `security definer` con `for no key update` y `23P01`, sin `EXECUTE` para PUBLIC, `anon` ni `authenticated`; `trg_20_caf_sin_traslape` en `cafs`: `before`, por fila, `insert` y `update of` las 5 columnas, activo); 12 ningún par de CAF traslapado en los datos; 13–14 `folios_anulados` sin la política `alta` (solo `lectura`) y `authenticated` sin `insert`, `update`, `delete` ni `truncate` (sí `select`), `anon` sin nada; 15 `cafs` y `folios_anulados` en `supabase_realtime` (`insert`/`update`/`delete`) sin sacar a las 5 de la 0001 y la 0006; 16 Realtime aplica RLS en las dos (RLS activo, `lectura` con `es_miembro`, `select` para `authenticated`, nada para `anon`, *replica identity* por defecto); 17 `cafs` sin columnas de XML ni llave (`caf_secret_id` es un uuid); 18 migración registrada como `0011`. Aplicada el 2026-11-15: 18/18 `ok` ([despliegue](../08-esquema-supabase/despliegue.md#fase-6-migración-0011)); antes de migrar daba 3/18 (12, 16 y 17), igual que en PGlite sin la 0011 (18/18 con ella) |
 | `0012_folio_anulado.sql` | 7 comprobaciones: `tg_validar_documento()` existe, devuelve `trigger`, `plpgsql`, `security definer`, `search_path` vacío; cuerpo de la 0012 (lee el CAF con `for key share` **antes** de `folios_anulados`, solo cuando el documento fija su folio —`new.folio is distinct from old.folio` o `new.caf_id is distinct from old.caf_id`—, `23514`); conserva las reglas de la 0001 (CAF obligatorio, ambiente y tipo, rango, P91 y plan); sin `EXECUTE` para PUBLIC, `anon` ni `authenticated`; `trg_10_validar_documento` sin cambios (`before`, por fila, `insert` y `update of` `ambiente`, `caf_id`, `folio`, `tipo_dte`); ningún documento vivo con folio anulado; migración registrada como `0012`. Aplicada el 2026-11-15: 7/7 `ok` ([despliegue](../08-esquema-supabase/despliegue.md#fase-7-migración-0012)); antes de migrar daba 5/7 (2 y 7 en `false`), igual que en PGlite sin la 0012 (7/7 con ella) |
 | `0013_notificaciones.sql` | 18 comprobaciones: 1–8 la tabla `notificaciones` (15 columnas con sus tipos y `not null`; PK y clave única; FK a `organizaciones` en cascada; los `check` de tipo, clave, estado, enviada con fecha, intentos, datos, destinatarios y textos; índice `notificaciones_organizacion`; trigger `trg_90_actualizado_en`; RLS con una sola política `lectura`; `authenticated` solo lee, `anon` nada, `service_role` escribe); 9–13 `reclamar_notificacion` (las 5 funciones con su firma; nombres de parámetros; `plpgsql`, `security definer`, `search_path` vacío; solo `service_role` ejecuta las 5; cuerpo con `on conflict`, misma organización, menos de 5 intentos, fallida o pendiente de más de 15 minutos y el `grupo`); 14–17 `notificacion_cerrada` y las de candidatos (negación de reclamar; `sql`, `stable`, invoker, `search_path` vacío; excluyen lo avisado y reparten por turnos; umbral 1/7/15/30); 18 fuera de Realtime y migración registrada. **Aplicada el 2026-11-17**: en producción 18/18 (antes de migrar sale todo `false`); en PGlite 18/18 con la 0013 y 0/18 sin ella |
-| `0014_cron.sql` | 12 comprobaciones (no muestra el secreto: de Vault solo cuenta filas, y la 9 compara dentro de la consulta): 1 `pg_cron` y `pg_net`; 2 `cron_token` existe una vez; 3 los 4 jobs con su horario; 4–5 los dos `net.http_post` (URL de *Production*, JSON, Bearer leído de `vault.decrypted_secrets` en tiempo de ejecución, timeout; ningún literal después de `'Bearer '`); 6–7 las dos limpiezas; 8 activos, base y usuario `postgres`; 9 ningún job contiene el valor de `cron_token`; 10 nada más llama a `/api/cron`; 11 sin corridas fallidas en la última hora; 12 migración registrada. **Aplicada el 2026-11-17**: en producción 12/12, corrida con el MCP `execute_sql` (rol `postgres`); con `supabase db query --read-only` falla la 9, que descifra `cron_token` (`42501` en `_crypto_aead_det_decrypt`). Antes de migrar salen true 1, 2, 9, 10 y 11; en PGlite 11/12 (la 1 no aplica). Además, después de aplicarla, mirar `net._http_response` y los monitores de Sentry (2026-11-17: 200 en las dos rutas y los dos monitores en `ok`) |
+| `0014_cron.sql` | 12 comprobaciones (no muestra el secreto: de Vault solo cuenta filas, y la 9 compara dentro de la consulta): 1 `pg_cron` y `pg_net`; 2 `cron_token` existe una vez; 3 los 4 jobs con su horario; 4–5 los dos `net.http_post` (URL de *Production*, JSON, Bearer leído de `vault.decrypted_secrets` en tiempo de ejecución, timeout; ningún literal después de `'Bearer '`); 6–7 las dos limpiezas; 8 activos, base y usuario `postgres`; 9 ningún job contiene el valor de `cron_token`; 10 nada más llama a `/api/cron`; 11 sin corridas fallidas en la última hora; 12 migración registrada. **Aplicada el 2026-11-17**: en producción 12/12, corrida con el MCP `execute_sql` (rol `postgres`); con `supabase db query --read-only` falla la 9, que descifra `cron_token` (`42501` en `_crypto_aead_det_decrypt`). Antes de migrar salen true 1, 2, 9, 10 y 11; en PGlite 11/12 (la 1 no aplica). Además, después de aplicarla, mirar `net._http_response` y los monitores de Sentry (2026-11-17: 200 en las dos rutas y los dos monitores en `ok`). **Desde la `0017_cron_suscripciones` la 10 sale `false`** con detalle `sincronizar-suscripciones`: es esperado |
+| `0015_planes_comerciales.sql` | 10 comprobaciones: 1–2 columnas `autoservicio` (`boolean not null default false`) y `orden` (`smallint not null default 0`) de `planes`; 3–6 la grilla (los 5 planes activos con sus valores, comparados con `to_jsonb(p) @>`; `emprendedor` inactivo; solo `pyme`, `contador` y `api` de autoservicio; la política `lectura` sigue ocultando los inactivos); 7–8 `crear_organizacion` (sin el plazo de 30 días; mismos privilegios); 9 ninguna suscripción de Certificación con `periodo_fin`; 10 migración registrada. **Pendiente de aplicar**: en PGlite 10/10 con la 0015 y 2/10 sin ella (7 y 9); en producción aún no se corre |
+| `0016_pagos.sql` | 20 comprobaciones: 1–3 `clientes_pago` (columnas; PK, único y FK; `check`); 4–7 `pagos` (columnas; llaves y FK; `check`; índice `pagos_organizacion`); 8–9 `eventos_pasarela` (columnas; llaves, FK y `check`); 10 triggers `trg_90_actualizado_en`; 11–12 RLS y políticas (`es_admin`; ninguna en `eventos_pasarela`); 13 privilegios; 14–15 `suscripciones` (columnas nuevas e índice único parcial `suscripciones_externa_unica`); 16–19 `activar_suscripcion` (firma, `security definer` y `search_path`, solo `service_role`, cuerpo con `for no key update`); 20 fuera de Realtime y migración registrada. **Pendiente de aplicar**: en PGlite 20/20 con la 0016 y 0/20 sin ella; en producción aún no se corre. Ojo: en `suscripciones` la columna es `proveedor_pago`; en las tablas nuevas, `proveedor` |
 
 Se ejecuta pegándolo en el SQL Editor o con el MCP `execute_sql`. Cada migración nueva trae
 el suyo. `supabase db query --remote --read-only -f` sirve para las que no leen secretos;
@@ -96,7 +98,9 @@ borradores. A diferencia de las verificaciones de §1, **escribe**, pero todo de
 3. A y B crean su organización con `crear_organizacion()`. A invita a un administrador, un
    emisor y un lector, que aceptan con `aceptar_invitacion()`. El plan Certificación
    permite 2 usuarios, así que el script comprueba que el tercero choca con el cupo y
-   luego, como `postgres` (el backend), sube a A al plan Pyme para completar el equipo.
+   luego, como `postgres` (el backend), sube a A al plan Empresa (sin tope) para completar
+   el equipo. Hasta la Fase 10 era Pyme; con la grilla de la `0015` Pyme admite 3 usuarios y
+   el lector, cuarto miembro, ya no cabría. Con Empresa el script sirve con y sin la 0015.
 4. Cada comprobación escribe una fila en la tabla temporal `resultados(n, verificacion,
    ok, detalle)` mediante `pg_temp.registrar()`. Los errores esperados se capturan con
    bloques `do $$ … exception when insufficient_privilege | raise_exception |
@@ -122,7 +126,7 @@ y `anon` para que las sesiones simuladas puedan anotar resultados.
 | 41–44 | Último propietario | el único propietario no sale ni se degrada; tras nombrar a otro, sí; el propietario borra su organización (la cascada no choca con la regla) |
 | 45–47 | anon | permiso denegado en las 8 tablas de tenancy; no ejecuta `crear_organizacion` ni `aceptar_invitacion`; sí lee `planes` |
 | 48–51 | `ver_invitacion` | token correcto devuelve la fila; token malo, ya aceptado o vencido devuelve cero filas. Solo si `to_regprocedure('public.ver_invitacion(text)')` existe (migración 0003); si no, `ok = null` y detalle «omitida». La fila 52 solo aparece (con `ok = false`) si `ver_invitacion` lanza un error inesperado |
-| 53 | Suscripción morosa | como `postgres`, A pasa a `morosa` (en Pyme, con cupo libre) y se reabre la invitación de `vencida-a`; `aceptar_invitacion` rechaza con «La organización no tiene una suscripción vigente» (migración 0004). Sin 0004 sale `ok = false` |
+| 53 | Suscripción morosa | como `postgres`, A pasa a `morosa` (en Empresa, sin tope de usuarios: el cupo no es el motivo) y se reabre la invitación de `vencida-a`; `aceptar_invitacion` rechaza con «La organización no tiene una suscripción vigente» (migración 0004). Sin 0004 sale `ok = false` |
 
 ### Cómo correrlo sin dejar datos
 
@@ -146,8 +150,10 @@ y `anon` para que las sesiones simuladas puedan anotar resultados.
 Si la ejecución se corta a mitad, Postgres descarta la transacción completa. Nunca cambies
 el `rollback` final por `commit`, ni ejecutes el archivo por partes.
 
-Resultado de la última corrida (2026-11-12, con 0003 y 0004 aplicadas): 52 de 52 en
-`ok = true` (1–51 y 53; la 52 no aparece). La consulta de control dio 0 en todo.
+Resultado de la última corrida en producción (2026-11-12, con 0003 y 0004 aplicadas): 52 de
+52 en `ok = true` (1–51 y 53; la 52 no aparece). La consulta de control dio 0 en todo. Con el
+ajuste de la Fase 10 (plan Empresa), en PGlite con la 0015 y la 0016: 52/52; en producción
+el script ajustado aún no se corre.
 
 ## 4. Simulación de roles de la Fase 3 (`rls-fase3-empresas.sql`)
 
@@ -160,7 +166,9 @@ encabezado en 0 (el `rollback` no dejó datos ni secretos de prueba).
 
 Diferencias con la de la Fase 2: cinco usuarios (`…a1`–`a4` en A, `…b1` en B); A pasa a
 Pyme y su equipo se da de alta directo como `postgres` (las invitaciones ya las prueba
-la Fase 2); B queda en Certificación. Crea certificados de prueba con huellas
+la Fase 2; el alta directa como `postgres` no revisa el cupo, así que los 3 usuarios de
+Pyme en la grilla de la `0015` no la afectan: 43/43 en PGlite con la 0015 y la 0016); B
+queda en Certificación. Crea certificados de prueba con huellas
 `repeat('a', 64)` y `repeat('b', 64)` y dos secretos de prueba por certificado en Vault,
 que el `rollback` también deshace. De `vault.secrets` solo cuenta filas y mira ids y
 descripciones, nunca el contenido. Anota el texto completo de cada error de
@@ -537,7 +545,74 @@ aceptadas y 0 esperando al SII. El Tablero desplegado mostró las mismas cifras 
 cumplido el 2026-11-17;
 [guía](../02-guias/tablero-y-reportes.md#consulta-de-control-y-criterio-de-aceptación)).
 
-## 13. Lo que no se prueba con SQL
+## 13. Simulación de planes y pagos de la Fase 10 (`rls-fase10-pagos.sql`)
+
+`supabase/verificaciones/rls-fase10-pagos.sql` prueba las migraciones 0015 y 0016: una
+organización nueva nace en Certificación sin `periodo_fin`; `activar_suscripcion` (solo
+`service_role`) deja vigente el plan pagado en Flow en una transacción, es idempotente con
+el mismo id externo, cambia de plan sobre la misma suscripción externa, vuelve a
+Certificación sin proveedor y rechaza datos incompletos o estados no permitidos; el cupo de
+boletas del plan nuevo se aplica al emitir en producción; propietarios y administradores
+leen `pagos` y `clientes_pago` de su organización, y nadie más; `eventos_pasarela` es solo
+de `service_role`. **Requiere la 0015 y la 0016 aplicadas** (las dos **pendientes** en
+producción): sin ellas el script corre igual (cada paso captura su error), pero casi todo
+sale `false`.
+
+Mismo patrón que las anteriores (usuarios ficticios `pagos-…@ejemplo.invalid`, claims
+locales + `set local role`, `pg_temp.registrar`, parámetros locales `prueba.*`, `rollback`
+final, igual que `rls-fase8-notificaciones.sql`). Crea dos organizaciones
+(`zz-prueba-pagos-fase10…`), suscripciones con ids externos `sub-prueba-fase10…`, una empresa
+marcada como autorizada en producción, un CAF de producción **de mentira** por
+`registrar_caf` (con su secreto de prueba en Vault), boletas de producción, filas de
+`uso_mensual`, clientes (`cus-prueba-fase10…`), pagos (`inv-prueba-fase10…`) y avisos
+(`tok-prueba-fase10…`). No llama a Flow, al SII ni a `pg_net`: los documentos se insertan ya
+`firmado`.
+
+| # | Grupo | Comprobaciones |
+|---|---|---|
+| 1–3 | Preparación y Certificación | `crear_organizacion` deja a A y B en `certificacion`/`prueba` sin `periodo_fin` y `plan_vigente` sin producción; A con los 4 roles, empresa autorizada y CAF de producción 1–2000; en Certificación una boleta de producción se rechaza y no cuenta uso |
+| 4–7 | Alta en Pyme | Certificación → Pyme con id externo: id nuevo, la anterior `cancelada` con `periodo_fin`, una sola vigente, `plan_vigente` pyme con 1.000; `sincronizada_en` y `cancelar_al_fin_periodo = false`; repetir es idempotente; con 999 usadas la boleta 1.000 entra y la 1.001 se rechaza |
+| 8–9 | Cambio de plan | mismo id externo → `plan_id` contador en la misma fila; la boleta 1.001 que Pyme rechazó ahora entra |
+| 10–11 | Ids externos y mora | B no puede usar el id externo de A (`23505`); una `morosa` no tiene plan vigente y el mismo id la reactiva en la misma fila |
+| 12–14 | Vuelta a Certificación | sin proveedor: id nuevo, la de Flow `cancelada`; repetir es idempotente; no se emite en producción y un aviso tardío con el id cancelado da `22023` («ya terminó») |
+| 15–18 | Errores y permisos | `22004`; `22023` (estado `morosa`/`cancelada`, proveedor sin id o al revés); `P0002`; propietario, administrador, lector y `anon` no ejecutan `activar_suscripcion` (`42501`) |
+| 19–21 | Tablas (service_role) | registra clientes, 3 pagos y un aviso; los `check` dan `23514`; los únicos dan `23505` y el upsert por `(proveedor, factura_externa)` actualiza |
+| 22–28 | RLS | propietario y administrador de A leen sus 2 pagos y su cliente (con marca y últimos 4), nada de B; nadie lee `eventos_pasarela` con sesión (`42501`); el administrador no escribe (`42501`); emisor y lector leen 0 filas; B solo lo suyo; `anon` nada |
+| 29–30 | FK | borrar una suscripción deja sus pagos con `suscripcion_id` nulo; borrar B borra sus pagos y su cliente y deja su aviso con `organizacion_id` nulo |
+
+Lo que no prueba: que el `for no key update` sobre la organización no frene un insert en
+una tabla hija (hace falta una segunda sesión concurrente; la verificación 0016, 19, revisa
+que el cuerpo use ese modo).
+
+Cómo correrlo: el archivo **completo**, tal cual, con el MCP `execute_sql` o en el SQL
+Editor (como `postgres`); nunca por partes ni cambiando el `rollback` por `commit`. Debe dar
+30/30. Después, la consulta de control del encabezado, todo en 0:
+
+```sql
+select
+  (select count(*) from auth.users where email like 'pagos-%@ejemplo.invalid') as usuarios,
+  (select count(*) from public.organizaciones where slug like 'zz-prueba-pagos-fase10%') as organizaciones,
+  (select count(*) from public.suscripciones where id_externo like 'sub-prueba-fase10%') as suscripciones,
+  (select count(*) from public.empresas where razon_social like 'Empresa pagos fase 10%') as empresas,
+  (select count(*) from vault.secrets where description like 'caf:76543210-3:produccion:39:1-%') as secretos,
+  (select count(*) from public.clientes_pago where cliente_externo like 'cus-prueba-fase10%') as clientes_pago,
+  (select count(*) from public.pagos where factura_externa like 'inv-prueba-fase10%') as pagos,
+  (select count(*) from public.eventos_pasarela where token like 'tok-prueba-fase10%') as eventos;
+-- todo en 0 (secretos: el mismo número que antes, si una empresa real tuviera el RUT
+-- 76543210-3 con un CAF de producción de boletas desde el folio 1)
+```
+
+Antes de aplicar la 0016 la consulta de limpieza falla (las tablas `clientes_pago`, `pagos` y
+`eventos_pasarela` no existen): córrela después de migrar.
+
+Probada en PGlite (esquema 0001 y 0003–0016 con stubs): 30/30 con las dos migraciones, 3/30
+solo con la 0015 y 2/30 sin ninguna; la limpieza dio todo en 0. En la misma corrida siguen en
+verde `rls-fase2-tenancy.sql` (52/52, con el ajuste del plan Empresa), `rls-fase3-empresas.sql`
+(43/43), la verificación `0004` (3/3) y `rls-fase8-notificaciones.sql` (26/26). **En
+producción aún no se corre** (las migraciones están pendientes;
+[despliegue](../08-esquema-supabase/despliegue.md#fase-10-migraciones-0015-0016-y-0017)).
+
+## 14. Lo que no se prueba con SQL
 
 El aislamiento entre organizaciones y los permisos por rol también se prueban de punta a
 punta con la app (Fase 2): dos usuarios de organizaciones distintas, cada uno con su

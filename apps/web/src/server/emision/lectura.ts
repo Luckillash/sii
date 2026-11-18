@@ -15,7 +15,7 @@ import {
 } from '@/lib/folios';
 import { fallaBase } from '../certificacion/comun';
 import { leerCafs } from '../folios/disponibles';
-import { planPermiteProduccion } from '../folios/plan';
+import { cuotaProduccion, planPermiteProduccion } from '../folios/plan';
 import { ErrorUso } from '../sii/errores';
 import { aBorrador, UUID } from './borradores';
 import { type DependenciasEmision, resolverDependenciasEmision } from './dependencias';
@@ -64,7 +64,7 @@ export async function leerVistaEmision(
     TIPOS_FOLIO.map((tipoDte) => ({ ambiente, tipoDte })),
   );
 
-  const [resoluciones, predeterminado, borradores, cafs, plan] = await Promise.all([
+  const [resoluciones, predeterminado, borradores, cafs, plan, cuota] = await Promise.all([
     sesion
       .from('resoluciones')
       .select('ambiente, numero, fecha')
@@ -90,6 +90,7 @@ export async function leerVistaEmision(
       .limit(MAXIMO_BORRADORES),
     Promise.all(combinaciones.map((c) => leerCafs(sesion, clave(c.ambiente, c.tipoDte)))),
     planPermiteProduccion(deps.servicio(), organizacionId).catch(() => null),
+    cuotaProduccion(deps.servicio(), organizacionId, deps.reloj.ahora()).catch(() => null),
   ]);
   if (resoluciones.error) throw fallaBase('leer las resoluciones', resoluciones.error);
   if (predeterminado.error) throw fallaBase('leer los certificados', predeterminado.error);
@@ -202,5 +203,6 @@ export async function leerVistaEmision(
     folios,
     borradores: listaBorradores,
     borrador,
+    cuotaProduccion: cuota,
   };
 }

@@ -155,7 +155,7 @@ describe('explicarMotivo', () => {
   it.each([
     ['empresa_inactiva', `/acme/configuracion/empresas/${EMPRESA}`],
     ['sin_autorizacion', `/acme/certificacion?empresa=${EMPRESA}`],
-    ['plan_sin_produccion', '/acme/configuracion'],
+    ['plan_sin_produccion', '/acme/configuracion/plan'],
     ['sin_resolucion', `/acme/configuracion/empresas/${EMPRESA}`],
     ['sin_certificado', `/acme/configuracion/empresas/${EMPRESA}/certificados`],
   ] as const)('%s enlaza a lo que lo arregla', (motivo, href) => {
@@ -206,6 +206,55 @@ describe('bloqueoEmision', () => {
     const b = bloqueoEmision(v, 'certificacion', 39, 'acme', EMPRESA);
     expect(b?.texto).toMatch(/^CAF agotado/);
     expect(b?.texto).toMatch(/Solicita un nuevo rango de folios al SII antes de emitir\.$/);
+  });
+});
+
+describe('bloqueoEmision: cupo de producción del plan', () => {
+  // Ambos ambientes habilitados y con folios: solo la cuota puede bloquear.
+  const habilitada = (cuotaProduccion: VistaEmision['cuotaProduccion']) => ({
+    ...vista({
+      ambientes: [ambiente({ ambiente: 'produccion' }), ambiente()],
+      folios: [folios(), folios({ ambiente: 'produccion' })],
+    }),
+    cuotaProduccion,
+  });
+
+  it('cupo lleno bloquea producción con enlace al plan y nombra el plan', () => {
+    const v = habilitada({ plan: 'Emprende', usadas: 1000, maximo: 1000 });
+    const b = bloqueoEmision(v, 'produccion', 39, 'acme', EMPRESA);
+    expect(b?.texto).toMatch(
+      /límite de 1\.000 boletas en producción de este mes del plan Emprende/,
+    );
+    expect(b?.enlace?.href).toBe('/acme/configuracion/plan');
+    // Pasarse (la base contó otra antes de leer) también bloquea.
+    const pasada = habilitada({ plan: null, usadas: 1001, maximo: 1000 });
+    expect(bloqueoEmision(pasada, 'produccion', 39, 'acme', EMPRESA)?.texto).not.toMatch(
+      /del plan/,
+    );
+  });
+
+  it('el cupo lleno no bloquea certificación', () => {
+    const v = habilitada({ plan: 'Emprende', usadas: 1000, maximo: 1000 });
+    expect(bloqueoEmision(v, 'certificacion', 39, 'acme', EMPRESA)).toBeNull();
+  });
+
+  it('bajo el cupo, sin límite (null), máximo 0 o sin dato de cuota: no bloquea por cuota', () => {
+    for (const cuota of [
+      { plan: 'Emprende', usadas: 999, maximo: 1000 },
+      { plan: 'Empresa', usadas: 50_000, maximo: null },
+      { plan: 'Certificación', usadas: 3, maximo: 0 },
+      null,
+      undefined,
+    ]) {
+      expect(bloqueoEmision(habilitada(cuota), 'produccion', 39, 'acme', EMPRESA)).toBeNull();
+    }
+  });
+
+  it('el certificado faltante se explica antes que la cuota', () => {
+    const v = { ...habilitada({ plan: 'X', usadas: 5, maximo: 5 }), certificado: null };
+    expect(bloqueoEmision(v, 'produccion', 39, 'acme', EMPRESA)?.enlace?.href).toMatch(
+      /certificados$/,
+    );
   });
 });
 
@@ -339,7 +388,7 @@ describe('bloqueoGuardado', () => {
       ],
     });
     expect(bloqueoGuardado(plan, 'produccion', 'acme', EMPRESA)?.enlace?.href).toBe(
-      '/acme/configuracion',
+      '/acme/configuracion/plan',
     );
   });
 

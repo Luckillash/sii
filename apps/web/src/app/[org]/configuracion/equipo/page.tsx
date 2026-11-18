@@ -27,7 +27,10 @@ export default async function PaginaEquipo({ params }: { params: Promise<{ org: 
   const avisoCupo =
     cupo && cupoLleno
       ? `El plan ${cupo.plan ?? 'vigente'} permite hasta ${cupo.maximo} usuarios y ya están todos ocupados. Quita a un miembro o cambia de plan para invitar a alguien más.`
-      : null;
+      : cupo && cupo.plan === null
+        ? // Suscripción morosa o cancelada: `exigir_cupo_usuarios` rechaza al aceptar (0004).
+          'La organización no tiene un plan vigente (por ejemplo, por un pago vencido): las invitaciones no se podrán aceptar hasta regularizarlo en Configuración → Plan.'
+        : null;
 
   return (
     <>

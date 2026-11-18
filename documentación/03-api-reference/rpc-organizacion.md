@@ -45,8 +45,11 @@ public.crear_organizacion(p_nombre text, p_slug text) returns uuid
 **Efectos** (en una transacción):
 
 1. Inserta en `organizaciones` con `slug = lower(p_slug)` y `creado_por = auth.uid()`.
-2. Crea la suscripción al plan `certificacion` en estado `prueba`, con
-   `periodo_fin = now() + 30 días`.
+2. Crea la suscripción al plan `certificacion` en estado `prueba`, **sin `periodo_fin`**
+   (Certificación no vence) desde la migración `0015_planes_comerciales` (Fase 10,
+   pendiente de aplicar), que reemplaza la función con `create or replace` y conserva sus
+   privilegios. En la `0001` era `periodo_fin = now() + 30 días`, que nada hacía cumplir:
+   `plan_vigente()` no mira `periodo_fin`.
 3. Agrega al usuario a `miembros_organizacion` como `propietario`.
 
 Devuelve el `id` de la organización.

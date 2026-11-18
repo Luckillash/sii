@@ -1,0 +1,222 @@
+/* Configuración → Plan (PLAN-SAAS Fase 10). */
+
+.bloque {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.subtitulo {
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}
+
+.nota {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  color: var(--ink-muted);
+}
+
+.resumenPlan {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-6);
+}
+
+.nombrePlan {
+  font-size: var(--text-title-size);
+  line-height: var(--text-title-line);
+  font-weight: var(--text-title-weight);
+}
+
+.precio {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: 500;
+}
+
+.porMes {
+  font-family: var(--font-sans);
+  font-size: var(--text-caption-size);
+  color: var(--ink-muted);
+  font-weight: 400;
+}
+
+.datos {
+  margin: 0;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-1) var(--space-4);
+}
+
+.datos dt {
+  color: var(--ink-muted);
+}
+
+.datos dd {
+  margin: 0;
+}
+
+.estado {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  font-weight: 500;
+  background: var(--surface-sunken);
+  color: var(--ink);
+}
+
+.estado[data-estado="activa"] {
+  background: var(--exito-soft);
+  color: var(--ink);
+}
+
+.estado[data-estado="morosa"] {
+  background: var(--error-soft);
+  color: var(--ink);
+}
+
+/* Uso del mes */
+
+.usos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--space-4);
+}
+
+.uso {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.usoCabecera {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.usoEtiqueta {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--text-label-weight);
+}
+
+.usoCifra {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  color: var(--ink-muted);
+}
+
+.usoNota {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+.barra {
+  height: 8px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+
+.relleno {
+  height: 100%;
+  background: var(--sello);
+  transition: width 200ms ease;
+}
+
+.relleno[data-nivel="aviso"] {
+  background: var(--aviso);
+}
+
+.relleno[data-nivel="lleno"] {
+  background: var(--error);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .relleno {
+    transition: none;
+  }
+}
+
+/* Grilla de planes */
+
+.grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: var(--space-4);
+}
+
+.tarjetaPlan {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tarjetaPlan[data-actual="true"] {
+  border-color: var(--sello);
+}
+
+.cabeceraPlan {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.marcaActual {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  font-weight: 500;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--sello-soft);
+  color: var(--ink);
+}
+
+.caracteristicas {
+  margin: 0;
+  padding-left: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+.accionPlan {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.motivo {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.cifra {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}

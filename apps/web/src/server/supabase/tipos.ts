@@ -273,6 +273,63 @@ export type Database = {
           },
         ]
       }
+      clientes_pago: {
+        Row: {
+          actualizado_en: string
+          cliente_externo: string
+          creado_en: string
+          organizacion_id: string
+          plan_pendiente_en: string | null
+          plan_pendiente_id: string | null
+          plan_pendiente_por: string | null
+          proveedor: string
+          tarjeta_marca: string | null
+          tarjeta_registrada_en: string | null
+          tarjeta_ultimos4: string | null
+        }
+        Insert: {
+          actualizado_en?: string
+          cliente_externo: string
+          creado_en?: string
+          organizacion_id: string
+          plan_pendiente_en?: string | null
+          plan_pendiente_id?: string | null
+          plan_pendiente_por?: string | null
+          proveedor: string
+          tarjeta_marca?: string | null
+          tarjeta_registrada_en?: string | null
+          tarjeta_ultimos4?: string | null
+        }
+        Update: {
+          actualizado_en?: string
+          cliente_externo?: string
+          creado_en?: string
+          organizacion_id?: string
+          plan_pendiente_en?: string | null
+          plan_pendiente_id?: string | null
+          plan_pendiente_por?: string | null
+          proveedor?: string
+          tarjeta_marca?: string | null
+          tarjeta_registrada_en?: string | null
+          tarjeta_ultimos4?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clientes_pago_organizacion_id_fkey"
+            columns: ["organizacion_id"]
+            isOneToOne: true
+            referencedRelation: "organizaciones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clientes_pago_plan_pendiente_id_fkey"
+            columns: ["plan_pendiente_id"]
+            isOneToOne: false
+            referencedRelation: "planes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       consultas_envio: {
         Row: {
           aceptados: number | null
@@ -960,6 +1017,56 @@ export type Database = {
           },
         ]
       }
+      eventos_pasarela: {
+        Row: {
+          datos: Json
+          error: string | null
+          estado: string
+          id: string
+          intentos: number
+          organizacion_id: string | null
+          procesado_en: string | null
+          proveedor: string
+          recibido_en: string
+          tipo: string
+          token: string
+        }
+        Insert: {
+          datos?: Json
+          error?: string | null
+          estado?: string
+          id?: string
+          intentos?: number
+          organizacion_id?: string | null
+          procesado_en?: string | null
+          proveedor: string
+          recibido_en?: string
+          tipo: string
+          token: string
+        }
+        Update: {
+          datos?: Json
+          error?: string | null
+          estado?: string
+          id?: string
+          intentos?: number
+          organizacion_id?: string | null
+          procesado_en?: string | null
+          proveedor?: string
+          recibido_en?: string
+          tipo?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eventos_pasarela_organizacion_id_fkey"
+            columns: ["organizacion_id"]
+            isOneToOne: false
+            referencedRelation: "organizaciones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       estados_sii: {
         Row: {
           codigo: string
@@ -1298,6 +1405,84 @@ export type Database = {
         }
         Relationships: []
       }
+      pagos: {
+        Row: {
+          actualizado_en: string
+          creado_en: string
+          enlace_pago: string | null
+          error: string | null
+          estado: string
+          factura_externa: string
+          id: string
+          intentos: number
+          medio: string | null
+          monto_clp: number
+          orden_externa: string | null
+          organizacion_id: string
+          pagado_en: string | null
+          periodo_fin: string | null
+          periodo_inicio: string | null
+          proveedor: string
+          suscripcion_id: string | null
+          vence_en: string | null
+        }
+        Insert: {
+          actualizado_en?: string
+          creado_en?: string
+          enlace_pago?: string | null
+          error?: string | null
+          estado: string
+          factura_externa: string
+          id?: string
+          intentos?: number
+          medio?: string | null
+          monto_clp: number
+          orden_externa?: string | null
+          organizacion_id: string
+          pagado_en?: string | null
+          periodo_fin?: string | null
+          periodo_inicio?: string | null
+          proveedor: string
+          suscripcion_id?: string | null
+          vence_en?: string | null
+        }
+        Update: {
+          actualizado_en?: string
+          creado_en?: string
+          enlace_pago?: string | null
+          error?: string | null
+          estado?: string
+          factura_externa?: string
+          id?: string
+          intentos?: number
+          medio?: string | null
+          monto_clp?: number
+          orden_externa?: string | null
+          organizacion_id?: string
+          pagado_en?: string | null
+          periodo_fin?: string | null
+          periodo_inicio?: string | null
+          proveedor?: string
+          suscripcion_id?: string | null
+          vence_en?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pagos_organizacion_id_fkey"
+            columns: ["organizacion_id"]
+            isOneToOne: false
+            referencedRelation: "organizaciones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pagos_suscripcion_id_fkey"
+            columns: ["suscripcion_id"]
+            isOneToOne: false
+            referencedRelation: "suscripciones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       perfiles: {
         Row: {
           actualizado_en: string
@@ -1352,6 +1537,7 @@ export type Database = {
       planes: {
         Row: {
           activo: boolean
+          autoservicio: boolean
           codigo: string
           creado_en: string
           id: string
@@ -1361,11 +1547,13 @@ export type Database = {
           max_empresas: number | null
           max_usuarios: number | null
           nombre: string
+          orden: number
           permite_produccion: boolean
           precio_mensual_clp: number
         }
         Insert: {
           activo?: boolean
+          autoservicio?: boolean
           codigo: string
           creado_en?: string
           id?: string
@@ -1375,11 +1563,13 @@ export type Database = {
           max_empresas?: number | null
           max_usuarios?: number | null
           nombre: string
+          orden?: number
           permite_produccion?: boolean
           precio_mensual_clp?: number
         }
         Update: {
           activo?: boolean
+          autoservicio?: boolean
           codigo?: string
           creado_en?: string
           id?: string
@@ -1389,6 +1579,7 @@ export type Database = {
           max_empresas?: number | null
           max_usuarios?: number | null
           nombre?: string
+          orden?: number
           permite_produccion?: boolean
           precio_mensual_clp?: number
         }
@@ -1956,6 +2147,7 @@ export type Database = {
       suscripciones: {
         Row: {
           actualizado_en: string
+          cancelar_al_fin_periodo: boolean
           creado_en: string
           estado: Database["public"]["Enums"]["estado_suscripcion"]
           id: string
@@ -1965,9 +2157,11 @@ export type Database = {
           periodo_inicio: string
           plan_id: string
           proveedor_pago: string | null
+          sincronizada_en: string | null
         }
         Insert: {
           actualizado_en?: string
+          cancelar_al_fin_periodo?: boolean
           creado_en?: string
           estado?: Database["public"]["Enums"]["estado_suscripcion"]
           id?: string
@@ -1977,9 +2171,11 @@ export type Database = {
           periodo_inicio?: string
           plan_id: string
           proveedor_pago?: string | null
+          sincronizada_en?: string | null
         }
         Update: {
           actualizado_en?: string
+          cancelar_al_fin_periodo?: boolean
           creado_en?: string
           estado?: Database["public"]["Enums"]["estado_suscripcion"]
           id?: string
@@ -1989,6 +2185,7 @@ export type Database = {
           periodo_inicio?: string
           plan_id?: string
           proveedor_pago?: string | null
+          sincronizada_en?: string | null
         }
         Relationships: [
           {
@@ -2450,6 +2647,18 @@ export type Database = {
     }
     Functions: {
       aceptar_invitacion: { Args: { p_token: string }; Returns: string }
+      activar_suscripcion: {
+        Args: {
+          p_estado: Database["public"]["Enums"]["estado_suscripcion"]
+          p_id_externo?: string
+          p_organizacion: string
+          p_periodo_fin?: string
+          p_periodo_inicio?: string
+          p_plan: string
+          p_proveedor?: string
+        }
+        Returns: string
+      }
       alertas_certificados_por_vencer: {
         Args: { p_limite?: number }
         Returns: {
@@ -2592,6 +2801,7 @@ export type Database = {
         Args: { p_organizacion: string }
         Returns: {
           activo: boolean
+          autoservicio: boolean
           codigo: string
           creado_en: string
           id: string
@@ -2601,6 +2811,7 @@ export type Database = {
           max_empresas: number | null
           max_usuarios: number | null
           nombre: string
+          orden: number
           permite_produccion: boolean
           precio_mensual_clp: number
         }

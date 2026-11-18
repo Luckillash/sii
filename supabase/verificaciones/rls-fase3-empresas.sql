@@ -45,7 +45,8 @@
 --   ...a3 emisor-a         emisor de A
 --   ...a4 lector-a         lector de A
 --   ...b1 propietario-b    propietario de la organización B
--- A pasa al plan Pyme (5 usuarios, 3 empresas) y su equipo se da de alta directo, como lo
+-- A pasa al plan Pyme (de pago; con la grilla de la 0015, 3 usuarios y 1 empresa: el alta
+-- directa como postgres no revisa el cupo) y su equipo se da de alta directo, como lo
 -- haría el backend (las invitaciones ya las prueba la Fase 2). B queda en Certificación
 -- (1 empresa), para probar tg_limite_empresas.
 

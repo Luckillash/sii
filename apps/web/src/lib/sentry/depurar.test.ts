@@ -233,6 +233,16 @@ describe('depurarTexto', () => {
     expect(depurarTexto('/invitacion/[token]')).toBe(`/invitacion/${FILTRADO}`);
   });
 
+  it('filtra apiKey, token y la firma s de una URL GET de Flow (Fase 10)', () => {
+    const url =
+      'https://sandbox.flow.cl/api/payment/getStatus?apiKey=2FF6-AAAA-L78B&token=ABC123def&s=68feda2de322fc63e2d6963c3d56b82b';
+    const depurado = depurarTexto(url);
+    for (const secreto of ['2FF6-AAAA-L78B', 'ABC123def', '68feda2de322fc63e2d6963c3d56b82b']) {
+      expect(depurado).not.toContain(secreto);
+    }
+    expect(depurado).toContain('https://sandbox.flow.cl/api/payment/getStatus?');
+  });
+
   it('no toca textos sin secretos', () => {
     const texto = 'Boleta 39 folio 1520 aceptada por el SII (Track ID 123456).';
     expect(depurarTexto(texto)).toBe(texto);

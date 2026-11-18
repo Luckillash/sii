@@ -115,8 +115,8 @@ export function explicarMotivo(
       };
     case 'plan_sin_produccion':
       return {
-        texto: 'El plan vigente no incluye producción.',
-        enlace: { href: `/${slug}/configuracion`, texto: 'Revisa el plan en Configuración' },
+        texto: 'Tu plan no incluye producción o tiene un pago vencido.',
+        enlace: { href: `/${slug}/configuracion/plan`, texto: 'Revisa tu plan' },
       };
     case 'sin_resolucion':
       return {
@@ -149,7 +149,7 @@ export function ambientePorDefecto(vista: Pick<VistaEmision, 'ambientes'>): Ambi
  * va aparte (se explica campo por campo al intentar emitir).
  */
 export function bloqueoEmision(
-  vista: Pick<VistaEmision, 'ambientes' | 'folios' | 'certificado'>,
+  vista: Pick<VistaEmision, 'ambientes' | 'folios' | 'certificado' | 'cuotaProduccion'>,
   ambiente: AmbienteSii,
   tipo: TipoFolio,
   slug: string,
@@ -163,6 +163,20 @@ export function bloqueoEmision(
     return explicarMotivo(a.motivo ?? 'sin_resolucion', ambiente, slug, empresaId);
   }
   if (!vista.certificado) return explicarMotivo('sin_certificado', ambiente, slug, empresaId);
+  // Cupo del plan (Fase 10): la base rechaza la boleta que pasa max_boletas_mes.
+  const cuota = vista.cuotaProduccion;
+  if (
+    ambiente === 'produccion' &&
+    cuota &&
+    cuota.maximo !== null &&
+    cuota.maximo > 0 &&
+    cuota.usadas >= cuota.maximo
+  ) {
+    return {
+      texto: `Se alcanzó el límite de ${formatearMiles(cuota.maximo)} boletas en producción de este mes${cuota.plan ? ` del plan ${cuota.plan}` : ''}. Cambia a un plan más grande o espera al próximo mes.`,
+      enlace: { href: `/${slug}/configuracion/plan`, texto: 'Revisa tu plan' },
+    };
+  }
   const f = foliosDe(vista, ambiente, tipo);
   // Sin siguiente folio no hay qué asignar, aunque `puedeEmitir` diga otra cosa.
   if (!f?.puedeEmitir || f.siguiente === null) {

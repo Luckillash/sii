@@ -1,9 +1,9 @@
 ---
 title: "Esquema: despliegue"
 description: "Cómo se aplican las migraciones en la única base (Supabase en la nube, producción), requisitos (Vault, Realtime, pg_cron, pg_net) y tareas programadas."
-keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, aplicadas, 0008_certificacion, registrar_caf, guardar_set_pruebas, rls-fase5-certificacion, 0009_autorizacion_externa, tg_resolucion_autoriza_produccion, rls-fase5-autorizacion-externa, 0010_verificar_autorizacion, verificar_autorizacion, operacion_sii, rls-fase5-verificar-autorizacion, 0011_folios, anular_folios, trg_20_caf_sin_traslape, tg_caf_sin_traslape, rls-fase6-folios, Fase 6, 0012_folio_anulado, Fase 8, 0013_notificaciones, notificaciones, reclamar_notificacion, rls-fase8-notificaciones, 0014_cron, cron.schedule, seguimiento-envios, alertas, limpiar-tokens-sii, limpiar-historial-cron, net._http_response, cron.job_run_details, CRON_SECRET, execute_sql, 42501, _crypto_aead_det_decrypt, db:tipos, nulabilidad, retornos de funciones]
-related: ["02-guias/quickstart.md", "05-pruebas/probar-el-esquema.md", "08-esquema-supabase/vault-y-secretos.md"]
-source: ["supabase_saas_sii.sql (cabecera, opcional pg_cron)", "PLAN-SAAS.md §4.4 §6", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql"]
+keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, aplicadas, 0008_certificacion, registrar_caf, guardar_set_pruebas, rls-fase5-certificacion, 0009_autorizacion_externa, tg_resolucion_autoriza_produccion, rls-fase5-autorizacion-externa, 0010_verificar_autorizacion, verificar_autorizacion, operacion_sii, rls-fase5-verificar-autorizacion, 0011_folios, anular_folios, trg_20_caf_sin_traslape, tg_caf_sin_traslape, rls-fase6-folios, Fase 6, 0012_folio_anulado, Fase 8, 0013_notificaciones, notificaciones, reclamar_notificacion, rls-fase8-notificaciones, 0014_cron, cron.schedule, seguimiento-envios, alertas, limpiar-tokens-sii, limpiar-historial-cron, net._http_response, cron.job_run_details, CRON_SECRET, execute_sql, 42501, _crypto_aead_det_decrypt, db:tipos, nulabilidad, retornos de funciones, Fase 10, 0015_planes_comerciales, 0016_pagos, 0017_cron_suscripciones, sincronizar-suscripciones, activar_suscripcion, rls-fase10-pagos]
+related: ["02-guias/quickstart.md", "05-pruebas/probar-el-esquema.md", "08-esquema-supabase/vault-y-secretos.md", "02-guias/planes-y-pagos.md"]
+source: ["supabase_saas_sii.sql (cabecera, opcional pg_cron)", "PLAN-SAAS.md §4.4 §6", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "supabase/migrations/0015_planes_comerciales.sql", "supabase/migrations/0016_pagos.sql", "supabase/migrations/0017_cron_suscripciones.sql"]
 ---
 
 # Esquema: despliegue
@@ -33,7 +33,7 @@ Viven en `supabase/migrations/` con prefijo **secuencial de 4 dígitos** (no tim
 |---|---|
 | `0001_esquema_inicial.sql` | `supabase_saas_sii.sql` **byte a byte** (19 secciones: tipos, tablas, RLS, Vault, Storage, Realtime). Nunca se edita |
 | `0002_extensiones_cron.sql` | `pg_cron` (schema `pg_catalog`) y `pg_net` (schema `extensions`) |
-| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, y la `0010_verificar_autorizacion`, aplicada el 2026-11-14, son de la Fase 5: ver [abajo](#fase-5-migración-0008); la `0011_folios`, de la Fase 6, se aplicó el 2026-11-15: ver [abajo](#fase-6-migración-0011); la `0012_folio_anulado`, de la Fase 7, se aplicó el 2026-11-15: ver [abajo](#fase-7-migración-0012); la `0013_notificaciones` y la `0014_cron`, de la Fase 8, se aplicaron el 2026-11-17 (la 0014 después del deploy): ver [abajo](#fase-8-migraciones-0013-y-0014)) |
+| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, y la `0010_verificar_autorizacion`, aplicada el 2026-11-14, son de la Fase 5: ver [abajo](#fase-5-migración-0008); la `0011_folios`, de la Fase 6, se aplicó el 2026-11-15: ver [abajo](#fase-6-migración-0011); la `0012_folio_anulado`, de la Fase 7, se aplicó el 2026-11-15: ver [abajo](#fase-7-migración-0012); la `0013_notificaciones` y la `0014_cron`, de la Fase 8, se aplicaron el 2026-11-17 (la 0014 después del deploy): ver [abajo](#fase-8-migraciones-0013-y-0014); la `0015_planes_comerciales`, la `0016_pagos` y la `0017_cron_suscripciones`, de la Fase 10, están escritas y **pendientes de aplicar** (la 0015 y la 0016 antes del deploy, la 0017 después): ver [abajo](#fase-10-migraciones-0015-0016-y-0017)) |
 
 Reglas, todas derivadas de que la única base es producción:
 
@@ -434,7 +434,8 @@ Alertas: `correo: "configurado"`, 0 correos. Monitores de Sentry `cron-seguimien
 | `0014_cron` | Los 4 jobs de `pg_cron`: `seguimiento-envios` (`*/5`, `net.http_post` a `/api/cron/seguimiento`, timeout 300 s), `alertas` (`*/10`, `/api/cron/alertas`, 60 s), `limpiar-tokens-sii` (`17 * * * *`) y `limpiar-historial-cron` (`23 3 * * *`). Bearer leído de `vault.decrypted_secrets` (`cron_token`) en cada corrida; se niega a correr (`55000`) sin `cron_token`; idempotente (desagenda y vuelve a agendar) | No hay seguimiento automático: los envíos solo se actualizan con «Consultar estado en el SII»; no salen alertas; `tokens_sii` y `cron.job_run_details` crecen sin limpieza |
 
 El número: el plan reservaba `0014` para los planes comerciales (Fase 10); por orden de
-creación quedan `0015_planes_comerciales`, `0016_pagos` y `0017_indices_fk` (provisorios).
+creación quedaron `0015_planes_comerciales`, `0016_pagos` y `0017_cron_suscripciones`
+([Fase 10](#fase-10-migraciones-0015-0016-y-0017)); los índices de FK van después.
 
 **Orden: la 0013 antes del deploy, la 0014 después.** La 0013 es aditiva y el código
 anterior no la usa. La 0014 empieza a llamar a las rutas apenas se aplica: antes del deploy
@@ -506,6 +507,90 @@ en el estado de arriba):
    `PLAN-SAAS.md`, el estado de la Fase 8 y las filas de `0013_notificaciones` y `0014_cron`
    en §6 (`grep -rn "pendientes\? de aplicar" documentación/`).
 
+### Fase 10: migraciones 0015, 0016 y 0017
+
+**Estado: las tres escritas y probadas en PGlite; ninguna aplicada en producción.** Orden:
+**`0015` y `0016` antes del deploy de la Fase 10; `0017` después.** Nada de esta sección
+se ha corrido contra producción: los resultados que siguen son de PGlite.
+
+| Migración | Contenido | Qué falla si falta |
+|---|---|---|
+| `0015_planes_comerciales` | Columnas `planes.autoservicio` y `planes.orden`; grilla D5 con `on conflict (codigo) do update` (`certificacion`, `pyme`, `contador`, `api`, `empresa`; `emprendedor` con `activo = false`); `create or replace` de `crear_organizacion()` sin el `periodo_fin = now() + 30 days` (mismos privilegios); `update` que quita `periodo_fin` a las suscripciones `certificacion`/`prueba` ([grilla](../04-objetos/objetos-tenancy.md#planes)) | La página de plan no puede leer `autoservicio`/`orden` (la consulta de `leerVistaPlan` falla) y siguen los planes de ejemplo de la `0001` |
+| `0016_pagos` | Tablas `clientes_pago`, `pagos` y `eventos_pasarela` (RLS, `trg_90_actualizado_en`); columnas `suscripciones.cancelar_al_fin_periodo` y `sincronizada_en`; índice único parcial `suscripciones_externa_unica`; RPC `activar_suscripcion` (solo `service_role`). Sin Realtime ([contrato](../03-api-reference/rpc-backend.md#activar_suscripcion-migración-0016)) | Contratar falla al guardar el cliente (`clientes_pago` no existe) y el retorno de Flow no puede activar el plan (`PGRST202`) |
+| `0017_cron_suscripciones` | Job `sincronizar-suscripciones` (`41 * * * *`, `net.http_post` a `https://boleteame.dev/api/cron/suscripciones`, Bearer de `cron_token` leído en cada corrida, timeout 120 s = `maxDuration` de la ruta). Idempotente; se niega a correr (`55000`) sin `cron_token` | La mora, la vuelta a Certificación al terminar una cancelación y los correos de mora no se aplican solos: solo los adelanta el callback de pago |
+
+**Por qué este orden.** La `0015` y la `0016` son aditivas: el código desplegado hoy no lee
+las columnas ni las tablas nuevas, y el de la Fase 10 las necesita desde la primera
+petición a Configuración → Plan. La `0017` llama a la ruta apenas se aplica: antes del
+deploy, `pg_cron` recibiría 404 cada hora (mismo criterio que la `0014`). Con las `FLOW_*`
+sin cargar, la ruta responde 503 (después de validar el Bearer): ruido, pero sin efectos.
+El horario (`41 * * * *`) también vive en `HORARIO_SUSCRIPCIONES`
+(`apps/web/src/server/pagos/constantes.ts`) y en el *cron monitor* `cron-suscripciones` de
+Sentry: se cambian juntos.
+
+Resultados en PGlite (esquema 0001 y 0003–0016 con stubs; nada toca la base real):
+
+| Prueba | Con las migraciones | Sin ellas |
+|---|---|---|
+| `supabase/verificaciones/0015_planes_comerciales.sql` (solo lectura, 10) | 10/10 | 2/10 (7 y 9, que ya se cumplían) |
+| `supabase/verificaciones/0016_pagos.sql` (solo lectura, 20) | 20/20 | 0/20 |
+| `supabase/verificaciones/rls-fase10-pagos.sql` (con `rollback`, 30) | 30/30 | 2/30 sin ninguna; 3/30 solo con la 0015 |
+| Regresiones con la 0015 y la 0016: `rls-fase2-tenancy.sql` (ajustada, ver abajo), `rls-fase3-empresas.sql`, verificación `0004`, `rls-fase8-notificaciones.sql` | 52/52, 43/43, 3/3, 26/26 | — |
+
+La consulta de limpieza de `rls-fase10-pagos.sql` dio todo en 0 en PGlite. Lo que PGlite no
+puede probar: que el `for no key update` de `activar_suscripcion` sobre la organización no
+frene un insert concurrente en una tabla hija (hace falta una segunda conexión); la
+verificación 0016 (19) solo revisa que el cuerpo use ese modo. La `0017` no tiene archivo de
+verificación propio.
+
+`rls-fase2-tenancy.sql` cambió en esta fase: su sección 2 sube a la organización de prueba al
+plan `empresa` (sin tope) en vez de `pyme`, porque con la grilla de la 0015 Pyme admite 3
+usuarios y el lector, cuarto miembro, ya no cabría. Sirve con y sin la 0015. En
+`rls-fase3-empresas.sql` solo cambió la cabecera (el alta directa como `postgres` no revisa
+el cupo, así que Pyme con 1 empresa no la afecta).
+
+Pasos, **con autorización del usuario** (ninguno hecho todavía):
+
+1. Leer las tres migraciones completas y revisar el respaldo (panel → *Database → Backups*).
+2. Antes de migrar: `0015_planes_comerciales.sql` tiene que dar **2/10** (7 y 9 en `true`) y
+   `0016_pagos.sql` **0/20**. Confirmar que la única suscripción sigue siendo
+   `certificacion`/`prueba` de `servicio` y que nadie está en `emprendedor` (la 0015 no mueve
+   a nadie de plan):
+   `select o.slug, p.codigo, s.estado, s.periodo_fin from public.suscripciones s join public.planes p on p.id = s.plan_id join public.organizaciones o on o.id = s.organizacion_id where s.estado in ('prueba','activa','morosa');`
+3. Sacar la `0017` de `supabase/migrations/` durante el push (como se hizo con la 0014), para
+   que `pnpm exec supabase db push --remote=rbrntkztzijaxsnpgpqn --dry-run` liste **solo
+   `0015` y `0016`**; `db push`; devolver la 0017 a la carpeta.
+4. Verificaciones, todas `ok = true`: `0015_planes_comerciales.sql` **10/10**,
+   `0016_pagos.sql` **20/20**, la simulación `rls-fase10-pagos.sql` **30/30** y su consulta de
+   limpieza en 0 ([cómo](../05-pruebas/probar-el-esquema.md#13-simulación-de-planes-y-pagos-de-la-fase-10-rls-fase10-pagossql));
+   de nuevo `rls-fase2-tenancy.sql` 52/52 y `rls-fase3-empresas.sql` 43/43.
+5. `pnpm db:tipos` y comparar con lo agregado a mano en
+   `apps/web/src/server/supabase/tipos.ts` (columnas nuevas de `planes` y `suscripciones`, las
+   tres tablas y `activar_suscripcion`); se versiona lo generado.
+6. *Advisors*: `rls_enabled_no_policy` en `eventos_pasarela` (INFO) es **esperado**, como en
+   `tokens_sii`. `activar_suscripcion` no debería aparecer en
+   `authenticated_security_definer_function_executable`.
+7. `FLOW_API_KEY`, `FLOW_SECRET_KEY` y `FLOW_API_URL=https://sandbox.flow.cl/api` en
+   `.env.local` y en Vercel *Production* ([variables](../01-fundamentos/ambientes-y-credenciales.md#pasarela-de-pagos-flow_-fase-10)).
+8. **Deploy** de la Fase 10 y humo: `POST /api/cron/suscripciones` sin Bearer → 401;
+   `/api/pagos/flow/confirmacion` sin `token` → 400; la página de plan con sesión.
+9. **0017**: `db push --remote=… --dry-run` debe listar **solo `0017`**; `db push`. No hay
+   verificación SQL propia: comprobar a mano que `cron.job` tiene `sincronizar-suscripciones`
+   con `41 * * * *`, activo, como `postgres`, y que su comando no contiene el valor de
+   `cron_token`. Después del minuto 41: `cron.job_run_details` `succeeded`,
+   `net._http_response` con 200 y el monitor `cron-suscripciones` en verde en Sentry.
+   **Ojo:** desde la 0017, la comprobación 10 de `0014_cron.sql` («ningún otro job llama a
+   `/api/cron`») sale `false` con detalle `sincronizar-suscripciones`; es esperado (esa
+   verificación se escribió para los jobs de la Fase 8).
+10. Criterio de aceptación en sandbox ([cómo probar](../02-guias/planes-y-pagos.md#probar-en-el-sandbox-de-flow)).
+11. Actualizar la documentación («pendiente de aplicar» → «aplicada el AAAA-MM-DD», con los
+    resultados reales): esta sección y la tabla de Migraciones, `rls-y-privilegios.md`,
+    `03-api-reference/rpc-backend.md`, `acceso-por-tabla.md`, `indice-operaciones.md`,
+    `04-objetos/objetos-tenancy.md`, `01-fundamentos/tenancy-y-roles.md`,
+    `ambientes-y-credenciales.md`, `02-guias/planes-y-pagos.md`, `onboarding-organizacion.md`,
+    `05-pruebas/probar-el-esquema.md` (§1 y §13), `07-referencia/trampas-conocidas.md`,
+    `checklist-produccion.md` y `README.md` (`grep -rn "pendientes\? de aplicar" documentación/`).
+
 ## Requisitos del proyecto
 
 - Postgres 17 (`supabase/config.toml` declara `major_version = 17`).
@@ -563,6 +648,7 @@ select cron.schedule(
 | `alertas` → `/api/cron/alertas` (documento rechazado, envío incierto, certificado por vencer; la de folios sale sin cron desde la Fase 6, al cruzar el 15 %) | `*/10 * * * *` | 8 | `0014_cron` (aplicada) |
 | `limpiar-tokens-sii` (tokens vencidos hace más de un día) | `17 * * * *` | 8 | `0014_cron` (aplicada) |
 | `limpiar-historial-cron` (`cron.job_run_details` de más de 7 días) | `23 3 * * *` | 8 | `0014_cron` (aplicada) |
+| `sincronizar-suscripciones` → `/api/cron/suscripciones` (mora, vuelta a Certificación tras cancelar, pagos y correo de mora; timeout 120 s) | `41 * * * *` | 10 | `0017_cron_suscripciones` (pendiente, después del deploy) |
 | `/api/cron/webhooks` | cada minuto | 11 | — |
 
 `net._http_response` no necesita limpieza: `pg_net` borra las respuestas de más de

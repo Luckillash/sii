@@ -63,7 +63,8 @@ por fase están en `PLAN-SAAS.md`, en la raíz del repositorio.
 | Secretos | .pfx, clave, CAF, tokens y cookies nunca en mensajes, logs, Sentry ni `operaciones_sii`; credenciales y transporte se crean por invocación, nunca globales ([vault](08-esquema-supabase/vault-y-secretos.md)) |
 | Tenancy | Todo dato de negocio lleva `organizacion_id`, heredado del padre por `trg_00_organizacion`; RLS es la autoridad y la UI solo oculta acciones ([RLS](08-esquema-supabase/rls-y-privilegios.md)) |
 | Campos del sistema | `autorizada_produccion`, la etapa y el estado SII del proceso solo los cambia el sistema (triggers `trg_05_proteger_*`) ([triggers](08-esquema-supabase/triggers-y-logica.md)) |
-| Plan | Los límites salen de `plan_vigente()`; un plan `null` significa «sin suscripción vigente», no «ilimitado» ([RPC del backend](03-api-reference/rpc-backend.md#plan_vigente)) |
+| Plan | Los límites salen de `plan_vigente()`; un plan `null` significa «sin suscripción vigente» (`morosa` o `cancelada`), no «ilimitado» ([RPC del backend](03-api-reference/rpc-backend.md#plan_vigente)) |
+| Planes y pagos | Fase 10, **sin desplegar**: grilla D5 (Certificación gratis y sin plazo; Pyme, Contador y API de autoservicio; Empresa a medida) y cobro con Flow (D4). El retorno del registro de tarjeta llega sin cookies (la organización sale del `customerId`), el callback solo trae `token` (se consulta firmado y siempre responde 200) y la mora la trae la sincronización (`morose = 1` → `morosa`). Los cambios de suscripción van por `activar_suscripcion` (`service_role`); la cuota de boletas es bloqueo duro con aviso al 80 % y al 100 %. Migraciones `0015` y `0016` (antes del deploy) y `0017` (después) **pendientes de aplicar**; credenciales de Flow sin cargar ([guía](02-guias/planes-y-pagos.md)) |
 | Ambientes | Una sola base (producción) para local y Vercel; el ambiente del SII (`certificacion` / `produccion`) es un enum, nunca un texto libre, y en certificación se muestra `BannerAmbiente` |
 | Textos al SII | XML en ISO-8859-1 tal cual (`Buffer`, sin recodificar); montos en pesos enteros; fechas en hora de Chile ([formatos](01-fundamentos/formatos-y-validaciones.md)) |
 
@@ -83,6 +84,7 @@ por fase están en `PLAN-SAAS.md`, en la raíz del repositorio.
 | RUT, correo, montos, IVA, fechas | [01-fundamentos/formatos-y-validaciones.md](01-fundamentos/formatos-y-validaciones.md) |
 | Recorrido mínimo ejecutable | [02-guias/quickstart.md](02-guias/quickstart.md) |
 | Alta de cliente, equipo, plan, certificado | [02-guias/onboarding-organizacion.md](02-guias/onboarding-organizacion.md) |
+| **Planes, contratar o cambiar de plan, cobro con Flow, mora y cuotas** | [02-guias/planes-y-pagos.md](02-guias/planes-y-pagos.md) |
 | **Certificar una empresa ante el SII** | [02-guias/certificacion-empresa.md](02-guias/certificacion-empresa.md) |
 | **Pedir, subir o anular CAF; alerta de folios bajos; asignar folios** | [02-guias/folios-caf.md](02-guias/folios-caf.md) |
 | **Emitir una boleta** (pantalla, flujo, estados por camino, PDF, correo, borradores) | [02-guias/emision-boletas.md](02-guias/emision-boletas.md) |
@@ -101,7 +103,7 @@ por fase están en `PLAN-SAAS.md`, en la raíz del repositorio.
 | Integrar un sistema externo (API, webhooks) | [06-integraciones/overview.md](06-integraciones/overview.md) |
 | Copiar un ejemplo de código | [07-referencia/ejemplos-de-codigo.md](07-referencia/ejemplos-de-codigo.md) |
 | Dato rápido (vigencia, tope, largo) | [07-referencia/reglas-y-limites.md](07-referencia/reglas-y-limites.md) |
-| Pasar una empresa a producción | [07-referencia/checklist-produccion.md](07-referencia/checklist-produccion.md) |
+| Pasar una empresa a producción, o pasar Flow del sandbox a producción | [07-referencia/checklist-produccion.md](07-referencia/checklist-produccion.md) |
 | Algo no funciona como se espera | [07-referencia/trampas-conocidas.md](07-referencia/trampas-conocidas.md) |
 | Construir una pantalla, usar un componente o un token | [07-referencia/design-system.md](07-referencia/design-system.md) |
 | **Esquema:** entender o modificar el SQL | [08-esquema-supabase/arquitectura.md](08-esquema-supabase/arquitectura.md) |
@@ -115,7 +117,7 @@ por fase están en `PLAN-SAAS.md`, en la raíz del repositorio.
 
 | Tablas | Archivo |
 |---|---|
-| `perfiles`, `organizaciones`, `miembros_organizacion`, `invitaciones`, `planes`, `suscripciones`, `uso_mensual` | [04-objetos/objetos-tenancy.md](04-objetos/objetos-tenancy.md) |
+| `perfiles`, `organizaciones`, `miembros_organizacion`, `invitaciones`, `planes`, `suscripciones`, `uso_mensual`, `clientes_pago`, `pagos`, `eventos_pasarela` | [04-objetos/objetos-tenancy.md](04-objetos/objetos-tenancy.md) |
 | `empresas`, `resoluciones`, `certificados`, `empresa_certificados`, `tokens_sii`, `sesiones_sii`, `bloqueos_sii`, `v_certificados_estado` | [04-objetos/objetos-empresas-y-credenciales.md](04-objetos/objetos-empresas-y-credenciales.md) |
 | `cafs`, `solicitudes_folios`, `folios_anulados`, `v_folios_disponibles` | [04-objetos/objetos-folios.md](04-objetos/objetos-folios.md) |
 | `documentos`, `documento_detalles`, `receptores`, `productos`, `v_ventas_diarias` | [04-objetos/objetos-documentos.md](04-objetos/objetos-documentos.md) |
@@ -148,6 +150,7 @@ documentación/
 │   ├── emision-boletas.md
 │   ├── seguimiento-envios.md
 │   ├── tablero-y-reportes.md
+│   ├── planes-y-pagos.md
 │   └── flujos-tipicos.md
 ├── 03-api-reference/                  ← contrato de RPC, tablas y servicios del SII (el "qué")
 │   ├── indice-operaciones.md
@@ -216,13 +219,15 @@ documentación/
 
 | Fuente | Qué aporta | Fuente de verdad para |
 |---|---|---|
-| `supabase/migrations/` (0001–0014 aplicadas, la 0011 y la 0012 el 2026-11-15, la 0013 y la 0014 el 2026-11-17; la 0014 después del deploy de la Fase 8) | Esquema aplicado en producción | Tablas, RLS, triggers y RPC |
+| `supabase/migrations/` (0001–0014 aplicadas, la 0011 y la 0012 el 2026-11-15, la 0013 y la 0014 el 2026-11-17; la 0014 después del deploy de la Fase 8; 0015–0017, de la Fase 10, escritas y pendientes de aplicar) | Esquema aplicado en producción (y el pendiente de la Fase 10) | Tablas, RLS, triggers y RPC |
 | `08-esquema-supabase/supabase_saas_sii.sql` | Esquema original (= `0001`), comentado | Intención de diseño de la `0001` |
 | `apps/web/src/server/` | Capa SII, certificación y Supabase | Comportamiento del backend |
 | `packages/certificacion` (`@winex/certificacion`, de `certificacion-node`) | Librería y CLI `sii`, con sus `docs/` | Protocolo con el SII y códigos de error |
 | `PLAN-SAAS.md` | Fases, decisiones y estado | Qué está hecho y qué falta |
 
-Análisis inicial: 2026-11-10; actualizado por fase hasta la Fase 9 (2026-11-17; Fase 9 desplegada,
+Análisis inicial: 2026-11-10; actualizado por fase hasta la Fase 10 (2026-11-17; Fase 10 con el
+código escrito y las migraciones 0015–0017 probadas en PGlite, pendientes de aplicar, sin deploy
+ni prueba en el sandbox de Flow; Fase 9 desplegada,
 sin migraciones y con el criterio de aceptación cumplido;
 Fase 8 desplegada, migraciones 0013 y 0014 aplicadas, cron verificado, arreglo de Realtime en
 cargas completas desplegado y criterio de aceptación cumplido; la Fase 7 está desplegada y con su criterio cumplido). Si un

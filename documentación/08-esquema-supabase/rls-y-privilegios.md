@@ -1,9 +1,9 @@
 ---
 title: "Esquema: RLS y privilegios"
 description: "Políticas por tabla, grants de columnas y funciones, y protección de campos del sistema."
-keywords: [RLS, políticas, es_miembro, tiene_rol, es_admin, puede_emitir, comparte_organizacion, anon, service_role, grants de columnas, tg_proteger_autorizacion, tg_proteger_proceso, tokens_sii, sesiones_sii, registrar_certificado, registrar_resolucion, fijar_certificado_predeterminado, security definer, security invoker, grant execute, anular_folios, tg_caf_sin_traslape, migración 0011, folios_anulados, notificaciones, migración 0013, reclamar_notificacion, notificacion_cerrada, alertas_documentos_rechazados, alertas_envios_inciertos, alertas_certificados_por_vencer]
-related: ["03-api-reference/acceso-por-tabla.md"]
-source: ["supabase_saas_sii.sql §17", "supabase/migrations/0013_notificaciones.sql"]
+keywords: [RLS, políticas, es_miembro, tiene_rol, es_admin, puede_emitir, comparte_organizacion, anon, service_role, grants de columnas, tg_proteger_autorizacion, tg_proteger_proceso, tokens_sii, sesiones_sii, registrar_certificado, registrar_resolucion, fijar_certificado_predeterminado, security definer, security invoker, grant execute, anular_folios, tg_caf_sin_traslape, migración 0011, folios_anulados, notificaciones, migración 0013, reclamar_notificacion, notificacion_cerrada, alertas_documentos_rechazados, alertas_envios_inciertos, alertas_certificados_por_vencer, migración 0016, clientes_pago, pagos, eventos_pasarela, activar_suscripcion]
+related: ["03-api-reference/acceso-por-tabla.md", "02-guias/planes-y-pagos.md"]
+source: ["supabase_saas_sii.sql §17", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0016_pagos.sql"]
 ---
 
 # Esquema: RLS y privilegios
@@ -16,7 +16,7 @@ agregan funciones y tablas con sus propios grants (abajo, la `0005`; las demás 
 
 ## Reglas generales
 
-- **RLS activo en las 33 tablas de `public`.** Una tabla sin política para una acción la
+- **RLS activo en las 33 tablas de `public`** (36 con la `0016`, pendiente de aplicar). Una tabla sin política para una acción la
   niega a `authenticated`; `service_role` omite RLS.
 - **Autoridad = RLS, no la UI.** La UI oculta acciones según el rol, pero la base decide.
 - **Helpers** (`security definer`, con `execute` para `authenticated`):
@@ -49,6 +49,8 @@ agregan funciones y tablas con sus propios grants (abajo, la `0005`; las demás 
 | `suscripciones`, `uso_mensual`, `certificados`, `cafs`, `solicitudes_folios`, `envios`, `envio_estadisticas`, `consultas_envio`, `envio_rechazos`, `rcof`, `set_pruebas_casos`, `operaciones_sii` | miembro | backend | backend | backend |
 | `tokens_sii`, `sesiones_sii` | backend | backend | backend | backend |
 | `notificaciones` (migración 0013, aplicada el 2026-11-17) | miembro | backend (`reclamar_notificacion`) | backend | backend |
+| `clientes_pago`, `pagos` (migración 0016, pendiente) | admin | backend | backend | backend |
+| `eventos_pasarela` (migración 0016, pendiente) | backend | backend | backend | backend |
 
 ¹ Solo un `propietario` puede dar, cambiar o quitar el rol `propietario`; además,
 `tg_proteger_ultimo_propietario` impide dejar la organización sin propietario.
@@ -144,3 +146,36 @@ Lo comprueban `supabase/verificaciones/0011_folios.sql` (4–7, 10, 13 y 14) y
 `supabase/verificaciones/0013_notificaciones.sql` (7, 8, 11, 12 y 15) y
 `rls-fase8-notificaciones.sql` (15–20 y 26), que en producción dieron 18/18 y 26/26 el
 2026-11-17 ([contratos](../03-api-reference/rpc-backend.md#notificaciones-migración-0013)).
+
+## Tablas y función de la migración 0016 (pendiente de aplicar)
+
+Pagos con Flow (Fase 10). **Escrita y probada en PGlite; no aplicada en producción.**
+
+| Tabla | RLS y política | Privilegios |
+|---|---|---|
+| `clientes_pago` | activo; `lectura` `for select to authenticated using (es_admin(organizacion_id))` | `revoke all` a `anon` y `authenticated`; `grant select` a `authenticated`; `grant all` a `service_role` |
+| `pagos` | activo; `lectura` igual, con `es_admin` | igual que `clientes_pago` |
+| `eventos_pasarela` | activo, **sin políticas** | `revoke all` a `anon` y `authenticated`; `grant all` a `service_role` (como `tokens_sii`) |
+
+- La lectura es de **administradores**, no de miembros: la tarjeta (marca y últimos 4) y
+  los cobros son datos de facturación. Un emisor o un lector recibe 0 filas, sin error.
+- Nadie escribe con su sesión: todo lo escribe `server/pagos/` con `service_role`.
+- Ninguna de las tres está en `supabase_realtime`.
+- La `0016` también agrega columnas a `suscripciones` (`cancelar_al_fin_periodo`,
+  `sincronizada_en`), que siguen con la política de la 0001 (lectura para miembros,
+  escritura del backend).
+
+| Función | Seguridad | `execute` | Por qué |
+|---|---|---|---|
+| `activar_suscripcion(uuid, uuid, estado_suscripcion, text, text, timestamptz, timestamptz)` | `security definer`, `search_path = ''` | solo `service_role` (`revoke` a `public`, `anon`, `authenticated`) | cancela la suscripción vigente e inserta la nueva en una transacción, con candado sobre la organización; no revisa membresía: la llama el backend después del retorno de Flow o de la sincronización |
+
+La `0015` no cambia políticas ni privilegios: `crear_organizacion` se reemplaza con
+`create or replace`, que conserva sus grants (la verificación 0015, comprobación 8, lo
+revisa). La política `lectura` de `planes` (`using (activo)`) ya ocultaba los planes
+inactivos: con la 0015, `emprendedor` deja de verse para `anon` y `authenticated`.
+
+*Advisors* debería listar `rls_enabled_no_policy` en `eventos_pasarela` (INFO, esperado) y
+no listar `activar_suscripcion`. Lo comprueban `supabase/verificaciones/0016_pagos.sql`
+(11–13 y 18) y `rls-fase10-pagos.sql` (18 y 22–28): 20/20 y 30/30 en PGlite; **en
+producción aún no se corren**
+([contrato](../03-api-reference/rpc-backend.md#activar_suscripcion-migración-0016)).

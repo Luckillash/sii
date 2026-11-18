@@ -147,10 +147,13 @@ exception when raise_exception then
   perform pg_temp.registrar(7, 'aceptar_invitacion respeta el cupo de usuarios del plan', sqlerrm like 'El plan % permite como máximo 2 usuario(s)', sqlerrm);
 end $$;
 
--- El backend sube a A al plan Pyme (5 usuarios); así entran el emisor y el lector.
+-- El backend sube a A al plan Empresa (usuarios ilimitados); así entran el emisor y el lector.
+-- (Hasta la migración 0015 era Pyme, con 5 usuarios; con la grilla de la 0015 Pyme permite
+-- 3 y el lector, cuarto miembro, ya no cabría. Empresa no tiene tope ni antes ni después
+-- de la 0015, así el script sirve con y sin ella.)
 reset role;
 update public.suscripciones
-set plan_id = (select id from public.planes where codigo = 'pyme')
+set plan_id = (select id from public.planes where codigo = 'empresa')
 where organizacion_id = current_setting('prueba.org_a')::uuid;
 
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-0000000000a3","role":"authenticated"}', true);
@@ -683,7 +686,7 @@ end $$;
 -- 11. Organización morosa no acepta miembros (migración 0004)
 -- ---------------------------------------------------------------------------
 
--- El backend deja a A `morosa` (Pyme, 4 de 5 usuarios: el cupo no es el motivo) y
+-- El backend deja a A `morosa` (Empresa, sin tope de usuarios: el cupo no es el motivo) y
 -- reabre la invitación de vencida-a, que ahora sí calza en correo y fecha.
 reset role;
 update public.suscripciones set estado = 'morosa'

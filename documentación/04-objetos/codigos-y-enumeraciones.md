@@ -65,7 +65,7 @@ Fuente: §1 (tipos) y §3 (catálogos) de `supabase_saas_sii.sql`. Ninguna migra
 | Enum | Valores | Notas |
 |---|---|---|
 | `rol_miembro` | `propietario`, `administrador`, `emisor`, `lector` | `es_admin` = propietario o administrador; `puede_emitir` = esos más emisor |
-| `estado_suscripcion` | `prueba`, `activa`, `morosa`, `cancelada` | `plan_vigente()` solo considera `prueba` y `activa` |
+| `estado_suscripcion` | `prueba`, `activa`, `morosa`, `cancelada` | `plan_vigente()` solo considera `prueba` y `activa`. Desde la Fase 10: `prueba` = plan gratis Certificación (sin plazo); `activa` = pagada en Flow (también durante la gracia, mientras Flow reintenta); `morosa` = Flow informó un importe vencido (`morose = 1`); `cancelada` = reemplazada o terminada. En la UI: «Gratis», «Activa», «Pago vencido», «Cancelada» ([planes y pagos](../02-guias/planes-y-pagos.md)) |
 | `estado_entrega_webhook` | `pendiente`, `entregado`, `fallido`, `descartado` | Fase 11 |
 
 ## Códigos de salida de la CLI ↔ `resultado_operacion`

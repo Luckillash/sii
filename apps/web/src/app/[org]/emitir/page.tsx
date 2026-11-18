@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { Alerta, Boton, Campo, clasesBoton, Select } from '@/components/boleteame';
 import { formatearRut } from '@/lib/formatos';
 import { ETIQUETA_ROL, puedeAdministrar, puedeEmitir } from '@/lib/permisos';
+import { nivelCuota, textoLimite } from '@/lib/planes';
 import { leerVistaEmision } from '@/server/emision';
 import { listarEmpresas } from '@/server/empresas';
 import { exigirMembresia, obtenerPerfil } from '@/server/sesion';
@@ -114,6 +115,31 @@ export default async function PaginaEmitir({
     borradorId ? { borradorId } : {},
   );
 
+  // Aviso del cupo de boletas de producción al 80 % y al 100 % (PLAN-SAAS Fase 10, D5).
+  const cuota = vista.cuotaProduccion;
+  const nivel = cuota?.maximo ? nivelCuota(cuota.usadas, cuota.maximo) : 'normal';
+  const avisoCuota =
+    cuota?.maximo && (nivel === 'aviso' || nivel === 'lleno') ? (
+      <Alerta
+        tono={nivel === 'lleno' ? 'error' : 'aviso'}
+        titulo={
+          nivel === 'lleno'
+            ? 'Se alcanzó el límite de boletas en producción de este mes'
+            : 'Te quedan pocas boletas en producción este mes'
+        }
+        accion={
+          admin ? <Link href={`/${slug}/configuracion/plan`}>Revisa tu plan</Link> : undefined
+        }
+      >
+        Llevas {cuota.usadas.toLocaleString('es-CL')} de {textoLimite(cuota.maximo)} boletas en
+        producción{cuota.plan ? ` del plan ${cuota.plan}` : ''}.{' '}
+        {nivel === 'lleno'
+          ? 'Hasta el próximo mes solo puedes emitir en certificación, salvo que cambies a un plan más grande.'
+          : 'Cuando llegues al límite no podrás emitir en producción hasta el próximo mes, salvo que cambies de plan.'}
+        {admin ? '' : ' Avísale a un administrador si necesitas más.'}
+      </Alerta>
+    ) : null;
+
   return (
     <>
       <div className={estilos.cabeceraFila}>
@@ -136,6 +162,8 @@ export default async function PaginaEmitir({
           </form>
         ) : null}
       </div>
+
+      {avisoCuota}
 
       {borradorPedido && !vista.borrador ? (
         <Alerta tono="aviso" titulo="No encontramos ese borrador">

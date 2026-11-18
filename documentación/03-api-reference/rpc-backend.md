@@ -1,9 +1,9 @@
 ---
 title: "RPC del backend (service_role)"
-description: "registrar_certificado, registrar_caf, guardar_set_pruebas, anular_folios (también administradores) y el trigger trg_20_caf_sin_traslape, token_*, leer_secreto, tomar/liberar_bloqueo_certificado, asignar_folio, guardar_secreto, encolar_evento, plan_vigente, sincronizar_documentos_envio y las de notificaciones (migración 0013: reclamar_notificacion, notificacion_cerrada, alertas_*)."
-keywords: [service_role, registrar_certificado, registrar_caf, guardar_set_pruebas, migración 0008, CAF, RSASK, "caf:<rut>", idempotente, for no key update, set_pruebas_casos, set_descargado, P0002, "La empresa no existe en la organización", "El IDK del CAF no corresponde al ambiente", "Ya hay un CAF que empieza en el folio", Vault, vault.create_secret, guardar_secreto, leer_secreto, pfx_secret_id, clave_secret_id, huella_sha256, "certificado:<huella>:pfx", 23503, 22023, 23505, 22004, "El certificado ya está registrado en la organización", "permission denied for function", token_obtener, token_guardar, token_borrar, TokenStoreSupabase, tomar_bloqueo_certificado, liberar_bloqueo_certificado, bloqueos_sii, arriendo, titular, conBloqueoCertificado, "La duración del bloqueo debe estar entre 1 y 900 segundos", migración 0007, anular_folios, migración 0011, folios_anulados, cola completa, "El CAF no existe", "Solo un administrador de la organización puede anular folios", "ya tiene un documento emitido", tg_caf_sin_traslape, trg_20_caf_sin_traslape, 23P01, "se traslapa con otro CAF", asignar_folio, "No quedan folios", encolar_evento, folios.por_agotarse, sincronizar_documentos_envio, migración 0013, notificaciones, reclamar_notificacion, notificacion_cerrada, alertas_documentos_rechazados, alertas_envios_inciertos, alertas_certificados_por_vencer, grupo, Idempotency-Key, por turnos]
+description: "registrar_certificado, registrar_caf, guardar_set_pruebas, anular_folios (también administradores) y el trigger trg_20_caf_sin_traslape, token_*, leer_secreto, tomar/liberar_bloqueo_certificado, asignar_folio, guardar_secreto, encolar_evento, plan_vigente, activar_suscripcion (migración 0016), sincronizar_documentos_envio y las de notificaciones (migración 0013: reclamar_notificacion, notificacion_cerrada, alertas_*)."
+keywords: [service_role, registrar_certificado, registrar_caf, guardar_set_pruebas, migración 0008, CAF, RSASK, "caf:<rut>", idempotente, for no key update, set_pruebas_casos, set_descargado, P0002, "La empresa no existe en la organización", "El IDK del CAF no corresponde al ambiente", "Ya hay un CAF que empieza en el folio", Vault, vault.create_secret, guardar_secreto, leer_secreto, pfx_secret_id, clave_secret_id, huella_sha256, "certificado:<huella>:pfx", 23503, 22023, 23505, 22004, "El certificado ya está registrado en la organización", "permission denied for function", token_obtener, token_guardar, token_borrar, TokenStoreSupabase, tomar_bloqueo_certificado, liberar_bloqueo_certificado, bloqueos_sii, arriendo, titular, conBloqueoCertificado, "La duración del bloqueo debe estar entre 1 y 900 segundos", migración 0007, anular_folios, migración 0011, folios_anulados, cola completa, "El CAF no existe", "Solo un administrador de la organización puede anular folios", "ya tiene un documento emitido", tg_caf_sin_traslape, trg_20_caf_sin_traslape, 23P01, "se traslapa con otro CAF", asignar_folio, "No quedan folios", encolar_evento, folios.por_agotarse, sincronizar_documentos_envio, migración 0013, notificaciones, reclamar_notificacion, notificacion_cerrada, alertas_documentos_rechazados, alertas_envios_inciertos, alertas_certificados_por_vencer, grupo, Idempotency-Key, por turnos, activar_suscripcion, migración 0016, suscripciones_externa_unica, "ya terminó", Flow]
 related: ["09-libreria/backend-service-role.md", "08-esquema-supabase/vault-y-secretos.md", "04-objetos/objetos-empresas-y-credenciales.md", "04-objetos/objetos-folios.md", "02-guias/folios-caf.md", "02-guias/onboarding-organizacion.md", "01-fundamentos/autenticacion-sii.md"]
-source: ["supabase_saas_sii.sql §15 §17", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0011_folios.sql", "supabase/migrations/0013_notificaciones.sql", "apps/web/src/server/sii/", "apps/web/src/server/certificacion/", "apps/web/src/server/folios/", "apps/web/src/server/alertas/datos.ts"]
+source: ["supabase_saas_sii.sql §15 §17", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0011_folios.sql", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0016_pagos.sql", "apps/web/src/server/pagos/suscripciones.ts", "apps/web/src/server/sii/", "apps/web/src/server/certificacion/", "apps/web/src/server/folios/", "apps/web/src/server/alertas/datos.ts"]
 ---
 
 # RPC del backend (service_role)
@@ -22,7 +22,9 @@ llama con su sesión y la función revisa el rol por dentro. Está aquí porque 
 
 La Fase 8 suma las funciones de la migración
 [`0013_notificaciones`](#notificaciones-migración-0013) (**aplicada el 2026-11-17**), todas
-solo `service_role`.
+solo `service_role`. La Fase 10 suma
+[`activar_suscripcion`](#activar_suscripcion-migración-0016) (migración `0016`, **pendiente
+de aplicar**), también solo `service_role`.
 
 ## `sincronizar_documentos_envio`
 
@@ -170,6 +172,88 @@ public.plan_vigente(p_organizacion uuid)
   la `0001` envuelven los booleanos en `coalesce(..., false)`; la migración `0004_cupo_sin_suscripcion` corrigió
   `exigir_cupo_usuarios`, que leía `max_usuarios` nulo como ilimitado y dejaba aceptar
   miembros sin suscripción vigente. Al usarla en código nuevo, distingue los dos casos.
+- No mira `periodo_fin` ni `planes.activo`: Certificación no vence (desde la `0015` ni
+  siquiera tiene `periodo_fin`) y una organización en un plan inactivo (`emprendedor`)
+  conserva sus límites.
+- `authenticated` **no** la ejecuta. La app la llama con `service_role`
+  (`planPermiteProduccion` y `cuotaProduccion` de `server/folios/plan.ts`, Fase 10, para
+  avisar en Emitir) y la página de plan lee la suscripción con la sesión.
+
+## `activar_suscripcion` (migración 0016)
+
+Viene en `supabase/migrations/0016_pagos.sql` (Fase 10). **Estado: escrita, pendiente de
+aplicar en producción** (antes del deploy de la fase;
+[despliegue](../08-esquema-supabase/despliegue.md#fase-10-migraciones-0015-0016-y-0017)).
+En una base sin ella, el retorno de Flow falla con `PGRST202` **después** de crear la
+suscripción en Flow: el aviso queda `fallido` en `eventos_pasarela` con
+`datos.suscripcion_externa`, y un reintento la reusa en vez de crear otra.
+
+```sql
+public.activar_suscripcion(
+  p_organizacion   uuid,
+  p_plan           uuid,
+  p_estado         public.estado_suscripcion,   -- solo 'prueba' o 'activa'
+  p_proveedor      text default null,           -- 'flow' o nulo (plan sin pasarela)
+  p_id_externo     text default null,           -- subscriptionId de Flow; va junto con p_proveedor
+  p_periodo_inicio timestamptz default null,
+  p_periodo_fin    timestamptz default null
+) returns uuid                                  -- id de la suscripción que quedó vigente
+-- plpgsql · security definer · search_path = ''
+-- revoke execute from public, anon, authenticated · grant execute to service_role
+```
+
+**Para qué:** dejar vigente un plan en **una** transacción. Con dos pasos sueltos (cancelar
+la vigente e insertar la nueva) la organización quedaba un momento sin plan, o chocaba con
+el índice `suscripciones_vigente_unica`.
+
+**Efectos, en orden**
+
+1. Valida (`22004`, `22023`) y que existan la organización y el plan (`P0002`).
+2. `for no key update` sobre la fila de la organización: serializa los cambios de plan de
+   esa organización (retorno de Flow, cron, cancelación). `no key update` no choca con el
+   `for key share` de las FK al insertar documentos, envíos o `uso_mensual`, así no frena la
+   emisión. Que no bloquee inserts concurrentes no se pudo probar en PGlite (una sola
+   conexión): `0016_pagos.sql` (19) solo revisa que el cuerpo use ese modo.
+3. Si `p_id_externo` es de una suscripción **ya cancelada**, `22023` («La suscripción
+   externa … ya terminó»): un aviso tardío de Flow no revive una suscripción terminada.
+4. Lee la vigente (`prueba`, `activa` o `morosa`) con `for update`:
+   - **es la misma** (mismo proveedor e id externo; o, sin proveedor, sin id externo y el
+     mismo plan, p. ej. volver a `certificacion` dos veces) → la actualiza: `plan_id`,
+     `estado`, `periodo_inicio = coalesce(nuevo, actual)`, `periodo_fin` (sin proveedor, el
+     que llega, aunque sea nulo; con proveedor, `coalesce(nuevo, actual)`) y
+     `cancelar_al_fin_periodo = false`. Devuelve su id. Es idempotente: el retorno de Flow
+     y el cron pueden llegar dos veces, y una `morosa` se reactiva con su mismo id;
+   - **es otra** → la deja `cancelada` con `periodo_fin = coalesce(least(periodo_fin,
+     now()), now())` e inserta la nueva (`periodo_inicio` por defecto `now()`,
+     `sincronizada_en = now()` si hay proveedor). Devuelve el id nuevo.
+
+**Errores**
+
+| Código | Mensaje | Causa |
+|---|---|---|
+| `22004` | `Faltan la organización, el plan o el estado` | alguno nulo |
+| `22023` | `Estado no permitido al activar: <estado>` | `morosa` o `cancelada` (la mora la marca la sincronización con un `update`) |
+| `22023` | `El proveedor y el id externo van juntos` | uno sin el otro |
+| `22023` | `La suscripción externa <id> ya terminó` | id externo de una suscripción cancelada |
+| `23505` | `duplicate key value violates unique constraint "suscripciones_externa_unica"` | el id externo ya es de otra organización |
+| `P0002` | `La organización no existe` / `El plan no existe` | |
+| `42501` | `permission denied for function activar_suscripcion` | llamada sin `service_role` |
+
+**Quién la llama** (`server/pagos/suscripciones.ts`, siempre con `service_role`):
+
+| Llamador | Cuándo | Argumentos |
+|---|---|---|
+| `activarDespuesDeRegistro` | retorno del registro de tarjeta, después de `subscription/create` | plan pendiente, `activa`, `flow`, `subscriptionId`, período de Flow |
+| `aplicarExterna` (sincronización: cron, callback, cancelación) | Flow informa la suscripción cancelada (`status = 4`) | plan `certificacion`, `prueba`, sin proveedor (vuelta al plan gratis) |
+
+El cambio de plan con una suscripción de Flow vigente **no** la llama: Flow mantiene el
+mismo `subscriptionId` y la sincronización actualiza `plan_id` con un `update`. Detalle del
+flujo en [planes y pagos](../02-guias/planes-y-pagos.md).
+
+Verificación: `supabase/verificaciones/0016_pagos.sql` (16–19) y la simulación
+`rls-fase10-pagos.sql` (4–18, con `rollback`)
+([cómo](../05-pruebas/probar-el-esquema.md#13-simulación-de-planes-y-pagos-de-la-fase-10-rls-fase10-pagossql)).
+En PGlite, 20/20 y 30/30; **en producción aún no se corren**.
 
 ## `token_obtener`, `token_guardar`, `token_borrar`
 

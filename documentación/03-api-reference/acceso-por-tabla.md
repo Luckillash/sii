@@ -1,9 +1,9 @@
 ---
 title: "Acceso por tabla (PostgREST + RLS)"
 description: "Qué puede hacer cada rol en cada tabla: select, insert, update, delete."
-keywords: [RLS, PostgREST, políticas, grant, revoke, privilegios por columna, anon, authenticated, service_role, lector, emisor, administrador, propietario, select, insert, update, delete, "new row violates row-level security policy", "permission denied for table", 42501, folios_anulados, anular_folios, migración 0011, borrador, alta_borrador, edicion_borrador, receptores, upsert, emisión, P0001, notificaciones, migración 0013, rls-fase8-notificaciones, seguimiento, Fase 9, Tablero, exportación, v_ventas_diarias]
-related: ["08-esquema-supabase/rls-y-privilegios.md", "01-fundamentos/tenancy-y-roles.md", "03-api-reference/rpc-organizacion.md", "05-pruebas/probar-el-esquema.md", "02-guias/tablero-y-reportes.md"]
-source: ["supabase_saas_sii.sql §17", "supabase/verificaciones/rls-fase2-tenancy.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/verificaciones/rls-fase3-empresas.sql"]
+keywords: [RLS, PostgREST, políticas, grant, revoke, privilegios por columna, anon, authenticated, service_role, lector, emisor, administrador, propietario, select, insert, update, delete, "new row violates row-level security policy", "permission denied for table", 42501, folios_anulados, anular_folios, migración 0011, borrador, alta_borrador, edicion_borrador, receptores, upsert, emisión, P0001, notificaciones, migración 0013, rls-fase8-notificaciones, seguimiento, Fase 9, Tablero, exportación, v_ventas_diarias, Fase 10, clientes_pago, pagos, eventos_pasarela, migración 0016, rls-fase10-pagos]
+related: ["08-esquema-supabase/rls-y-privilegios.md", "01-fundamentos/tenancy-y-roles.md", "03-api-reference/rpc-organizacion.md", "05-pruebas/probar-el-esquema.md", "02-guias/tablero-y-reportes.md", "02-guias/planes-y-pagos.md"]
+source: ["supabase_saas_sii.sql §17", "supabase/verificaciones/rls-fase2-tenancy.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/verificaciones/rls-fase3-empresas.sql", "supabase/migrations/0016_pagos.sql", "supabase/verificaciones/rls-fase10-pagos.sql"]
 ---
 
 # Acceso por tabla (PostgREST + RLS)
@@ -19,7 +19,8 @@ Una operación pasa solo si se cumplen las dos capas:
    privilegios por defecto de Supabase en todas las tablas, salvo: nada en `tokens_sii` ni
    `sesiones_sii`; en `invitaciones`, `api_keys` y `webhooks` solo `select` y `delete`,
    más `update` en columnas puntuales. `service_role` tiene todo.
-2. **Política RLS.** RLS está activo en las 33 tablas. Sin política para una operación,
+2. **Política RLS.** RLS está activo en las 33 tablas (36 cuando se aplique la `0016_pagos`,
+   que suma `clientes_pago`, `pagos` y `eventos_pasarela`). Sin política para una operación,
    `authenticated` no puede hacerla aunque tenga el privilegio. `service_role` salta RLS.
 
 Cómo falla cada caso (lo que ve el cliente en `error`):
@@ -60,6 +61,14 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
 | `invitaciones` | — | — | — | S D ⁷ | S D ⁷ | SIUD |
 | `suscripciones` | — | S | S | S | S | SIUD |
 | `uso_mensual` | — | S | S | S | S | SIUD |
+
+### Pagos (migración 0016, Fase 10, pendiente de aplicar)
+
+| Tabla | anon | lector | emisor | administrador | propietario | service_role |
+|---|---|---|---|---|---|---|
+| `clientes_pago` ²² | — | — | — | S | S | SIUD |
+| `pagos` ²² | — | — | — | S | S | SIUD |
+| `eventos_pasarela` 🔒 ²² | — | — | — | — | — | SIUD |
 
 ### Empresas y credenciales
 
@@ -202,6 +211,16 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
     revocan a `authenticated` `insert`, `update`, `delete`, `truncate`, `references` y
     `trigger`, y a `anon` todo: la escribe solo el backend, con `reclamar_notificacion` y
     `update` de `service_role` desde `/api/cron/alertas`. No está en Realtime.
+22. Migración `0016_pagos` (Fase 10, **escrita, pendiente de aplicar**). `clientes_pago` y
+    `pagos`: política `lectura` con `es_admin(organizacion_id)` (datos de facturación: la
+    tarjeta, marca y últimos 4, y los cobros), `authenticated` solo `select`; un emisor o un
+    lector recibe 0 filas, sin error, y un `insert`, `update` o `delete` con sesión da
+    `42501`. `eventos_pasarela`: RLS sin políticas y sin privilegios para `anon` ni
+    `authenticated` (`42501` al leer, también un propietario). `anon` no tiene nada en las
+    tres. Ninguna está en Realtime. Todo lo escribe el backend con `service_role`
+    (`server/pagos/`), filtrando por organización; la organización del retorno de Flow sale
+    del `customerId` que Flow confirma, no de la sesión
+    ([planes y pagos](../02-guias/planes-y-pagos.md)).
 
 La Fase 8 (seguimiento) escribe `envios`, `envio_estadisticas`, `envio_rechazos`,
 `consultas_envio` y `operaciones_sii` con `service_role`, filtrando por organización; las
@@ -214,6 +233,15 @@ La Fase 9 (Tablero y exportación) **solo lee**, siempre con la sesión del miem
 `ted_xml` con el `track_id` de `envios` por el *embed* de la FK), `cafs` (sin
 `caf_secret_id`), `envios`/`operaciones_sii` (inciertos) y `v_certificados_estado`. No usa
 `service_role` ni escribe nada ([guía](../02-guias/tablero-y-reportes.md#permisos)).
+
+La Fase 10 (planes y pagos) lee con la sesión del miembro `suscripciones`, `planes`,
+`empresas`, `miembros_organizacion` y `uso_mensual` (página de plan, cualquier miembro) y,
+solo para propietarios y administradores, `clientes_pago` y `pagos`. Todo lo que escribe
+(`suscripciones` con `activar_suscripcion` o `update`, `clientes_pago`, `pagos`,
+`eventos_pasarela`, `notificaciones` del aviso de mora) va con `service_role`. La nota 1
+tiene una consecuencia: una organización en un plan inactivo (`emprendedor`) no ve su plan
+con la sesión, y `plan_vigente` no se puede llamar con ella
+([trampa](../07-referencia/trampas-conocidas.md#pagos-y-suscripciones-fase-10)).
 
 `operaciones_sii` la escribe solo la capa SII con `service_role` (`ejecutarOperacion`,
 `marcarInciertaRevisada`); los miembros la leen y, con la migración 0006, reciben sus
@@ -254,3 +282,7 @@ cambios por Realtime ([Realtime](../06-integraciones/realtime-y-storage.md#realt
 - `notificaciones` y sus RPC por rol (administrador, lector, otra organización, `anon`,
   `service_role`): `supabase/verificaciones/rls-fase8-notificaciones.sql` (26). Requiere la
   migración 0013, aplicada el 2026-11-17; corrida en producción ese día (26/26).
+- `clientes_pago`, `pagos` y `eventos_pasarela` por rol (propietario, administrador, emisor,
+  lector, otra organización, `anon`, `service_role`) y `activar_suscripcion`:
+  `supabase/verificaciones/rls-fase10-pagos.sql` (30). Requiere las migraciones 0015 y
+  0016; 30/30 en PGlite, **en producción aún no se corre** (migraciones pendientes).
