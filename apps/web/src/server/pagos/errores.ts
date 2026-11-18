@@ -39,6 +39,16 @@ export function mensajeFallaPagos(falla: FallaPagos): MensajeError {
           'No se hizo ningún cobro desde Boletéame. Espera unos minutos y vuelve a intentarlo.',
       };
     case 'pasarela':
+      // La cuenta de comercio de Flow sin el contrato de cargos automáticos rechaza
+      // `customer/register` («Commerce has not automatic charge contract»): no es un
+      // problema de la tarjeta del usuario, sino de la configuración de Boletéame en Flow.
+      if (/automatic charge contract/i.test(falla.detalle ?? '')) {
+        return {
+          titulo: 'Los pagos con tarjeta todavía no están habilitados',
+          detalle:
+            'No se hizo ningún cobro y tu plan no cambió. Vuelve a intentarlo más tarde; si se repite, escríbenos.',
+        };
+      }
       return {
         titulo: 'Flow rechazó la operación',
         detalle:

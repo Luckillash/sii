@@ -113,6 +113,8 @@ function pasarelaFalsa() {
     creadas: 0,
     /** Importes que trae una suscripción recién creada. */
     facturasAlCrear: [factura()],
+    /** Importes con el detalle del pago (`invoice/get`). */
+    facturas: new Map<string, FacturaExterna>(),
     /** `true`: subscription/get ya informa el plan nuevo tras changePlan. */
     cambioInmediato: true,
   };
@@ -156,6 +158,10 @@ function pasarelaFalsa() {
       if (alFin) s.cancelarAlFinPeriodo = true;
       else s.estado = 'cancelada';
       return ok(structuredClone(s));
+    }),
+    obtenerFactura: vi.fn<Pasarela['obtenerFactura']>(async (id) => {
+      const f = flow.facturas.get(id);
+      return f ? ok(structuredClone(f)) : falla('rechazado', 'invoice/get: no existe');
     }),
     pagoDeAviso: vi.fn<Pasarela['pagoDeAviso']>(async (token) => {
       const p = flow.pagos.get(token);
@@ -674,6 +680,45 @@ describe('sincronizarSuscripcion', () => {
     // Segunda sincronización: upsert por (proveedor, factura_externa), sin duplicar.
     await sincronizarSuscripcion(e.deps, copiaFila(fila));
     expect(e.base.tablas.pagos).toHaveLength(3);
+  });
+
+  it('completa con invoice/get la fecha y el medio de un pagado sin detalle, y no lo vuelve a pedir', async () => {
+    const e = escenario();
+    const sinDetalle = factura({ id: 'inv-9', pagadoEn: null, medio: null, orden: null });
+    const fila = e.suscribirEnFlow(ORG, 'sus_1', 'pyme', 'activa', { facturas: [sinDetalle] });
+    e.flow.facturas.set(
+      'inv-9',
+      factura({
+        id: 'inv-9',
+        pagadoEn: '2026-11-18T21:32:42.000Z',
+        medio: 'Cargo automático',
+        orden: '11777257',
+      }),
+    );
+    await sincronizarSuscripcion(e.deps, copiaFila(fila));
+    expect(e.pasarela.obtenerFactura).toHaveBeenCalledTimes(1);
+    expect(e.base.tablas.pagos?.[0]).toMatchObject({
+      factura_externa: 'inv-9',
+      pagado_en: '2026-11-18T21:32:42.000Z',
+      medio: 'Cargo automático',
+      orden_externa: '11777257',
+    });
+
+    // La siguiente sincronización trae el mismo importe sin detalle: no se pide de nuevo
+    // ni se borra la fecha guardada.
+    await sincronizarSuscripcion(e.deps, copiaFila(fila));
+    expect(e.pasarela.obtenerFactura).toHaveBeenCalledTimes(1);
+    expect(e.base.tablas.pagos?.[0]?.pagado_en).toBe('2026-11-18T21:32:42.000Z');
+  });
+
+  it('si invoice/get falla, guarda el importe sin fecha (lo completa otra corrida)', async () => {
+    const e = escenario();
+    const fila = e.suscribirEnFlow(ORG, 'sus_1', 'pyme', 'activa', {
+      facturas: [factura({ id: 'inv-8', pagadoEn: null })],
+    });
+    const r = await sincronizarSuscripcion(e.deps, copiaFila(fila));
+    expect(r.ok).toBe(true);
+    expect(e.base.tablas.pagos?.[0]).toMatchObject({ factura_externa: 'inv-8', pagado_en: null });
   });
 
   it('vuelve a activa cuando Flow la informa al día', async () => {

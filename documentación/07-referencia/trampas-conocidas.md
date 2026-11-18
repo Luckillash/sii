@@ -939,9 +939,28 @@ migraciones nuevas.
 
 ## Pagos y suscripciones (Fase 10)
 
-Código en `apps/web/src/server/pagos/`, sin desplegar y sin probar contra el sandbox de Flow
-todavía; migraciones `0015` y `0016` aplicadas el 2026-11-18, `0017` pendiente. Guía:
-[planes y pagos](../02-guias/planes-y-pagos.md).
+Código en `apps/web/src/server/pagos/`, desplegado el 2026-11-18 (`9d2fd8b`); migraciones
+`0015`, `0016` y `0017` aplicadas ese día. Guía: [planes y pagos](../02-guias/planes-y-pagos.md).
+
+- **La cuenta de comercio de Flow necesita el contrato de cargos automáticos.** Sin él,
+  `customer/register` responde 401 `Commerce has not automatic charge contract` y no se
+  puede registrar la tarjeta (visto en el sandbox el 2026-11-18, con el plan
+  `boleteame-pyme` y el cliente ya creados; la organización siguió en Certificación). La
+  documentación de Flow no lo menciona: se pide a Flow que habilite «cargos automáticos» en
+  la cuenta (sandbox y, al lanzar, producción). La app lo muestra como «Los pagos con
+  tarjeta todavía no están habilitados» (`server/pagos/errores.ts`), sin culpar a la
+  tarjeta. El cliente y el plan pendiente quedan en `clientes_pago` y se reusan al
+  reintentar.
+- **Los importes de `subscription/get` vienen sin el pago.** `invoices[]` trae `status = 1`
+  pero no `payment`, así que no hay fecha ni medio; `invoice/get` sí los trae
+  (`paymentData.date`, `media` = «Cargo automático», `flowOrder`). `completarFacturas`
+  (`server/pagos/suscripciones.ts`) pide `invoice/get` solo para los pagados que aún no
+  tienen `pagado_en` en `pagos` (hasta 5 por corrida) y no reescribe una fecha ya guardada
+  (el upsert la dejaría en null). Visto en el sandbox el 2026-11-18.
+- **La orden de comercio de un cobro de suscripción es `sus_<id>_<importe>_<fecha hora>`**
+  (p. ej. `sus_l78a6791ff_1250381_2026-11-18 18:32`), no el id del importe. El callback la
+  usa para saber a qué suscripción sincronizar (`suscripcionDeOrden`); si no calza, revisa
+  las vigentes. El aviso del primer cobro llegó unos 4 minutos después del pago.
 
 - **El retorno del registro de tarjeta llega sin cookies de sesión.** Flow devuelve el
   navegador con un POST desde `flow.cl` a `/api/pagos/flow/registro`; las cookies de Supabase

@@ -11,6 +11,7 @@ import {
   ORIGEN_PUBLICO,
   pasarelaFlow,
   REINTENTOS_COBRO,
+  suscripcionDeOrden,
   urlCallbackPlanes,
 } from './flow-pasarela';
 
@@ -312,6 +313,52 @@ function flowFalso(rutas: Record<string, Respuesta | ((p: Record<string, string>
 
 const PYME = { codigo: 'pyme', nombre: 'Pyme', precioMensualClp: 14990 };
 
+describe('suscripcionDeOrden', () => {
+  it('lee el id de suscripción de la orden de comercio de Flow', () => {
+    expect(suscripcionDeOrden('sus_l78a6791ff_1250381_2026-11-18 18:32')).toBe('sus_l78a6791ff');
+    expect(suscripcionDeOrden('sus_abc_99')).toBe('sus_abc');
+    expect(suscripcionDeOrden('98765')).toBeNull();
+    expect(suscripcionDeOrden('orden-abc')).toBeNull();
+    expect(suscripcionDeOrden('sus_abc')).toBeNull();
+  });
+});
+
+describe('pasarelaFlow.obtenerFactura', () => {
+  it('normaliza el importe de invoice/get con el detalle del pago', async () => {
+    const { pasarela } = flowFalso({
+      'invoice/get': {
+        estado: 200,
+        cuerpo: {
+          id: 1250381,
+          amount: '14990.0000',
+          status: 1,
+          period_start: '2026-11-18 00:00:00',
+          period_end: '2026-12-17 00:00:00',
+          due_date: '2026-11-25 00:00:00',
+          attemp_count: 1,
+          error: 0,
+          payment: {
+            flowOrder: 11777257,
+            paymentData: { date: '2026-11-18 18:32:42', media: 'Cargo automático' },
+          },
+          paymentLink: null,
+        },
+      },
+    });
+    expect(await pasarela.obtenerFactura('1250381')).toMatchObject({
+      ok: true,
+      datos: {
+        id: '1250381',
+        monto: 14990,
+        estado: 'pagado',
+        pagadoEn: '2026-11-18T21:32:42.000Z',
+        medio: 'Cargo automático',
+        orden: '11777257',
+      },
+    });
+  });
+});
+
 describe('urlCallbackPlanes', () => {
   it('usa la URL de la app si es https y el origen público si es local', () => {
     expect(urlCallbackPlanes('https://boleteame.dev/')).toBe(
@@ -574,6 +621,25 @@ describe('pasarelaFlow.pagoDeAviso', () => {
       ['payment/getStatus', { token: 'tok_pago' }],
       ['invoice/get', { invoiceId: '98765' }],
     ]);
+  });
+
+  it('orden de Flow sus_<id>_<importe>_<fecha>: la suscripción sale de la orden, sin invoice/get', async () => {
+    const { pasarela, llamadas } = flowFalso({
+      'payment/getStatus': {
+        estado: 200,
+        cuerpo: {
+          status: 2,
+          flowOrder: 11777257,
+          commerceOrder: 'sus_l78a6791ff_1250381_2026-11-18 18:32',
+        },
+      },
+    });
+    const r = await pasarela.pagoDeAviso('tok');
+    expect(r).toMatchObject({
+      ok: true,
+      datos: { estado: 'pagado', suscripcionId: 'sus_l78a6791ff' },
+    });
+    expect(llamadas.map((l) => l.servicio)).toEqual(['payment/getStatus']);
   });
 
   it('commerceOrder no numérico: no consulta el importe', async () => {

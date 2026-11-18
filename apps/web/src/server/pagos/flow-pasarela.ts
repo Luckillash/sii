@@ -132,6 +132,12 @@ export function normalizarFactura(
   };
 }
 
+/** `sus_…` de una orden de comercio de Flow `sus_<id>_<invoice>_<fecha>`, o null. */
+export function suscripcionDeOrden(orden: string): string | null {
+  const m = /^(sus_[A-Za-z0-9]+)_\d+(?:_|$)/.exec(orden.trim());
+  return m?.[1] ?? null;
+}
+
 export function normalizarSuscripcion(
   bruto: Record<string, unknown>,
   ahora: Date = new Date(),
@@ -341,6 +347,20 @@ export function pasarelaFlow(config: ConfiguracionPasarelaFlow): Pasarela {
       return suscripcionOError(r, 'subscription/get');
     },
 
+    async obtenerFactura(id) {
+      const r = await llamarFlow<Record<string, unknown>>(
+        'GET',
+        'invoice/get',
+        { invoiceId: id },
+        opciones,
+      );
+      if (!r.ok) return r;
+      const f = normalizarFactura(r.datos);
+      return f
+        ? { ok: true, datos: f }
+        : { ok: false, motivo: 'red', detalle: 'invoice/get: respuesta sin importe' };
+    },
+
     async previsualizarCambioPlan(id, planCodigo) {
       const r = await llamarFlow<Record<string, unknown>>(
         'POST',
@@ -381,11 +401,13 @@ export function pasarelaFlow(config: ConfiguracionPasarelaFlow): Pasarela {
       if (!r.ok) return r;
       const status = numero(r.datos.status);
       const ordenComercio = texto(r.datos.commerceOrder, 100);
-      let suscripcionId: string | null = null;
-      // Los cobros de una suscripción salen de un importe (invoice); si la orden del
-      // comercio es el id del importe, este dice a qué suscripción pertenece. Si no, el
-      // llamador sincroniza por otra vía (ver `procesarAvisoPago`).
-      if (ordenComercio && /^\d+$/.test(ordenComercio)) {
+      // Los cobros de una suscripción salen de un importe (invoice). Flow arma la orden del
+      // comercio como `<subscriptionId>_<invoiceId>_<fecha hora>` (visto en el sandbox el
+      // 2026-11-18: `sus_l78a6791ff_1250381_2026-11-18 18:32`): de ahí sale la suscripción.
+      // Si la orden fuera solo el id del importe, se consulta `invoice/get`. Si no calza
+      // ninguna, el llamador sincroniza por otra vía (ver `procesarAvisoPago`).
+      let suscripcionId = ordenComercio ? suscripcionDeOrden(ordenComercio) : null;
+      if (!suscripcionId && ordenComercio && /^\d+$/.test(ordenComercio)) {
         const factura = await llamarFlow<Record<string, unknown>>(
           'GET',
           'invoice/get',

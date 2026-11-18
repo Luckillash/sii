@@ -97,6 +97,11 @@ export interface Pasarela {
     planCodigo: string,
   ): Promise<ResultadoPasarela<SuscripcionExterna>>;
   obtenerSuscripcion(id: string): Promise<ResultadoPasarela<SuscripcionExterna>>;
+  /**
+   * Un importe con el detalle de su pago (fecha, medio, orden). En Flow, los importes
+   * que trae `subscription/get` vienen sin `payment`; `invoice/get` sí lo trae.
+   */
+  obtenerFactura(id: string): Promise<ResultadoPasarela<FacturaExterna>>;
   previsualizarCambioPlan(id: string, planCodigo: string): Promise<ResultadoPasarela<CambioPlan>>;
   cambiarPlan(id: string, planCodigo: string): Promise<ResultadoPasarela<CambioPlan>>;
   cancelarSuscripcion(

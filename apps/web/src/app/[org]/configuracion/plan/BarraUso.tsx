@@ -32,7 +32,8 @@ export function BarraUso({
           {maximo === null ? ' · sin límite' : ` de ${textoLimite(maximo)}`}
         </span>
       </div>
-      {maximo !== null ? (
+      {/* Cupo 0 (plan sin producción): sin barra, la nota lo explica. */}
+      {maximo !== null && maximo > 0 ? (
         <div className={estilos.barra} aria-hidden="true">
           <div className={estilos.relleno} data-nivel={nivel} style={{ width: `${porcentaje}%` }} />
         </div>

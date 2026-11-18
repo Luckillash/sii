@@ -124,6 +124,46 @@ export function estadoDeExterna(ext: SuscripcionExterna): EstadoSuscripcion {
   return ext.morosidad === 'vencida' ? 'morosa' : 'activa';
 }
 
+/** Importes pagados que se completan con la pasarela por corrida (cada uno es una llamada). */
+const MAX_FACTURAS_A_COMPLETAR = 5;
+
+/**
+ * Completa fecha, medio y orden de los importes pagados que vienen sin el detalle del
+ * pago (en Flow, `subscription/get` no trae `payment`; `invoice/get` sí). Solo los que
+ * aún no tienen `pagado_en` en `pagos`, hasta MAX_FACTURAS_A_COMPLETAR: una vez guardado,
+ * no se vuelve a pedir. Si la pasarela falla, se guarda lo que había (lo completa otra
+ * corrida). Los que ya tienen `pagado_en` en la base no se reescriben: el upsert los
+ * dejaría sin fecha.
+ */
+export async function completarFacturas(
+  deps: DependenciasPagos,
+  facturas: FacturaExterna[],
+): Promise<FacturaExterna[]> {
+  const sinFecha = facturas.filter((f) => f.estado === 'pagado' && !f.pagadoEn);
+  if (sinFecha.length === 0) return facturas;
+  const { data } = await deps.db
+    .from('pagos')
+    .select('factura_externa')
+    .eq('proveedor', 'flow')
+    .in(
+      'factura_externa',
+      sinFecha.map((f) => f.id),
+    )
+    .not('pagado_en', 'is', null);
+  const yaCompletas = new Set((data ?? []).map((p) => p.factura_externa));
+  const porCompletar = sinFecha
+    .filter((f) => !yaCompletas.has(f.id))
+    .slice(0, MAX_FACTURAS_A_COMPLETAR);
+  const completas = new Map<string, FacturaExterna>();
+  for (const f of porCompletar) {
+    const r = await deps.pasarela.obtenerFactura(f.id);
+    if (r.ok && r.datos.pagadoEn) completas.set(f.id, r.datos);
+  }
+  return facturas
+    .filter((f) => !yaCompletas.has(f.id) || f.estado !== 'pagado' || f.pagadoEn)
+    .map((f) => completas.get(f.id) ?? f);
+}
+
 // --------------------------------------------------------------------------------
 // Sincronización (fuente de verdad: Flow)
 // --------------------------------------------------------------------------------
@@ -159,7 +199,12 @@ async function aplicarExterna(
   const { db } = deps;
   const base = { organizacionId: fila.organizacion_id, suscripcionId: fila.id };
   try {
-    await guardarFacturas(db, fila.organizacion_id, fila.id, ext.facturas);
+    await guardarFacturas(
+      db,
+      fila.organizacion_id,
+      fila.id,
+      await completarFacturas(deps, ext.facturas),
+    );
     const estadoNuevo = estadoDeExterna(ext);
 
     if (estadoNuevo === 'cancelada') {
@@ -616,7 +661,7 @@ export async function activarDespuesDeRegistro(
         });
         throw new Error(`activar_suscripcion: ${eActivar?.message ?? 'sin id'}`);
       }
-      await guardarFacturas(db, org, suscripcionId, ext.facturas);
+      await guardarFacturas(db, org, suscripcionId, await completarFacturas(deps, ext.facturas));
       if (estadoDeExterna(ext) === 'morosa') {
         await db.from('suscripciones').update({ estado: 'morosa' }).eq('id', suscripcionId);
       }
