@@ -55,14 +55,14 @@ solo lectura en `supabase/verificaciones/` ([despliegue](despliegue.md)).
 | `0012_folio_anulado` (**aplicada el 2026-11-15**) | `tg_validar_documento` lee el CAF con `for key share` y rechaza (`23514`) un documento que fija un folio anulado ([triggers](triggers-y-logica.md#tg_validar_documento-migración-0012)) |
 | `0013_notificaciones` (**aplicada el 2026-11-17**, antes del deploy de la Fase 8) | Tabla `notificaciones` (deduplicación de alertas por correo) y las RPC `reclamar_notificacion`, `notificacion_cerrada`, `alertas_documentos_rechazados`, `alertas_envios_inciertos` y `alertas_certificados_por_vencer`, solo `service_role` ([despliegue](despliegue.md#fase-8-migraciones-0013-y-0014)) |
 | `0014_cron` (**aplicada el 2026-11-17**, después del deploy de la Fase 8; verificación 12/12) | Jobs de `pg_cron`: `seguimiento-envios`, `alertas`, `limpiar-tokens-sii`, `limpiar-historial-cron` (Bearer leído de Vault) |
-| `0015_planes_comerciales` (**pendiente de aplicar**, antes del deploy de la Fase 10) | `planes.autoservicio` y `planes.orden`; grilla D5 (`pyme`, `contador`, `api`, `empresa`; `emprendedor` inactivo); `crear_organizacion` sin `periodo_fin` (Certificación sin plazo) ([despliegue](despliegue.md#fase-10-migraciones-0015-0016-y-0017)) |
-| `0016_pagos` (**pendiente de aplicar**, antes del deploy de la Fase 10) | Tablas `clientes_pago`, `pagos`, `eventos_pasarela`; `suscripciones.cancelar_al_fin_periodo`, `sincronizada_en` e índice `suscripciones_externa_unica`; RPC `activar_suscripcion` (solo `service_role`) |
+| `0015_planes_comerciales` (**aplicada el 2026-11-18**, antes del deploy de la Fase 10; verificación 10/10) | `planes.autoservicio` y `planes.orden`; grilla D5 (`pyme`, `contador`, `api`, `empresa`; `emprendedor` inactivo); `crear_organizacion` sin `periodo_fin` (Certificación sin plazo) ([despliegue](despliegue.md#fase-10-migraciones-0015-0016-y-0017)) |
+| `0016_pagos` (**aplicada el 2026-11-18**, antes del deploy de la Fase 10; verificación 20/20) | Tablas `clientes_pago`, `pagos`, `eventos_pasarela`; `suscripciones.cancelar_al_fin_periodo`, `sincronizada_en` e índice `suscripciones_externa_unica`; RPC `activar_suscripcion` (solo `service_role`) |
 | `0017_cron_suscripciones` (**pendiente de aplicar**, después del deploy de la Fase 10) | Job de `pg_cron` `sincronizar-suscripciones` (`41 * * * *`, `/api/cron/suscripciones`) |
 
-Aplicadas en producción: `0001`–`0014` (la `0011` y la `0012`, el 2026-11-15; la `0013` y la
-`0014`, el 2026-11-17, la 0014 después del deploy de la Fase 8). Escritas y pendientes: `0015`,
-`0016` y `0017` (Fase 10). Los índices de FK (`unindexed_foreign_keys`) van en una migración
-posterior.
+Aplicadas en producción: `0001`–`0016` (la `0011` y la `0012`, el 2026-11-15; la `0013` y la
+`0014`, el 2026-11-17, la 0014 después del deploy de la Fase 8; la `0015` y la `0016`, el
+2026-11-18). Escrita y pendiente: `0017` (después del deploy de la Fase 10). Los índices de FK
+(`unindexed_foreign_keys`) van en la `0018_indices_fk` (Fase 13).
 
 ## Relaciones
 

@@ -16,7 +16,7 @@ agregan funciones y tablas con sus propios grants (abajo, la `0005`; las demás 
 
 ## Reglas generales
 
-- **RLS activo en las 33 tablas de `public`** (36 con la `0016`, pendiente de aplicar). Una tabla sin política para una acción la
+- **RLS activo en las 36 tablas de `public`** (33 de la `0001` y 3 de la `0016`, aplicada el 2026-11-18). Una tabla sin política para una acción la
   niega a `authenticated`; `service_role` omite RLS.
 - **Autoridad = RLS, no la UI.** La UI oculta acciones según el rol, pero la base decide.
 - **Helpers** (`security definer`, con `execute` para `authenticated`):
@@ -49,8 +49,8 @@ agregan funciones y tablas con sus propios grants (abajo, la `0005`; las demás 
 | `suscripciones`, `uso_mensual`, `certificados`, `cafs`, `solicitudes_folios`, `envios`, `envio_estadisticas`, `consultas_envio`, `envio_rechazos`, `rcof`, `set_pruebas_casos`, `operaciones_sii` | miembro | backend | backend | backend |
 | `tokens_sii`, `sesiones_sii` | backend | backend | backend | backend |
 | `notificaciones` (migración 0013, aplicada el 2026-11-17) | miembro | backend (`reclamar_notificacion`) | backend | backend |
-| `clientes_pago`, `pagos` (migración 0016, pendiente) | admin | backend | backend | backend |
-| `eventos_pasarela` (migración 0016, pendiente) | backend | backend | backend | backend |
+| `clientes_pago`, `pagos` (migración 0016, aplicada el 2026-11-18) | admin | backend | backend | backend |
+| `eventos_pasarela` (migración 0016, aplicada el 2026-11-18) | backend | backend | backend | backend |
 
 ¹ Solo un `propietario` puede dar, cambiar o quitar el rol `propietario`; además,
 `tg_proteger_ultimo_propietario` impide dejar la organización sin propietario.
@@ -147,9 +147,10 @@ Lo comprueban `supabase/verificaciones/0011_folios.sql` (4–7, 10, 13 y 14) y
 `rls-fase8-notificaciones.sql` (15–20 y 26), que en producción dieron 18/18 y 26/26 el
 2026-11-17 ([contratos](../03-api-reference/rpc-backend.md#notificaciones-migración-0013)).
 
-## Tablas y función de la migración 0016 (pendiente de aplicar)
+## Tablas y función de la migración 0016 (aplicada el 2026-11-18)
 
-Pagos con Flow (Fase 10). **Escrita y probada en PGlite; no aplicada en producción.**
+Pagos con Flow (Fase 10). **Aplicada en producción el 2026-11-18**, antes del deploy de la
+fase.
 
 | Tabla | RLS y política | Privilegios |
 |---|---|---|
@@ -174,8 +175,8 @@ La `0015` no cambia políticas ni privilegios: `crear_organizacion` se reemplaza
 revisa). La política `lectura` de `planes` (`using (activo)`) ya ocultaba los planes
 inactivos: con la 0015, `emprendedor` deja de verse para `anon` y `authenticated`.
 
-*Advisors* debería listar `rls_enabled_no_policy` en `eventos_pasarela` (INFO, esperado) y
-no listar `activar_suscripcion`. Lo comprueban `supabase/verificaciones/0016_pagos.sql`
-(11–13 y 18) y `rls-fase10-pagos.sql` (18 y 22–28): 20/20 y 30/30 en PGlite; **en
-producción aún no se corren**
+*Advisors* (2026-11-18) lista `rls_enabled_no_policy` en `eventos_pasarela` (INFO,
+esperado) y no lista `activar_suscripcion` como ejecutable por `anon` ni `authenticated`.
+Lo comprueban `supabase/verificaciones/0016_pagos.sql` (11–13 y 18) y
+`rls-fase10-pagos.sql` (18 y 22–28): 20/20 y 30/30 en producción el 2026-11-18 (y en PGlite)
 ([contrato](../03-api-reference/rpc-backend.md#activar_suscripcion-migración-0016)).

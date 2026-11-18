@@ -43,7 +43,7 @@ la app).
 | `orden` | `smallint`, defecto 0 | `0015`. Orden de la grilla en la UI y en la landing |
 | `creado_en` | `timestamptz` | |
 
-Grilla de la `0015` (PLAN-SAAS D5; **pendiente de aplicar en producción**, donde siguen los
+Grilla de la `0015` (PLAN-SAAS D5; **aplicada en producción el 2026-11-18**; reemplazó los
 valores de la `0001`: `emprendedor` 9.990 · 1 · 2 · 500; `pyme` 24.990 · 3 empresas · 5
 usuarios · 3.000 con API; `empresa` 79.990 sin límites):
 

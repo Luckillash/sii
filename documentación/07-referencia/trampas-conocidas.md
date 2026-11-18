@@ -939,8 +939,8 @@ migraciones nuevas.
 
 ## Pagos y suscripciones (Fase 10)
 
-Código en `apps/web/src/server/pagos/`; migraciones `0015`, `0016` y `0017` **pendientes de
-aplicar** y sin probar contra el sandbox de Flow todavía. Guía:
+Código en `apps/web/src/server/pagos/`, sin desplegar y sin probar contra el sandbox de Flow
+todavía; migraciones `0015` y `0016` aplicadas el 2026-11-18, `0017` pendiente. Guía:
 [planes y pagos](../02-guias/planes-y-pagos.md).
 
 - **El retorno del registro de tarjeta llega sin cookies de sesión.** Flow devuelve el

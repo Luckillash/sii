@@ -23,8 +23,8 @@ llama con su sesión y la función revisa el rol por dentro. Está aquí porque 
 La Fase 8 suma las funciones de la migración
 [`0013_notificaciones`](#notificaciones-migración-0013) (**aplicada el 2026-11-17**), todas
 solo `service_role`. La Fase 10 suma
-[`activar_suscripcion`](#activar_suscripcion-migración-0016) (migración `0016`, **pendiente
-de aplicar**), también solo `service_role`.
+[`activar_suscripcion`](#activar_suscripcion-migración-0016) (migración `0016`, **aplicada el
+2026-11-18**), también solo `service_role`.
 
 ## `sincronizar_documentos_envio`
 
@@ -181,10 +181,10 @@ public.plan_vigente(p_organizacion uuid)
 
 ## `activar_suscripcion` (migración 0016)
 
-Viene en `supabase/migrations/0016_pagos.sql` (Fase 10). **Estado: escrita, pendiente de
-aplicar en producción** (antes del deploy de la fase;
-[despliegue](../08-esquema-supabase/despliegue.md#fase-10-migraciones-0015-0016-y-0017)).
-En una base sin ella, el retorno de Flow falla con `PGRST202` **después** de crear la
+Viene en `supabase/migrations/0016_pagos.sql` (Fase 10). **Estado: aplicada en producción
+el 2026-11-18**, antes del deploy de la fase, que todavía no se hace
+([despliegue](../08-esquema-supabase/despliegue.md#fase-10-migraciones-0015-0016-y-0017)).
+*Advisors* no la lista como ejecutable por `anon` ni `authenticated`. En una base sin ella, el retorno de Flow falla con `PGRST202` **después** de crear la
 suscripción en Flow: el aviso queda `fallido` en `eventos_pasarela` con
 `datos.suscripcion_externa`, y un reintento la reusa en vez de crear otra.
 
@@ -253,7 +253,8 @@ flujo en [planes y pagos](../02-guias/planes-y-pagos.md).
 Verificación: `supabase/verificaciones/0016_pagos.sql` (16–19) y la simulación
 `rls-fase10-pagos.sql` (4–18, con `rollback`)
 ([cómo](../05-pruebas/probar-el-esquema.md#13-simulación-de-planes-y-pagos-de-la-fase-10-rls-fase10-pagossql)).
-En PGlite, 20/20 y 30/30; **en producción aún no se corren**.
+En PGlite, 20/20 y 30/30; en producción, el 2026-11-18, 20/20 y 30/30 (limpieza en 0
+antes y después).
 
 ## `token_obtener`, `token_guardar`, `token_borrar`
 

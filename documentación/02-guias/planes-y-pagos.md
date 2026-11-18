@@ -12,12 +12,13 @@ source: ["PLAN-SAAS.md Fase 10, D4 y D5", "supabase/migrations/0015_planes_comer
 > `/api/pagos/flow/*` o `/api/cron/suscripciones`, o necesitas explicar por qué una
 > organización no puede emitir en producción, agregar empresas o sumar usuarios.
 
-**Estado (2026-11-17).** Fase 10 con el código escrito y las migraciones `0015`, `0016` y
-`0017` probadas en PGlite. **Pendiente:** aplicar las migraciones en producción (la `0015` y
-la `0016` antes del deploy, la `0017` después), cargar las credenciales de Flow sandbox en
-`.env.local` y en Vercel *Production*, desplegar y probar el criterio de aceptación en el
-sandbox. Nada de esta guía se ha probado todavía contra Flow ni contra la base de
-producción. También quedan fuera: cambiar la tarjeta registrada y emitir una boleta propia de
+**Estado (2026-11-18).** Fase 10 con el código escrito. Las migraciones `0015` y `0016`
+están **aplicadas en producción desde el 2026-11-18** (verificaciones 10/10 y 20/20,
+simulación `rls-fase10-pagos.sql` 30/30; la suscripción de `servicio` quedó en
+`certificacion`/`prueba` sin `periodo_fin`). **Pendiente:** cargar las credenciales de Flow
+sandbox en `.env.local` y en Vercel *Production*, desplegar, aplicar la `0017` (después del
+deploy) y probar el criterio de aceptación en el sandbox. Nada de esta guía se ha probado
+todavía contra Flow. También quedan fuera: cambiar la tarjeta registrada y emitir una boleta propia de
 Boletéame por cada cobro (cumplimiento tributario del SaaS, antes del lanzamiento).
 
 Decisiones (PLAN-SAAS §9): **D4**, la pasarela es Flow (suscripciones nativas en CLP:
@@ -46,7 +47,7 @@ bloqueo duro con aviso al 80 % y al 100 %, y Certificación gratis y sin plazo.
 
 ## La grilla
 
-Montos en pesos, **IVA incluido**, mensuales. Valores de la `0015` (pendiente de aplicar):
+Montos en pesos, **IVA incluido**, mensuales. Valores de la `0015` (aplicada el 2026-11-18):
 
 | `codigo` | Nombre | $/mes | Empresas | Usuarios | Boletas de producción al mes | API y webhooks | Se contrata en la app |
 |---|---|--:|--:|--:|--:|:-:|:-:|
@@ -366,7 +367,7 @@ Ninguna devuelve datos del pago, de la tarjeta ni de la organización.
 **Todavía no se ha hecho.** Criterio de aceptación de la fase: cambiar de plan en el sandbox
 actualiza `suscripciones` y los límites se aplican en la siguiente emisión.
 
-Requisitos: las migraciones `0015` y `0016` aplicadas, las `FLOW_*` del sandbox cargadas y
+Requisitos: las migraciones `0015` y `0016` aplicadas (hecho el 2026-11-18), las `FLOW_*` del sandbox cargadas y
 la Fase 10 desplegada en *Production*. Conviene probar en el deploy de *Production* y no
 desde `localhost`: Flow no puede llamar al callback de un equipo local, y el primer plan
 que se crea en Flow guarda el `urlCallback` que tenga `NEXT_PUBLIC_APP_URL` en ese momento.

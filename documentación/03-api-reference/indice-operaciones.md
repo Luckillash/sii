@@ -20,7 +20,8 @@ El dominio vive en `apps/web/src/server/pagos/` (`suscripciones.ts`, exportado p
 exigen membresía, rol **propietario o administrador** (`puedeAdministrar`) y confirman la
 sesión con `getUser()` antes de llamar a Flow. Ninguna sale al SII ni usa `operaciones_sii`.
 Detalle en [planes y pagos](../02-guias/planes-y-pagos.md). Código escrito; migraciones
-`0015`, `0016` y `0017` **pendientes de aplicar**, sin deploy.
+`0015` y `0016` **aplicadas el 2026-11-18**; la `0017`, el deploy y las credenciales de Flow,
+pendientes.
 
 | Función | Quién la llama | Sale a Flow | Escribe |
 |---|---|---|---|
@@ -39,7 +40,7 @@ Detalle en [planes y pagos](../02-guias/planes-y-pagos.md). Código escrito; mig
 Las acciones devuelven `{ ok: true, … }` o `{ ok: false, error: MensajeError }` (textos de
 `server/pagos/errores.ts`). Rutas y respuestas en la
 [guía](../02-guias/planes-y-pagos.md#qué-responde-cada-ruta). RPC de la fase (migración
-0016, solo `service_role`): [`activar_suscripcion`](rpc-backend.md#activar_suscripcion-migración-0016).
+0016, aplicada el 2026-11-18, solo `service_role`): [`activar_suscripcion`](rpc-backend.md#activar_suscripcion-migración-0016).
 
 ## Tablero y reportes (Fase 9)
 

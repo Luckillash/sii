@@ -32,8 +32,8 @@ comprobación con `ok = true/false` y, si falla, el `detalle`. No escribe nada.
 | `0012_folio_anulado.sql` | 7 comprobaciones: `tg_validar_documento()` existe, devuelve `trigger`, `plpgsql`, `security definer`, `search_path` vacío; cuerpo de la 0012 (lee el CAF con `for key share` **antes** de `folios_anulados`, solo cuando el documento fija su folio —`new.folio is distinct from old.folio` o `new.caf_id is distinct from old.caf_id`—, `23514`); conserva las reglas de la 0001 (CAF obligatorio, ambiente y tipo, rango, P91 y plan); sin `EXECUTE` para PUBLIC, `anon` ni `authenticated`; `trg_10_validar_documento` sin cambios (`before`, por fila, `insert` y `update of` `ambiente`, `caf_id`, `folio`, `tipo_dte`); ningún documento vivo con folio anulado; migración registrada como `0012`. Aplicada el 2026-11-15: 7/7 `ok` ([despliegue](../08-esquema-supabase/despliegue.md#fase-7-migración-0012)); antes de migrar daba 5/7 (2 y 7 en `false`), igual que en PGlite sin la 0012 (7/7 con ella) |
 | `0013_notificaciones.sql` | 18 comprobaciones: 1–8 la tabla `notificaciones` (15 columnas con sus tipos y `not null`; PK y clave única; FK a `organizaciones` en cascada; los `check` de tipo, clave, estado, enviada con fecha, intentos, datos, destinatarios y textos; índice `notificaciones_organizacion`; trigger `trg_90_actualizado_en`; RLS con una sola política `lectura`; `authenticated` solo lee, `anon` nada, `service_role` escribe); 9–13 `reclamar_notificacion` (las 5 funciones con su firma; nombres de parámetros; `plpgsql`, `security definer`, `search_path` vacío; solo `service_role` ejecuta las 5; cuerpo con `on conflict`, misma organización, menos de 5 intentos, fallida o pendiente de más de 15 minutos y el `grupo`); 14–17 `notificacion_cerrada` y las de candidatos (negación de reclamar; `sql`, `stable`, invoker, `search_path` vacío; excluyen lo avisado y reparten por turnos; umbral 1/7/15/30); 18 fuera de Realtime y migración registrada. **Aplicada el 2026-11-17**: en producción 18/18 (antes de migrar sale todo `false`); en PGlite 18/18 con la 0013 y 0/18 sin ella |
 | `0014_cron.sql` | 12 comprobaciones (no muestra el secreto: de Vault solo cuenta filas, y la 9 compara dentro de la consulta): 1 `pg_cron` y `pg_net`; 2 `cron_token` existe una vez; 3 los 4 jobs con su horario; 4–5 los dos `net.http_post` (URL de *Production*, JSON, Bearer leído de `vault.decrypted_secrets` en tiempo de ejecución, timeout; ningún literal después de `'Bearer '`); 6–7 las dos limpiezas; 8 activos, base y usuario `postgres`; 9 ningún job contiene el valor de `cron_token`; 10 nada más llama a `/api/cron`; 11 sin corridas fallidas en la última hora; 12 migración registrada. **Aplicada el 2026-11-17**: en producción 12/12, corrida con el MCP `execute_sql` (rol `postgres`); con `supabase db query --read-only` falla la 9, que descifra `cron_token` (`42501` en `_crypto_aead_det_decrypt`). Antes de migrar salen true 1, 2, 9, 10 y 11; en PGlite 11/12 (la 1 no aplica). Además, después de aplicarla, mirar `net._http_response` y los monitores de Sentry (2026-11-17: 200 en las dos rutas y los dos monitores en `ok`). **Desde la `0017_cron_suscripciones` la 10 sale `false`** con detalle `sincronizar-suscripciones`: es esperado |
-| `0015_planes_comerciales.sql` | 10 comprobaciones: 1–2 columnas `autoservicio` (`boolean not null default false`) y `orden` (`smallint not null default 0`) de `planes`; 3–6 la grilla (los 5 planes activos con sus valores, comparados con `to_jsonb(p) @>`; `emprendedor` inactivo; solo `pyme`, `contador` y `api` de autoservicio; la política `lectura` sigue ocultando los inactivos); 7–8 `crear_organizacion` (sin el plazo de 30 días; mismos privilegios); 9 ninguna suscripción de Certificación con `periodo_fin`; 10 migración registrada. **Pendiente de aplicar**: en PGlite 10/10 con la 0015 y 2/10 sin ella (7 y 9); en producción aún no se corre |
-| `0016_pagos.sql` | 20 comprobaciones: 1–3 `clientes_pago` (columnas; PK, único y FK; `check`); 4–7 `pagos` (columnas; llaves y FK; `check`; índice `pagos_organizacion`); 8–9 `eventos_pasarela` (columnas; llaves, FK y `check`); 10 triggers `trg_90_actualizado_en`; 11–12 RLS y políticas (`es_admin`; ninguna en `eventos_pasarela`); 13 privilegios; 14–15 `suscripciones` (columnas nuevas e índice único parcial `suscripciones_externa_unica`); 16–19 `activar_suscripcion` (firma, `security definer` y `search_path`, solo `service_role`, cuerpo con `for no key update`); 20 fuera de Realtime y migración registrada. **Pendiente de aplicar**: en PGlite 20/20 con la 0016 y 0/20 sin ella; en producción aún no se corre. Ojo: en `suscripciones` la columna es `proveedor_pago`; en las tablas nuevas, `proveedor` |
+| `0015_planes_comerciales.sql` | 10 comprobaciones: 1–2 columnas `autoservicio` (`boolean not null default false`) y `orden` (`smallint not null default 0`) de `planes`; 3–6 la grilla (los 5 planes activos con sus valores, comparados con `to_jsonb(p) @>`; `emprendedor` inactivo; solo `pyme`, `contador` y `api` de autoservicio; la política `lectura` sigue ocultando los inactivos); 7–8 `crear_organizacion` (sin el plazo de 30 días; mismos privilegios); 9 ninguna suscripción de Certificación con `periodo_fin`; 10 migración registrada. **Aplicada el 2026-11-18**: en producción 10/10 (antes de migrar daba 1/10, solo la 7: la 9 salía `false` porque la suscripción de `servicio` todavía tenía `periodo_fin`); en PGlite 10/10 con la 0015 y 2/10 sin ella (7 y 9) |
+| `0016_pagos.sql` | 20 comprobaciones: 1–3 `clientes_pago` (columnas; PK, único y FK; `check`); 4–7 `pagos` (columnas; llaves y FK; `check`; índice `pagos_organizacion`); 8–9 `eventos_pasarela` (columnas; llaves, FK y `check`); 10 triggers `trg_90_actualizado_en`; 11–12 RLS y políticas (`es_admin`; ninguna en `eventos_pasarela`); 13 privilegios; 14–15 `suscripciones` (columnas nuevas e índice único parcial `suscripciones_externa_unica`); 16–19 `activar_suscripcion` (firma, `security definer` y `search_path`, solo `service_role`, cuerpo con `for no key update`); 20 fuera de Realtime y migración registrada. **Aplicada el 2026-11-18**: en producción 20/20 (antes de migrar, 0/20); en PGlite 20/20 con la 0016 y 0/20 sin ella. Ojo: en `suscripciones` la columna es `proveedor_pago`; en las tablas nuevas, `proveedor` |
 
 Se ejecuta pegándolo en el SQL Editor o con el MCP `execute_sql`. Cada migración nueva trae
 el suyo. `supabase db query --remote --read-only -f` sirve para las que no leen secretos;
@@ -152,8 +152,8 @@ el `rollback` final por `commit`, ni ejecutes el archivo por partes.
 
 Resultado de la última corrida en producción (2026-11-12, con 0003 y 0004 aplicadas): 52 de
 52 en `ok = true` (1–51 y 53; la 52 no aparece). La consulta de control dio 0 en todo. Con el
-ajuste de la Fase 10 (plan Empresa), en PGlite con la 0015 y la 0016: 52/52; en producción
-el script ajustado aún no se corre.
+ajuste de la Fase 10 (plan Empresa): en PGlite con la 0015 y la 0016, 52/52; en producción,
+el 2026-11-18 con las dos aplicadas, 52/52 y la consulta de control en 0.
 
 ## 4. Simulación de roles de la Fase 3 (`rls-fase3-empresas.sql`)
 
@@ -554,8 +554,8 @@ el mismo id externo, cambia de plan sobre la misma suscripción externa, vuelve 
 Certificación sin proveedor y rechaza datos incompletos o estados no permitidos; el cupo de
 boletas del plan nuevo se aplica al emitir en producción; propietarios y administradores
 leen `pagos` y `clientes_pago` de su organización, y nadie más; `eventos_pasarela` es solo
-de `service_role`. **Requiere la 0015 y la 0016 aplicadas** (las dos **pendientes** en
-producción): sin ellas el script corre igual (cada paso captura su error), pero casi todo
+de `service_role`. **Requiere la 0015 y la 0016 aplicadas** (en producción desde el
+2026-11-18): sin ellas el script corre igual (cada paso captura su error), pero casi todo
 sale `false`.
 
 Mismo patrón que las anteriores (usuarios ficticios `pagos-…@ejemplo.invalid`, claims
@@ -608,9 +608,13 @@ Antes de aplicar la 0016 la consulta de limpieza falla (las tablas `clientes_pag
 Probada en PGlite (esquema 0001 y 0003–0016 con stubs): 30/30 con las dos migraciones, 3/30
 solo con la 0015 y 2/30 sin ninguna; la limpieza dio todo en 0. En la misma corrida siguen en
 verde `rls-fase2-tenancy.sql` (52/52, con el ajuste del plan Empresa), `rls-fase3-empresas.sql`
-(43/43), la verificación `0004` (3/3) y `rls-fase8-notificaciones.sql` (26/26). **En
-producción aún no se corre** (las migraciones están pendientes;
-[despliegue](../08-esquema-supabase/despliegue.md#fase-10-migraciones-0015-0016-y-0017)).
+(43/43), la verificación `0004` (3/3) y `rls-fase8-notificaciones.sql` (26/26).
+
+Corrida en producción el 2026-11-18, con la 0015 y la 0016 aplicadas
+([despliegue](../08-esquema-supabase/despliegue.md#fase-10-migraciones-0015-0016-y-0017)):
+30/30 `ok`; la consulta de limpieza dio todo en 0 antes y después, y los totales de la base no
+cambiaron (`vault.secrets` 4, suscripciones 1, usuarios 2, organizaciones 1, miembros 1). En la
+misma sesión, `rls-fase2-tenancy.sql` (ajustada) 52/52.
 
 ## 14. Lo que no se prueba con SQL
 

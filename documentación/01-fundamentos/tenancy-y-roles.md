@@ -143,9 +143,8 @@ borra o cambia de rol, y no hay otro propietario, lanza
 
 `plan_vigente(org)` devuelve el plan de la suscripción más reciente en estado `prueba` o
 `activa`. Grilla comercial de la migración `0015_planes_comerciales` (PLAN-SAAS D5,
-2026-11-17; **escrita, pendiente de aplicar en producción**: hasta entonces rigen los
-valores de ejemplo de la `0001`, con `emprendedor` activo y `pyme` de 5 usuarios y 3
-empresas):
+2026-11-17; **aplicada en producción el 2026-11-18**; reemplazó los valores de ejemplo de
+la `0001`, que tenían `emprendedor` activo y `pyme` con 5 usuarios y 3 empresas):
 
 | Plan (`codigo`) | $/mes (IVA incl.) | `max_usuarios` | `max_empresas` | `max_boletas_mes` | Producción | API y webhooks | Autoservicio |
 |---|--:|--:|--:|--:|:-:|:-:|:-:|
@@ -157,7 +156,7 @@ empresas):
 
 `emprendedor` queda con `activo = false` (se fusiona con `pyme`). Toda organización nace
 en `certificacion`/`prueba` **sin plazo** (`periodo_fin` nulo desde la `0015`; antes eran 30
-días que nada hacía cumplir). Los planes de autoservicio se contratan y se cobran con
+días que nada hacía cumplir; la suscripción de `servicio` quedó así el 2026-11-18). Los planes de autoservicio se contratan y se cobran con
 Flow desde Configuración → Plan ([planes y pagos](../02-guias/planes-y-pagos.md)).
 
 - **Mora.** Cuando Flow informa un importe vencido, la suscripción pasa a `morosa` y
@@ -186,6 +185,7 @@ Verificación: `supabase/verificaciones/rls-fase2-tenancy.sql` prueba todo lo an
 con usuarios ficticios y `rollback` ([cómo correrlo](../05-pruebas/probar-el-esquema.md)).
 Desde la Fase 10 su sección 2 sube a la organización de prueba al plan `empresa` (sin
 tope) en vez de `pyme`, porque con la grilla de la `0015` Pyme admite 3 usuarios y el
-cuarto miembro del script ya no cabría; así sirve con y sin la `0015`. Los cambios de
-plan con Flow y el cupo de boletas del plan nuevo los prueba
-`supabase/verificaciones/rls-fase10-pagos.sql`.
+cuarto miembro del script ya no cabría; así sirve con y sin la `0015` (en producción, con
+la 0015 aplicada, 52/52 el 2026-11-18). Los cambios de plan con Flow y el cupo de boletas
+del plan nuevo los prueba `supabase/verificaciones/rls-fase10-pagos.sql` (30/30 en
+producción el 2026-11-18).

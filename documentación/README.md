@@ -64,7 +64,7 @@ por fase están en `PLAN-SAAS.md`, en la raíz del repositorio.
 | Tenancy | Todo dato de negocio lleva `organizacion_id`, heredado del padre por `trg_00_organizacion`; RLS es la autoridad y la UI solo oculta acciones ([RLS](08-esquema-supabase/rls-y-privilegios.md)) |
 | Campos del sistema | `autorizada_produccion`, la etapa y el estado SII del proceso solo los cambia el sistema (triggers `trg_05_proteger_*`) ([triggers](08-esquema-supabase/triggers-y-logica.md)) |
 | Plan | Los límites salen de `plan_vigente()`; un plan `null` significa «sin suscripción vigente» (`morosa` o `cancelada`), no «ilimitado» ([RPC del backend](03-api-reference/rpc-backend.md#plan_vigente)) |
-| Planes y pagos | Fase 10, **sin desplegar**: grilla D5 (Certificación gratis y sin plazo; Pyme, Contador y API de autoservicio; Empresa a medida) y cobro con Flow (D4). El retorno del registro de tarjeta llega sin cookies (la organización sale del `customerId`), el callback solo trae `token` (se consulta firmado y siempre responde 200) y la mora la trae la sincronización (`morose = 1` → `morosa`). Los cambios de suscripción van por `activar_suscripcion` (`service_role`); la cuota de boletas es bloqueo duro con aviso al 80 % y al 100 %. Migraciones `0015` y `0016` (antes del deploy) y `0017` (después) **pendientes de aplicar**; credenciales de Flow sin cargar ([guía](02-guias/planes-y-pagos.md)) |
+| Planes y pagos | Fase 10, **sin desplegar**: grilla D5 (Certificación gratis y sin plazo; Pyme, Contador y API de autoservicio; Empresa a medida) y cobro con Flow (D4). El retorno del registro de tarjeta llega sin cookies (la organización sale del `customerId`), el callback solo trae `token` (se consulta firmado y siempre responde 200) y la mora la trae la sincronización (`morose = 1` → `morosa`). Los cambios de suscripción van por `activar_suscripcion` (`service_role`); la cuota de boletas es bloqueo duro con aviso al 80 % y al 100 %. Migraciones `0015` y `0016` **aplicadas el 2026-11-18** (antes del deploy; verificaciones 10/10 y 20/20, simulación 30/30); pendientes la `0017` (después del deploy), el deploy y las credenciales de Flow ([guía](02-guias/planes-y-pagos.md)) |
 | Ambientes | Una sola base (producción) para local y Vercel; el ambiente del SII (`certificacion` / `produccion`) es un enum, nunca un texto libre, y en certificación se muestra `BannerAmbiente` |
 | Textos al SII | XML en ISO-8859-1 tal cual (`Buffer`, sin recodificar); montos en pesos enteros; fechas en hora de Chile ([formatos](01-fundamentos/formatos-y-validaciones.md)) |
 
@@ -219,15 +219,15 @@ documentación/
 
 | Fuente | Qué aporta | Fuente de verdad para |
 |---|---|---|
-| `supabase/migrations/` (0001–0014 aplicadas, la 0011 y la 0012 el 2026-11-15, la 0013 y la 0014 el 2026-11-17; la 0014 después del deploy de la Fase 8; 0015–0017, de la Fase 10, escritas y pendientes de aplicar) | Esquema aplicado en producción (y el pendiente de la Fase 10) | Tablas, RLS, triggers y RPC |
+| `supabase/migrations/` (0001–0016 aplicadas, la 0011 y la 0012 el 2026-11-15, la 0013 y la 0014 el 2026-11-17, la 0014 después del deploy de la Fase 8; la 0015 y la 0016 el 2026-11-18; la 0017, de la Fase 10, escrita y pendiente hasta después del deploy) | Esquema aplicado en producción (y la 0017 pendiente) | Tablas, RLS, triggers y RPC |
 | `08-esquema-supabase/supabase_saas_sii.sql` | Esquema original (= `0001`), comentado | Intención de diseño de la `0001` |
 | `apps/web/src/server/` | Capa SII, certificación y Supabase | Comportamiento del backend |
 | `packages/certificacion` (`@winex/certificacion`, de `certificacion-node`) | Librería y CLI `sii`, con sus `docs/` | Protocolo con el SII y códigos de error |
 | `PLAN-SAAS.md` | Fases, decisiones y estado | Qué está hecho y qué falta |
 
-Análisis inicial: 2026-11-10; actualizado por fase hasta la Fase 10 (2026-11-17; Fase 10 con el
-código escrito y las migraciones 0015–0017 probadas en PGlite, pendientes de aplicar, sin deploy
-ni prueba en el sandbox de Flow; Fase 9 desplegada,
+Análisis inicial: 2026-11-10; actualizado por fase hasta la Fase 10 (2026-11-18; Fase 10 con el
+código escrito y las migraciones 0015 y 0016 aplicadas el 2026-11-18; pendientes la 0017, el
+deploy, las credenciales de Flow y la prueba en el sandbox; Fase 9 desplegada,
 sin migraciones y con el criterio de aceptación cumplido;
 Fase 8 desplegada, migraciones 0013 y 0014 aplicadas, cron verificado, arreglo de Realtime en
 cargas completas desplegado y criterio de aceptación cumplido; la Fase 7 está desplegada y con su criterio cumplido). Si un

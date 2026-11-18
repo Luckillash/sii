@@ -66,8 +66,8 @@ lo mismo (no revela qué correos existen).
 transacción crea la organización, la suscripción al plan **Certificación** en estado
 `prueba` y la membresía de **propietario**. Luego redirige a `/<slug>/tablero`. La
 `0001` le ponía `periodo_fin = now() + 30 días`, que nada hacía cumplir (`plan_vigente()`
-no mira `periodo_fin`); la `0015_planes_comerciales` (Fase 10, **pendiente de aplicar**) la
-deja sin plazo: Certificación es gratis y no vence.
+no mira `periodo_fin`); la `0015_planes_comerciales` (Fase 10, **aplicada el 2026-11-18**)
+la deja sin plazo: Certificación es gratis y no vence.
 
 | Error | Mensaje en la UI |
 |---|---|
@@ -103,8 +103,9 @@ cancelación rige al fin del período pagado (después vuelve a Certificación).
 llamar a Flow, la app revisa que las empresas y usuarios actuales quepan en el plan
 elegido. El plan `empresa` (a medida) no se contrata desde la app: lo asigna `service_role`.
 Flujo completo, mora y pruebas en [planes y pagos](planes-y-pagos.md). **Estado:** código
-escrito; migraciones `0015` y `0016` pendientes de aplicar, credenciales de Flow sin cargar
-y sin deploy. Hasta entonces, solo `service_role` cambia una suscripción.
+escrito; migraciones `0015` y `0016` aplicadas el 2026-11-18; pendientes la `0017`, las
+credenciales de Flow y el deploy. Hasta entonces, solo `service_role` cambia una
+suscripción.
 
 Si la suscripción queda `morosa` (Flow informó un importe vencido) o sin plan vigente, la
 organización no puede emitir en producción ni agregar empresas o usuarios: Empresas y

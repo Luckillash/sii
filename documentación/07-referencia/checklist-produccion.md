@@ -56,15 +56,16 @@ y el criterio de aceptación quedó cumplido.
 Detalle en [planes y pagos](../02-guias/planes-y-pagos.md) y los pasos de las migraciones en
 [despliegue](../08-esquema-supabase/despliegue.md#fase-10-migraciones-0015-0016-y-0017).
 
-Estado al 2026-11-17: código escrito y migraciones probadas en PGlite. **Nada de lo
-siguiente está hecho en producción.**
+Estado al 2026-11-18: código escrito; migraciones `0015` y `0016` aplicadas en producción.
+Pendientes la `0017`, las credenciales de Flow, el deploy y el sandbox.
 
 ### Durante la Fase 10 (sandbox)
 
-- [ ] Migraciones `0015_planes_comerciales` y `0016_pagos` aplicadas **antes** del deploy;
-      verificaciones 10/10 y 20/20, `rls-fase10-pagos.sql` 30/30 con limpieza en 0, y de nuevo
-      `rls-fase2-tenancy.sql` 52/52 y `rls-fase3-empresas.sql` 43/43.
-- [ ] `pnpm db:tipos` comparado con lo agregado a mano y versionado.
+- [x] Migraciones `0015_planes_comerciales` y `0016_pagos` aplicadas **antes** del deploy
+      (2026-11-18; hora previa para PITR 17:01:47 UTC); verificaciones 10/10 y 20/20,
+      `rls-fase10-pagos.sql` 30/30 y `rls-fase2-tenancy.sql` 52/52, con limpieza en 0.
+- [x] `pnpm db:tipos` regenerado (2026-11-18): solo difiere de lo agregado a mano en el orden
+      de `estados_sii` y `eventos_pasarela`.
 - [ ] `FLOW_API_KEY`, `FLOW_SECRET_KEY` (*Sensitive*) y
       `FLOW_API_URL=https://sandbox.flow.cl/api` en Vercel *Production* y en `.env.local`.
 - [ ] Deploy de la Fase 10; `/api/cron/suscripciones` sin Bearer → 401;

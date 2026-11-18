@@ -19,8 +19,8 @@ Una operación pasa solo si se cumplen las dos capas:
    privilegios por defecto de Supabase en todas las tablas, salvo: nada en `tokens_sii` ni
    `sesiones_sii`; en `invitaciones`, `api_keys` y `webhooks` solo `select` y `delete`,
    más `update` en columnas puntuales. `service_role` tiene todo.
-2. **Política RLS.** RLS está activo en las 33 tablas (36 cuando se aplique la `0016_pagos`,
-   que suma `clientes_pago`, `pagos` y `eventos_pasarela`). Sin política para una operación,
+2. **Política RLS.** RLS está activo en las 36 tablas (33 de la `0001` y las 3 que sumó la
+   `0016_pagos`, aplicada el 2026-11-18: `clientes_pago`, `pagos` y `eventos_pasarela`). Sin política para una operación,
    `authenticated` no puede hacerla aunque tenga el privilegio. `service_role` salta RLS.
 
 Cómo falla cada caso (lo que ve el cliente en `error`):
@@ -62,7 +62,7 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
 | `suscripciones` | — | S | S | S | S | SIUD |
 | `uso_mensual` | — | S | S | S | S | SIUD |
 
-### Pagos (migración 0016, Fase 10, pendiente de aplicar)
+### Pagos (migración 0016, Fase 10, aplicada el 2026-11-18)
 
 | Tabla | anon | lector | emisor | administrador | propietario | service_role |
 |---|---|---|---|---|---|---|
@@ -211,7 +211,7 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
     revocan a `authenticated` `insert`, `update`, `delete`, `truncate`, `references` y
     `trigger`, y a `anon` todo: la escribe solo el backend, con `reclamar_notificacion` y
     `update` de `service_role` desde `/api/cron/alertas`. No está en Realtime.
-22. Migración `0016_pagos` (Fase 10, **escrita, pendiente de aplicar**). `clientes_pago` y
+22. Migración `0016_pagos` (Fase 10, **aplicada el 2026-11-18**). `clientes_pago` y
     `pagos`: política `lectura` con `es_admin(organizacion_id)` (datos de facturación: la
     tarjeta, marca y últimos 4, y los cobros), `authenticated` solo `select`; un emisor o un
     lector recibe 0 filas, sin error, y un `insert`, `update` o `delete` con sesión da
@@ -285,4 +285,4 @@ cambios por Realtime ([Realtime](../06-integraciones/realtime-y-storage.md#realt
 - `clientes_pago`, `pagos` y `eventos_pasarela` por rol (propietario, administrador, emisor,
   lector, otra organización, `anon`, `service_role`) y `activar_suscripcion`:
   `supabase/verificaciones/rls-fase10-pagos.sql` (30). Requiere las migraciones 0015 y
-  0016; 30/30 en PGlite, **en producción aún no se corre** (migraciones pendientes).
+  0016, aplicadas el 2026-11-18; corrida en producción ese día (30/30, limpieza en 0).

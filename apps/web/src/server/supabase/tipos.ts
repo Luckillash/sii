@@ -1017,6 +1017,27 @@ export type Database = {
           },
         ]
       }
+      estados_sii: {
+        Row: {
+          codigo: string
+          en_proceso: boolean
+          es_rechazo: boolean
+          glosa: string
+        }
+        Insert: {
+          codigo: string
+          en_proceso?: boolean
+          es_rechazo?: boolean
+          glosa: string
+        }
+        Update: {
+          codigo?: string
+          en_proceso?: boolean
+          es_rechazo?: boolean
+          glosa?: string
+        }
+        Relationships: []
+      }
       eventos_pasarela: {
         Row: {
           datos: Json
@@ -1066,27 +1087,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      estados_sii: {
-        Row: {
-          codigo: string
-          en_proceso: boolean
-          es_rechazo: boolean
-          glosa: string
-        }
-        Insert: {
-          codigo: string
-          en_proceso?: boolean
-          es_rechazo?: boolean
-          glosa: string
-        }
-        Update: {
-          codigo?: string
-          en_proceso?: boolean
-          es_rechazo?: boolean
-          glosa?: string
-        }
-        Relationships: []
       }
       folios_anulados: {
         Row: {
