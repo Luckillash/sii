@@ -11,7 +11,7 @@ import org from '../organizacion.module.css';
 import { Folios } from './Folios';
 import estilos from './folios.module.css';
 
-export const metadata: Metadata = { title: 'Folios (CAF) · Boletéame' };
+export const metadata: Metadata = { title: 'Folios (CAF)' };
 
 // La solicitud de folios hace varias peticiones al SII de hasta 45 s cada una (login
 // AUT2000 y los pasos del asistente `of_*`; PLAN-SAAS §4.1). En Next 16 el `maxDuration`

@@ -2,7 +2,7 @@
 title: "Visión general del SaaS de boleta electrónica"
 description: "Qué es el producto, sus piezas (Supabase, backend, librería, SII) y los módulos del esquema."
 keywords: [Boletéame, organización, empresa, Vercel, gru1, Supabase, sa-east-1, Resend, Sentry, Turnstile, "@winex/certificacion", server-only, service_role, principios, módulos]
-related: ["01-fundamentos/ambientes-y-credenciales.md", "08-esquema-supabase/arquitectura.md"]
+related: ["01-fundamentos/ambientes-y-credenciales.md", "08-esquema-supabase/arquitectura.md", "02-guias/sitio-publico.md"]
 source: ["supabase_saas_sii.sql (cabecera)", "certificacion-node/docs/README.md"]
 ---
 
@@ -32,11 +32,11 @@ Navegador ──▶ Next.js en Vercel (gru1) ──▶ @winex/certificacion ─�
 
 | Pieza | Qué hace |
 |---|---|
-| Next.js (App Router, `apps/web`) | Páginas con la sesión del usuario (RLS), Server Actions, cron, API pública (Fase 11) |
+| Next.js (App Router, `apps/web`) | Páginas con la sesión del usuario (RLS), Server Actions, cron, API pública (Fase 11) y sitio público sin sesión: landing, estado del servicio, contacto, ayuda y legal (Fase 12, [guía](../02-guias/sitio-publico.md)) |
 | Capa SII (`apps/web/src/server/sii/`, `server-only`) | Credenciales desde Vault, tokens y sesiones cifrados, bloqueo por certificado y `ejecutarOperacion` con auditoría ([backend](../09-libreria/backend-service-role.md)) |
 | `@winex/certificacion` (`packages/certificacion`) | Firma, TED, sobres, clientes REST/SOAP, folios, postulación y declaración. La app no lo reimplementa |
 | Supabase | Datos con RLS por organización, Auth (con Turnstile y SMTP de Resend), Vault para .pfx, claves y CAF, Storage para XML y PDF, Realtime para el estado de las operaciones |
-| Resend | Correos de Auth, invitaciones y avisos (`no-responder@mail.boleteame.dev`) |
+| Resend | Correos de Auth, invitaciones, avisos y el formulario de contacto del sitio público, que llega a `CORREO_CONTACTO` (`no-responder@mail.boleteame.dev`) |
 | Sentry | Errores y trazas, con los secretos depurados |
 | SII | Certificación: maullin / apicert / pangal (IDK 100). Producción: palena / api / rahue (IDK 300) |
 
@@ -45,7 +45,8 @@ Navegador ──▶ Next.js en Vercel (gru1) ──▶ @winex/certificacion ─�
 1. Lo que firma o habla con el SII vive solo en el servidor; el navegador nunca recibe un
    .pfx, una clave, un CAF ni un token.
 2. RLS primero: `service_role` solo en la capa SII, los cron y la API pública, siempre
-   filtrando por `organizacion_id`.
+   filtrando por `organizacion_id`. La página pública `/estado` (Fase 12) lee sin filtrar
+   por organización, pero devuelve solo agregados (conteos y fechas), nunca filas.
 3. Las operaciones ⚠️ tienen ensayo y confirmación; un `incierto` bloquea el reintento.
 4. Paridad con la librería: la app solo adapta persistencia, secretos y UI.
 5. Toda llamada al SII deja una fila en `operaciones_sii`, sin secretos.

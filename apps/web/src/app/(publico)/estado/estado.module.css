@@ -1,0 +1,129 @@
+/* Estado del servicio. */
+
+.contenedor {
+  max-width: 880px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-8) clamp(16px, 4vw, 32px) 64px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.cabecera {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.antetitulo {
+  color: var(--sello);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--text-label-weight);
+}
+
+.titulo {
+  font-size: var(--text-display-size);
+  line-height: var(--text-display-line);
+  font-weight: var(--text-display-weight);
+  letter-spacing: var(--text-display-tracking);
+}
+
+.bajada {
+  max-width: 64ch;
+  color: var(--ink-muted);
+}
+
+.filas {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-4) 20px;
+}
+
+.fila + .fila {
+  border-top: 1px solid var(--line);
+}
+
+.filaTexto {
+  display: flex;
+  flex: 1 1 280px;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.filaTitulo {
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}
+
+.detalle {
+  color: var(--ink-muted);
+}
+
+.medido time {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Insignia del nivel; los tonos vienen de tonos.module.css (--tb-fg, --tb-bg). */
+.nivel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 24px;
+  padding: 0 10px 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--tb-bg);
+  color: var(--tb-fg);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--text-label-weight);
+  white-space: nowrap;
+}
+
+.medido {
+  font-variant-numeric: tabular-nums;
+}
+
+.explicacion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.explicacion h2 {
+  font-size: var(--text-title-size);
+  line-height: var(--text-title-line);
+  font-weight: var(--text-title-weight);
+}
+
+.explicacion ul {
+  margin: 0;
+  padding-left: var(--space-6);
+}
+
+.explicacion li {
+  margin-bottom: var(--space-2);
+}
+
+.enlace {
+  color: var(--link);
+  text-underline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.enlace:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}

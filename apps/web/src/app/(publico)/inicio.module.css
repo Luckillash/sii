@@ -1,0 +1,536 @@
+/* Landing (plantilla «Landing», Main.dc.html). */
+
+.principal {
+  display: flex;
+  flex-direction: column;
+}
+
+.contenedor {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 88px clamp(16px, 4vw, 32px);
+}
+
+.encabezado {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 640px;
+}
+
+.tituloSeccion {
+  font-size: var(--text-display-size);
+  line-height: var(--text-display-line);
+  font-weight: var(--text-display-weight);
+  letter-spacing: var(--text-display-tracking);
+  color: var(--ink);
+}
+
+.bajada {
+  font-size: 17px;
+  line-height: 26px;
+  color: var(--ink-muted);
+}
+
+.tituloTarjeta {
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}
+
+.textoTenue {
+  color: var(--ink-muted);
+}
+
+.nota {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+
+.iconoSello {
+  display: inline-flex;
+  color: var(--sello);
+}
+
+.grande {
+  height: 44px;
+  padding: 0 20px;
+  font-size: 15px;
+}
+
+/* Dos columnas que pasan a una en pantallas angostas. */
+.dosColumnas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 48px;
+  align-items: start;
+}
+
+.dosColumnas > * {
+  min-width: 0;
+}
+
+.centrado {
+  align-items: center;
+}
+
+.columna {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+/* --- Hero ---------------------------------------------------------------------- */
+
+.hero {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 72px clamp(16px, 4vw, 32px) 96px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
+  gap: 56px;
+  align-items: center;
+}
+
+.hero > * {
+  min-width: 0;
+}
+
+.heroTexto {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+.antetitulo {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--text-label-weight);
+  color: var(--sello);
+}
+
+.titular {
+  font-size: clamp(32px, 4.2vw + 12px, 52px);
+  line-height: 1.12;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  overflow-wrap: break-word;
+}
+
+.bajadaHero {
+  max-width: 520px;
+  font-size: 17px;
+  line-height: 26px;
+  color: var(--ink-muted);
+}
+
+.botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.letraChica {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+/* Panel de ejemplo sobre un bloque `sello` con borde perforado y un cuadro ocre. */
+.heroVisual {
+  position: relative;
+  padding: var(--space-8) 0 var(--space-8) var(--space-8);
+}
+
+.sello {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 62%;
+  border-radius: var(--radius-sm);
+  background: var(--sello);
+}
+
+.perforacionVertical {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: calc(62% - 4px);
+  width: 8px;
+  background-image: radial-gradient(circle, var(--surface) 3.5px, transparent 4px);
+  background-size: 8px 16px;
+  background-position: 0 4px;
+}
+
+.perforacionHorizontal {
+  position: absolute;
+  right: 0;
+  bottom: -4px;
+  width: 62%;
+  height: 8px;
+  background-image: radial-gradient(circle, var(--surface) 3.5px, transparent 4px);
+  background-size: 16px 8px;
+  background-position: 4px 0;
+}
+
+.ocre {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-6);
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  background: var(--ocre);
+}
+
+.panelEjemplo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-lg);
+}
+
+/* El envoltorio desplaza; el marco de TablaDTE crece con la tabla (dos clases para ganarle
+   al `overflow-x: auto` del componente). */
+.desplazable {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+}
+
+.desplazable:focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: var(--focus-ring);
+}
+
+.panelEjemplo .tablaEjemplo {
+  width: max-content;
+  min-width: 100%;
+  overflow: visible;
+}
+
+.panelCabecera {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.panelTitulo {
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}
+
+.panelFecha,
+.leyendaEjemplo {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+@media (max-width: 480px) {
+  .heroVisual {
+    padding: var(--space-6) 0 var(--space-6) var(--space-4);
+  }
+}
+
+/* --- Producto ------------------------------------------------------------------ */
+
+.bandaClara {
+  background: var(--surface-raised);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.bandaClara > .contenedor {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.ciclo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.flecha {
+  flex: none;
+  color: var(--ink-muted);
+}
+
+.o {
+  font-size: var(--text-label-size);
+  color: var(--ink-muted);
+}
+
+.grillaFunciones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: var(--space-4);
+}
+
+.funcion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* --- Certificación ------------------------------------------------------------- */
+
+.pasos {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.paso {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-4) 20px;
+}
+
+.paso + .paso {
+  border-top: 1px solid var(--line);
+}
+
+.numeroPaso {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--sello-soft);
+  color: var(--sello);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.numeroPaso[data-ultimo="true"] {
+  background: var(--ocre);
+  color: var(--on-ocre);
+}
+
+.tituloPaso {
+  font-weight: 600;
+}
+
+.textoPaso {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+
+/* --- API ----------------------------------------------------------------------- */
+
+.bandaHundida {
+  background: var(--surface-sunken);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.codigoEnLinea {
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+.marcoCodigo {
+  overflow-x: auto;
+}
+
+.marcoCodigo:focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: var(--focus-ring);
+}
+
+.codigo {
+  margin: 0;
+  padding: 20px;
+  width: max-content;
+  min-width: 100%;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--ink);
+}
+
+.codigoTenue {
+  color: var(--ink-muted);
+}
+
+/* --- Precios ------------------------------------------------------------------- */
+
+.seccionPrecios {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.grillaPlanes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: var(--space-4);
+}
+
+.plan {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.plan[data-destacado="true"] {
+  border-color: var(--sello);
+}
+
+.cabeceraPlan {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.etiquetaDestacado {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--ocre);
+  color: var(--on-ocre);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.precio {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.porMes {
+  font-family: var(--font-sans);
+  font-size: var(--text-label-size);
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+
+.caracteristicas {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.botonPlan {
+  margin-top: auto;
+}
+
+.planesExtra {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: var(--space-4);
+}
+
+.planExtra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.planExtraTexto {
+  flex: 1 1 260px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.aMedida {
+  margin-left: var(--space-1);
+  font-size: var(--text-label-size);
+  font-weight: 500;
+  color: var(--ink-muted);
+}
+
+/* --- Llamado final ------------------------------------------------------------- */
+
+.llamado {
+  background: var(--sello);
+  color: var(--on-sello);
+}
+
+.llamadoInterior {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 64px clamp(16px, 4vw, 32px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+
+.llamadoTexto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 640px;
+}
+
+.tituloLlamado,
+.textoLlamado {
+  color: var(--on-sello);
+}
+
+.tituloLlamado {
+  font-size: var(--text-display-size);
+  line-height: var(--text-display-line);
+  font-weight: var(--text-display-weight);
+  letter-spacing: var(--text-display-tracking);
+}
+
+.textoLlamado {
+  font-size: 17px;
+  line-height: 26px;
+}
+
+/* Saltos desde la cabecera: el título no queda pegado al borde. */
+.principal :target {
+  scroll-margin-top: var(--space-4);
+}
+
+@media (max-width: 600px) {
+  .contenedor {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+
+  .hero {
+    padding-top: 48px;
+    padding-bottom: 64px;
+  }
+}

@@ -35,6 +35,12 @@ const esquemaCorreo = z.object({
   CORREO_REMITENTE: z.string().min(3),
 });
 
+// Buzón del equipo que recibe el formulario de contacto del sitio público (Fase 12).
+// Solo la dirección: el remitente sigue siendo CORREO_REMITENTE.
+const esquemaContacto = z.object({
+  CORREO_CONTACTO: z.string().trim().max(254).pipe(z.email()),
+});
+
 const esquemaTurnstile = z.object({
   TURNSTILE_SECRET_KEY: z.string().min(10),
 });
@@ -103,6 +109,13 @@ export const envAuth = () => validar(esquemaAuth, 'Auth');
  * (p. ej. mostrar el enlace de invitación para copiarlo a mano).
  */
 export const envCorreo = (): z.infer<typeof esquemaCorreo> | null => opcional(esquemaCorreo);
+
+/**
+ * Destino del formulario de contacto (`/contacto`, PLAN-SAAS Fase 12). `null` si falta o
+ * no es un correo: el formulario muestra «No pudimos enviar tu mensaje» y lo avisa a
+ * Sentry. Se usa junto con `envCorreo()` (Resend y remitente).
+ */
+export const envContacto = (): z.infer<typeof esquemaContacto> | null => opcional(esquemaContacto);
 
 /**
  * Turnstile en el servidor (`siteverify`, PLAN-SAAS §4.7), solo para formularios que no

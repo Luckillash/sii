@@ -52,7 +52,7 @@ import { ListaDocumentos } from '../documentos/ListaDocumentos';
 import org from '../organizacion.module.css';
 import estilos from './tablero.module.css';
 
-export const metadata: Metadata = { title: 'Tablero · Boletéame' };
+export const metadata: Metadata = { title: 'Tablero' };
 
 /** Cuántos documentos muestra «Últimos documentos emitidos» (como la plantilla). */
 const ULTIMOS = 6;

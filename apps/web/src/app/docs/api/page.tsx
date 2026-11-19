@@ -32,7 +32,7 @@ import styles from './docs.module.css';
 export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
-  title: 'API de Boletéame',
+  title: 'Documentación de la API',
   description:
     'Emite boletas electrónicas ante el SII desde tu sistema: API REST con idempotencia y webhooks firmados.',
 };

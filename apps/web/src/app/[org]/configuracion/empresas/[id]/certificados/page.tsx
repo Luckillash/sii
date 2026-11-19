@@ -14,7 +14,7 @@ import { exigirMembresia } from '@/server/sesion';
 import org from '../../../../organizacion.module.css';
 import { CertificadosEmpresa } from './CertificadosEmpresa';
 
-export const metadata: Metadata = { title: 'Certificados de la empresa · Boletéame' };
+export const metadata: Metadata = { title: 'Certificados de la empresa' };
 
 const esquemaId = z.uuid();
 

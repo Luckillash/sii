@@ -11,7 +11,7 @@ import estilos from './api.module.css';
 import { FormularioClave } from './FormularioClave';
 import { TablaClaves } from './TablaClaves';
 
-export const metadata: Metadata = { title: 'API · Boletéame' };
+export const metadata: Metadata = { title: 'API' };
 
 // Configuración → API (PLAN-SAAS Fase 11, punto 1): crear API keys (la clave se muestra
 // una vez), ver su prefijo, permisos, ambiente, empresa, vencimiento y último uso, y

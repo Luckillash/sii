@@ -22,7 +22,7 @@ import { EstadoEmpresa } from './EstadoEmpresa';
 import { FormularioResolucion } from './FormularioResolucion';
 import { TraerResolucionSii } from './TraerResolucionSii';
 
-export const metadata: Metadata = { title: 'Empresa · Boletéame' };
+export const metadata: Metadata = { title: 'Empresa' };
 
 // «Traer del SII» (Server Action `verificarAutorizacion`) hace un login AUT2000 y dos
 // páginas del SII de hasta 45–70 s cada una, más la consulta pública STC. Igual que en

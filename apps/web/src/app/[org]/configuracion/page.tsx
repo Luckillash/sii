@@ -13,7 +13,7 @@ import { Tarjeta } from '@/components/boleteame';
 import { exigirMembresia } from '@/server/sesion';
 import org from '../organizacion.module.css';
 
-export const metadata: Metadata = { title: 'Configuración · Boletéame' };
+export const metadata: Metadata = { title: 'Configuración' };
 
 // Empresas, certificados y equipo (Fases 2 y 3), plan (Fase 10) y API y webhooks
 // (Fase 11) (PLAN-SAAS §3.1).

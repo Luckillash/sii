@@ -24,6 +24,8 @@ agregan funciones y tablas con sus propios grants (abajo, la `0005`; las demás 
   `puede_emitir(org)` (admin o emisor) y `comparte_organizacion(usuario)`.
 - **`anon`** solo lee los catálogos `tipos_dte`, `estados_sii` y `planes` (activos), y
   ejecuta `rut_valido` y `correo_sii_valido`. `revoke all on all tables ... from anon`.
+  La landing (Fase 12) lee `planes` así, con la clave publicable y sin cookies
+  ([sitio público](../02-guias/sitio-publico.md#precios-desde-planes)).
 - **Secretos fuera de la API:** `tokens_sii` y `sesiones_sii` tienen RLS sin políticas y
   `revoke all` a `anon` y `authenticated`; solo las usa el backend con `service_role`.
 - **Funciones:** `revoke execute on all functions ... from public, anon, authenticated` y se

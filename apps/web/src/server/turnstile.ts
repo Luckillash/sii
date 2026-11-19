@@ -30,6 +30,22 @@ export type ResultadoTurnstile = { ok: true } | { ok: false; motivo: string };
 interface RespuestaSiteverify {
   success?: boolean;
   'error-codes'?: string[];
+  /** `action` con la que se renderizó el widget. */
+  action?: string;
+  /** Hostname de la página donde se resolvió el desafío. */
+  hostname?: string;
+}
+
+/**
+ * Lo que debe traer la respuesta de `siteverify` además de `success`. Cada campo que se
+ * pida se compara; si no calza, el token se rechaza (un token sacado de otro formulario
+ * o de otro sitio con la misma clave de sitio).
+ */
+export interface EsperadoTurnstile {
+  /** `action` del widget (la prop `accion` de `<Turnstile>`). */
+  accion?: string;
+  /** Hostname de la página, sin puerto ni esquema (`boleteame.dev`). */
+  hostname?: string;
 }
 
 const ERRORES_DE_CONFIGURACION = new Set([
@@ -43,15 +59,19 @@ const ERRORES_DE_CONFIGURACION = new Set([
  * Verifica un token de Turnstile con `siteverify`.
  *
  * - Sin TURNSTILE_SECRET_KEY (`envTurnstile()` es `null`) devuelve `{ ok: true }`:
- *   Turnstile está desactivado (aún no hay cuenta; desarrollo).
+ *   Turnstile está desactivado (aún no hay cuenta; desarrollo). Quien quiera fallar
+ *   cerrado en producción lo revisa antes (ver la acción de `/contacto`).
  * - `motivo` está redactado para mostrarlo a la persona.
  * - Nunca lanza: red caída, timeout (5 s) o respuesta rara → `{ ok: false }`.
  *
  * @param ip IP de quien envía (opcional; ver `ipCliente()`).
+ * @param esperado `action` y `hostname` que debe traer la respuesta (opcional; lo que no
+ *   se pide no se compara).
  */
 export async function verificarTurnstile(
   token: string | null | undefined,
   ip?: string | null,
+  esperado?: EsperadoTurnstile,
 ): Promise<ResultadoTurnstile> {
   const env = envTurnstile();
   if (!env) return { ok: true };
@@ -85,7 +105,22 @@ export async function verificarTurnstile(
     return { ok: false, motivo: MOTIVOS_TURNSTILE.sinConexion };
   }
 
-  if (datos?.success === true) return { ok: true };
+  if (datos?.success === true) {
+    // Solo qué campo no calzó: nunca el token ni los valores.
+    if (esperado?.accion !== undefined && datos.action !== esperado.accion) {
+      console.error('turnstile: la action de la respuesta no coincide');
+      return { ok: false, motivo: MOTIVOS_TURNSTILE.invalido };
+    }
+    if (
+      esperado?.hostname !== undefined &&
+      (typeof datos.hostname !== 'string' ||
+        datos.hostname.toLowerCase() !== esperado.hostname.toLowerCase())
+    ) {
+      console.error('turnstile: el hostname de la respuesta no coincide');
+      return { ok: false, motivo: MOTIVOS_TURNSTILE.invalido };
+    }
+    return { ok: true };
+  }
 
   const codigos = Array.isArray(datos?.['error-codes']) ? datos['error-codes'] : [];
   if (codigos.some((c) => ERRORES_DE_CONFIGURACION.has(c))) {

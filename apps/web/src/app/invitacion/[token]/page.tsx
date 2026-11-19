@@ -21,7 +21,7 @@ import { esTokenInvitacion, rutaInvitacion } from './token';
 // página muestra igual el mensaje de invitación inválida.
 
 export const metadata: Metadata = {
-  title: 'Invitación · Boletéame',
+  title: 'Invitación',
   referrer: 'no-referrer',
   robots: { index: false, follow: false },
 };

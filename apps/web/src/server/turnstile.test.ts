@@ -102,6 +102,67 @@ describe('verificarTurnstile', () => {
     expect(registrado).not.toContain(SECRETO);
   });
 
+  it('sin `esperado` no compara action ni hostname (compatible hacia atrás)', async () => {
+    fetchSimulado.mockImplementation(async () =>
+      respuestaJson({ success: true, action: 'otra', hostname: 'otro.example' }),
+    );
+    expect(await verificarTurnstile('tok', null)).toEqual({ ok: true });
+    expect(await verificarTurnstile('tok', null, {})).toEqual({ ok: true });
+  });
+
+  it('acepta cuando action y hostname calzan (el hostname sin importar mayúsculas)', async () => {
+    fetchSimulado.mockResolvedValue(
+      respuestaJson({ success: true, action: 'contacto', hostname: 'Boleteame.dev' }),
+    );
+    expect(
+      await verificarTurnstile('tok', null, { accion: 'contacto', hostname: 'boleteame.dev' }),
+    ).toEqual({ ok: true });
+  });
+
+  it('rechaza como inválido si la action no calza o falta', async () => {
+    for (const cuerpo of [
+      { success: true, action: 'ingresar', hostname: 'boleteame.dev' },
+      { success: true, hostname: 'boleteame.dev' },
+    ]) {
+      fetchSimulado.mockResolvedValueOnce(respuestaJson(cuerpo));
+      expect(await verificarTurnstile('tok', null, { accion: 'contacto' })).toEqual({
+        ok: false,
+        motivo: MOTIVOS_TURNSTILE.invalido,
+      });
+    }
+  });
+
+  it('rechaza como inválido si el hostname no calza o falta', async () => {
+    for (const cuerpo of [
+      { success: true, action: 'contacto', hostname: 'otro.example' },
+      { success: true, action: 'contacto' },
+    ]) {
+      fetchSimulado.mockResolvedValueOnce(respuestaJson(cuerpo));
+      expect(
+        await verificarTurnstile('tok', null, { accion: 'contacto', hostname: 'boleteame.dev' }),
+      ).toEqual({ ok: false, motivo: MOTIVOS_TURNSTILE.invalido });
+    }
+    // Al log va qué no calzó, nunca el token ni los valores.
+    const registrado = vi.mocked(console.error).mock.calls.flat().join(' ');
+    expect(registrado).toContain('hostname');
+    expect(registrado).not.toContain('otro.example');
+    expect(registrado).not.toContain('tok');
+  });
+
+  it('un token rechazado por Cloudflare sigue rechazado aunque la action calce', async () => {
+    fetchSimulado.mockResolvedValue(
+      respuestaJson({
+        success: false,
+        action: 'contacto',
+        'error-codes': ['timeout-or-duplicate'],
+      }),
+    );
+    expect(await verificarTurnstile('tok', null, { accion: 'contacto' })).toEqual({
+      ok: false,
+      motivo: MOTIVOS_TURNSTILE.vencido,
+    });
+  });
+
   it('red caída o timeout: sin conexión, sin lanzar', async () => {
     fetchSimulado.mockRejectedValue(new DOMException('tiempo agotado', 'TimeoutError'));
     expect(await verificarTurnstile('tok')).toEqual({

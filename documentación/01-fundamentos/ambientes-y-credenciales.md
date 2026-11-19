@@ -213,6 +213,37 @@ Las claves de sandbox y de producción son distintas: no se mezclan con la otra 
 sandbox están cargadas desde el 2026-11-18 en `.env.local` y en Vercel *Production* (las
 cargó el usuario), y `apps/web/.env.example` las lista ([planes y pagos](../02-guias/planes-y-pagos.md#variables-de-entorno)).
 
+### Formulario de contacto: `CORREO_CONTACTO` (Fase 12)
+
+| Variable | Valores | Notas |
+|---|---|---|
+| `CORREO_CONTACTO` | una dirección de correo (solo la dirección, sin nombre), p. ej. el buzón del equipo | servidor, no *sensitive*; `envContacto()` de `src/server/env.ts` la valida como correo |
+
+El formulario de `/contacto` envía por Resend a `CORREO_CONTACTO`, desde `CORREO_REMITENTE`
+y con `reply_to` de la persona; es el único correo (no hay acuse a la persona).
+Sin `CORREO_CONTACTO`, o sin `RESEND_API_KEY` / `CORREO_REMITENTE`, el formulario responde
+«No pudimos enviar tu mensaje» y avisa a Sentry solo con los nombres de las variables que
+faltan. Ni el mensaje ni el correo de la persona van a logs ni a Sentry. Turnstile se
+verifica en el servidor con `TURNSTILE_SECRET_KEY`; en *Production* falla cerrado (sin la
+clave, el formulario responde «no disponible»). Falta, fuera del código, una regla de
+*rate limit* por IP del Firewall de Vercel para los POST con cabecera `Next-Action` (no
+basta «POST a `/contacto`»: Next 16 ejecuta la Server Action desde cualquier ruta).
+Detalle en la [guía del sitio público](../02-guias/sitio-publico.md#formulario-de-contacto-contacto).
+
+### URL pública del sitio: `NEXT_PUBLIC_APP_URL` (desde la Fase 12, también SEO)
+
+Además de los enlaces de los correos y de Flow, `NEXT_PUBLIC_APP_URL` es la base de los
+metadatos del sitio: `urlSitio()` (`lib/sitio.ts`) la usa para `metadataBase` (canónica y
+`og:url`), `/sitemap.xml`, `/robots.txt` y el JSON-LD. Como es `NEXT_PUBLIC_`, **se fija en el
+build**: cambiarla en Vercel exige redesplegar. Si falta o no es una URL http(s), `urlSitio()`
+usa `https://boleteame.dev` para que el build no se caiga (a diferencia de `envAuth()`, que
+la exige con `z.url()`). En *Production* vale `https://boleteame.dev`.
+
+La landing también usa `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+para leer los precios como `anon` (`clientePublico()`), y `/estado`, `SUPABASE_SECRET_KEY`
+para sus agregados; sin ellas, la landing muestra los precios de respaldo y `/estado`, «Sin
+datos».
+
 ## API keys de la API pública y ambiente del SII (Fase 11)
 
 No confundir con las claves API de Supabase (arriba): estas son las que crea un cliente en

@@ -1,9 +1,9 @@
 ---
 title: "Design system «Boletéame» en la app"
 description: "Tokens, componentes TSX con CSS Modules, layouts, catálogo /_ds y pruebas de accesibilidad."
-keywords: ["design system", "tokens", "CSS Modules", "EstadoDTE", "incierto", "Por verificar", "BannerAmbiente", "Dialogo", "LayoutApp", "axe", "/_ds", "stylelint", "Autocompletado", "combobox", "aria-activedescendant", "Tablero", "Monto", "MedidorFolios", "Fase 9"]
-related: ["01-fundamentos/formatos-y-validaciones.md", "01-fundamentos/errores-y-resultados.md", "07-referencia/trampas-conocidas.md", "02-guias/tablero-y-reportes.md"]
-source: ["PLAN-SAAS.md §4.2 y Fase 1", "design-system/boleteame/", "apps/web/src/components/boleteame/Autocompletado.tsx"]
+keywords: ["design system", "tokens", "CSS Modules", "EstadoDTE", "incierto", "Por verificar", "BannerAmbiente", "Dialogo", "LayoutApp", "axe", "/_ds", "stylelint", "Autocompletado", "combobox", "aria-activedescendant", "Tablero", "Monto", "MedidorFolios", "Fase 9", "Fase 12", "sitio público", "Landing", "(publico)", "MenuPublico", "Saltar al contenido", "marca.ts", "estampilla", "icon.svg"]
+related: ["01-fundamentos/formatos-y-validaciones.md", "01-fundamentos/errores-y-resultados.md", "07-referencia/trampas-conocidas.md", "02-guias/tablero-y-reportes.md", "02-guias/sitio-publico.md"]
+source: ["PLAN-SAAS.md §4.2 y Fase 1", "design-system/boleteame/", "apps/web/src/components/boleteame/Autocompletado.tsx", "apps/web/src/app/(publico)/", "apps/web/src/app/_seo/marca.ts", "apps/web/e2e/sitio-publico.spec.ts"]
 ---
 
 # Design system «Boletéame» en la app
@@ -81,6 +81,34 @@ Layouts:
 
 **Tablero (Fase 9)**, sobre la plantilla «Tablero»: cuatro `Tarjeta` de cifras (`Monto destacado` para ventas e IVA; números en `--font-mono`), `MedidorFolios`, la `ListaDocumentos` de Documentos emitidos, `Alerta` de inciertos, certificados y folios, `BannerAmbiente`, selectores con `Campo` + `Select` en un formulario GET, una sola acción `primario` («Emitir boleta») y las descargas como enlaces `<a download>` con `clasesBoton('secundario', 'sm')` e ícono `Download` de 16 px. Una sección que no se pudo leer muestra una `Tarjeta` `plana` con `role="status"` ([guía](../02-guias/tablero-y-reportes.md)).
 
+**Sitio público (Fase 12)**, sobre la plantilla «Landing» (`Main.dc.html`; [guía](../02-guias/sitio-publico.md)):
+
+- **Layout `(publico)`** con piezas propias en `app/(publico)/_compartido/` (no en la
+  biblioteca de componentes): `Cabecera`, `MenuPublico` (cliente; botón «Menú» con
+  `aria-expanded` en móvil, cierra con Escape y devuelve el foco) y `Pie` (leyenda de
+  independencia del SII). El enlace «Saltar al contenido» lleva al `<main id="contenido"
+  tabIndex={-1}>` que pone **cada página**: el layout no pone `<main>`.
+- La landing usa `Tarjeta`, `Alerta`, `EstadoDTE` (el ciclo del documento), `TablaDTE` y
+  `MedidorFolios` con datos ficticios, y `clasesBoton()` sobre `Link`; la única acción
+  `primario` es «Crear cuenta» del hero. Íconos de funciones a 24 px con `strokeWidth={1.5}`.
+- `/estado` muestra cada nivel con `Glifo` (aceptado, reparos, rechazado, borrador) y la
+  clase de tono de `tonos.module.css` (`exito`, `aviso`, `error`, `neutro`), y el resumen en
+  una `Alerta`.
+- `/contacto` usa `Campo`, `Input`, `Select`, `CampoRut` y un `<textarea>` propio ligado al
+  `Campo` con `useCampo()`.
+- Las regiones desplazables sin nada enfocable adentro (la tabla del hero, el bloque de código
+  de la API, las tablas legales) llevan `tabIndex={0}` y nombre accesible: axe exige que se
+  puedan desplazar con el teclado.
+- **Colores fuera de CSS:** `app/_seo/marca.ts` copia en hex los tokens que necesitan
+  `ImageResponse` (Satori no resuelve `var(--…)`), `viewport.themeColor` y el manifest.
+  `marca.test.ts` los compara con `tokens.json`: si cambia un token, la prueba falla y se
+  actualiza ahí. Es la única excepción a «ningún color literal fuera de `tokens.css`», y es
+  TypeScript, no CSS.
+- **Íconos:** `app/icon.svg` es la estampilla (`svgEstampilla`: bloque `sello` perforado,
+  cuadro `ocre` y la «B»), con tema oscuro por `prefers-color-scheme`; `apple-icon.tsx` la
+  pone opaca sobre `surface`. Es un monograma, no un logotipo: el design system todavía no
+  tiene marca gráfica.
+
 **Navegación** (`navegacion.ts`): Tablero, Emitir documento, Documentos emitidos, Folios (CAF), Certificación y Configuración. «Documentos recibidos» y «Libro de Compras y Ventas» están ocultos por las banderas `dteRecibidos` y `libroComprasVentas` hasta la Fase 14 (H2).
 
 ## Estado `incierto` (decisión D3)
@@ -101,7 +129,9 @@ El estado está en la app y en el design system (artifact y copia en `design-sys
 - Foco visible con `--focus-ring`, selección de `TablaDTE` con teclado, `Dialogo` devuelve el foco y cierra con Escape, `CampoRut` formatea y avisa un dígito malo.
 - Guarda capturas por componente en `apps/web/test-results/capturas/` para compararlas con los `preview.html`.
 
-**Contra un deploy** (solo lectura, no toca el SII): `E2E_URL=https://<deploy> pnpm --filter web test:e2e` corre solo `e2e/despliegue.spec.ts`, sin levantar servidor. Comprueba que la portada carga con código 200, sin errores de consola y sin violaciones de axe; que los tokens y las fuentes Plex llegan en claro y oscuro; que `/_ds` responde 404; y que la portada no desborda en móvil.
+`e2e/sitio-publico.spec.ts` (Fase 12) corre en los mismos tres proyectos contra la landing y el layout público: axe sin violaciones (también con el menú móvil abierto y con `data-theme` fijado), sin desborde horizontal (también a 320 px), «Saltar al contenido», menú móvil con Escape y enlaces de la cabecera y del pie.
+
+**Contra un deploy** (solo lectura, no toca el SII): `E2E_URL=https://<deploy> pnpm --filter web test:e2e` corre solo `e2e/despliegue.spec.ts`, sin levantar servidor. Comprueba que la portada (desde la Fase 12, la landing, con su `<h1>`) carga con código 200, sin errores de consola y sin violaciones de axe; que los tokens y las fuentes Plex llegan en claro y oscuro; que `/_ds` responde 404; y que la portada no desborda en móvil.
 
 ## Trampas
 

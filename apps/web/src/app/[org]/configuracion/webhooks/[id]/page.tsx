@@ -18,7 +18,7 @@ import { AccionesWebhook } from './AccionesWebhook';
 import { EditarWebhook } from './EditarWebhook';
 import { HistorialEntregas } from './HistorialEntregas';
 
-export const metadata: Metadata = { title: 'Webhook · Boletéame' };
+export const metadata: Metadata = { title: 'Webhook' };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

@@ -12,7 +12,7 @@ import estilos from '../api/api.module.css';
 import { claseEstadoEntrega } from './estilosEntrega';
 import { FormularioWebhook } from './FormularioWebhook';
 
-export const metadata: Metadata = { title: 'Webhooks · Boletéame' };
+export const metadata: Metadata = { title: 'Webhooks' };
 
 // Configuración → Webhooks (PLAN-SAAS Fase 11, punto 4): crear webhooks (el secreto HMAC
 // se muestra una vez) y ver su estado y su última entrega. El detalle, la edición, la

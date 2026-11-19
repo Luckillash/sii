@@ -1,8 +1,8 @@
 ---
 title: "Esquema: despliegue"
 description: "Cómo se aplican las migraciones en la única base (Supabase en la nube, producción), requisitos (Vault, Realtime, pg_cron, pg_net) y tareas programadas."
-keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, aplicadas, 0008_certificacion, registrar_caf, guardar_set_pruebas, rls-fase5-certificacion, 0009_autorizacion_externa, tg_resolucion_autoriza_produccion, rls-fase5-autorizacion-externa, 0010_verificar_autorizacion, verificar_autorizacion, operacion_sii, rls-fase5-verificar-autorizacion, 0011_folios, anular_folios, trg_20_caf_sin_traslape, tg_caf_sin_traslape, rls-fase6-folios, Fase 6, 0012_folio_anulado, Fase 8, 0013_notificaciones, notificaciones, reclamar_notificacion, rls-fase8-notificaciones, 0014_cron, cron.schedule, seguimiento-envios, alertas, limpiar-tokens-sii, limpiar-historial-cron, net._http_response, cron.job_run_details, CRON_SECRET, execute_sql, 42501, _crypto_aead_det_decrypt, db:tipos, nulabilidad, retornos de funciones, Fase 10, 0015_planes_comerciales, 0016_pagos, 0017_cron_suscripciones, sincronizar-suscripciones, activar_suscripcion, rls-fase10-pagos, migración 0018, migración 0019, entregar-webhooks, limpiar-webhook-entregas, limpiar-api-idempotencia, trg_10_api_key_sin_reactivar]
-related: ["02-guias/quickstart.md", "05-pruebas/probar-el-esquema.md", "08-esquema-supabase/vault-y-secretos.md", "02-guias/planes-y-pagos.md"]
+keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, aplicadas, 0008_certificacion, registrar_caf, guardar_set_pruebas, rls-fase5-certificacion, 0009_autorizacion_externa, tg_resolucion_autoriza_produccion, rls-fase5-autorizacion-externa, 0010_verificar_autorizacion, verificar_autorizacion, operacion_sii, rls-fase5-verificar-autorizacion, 0011_folios, anular_folios, trg_20_caf_sin_traslape, tg_caf_sin_traslape, rls-fase6-folios, Fase 6, 0012_folio_anulado, Fase 8, 0013_notificaciones, notificaciones, reclamar_notificacion, rls-fase8-notificaciones, 0014_cron, cron.schedule, seguimiento-envios, alertas, limpiar-tokens-sii, limpiar-historial-cron, net._http_response, cron.job_run_details, CRON_SECRET, execute_sql, 42501, _crypto_aead_det_decrypt, db:tipos, nulabilidad, retornos de funciones, Fase 10, 0015_planes_comerciales, 0016_pagos, 0017_cron_suscripciones, sincronizar-suscripciones, activar_suscripcion, rls-fase10-pagos, migración 0018, migración 0019, entregar-webhooks, limpiar-webhook-entregas, limpiar-api-idempotencia, trg_10_api_key_sin_reactivar, Fase 12, sin migraciones, /estado, índice operaciones_sii]
+related: ["02-guias/quickstart.md", "05-pruebas/probar-el-esquema.md", "08-esquema-supabase/vault-y-secretos.md", "02-guias/planes-y-pagos.md", "02-guias/sitio-publico.md"]
 source: ["supabase_saas_sii.sql (cabecera, opcional pg_cron)", "PLAN-SAAS.md §4.4 §6", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "supabase/migrations/0015_planes_comerciales.sql", "supabase/migrations/0016_pagos.sql", "supabase/migrations/0017_cron_suscripciones.sql", "supabase/migrations/0018_api_webhooks.sql", "supabase/migrations/0019_cron_webhooks.sql"]
 ---
 
@@ -754,6 +754,27 @@ arriba):
    `03-api-reference/rpc-integraciones.md`, `rpc-backend.md`, `acceso-por-tabla.md`,
    `04-objetos/objetos-auditoria-e-integraciones.md` y `05-pruebas/probar-el-esquema.md`
    (§14).
+
+### Fase 12: sin migraciones
+
+El sitio público ([guía](../02-guias/sitio-publico.md)) no agrega migraciones; usa lo que
+ya existe:
+
+- La landing lee `planes` como `anon` (clave publicable, sin cookies) gracias a la política
+  `lectura` de la 0001 (`using (activo)`); la grilla es la de `0015_planes_comerciales`.
+- `/estado` lee con `service_role`, solo conteos con `head: true` y una fecha suelta, sobre
+  `operaciones_sii` (por `ambiente`, `resultado`, `operacion` y `terminada_en`) y
+  `v_envios_por_consultar`, más una lectura `head` de `planes` para medir la base. Como mucho
+  7 lecturas por minuto (`revalidate = 60`).
+- **Pendiente para la Fase 13:** `operaciones_sii` no tiene índice por fecha sin
+  organización (solo `(organizacion_id, iniciada_en)` y `(empresa_id, operacion,
+  iniciada_en)`), así que los conteos de `/estado` recorren la tabla. Cuando haya volumen, una
+  migración aditiva con un índice `concurrently` (p. ej. `(terminada_en)` o
+  `(ambiente, terminada_en)`), junto con los de `unindexed_foreign_keys`.
+
+Antes del deploy van `NEXT_PUBLIC_APP_URL` (se fija en el build: sitemap, canónica, OG) y
+`CORREO_CONTACTO` en Vercel *Production*; después, la regla del Firewall para los POST a
+`/contacto` ([checklist](../07-referencia/checklist-produccion.md#sitio-público-fase-12)).
 
 ## Requisitos del proyecto
 

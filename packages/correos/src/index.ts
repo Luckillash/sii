@@ -5,6 +5,7 @@ export { type CorreoAuth, PLANTILLAS_AUTH, type PlantillaAuth } from './auth';
 export { correoBoleta, type DatosBoleta } from './boleta';
 export { correoCertificacion, type DatosCertificacion } from './certificacion';
 export { correoCertificadoPorVencer, type DatosCertificadoPorVencer } from './certificado';
+export { correoContacto, type DatosContacto, limpiarLinea, limpiarTextoLibre } from './contacto';
 export { correoFoliosPorAgotarse, type DatosFoliosPorAgotarse } from './folios';
 export { correoEnvioIncierto, type DatosEnvioIncierto, type DocumentoIncierto } from './incierto';
 export { correoInvitacion, type DatosInvitacion } from './invitacion';

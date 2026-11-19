@@ -10,7 +10,7 @@ import { exigirMembresia } from '@/server/sesion';
 import org from '../../organizacion.module.css';
 import estilos from './empresas.module.css';
 
-export const metadata: Metadata = { title: 'Empresas · Boletéame' };
+export const metadata: Metadata = { title: 'Empresas' };
 
 export default async function PaginaEmpresas({ params }: { params: Promise<{ org: string }> }) {
   const { org: slug } = await params;

@@ -12,7 +12,7 @@ import { Asistente } from './Asistente';
 import estilos from './certificacion.module.css';
 import { diasHasta, elegirEmpresa } from './logica';
 
-export const metadata: Metadata = { title: 'Certificación · Boletéame' };
+export const metadata: Metadata = { title: 'Certificación' };
 
 // Las Server Actions de esta página (postular, solicitar folios, declarar…) hacen varias
 // peticiones al SII de hasta 45 s cada una (PLAN-SAAS §4.1). En Next 16 el `maxDuration`

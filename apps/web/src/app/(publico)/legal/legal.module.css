@@ -1,0 +1,224 @@
+/* Páginas de texto largo del sitio público: términos, privacidad y el índice de /legal. */
+
+.contenedor {
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-8) clamp(16px, 4vw, 32px) 64px;
+}
+
+.cabecera {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-bottom: var(--space-6);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--line);
+}
+
+.antetitulo {
+  color: var(--sello);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--text-label-weight);
+}
+
+.titulo {
+  font-size: var(--text-display-size);
+  line-height: var(--text-display-line);
+  font-weight: var(--text-display-weight);
+  letter-spacing: var(--text-display-tracking);
+  overflow-wrap: anywhere;
+}
+
+.bajada {
+  max-width: 72ch;
+  color: var(--ink-muted);
+}
+
+.vigencia {
+  color: var(--ink-muted);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+.cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+}
+
+@media (min-width: 900px) {
+  .cuerpo {
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: var(--space-8);
+  }
+
+  .indice {
+    position: sticky;
+    top: var(--space-4);
+    align-self: start;
+    max-height: calc(100vh - var(--space-8));
+    overflow-y: auto;
+  }
+}
+
+.indice {
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+}
+
+.indiceTitulo {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--text-label-weight);
+  color: var(--ink-muted);
+}
+
+.indice ol {
+  margin: 0;
+  padding-left: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.contenido {
+  min-width: 0;
+  max-width: 760px;
+}
+
+.seccion {
+  padding-bottom: var(--space-6);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: var(--space-4);
+}
+
+.seccion:last-of-type {
+  border-bottom: none;
+}
+
+.seccion h2 {
+  margin-bottom: var(--space-3);
+  font-size: var(--text-title-size);
+  line-height: var(--text-title-line);
+  font-weight: var(--text-title-weight);
+}
+
+.seccion h3 {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}
+
+.seccion p {
+  margin-bottom: var(--space-3);
+}
+
+.seccion ul,
+.seccion ol {
+  margin: 0 0 var(--space-3);
+  padding-left: var(--space-6);
+}
+
+.seccion li {
+  margin-bottom: var(--space-1);
+}
+
+.enlace {
+  color: var(--link);
+  text-underline-offset: 2px;
+  border-radius: var(--radius-sm);
+  overflow-wrap: anywhere;
+}
+
+.enlace:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.tablaContenedor {
+  margin: 0 0 var(--space-4);
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.tablaContenedor:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.tabla {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.tabla caption {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  font-weight: var(--text-label-weight);
+  color: var(--ink-muted);
+}
+
+.tabla th {
+  text-align: left;
+  font-weight: var(--text-label-weight);
+  color: var(--ink-muted);
+  background: var(--surface-sunken);
+}
+
+.tabla th,
+.tabla td {
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.nota {
+  color: var(--ink-muted);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.otros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin-top: var(--space-6);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* Índice de /legal: dos tarjetas. */
+.documentos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.documento {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  height: 100%;
+}
+
+.documentoTitulo {
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}

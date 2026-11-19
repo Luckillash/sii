@@ -17,7 +17,10 @@ test('la portada carga sin errores de consola y pasa axe', async ({ page }) => {
   const respuesta = await page.goto('/');
   expect(respuesta?.status()).toBe(200);
   await page.waitForLoadState('networkidle');
-  await expect(page.getByRole('heading', { level: 1, name: 'Boletéame' })).toBeVisible();
+  // Fase 12: la portada es la landing (`(publico)/page.tsx`).
+  await expect(
+    page.getByRole('heading', { level: 1, name: /boletas electrónicas sin vueltas/ }),
+  ).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'es-CL');
 
   const axe = await new AxeBuilder({ page }).withTags(ETIQUETAS_WCAG).analyze();

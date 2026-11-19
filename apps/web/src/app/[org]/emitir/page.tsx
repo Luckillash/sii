@@ -12,7 +12,7 @@ import org from '../organizacion.module.css';
 import { Emision } from './Emision';
 import estilos from './emitir.module.css';
 
-export const metadata: Metadata = { title: 'Emitir documento · Boletéame' };
+export const metadata: Metadata = { title: 'Emitir documento' };
 
 // La emisión pide un token al SII y hace una subida (PLAN-SAAS §4.1: 60 s). En Next 16 el
 // `maxDuration` de la página aplica a todas las Server Actions que se usan en ella

@@ -10,7 +10,7 @@ import estilos from './certificados.module.css';
 import { FormularioCertificado } from './FormularioCertificado';
 import { TablaCertificados } from './TablaCertificados';
 
-export const metadata: Metadata = { title: 'Certificados · Boletéame' };
+export const metadata: Metadata = { title: 'Certificados' };
 
 // La carga abre el .pfx con la librería (node-forge, node:crypto): nada de Edge.
 export const runtime = 'nodejs';

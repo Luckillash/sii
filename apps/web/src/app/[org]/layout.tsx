@@ -1,4 +1,5 @@
 import { LogOut } from 'lucide-react';
+import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Boton } from '@/components/boleteame';
 import { ETIQUETA_ROL } from '@/lib/permisos';
@@ -20,6 +21,11 @@ import { SelectorOrganizacion } from './SelectorOrganizacion';
 // Permisos en componentes cliente: por ahora las páginas pasan el rol como prop (Equipo
 // es el único que lo usa), así que no hay provider ni store. Cuando haga falta en
 // muchos componentes, va en `useContextoStore` (PLAN-SAAS §4.3).
+
+// Fuera de los buscadores (Fase 12): sin sesión el proxy redirige a /ingresar, así que
+// un buscador nunca ve el contenido; el `noindex` es la segunda barrera. Las páginas de
+// abajo no deben redefinir `robots`.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 async function perfilSeguro(): Promise<Perfil | null> {
   try {

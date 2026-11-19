@@ -38,7 +38,7 @@ import org from '../../organizacion.module.css';
 import estilos from './envio.module.css';
 import { MarcarRevisado } from './MarcarRevisado';
 
-export const metadata: Metadata = { title: 'Envío al SII · Boletéame' };
+export const metadata: Metadata = { title: 'Envío al SII' };
 
 // «Consultar estado en el SII» sale al SII: token (con renovación) y consulta, hasta 45 s
 // por petición según `TransporteUndici`, así que puede pasar de 2 minutos. En Next 16 el

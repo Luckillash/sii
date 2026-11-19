@@ -1,0 +1,182 @@
+.pagina {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.contenedor {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-8) 16px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.cabecera {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.titulo {
+  margin: 0;
+  font-size: var(--text-display-size);
+  line-height: var(--text-display-line);
+  font-weight: var(--text-display-weight);
+  letter-spacing: var(--text-display-tracking);
+}
+
+.bajada {
+  max-width: 64ch;
+  margin: 0;
+  color: var(--ink-muted);
+}
+
+.columnas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .columnas {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+/* En pantallas angostas la tarjeta pierde relleno para no apretar los campos. */
+@media (max-width: 480px) {
+  .tarjeta {
+    padding: var(--space-4);
+  }
+}
+
+.subtitulo {
+  margin: 0;
+  font-size: var(--text-title-size);
+  line-height: var(--text-title-line);
+  font-weight: var(--text-title-weight);
+}
+
+.notas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.notas p {
+  margin: 0;
+  color: var(--ink-muted);
+}
+
+.notas section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--line-strong);
+}
+
+.subtituloNota {
+  margin: 0;
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}
+
+.formulario,
+.exito {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.avisos:empty {
+  display: none;
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .fila {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* El CampoRut trae su propio tope de ancho; aquí ocupa su columna. */
+.fila > div {
+  min-width: 0;
+}
+
+/* Mismo aspecto que Input (`.tb-input`). */
+.areaTexto {
+  width: 100%;
+  min-height: 160px;
+  box-sizing: border-box;
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-line);
+  color: var(--ink);
+  background: var(--surface-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  resize: vertical;
+  transition:
+    box-shadow var(--duracion-rapida),
+    border-color var(--duracion-rapida);
+}
+
+.areaTexto::placeholder {
+  color: var(--ink-muted);
+}
+
+.areaTexto:focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: var(--focus-ring);
+}
+
+.areaTexto[aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+/* Campo trampa: fuera de la pantalla (no `display: none`, que algunos bots detectan). */
+.trampa {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.acciones {
+  display: flex;
+}
+
+.botonEnviar {
+  height: 44px;
+  font-size: 15px;
+}
+
+@media (max-width: 480px) {
+  .botonEnviar {
+    width: 100%;
+  }
+}
+
+/* Input y Select no traen ancho propio: aquí ocupan su columna. */
+.anchoTotal {
+  width: 100%;
+}

@@ -13,7 +13,7 @@ import { BarraUso } from './BarraUso';
 import { Planes } from './Planes';
 import estilos from './plan.module.css';
 
-export const metadata: Metadata = { title: 'Plan · Boletéame' };
+export const metadata: Metadata = { title: 'Plan' };
 
 // Configuración → Plan (PLAN-SAAS Fase 10): plan vigente, uso del mes contra los límites,
 // grilla para cambiar de plan (Flow), tarjeta e historial de pagos. Todos los miembros

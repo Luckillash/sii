@@ -9,7 +9,10 @@ import { FormularioOrganizacion } from './FormularioOrganizacion';
 // ve el formulario: se va a la última que abrió (si sigue siendo miembro) o a la
 // primera. Quien llega con `?invitacion=<token>` se va a aceptar la invitación.
 
-export const metadata: Metadata = { title: 'Crea tu organización · Boletéame' };
+export const metadata: Metadata = {
+  title: 'Crea tu organización',
+  robots: { index: false, follow: false },
+};
 
 /** Forma de un token de `token_aleatorio()` (64 hex); se acepta algo más amplio. */
 const FORMA_TOKEN = /^[A-Za-z0-9_-]{16,128}$/;

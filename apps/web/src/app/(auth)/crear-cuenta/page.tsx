@@ -3,7 +3,7 @@ import { destinoSeguro } from '@/lib/redireccion';
 import { primerValor } from '../_compartido/piezas';
 import { FormCrearCuenta } from './FormCrearCuenta';
 
-export const metadata: Metadata = { title: 'Crear cuenta · Boletéame' };
+export const metadata: Metadata = { title: 'Crear cuenta' };
 
 type Parametros = Record<string, string | string[] | undefined>;
 

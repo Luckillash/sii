@@ -1,9 +1,9 @@
 ---
 title: "Trampas conocidas"
 description: "Comportamientos no obvios del SII, de la librería y del esquema."
-keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna, ad_empresa1, ad_empresa2, Actualización de datos del contribuyente, representante legal, no está autorizado para operar en esta modalidad, verificar_autorizacion, ConsultaAutorizacion, situación tributaria de terceros, STC, stc/noauthz, getConsultaData, timbrajes, documentos autorizados, reCAPTCHA, SituacionTributaria, Fase 6, folios, migración 0011, anular_folios, cola completa, trg_20_caf_sin_traslape, 23P01, revisión con el SII, simulada, TransporteSinTimbrar, of_genera_folio, revisionId, folios.por_agotarse, Idempotency-Key, denominador, folio asignado sin documento, política alta, subirCaf, RSAPK, Fase 7, emisión, emitirDocumento, FABRICA_REST_EMISION, FABRICAS_SII.rest, documentoId, doble clic, borradorId, clave_idempotencia, sessionStorage, Ya la revisé, esFolioAnulado, INTENTOS_FOLIO, PDF417, bwip-js, bwip-js/node, binarytext, pdfkit, serverExternalPackages, AFM, ted_xml, latin1, instructivo de representación impresa, enlaceDocumento, uso_mensual.envios, Fase 8, seguimiento, ejecutarSeguimiento, consultarEnvio, consultar_envio, server/sii/clientes.ts, backoff, filtroPorConsultar, inconsistente, lista blanca, ESTADOS_CONOCIDOS, -11, RPR, ErrorTokenSoap, QueryEstUp, detalleIncompleto, orden de escritura, documento.aceptado falso, ya_final, cerrarAbandonadas, envio_sin_cerrar, Ya lo revisé, notificaciones, reclamar_notificacion, migración 0013, migración 0014, pg_cron, cron_token, CRON_SECRET, PRESUPUESTO_MS, LIMITE_MS, Fase 9, Tablero, v_ventas_diarias, set_pruebas, agregaciones de PostgREST, db-aggregates-enabled, max-rows, exportación, CSV, BOM, separador, inyección de fórmulas, neutralizarFormula, XLSX, inlineStr, escaparXml, serieExcel, crc32, keyset, armarResumen, Fase 10, Flow, pagos, suscripciones, SameSite=Lax, retorno sin cookies, callback sin firma, token, morose, status, instanteFlow, diaFlow, asegurarPlan, precio distinto, urlCallback, suscripciones_externa_unica, ya terminó, planes.lectura, plan_vigente, proveedor_pago, firma s, eventos_pasarela, cuotaProduccion, Fase 11, API pública, api_idempotencia, soltar_idempotencia, Idempotent-Replayed, 202 incierto, autenticar_api_key, webhook_entregas, DNS rebinding, lookup, 3xx, rotar_secreto_webhook, webhooks_url_permitida, openapi.json, /docs]
-related: ["02-guias/planes-y-pagos.md", "08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md", "02-guias/emision-boletas.md", "02-guias/seguimiento-envios.md", "02-guias/tablero-y-reportes.md", "02-guias/api-publica.md", "06-integraciones/webhooks.md"]
-source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/", "supabase/migrations/0011_folios.sql", "apps/web/src/server/folios/", "apps/web/src/app/[org]/folios/", "apps/web/src/server/emision/", "apps/web/src/server/pdf/", "apps/web/src/app/[org]/emitir/", "apps/web/next.config.ts", "apps/web/src/server/seguimiento/", "apps/web/src/server/alertas/", "apps/web/src/server/documentos/", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "apps/web/src/server/tablero/", "apps/web/src/server/reportes/", "apps/web/src/app/[org]/reportes/exportar/route.ts", "apps/web/src/server/pagos/", "apps/web/src/app/api/pagos/flow/", "supabase/migrations/0015_planes_comerciales.sql", "supabase/migrations/0016_pagos.sql", "apps/web/src/lib/api-publica.ts", "apps/web/src/server/api-publica/", "apps/web/src/server/webhooks/", "supabase/migrations/0018_api_webhooks.sql"]
+keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna, ad_empresa1, ad_empresa2, Actualización de datos del contribuyente, representante legal, no está autorizado para operar en esta modalidad, verificar_autorizacion, ConsultaAutorizacion, situación tributaria de terceros, STC, stc/noauthz, getConsultaData, timbrajes, documentos autorizados, reCAPTCHA, SituacionTributaria, Fase 6, folios, migración 0011, anular_folios, cola completa, trg_20_caf_sin_traslape, 23P01, revisión con el SII, simulada, TransporteSinTimbrar, of_genera_folio, revisionId, folios.por_agotarse, Idempotency-Key, denominador, folio asignado sin documento, política alta, subirCaf, RSAPK, Fase 7, emisión, emitirDocumento, FABRICA_REST_EMISION, FABRICAS_SII.rest, documentoId, doble clic, borradorId, clave_idempotencia, sessionStorage, Ya la revisé, esFolioAnulado, INTENTOS_FOLIO, PDF417, bwip-js, bwip-js/node, binarytext, pdfkit, serverExternalPackages, AFM, ted_xml, latin1, instructivo de representación impresa, enlaceDocumento, uso_mensual.envios, Fase 8, seguimiento, ejecutarSeguimiento, consultarEnvio, consultar_envio, server/sii/clientes.ts, backoff, filtroPorConsultar, inconsistente, lista blanca, ESTADOS_CONOCIDOS, -11, RPR, ErrorTokenSoap, QueryEstUp, detalleIncompleto, orden de escritura, documento.aceptado falso, ya_final, cerrarAbandonadas, envio_sin_cerrar, Ya lo revisé, notificaciones, reclamar_notificacion, migración 0013, migración 0014, pg_cron, cron_token, CRON_SECRET, PRESUPUESTO_MS, LIMITE_MS, Fase 9, Tablero, v_ventas_diarias, set_pruebas, agregaciones de PostgREST, db-aggregates-enabled, max-rows, exportación, CSV, BOM, separador, inyección de fórmulas, neutralizarFormula, XLSX, inlineStr, escaparXml, serieExcel, crc32, keyset, armarResumen, Fase 10, Flow, pagos, suscripciones, SameSite=Lax, retorno sin cookies, callback sin firma, token, morose, status, instanteFlow, diaFlow, asegurarPlan, precio distinto, urlCallback, suscripciones_externa_unica, ya terminó, planes.lectura, plan_vigente, proveedor_pago, firma s, eventos_pasarela, cuotaProduccion, Fase 11, API pública, api_idempotencia, soltar_idempotencia, Idempotent-Replayed, 202 incierto, autenticar_api_key, webhook_entregas, DNS rebinding, lookup, 3xx, rotar_secreto_webhook, webhooks_url_permitida, openapi.json, /docs, Fase 12, sitio público, clientePublico, PLANES_RESPALDO, /estado, agregados, opengraph-image, ESTATICO, PUBLICAS_EXACTAS, SLUGS_RESERVADOS, PATRON_SLUG, canonical, plantilla de título, noindex, sin acuse, relay de spam, honeypot, ImageResponse, next typegen, RESPONSABLE, Next-Action, Firewall de Vercel, falla cerrado, action, hostname, crear_organizacion, nivelResumen]
+related: ["02-guias/planes-y-pagos.md", "08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md", "02-guias/emision-boletas.md", "02-guias/seguimiento-envios.md", "02-guias/tablero-y-reportes.md", "02-guias/api-publica.md", "06-integraciones/webhooks.md", "02-guias/sitio-publico.md"]
+source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/", "supabase/migrations/0011_folios.sql", "apps/web/src/server/folios/", "apps/web/src/app/[org]/folios/", "apps/web/src/server/emision/", "apps/web/src/server/pdf/", "apps/web/src/app/[org]/emitir/", "apps/web/next.config.ts", "apps/web/src/server/seguimiento/", "apps/web/src/server/alertas/", "apps/web/src/server/documentos/", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "apps/web/src/server/tablero/", "apps/web/src/server/reportes/", "apps/web/src/app/[org]/reportes/exportar/route.ts", "apps/web/src/server/pagos/", "apps/web/src/app/api/pagos/flow/", "supabase/migrations/0015_planes_comerciales.sql", "supabase/migrations/0016_pagos.sql", "apps/web/src/lib/api-publica.ts", "apps/web/src/server/api-publica/", "apps/web/src/server/webhooks/", "supabase/migrations/0018_api_webhooks.sql", "apps/web/src/app/(publico)/", "apps/web/src/app/_seo/", "apps/web/src/lib/rutas.ts", "apps/web/src/server/estado/"]
 ---
 
 # Trampas conocidas
@@ -1160,3 +1160,133 @@ Notas de la implementación (rutas, entrega y base):
   API desde Configuración → Plan (con Flow sandbox, el 2026-11-19); sin `planes.incluye_api`
   no se pueden crear claves ni usar `/api/v1`, y sin `incluye_webhooks` `encolar_evento` no
   encola entregas.
+
+## Sitio público (Fase 12)
+
+Decisiones y trampas de la fase (detalle en la [guía](../02-guias/sitio-publico.md)).
+
+### Decisiones
+
+- **La landing lee `planes` con un cliente anónimo sin cookies** (`clientePublico()`,
+  `server/supabase/publico.ts`). Con `clienteServidor()` la página leería las cookies de la
+  sesión y dejaría de ser estática (se renderizaría en cada petición). El cliente anónimo
+  solo ve lo que RLS deja a `anon`: los planes activos.
+- **Precios con respaldo.** Si `planes` falla o no trae planes con precio, la landing
+  muestra `PLANES_RESPALDO` y avisa a Sentry (`landing: precios de respaldo`) en vez de
+  romperse o quedar sin precios. La prueba compara el respaldo con
+  `0015_planes_comerciales.sql`; una migración posterior que cambie precios exige
+  actualizar a mano el respaldo, `PLANES_JSON_LD` y los planes de Flow.
+- **`/estado` usa `service_role` y devuelve solo niveles.** `operaciones_sii` y `envios`
+  tienen RLS por organización y la página no tiene sesión. Lee solo conteos con
+  `head: true` (sin filas) y una fecha suelta, y devuelve solo el nivel y una frase fija por
+  fila: nunca ids, organizaciones, mensajes, errores crudos, conteos ni horas de actividad
+  (con pocos clientes, «última respuesta del SII a las 14:57» o «no hubo operaciones en la
+  última hora» dice cuándo emite alguien). A los logs va solo el código del error. Cualquier
+  cambio en `server/estado/` debe mantener esa regla: la página es pública.
+- **El seguimiento se mide por el cron, no por un cliente.** Con envíos atrasados, la fila
+  queda «Operativo» si hubo alguna corrida `seguimiento` con resultado `ok` en los últimos
+  60 min (los atrasados son de clientes puntuales: un certificado vencido deja la corrida de
+  esa empresa en `config`, y eso se ve en su panel); solo sin ninguna corrida `ok` reciente
+  pasa a «Con problemas». Antes, el atrasado de un solo cliente marcaba «Con demoras» para
+  todos.
+- **El resumen de `/estado` no cuenta la fila Plataforma** (siempre operativa) y nunca dice
+  «Todo funciona con normalidad» si no se pudo medir la base: queda en «Sin datos»
+  (`nivelResumen`).
+- **`/estado` nunca lanza:** cada lectura tiene 5 s de tope y la que falla deja su fila en
+  «Sin datos». Una página de estado que se cae cuando la base anda mal no sirve.
+- **Sin acuse de recibo.** El formulario de contacto manda un solo correo, a
+  `CORREO_CONTACTO` con `reply_to` de la persona. El correo de la persona lo escribe
+  cualquiera: un acuse automático a esa dirección, aunque no copie texto libre, nos haría
+  *relay* de spam hacia terceros con el mismo remitente de Auth (y gastaría la reputación de
+  la que dependen la confirmación de cuentas y la recuperación de contraseñas).
+- **Turnstile falla cerrado en `/contacto` en producción.** Si falta
+  `TURNSTILE_SECRET_KEY` y `VERCEL_ENV === 'production'`, la acción responde «no disponible»
+  y avisa a Sentry en vez de quedar abierta a bots. Además exige `action = 'contacto'` y, en
+  producción, el `hostname` de `urlSitio()` en la respuesta de `siteverify`. En local y
+  desarrollo sigue abierto; las invitaciones no cambian.
+- **El honeypot responde éxito** sin verificar Turnstile ni enviar: un bot que recibe un
+  error aprende a no llenar el campo.
+- **El mensaje de contacto no se guarda en la base** ni va a logs ni a Sentry; solo queda en
+  el buzón de `CORREO_CONTACTO`. `Idempotency-Key` = SHA-256 del destinatario y del contenido
+  (con el correo de la persona ya normalizado, el mismo de `reply_to`), y el cuerpo no lleva
+  la hora (Resend rechaza la misma clave con otro cuerpo).
+- **Textos legales sin marcadores.** Mientras falten los datos de `RESPONSABLE`
+  (`lib/legal.ts`), las páginas dicen «el titular de Boletéame» y «escríbenos desde la página
+  de contacto»; una prueba impide que salga `[…]`, `{…}`, «TU», `null` o `undefined`.
+- **Los pasos de certificación y el ejemplo de la API de la landing salen del código**
+  (`PASOS`, `URL_API`, `CABECERA_IDEMPOTENCIA`, `esquemaEmisionApi`, `calcularTotales`) y
+  tienen pruebas que fallan si el asistente o la API cambian.
+
+### Trampas
+
+- **`/opengraph-image` no calza con el regex de estáticos.** Las imágenes generadas
+  (`opengraph-image`, `twitter-image`, `apple-icon`, e `icon` si `icon.svg` pasara a
+  `icon.tsx`) se sirven **sin extensión** (`/opengraph-image?<hash>`), así que `ESTATICO` de
+  `lib/rutas.ts` no las cubre y, sin listarlas, el proxy las redirigiría a `/ingresar`: las vistas previas en
+  redes sociales quedarían sin imagen. Van en `PUBLICAS_EXACTAS`, solo en la raíz
+  (`/acme/opengraph-image` sigue protegida), y sus nombres están en `SLUGS_RESERVADOS`.
+- **Slugs con punto.** `/sitemap.xml`, `/robots.txt` y `/manifest.webmanifest` son rutas de
+  primer nivel, pero no hace falta reservarlas: `PATRON_SLUG` no admite puntos, así que
+  ninguna organización puede llamarse así.
+- **Prefijo público = slug reservado.** `/contacto`, `/ayuda`, `/estado` y `/legal` son
+  prefijos públicos (todo lo que cuelga de ellos es público). Sin reservar el slug, una
+  organización llamada `estado` dejaría su panel en una ruta pública. `rutas.test.ts` exige
+  que cada ruta pública de primer nivel sin punto esté reservada. La reserva solo frena las
+  organizaciones nuevas: antes de agregar una, revisar que ninguna existente use ese slug.
+- **Canónica `./`, no `/`.** `alternates.canonical: './'` en el layout raíz se resuelve contra
+  la ruta de cada página (canónica a sí misma, sin la query). Con `'/'`, cada página que no
+  definiera la suya declararía como canónica la landing y los buscadores la descartarían.
+- **La plantilla de título obligó a quitar « · Boletéame» de los títulos.** Con
+  `template: '%s · Boletéame'`, un `title: 'Ingresar · Boletéame'` sale «Ingresar · Boletéame
+  · Boletéame». Las páginas ponen solo su nombre; la landing usa `title.absolute`. Una página
+  nueva no debe agregar la marca.
+- **`noindex` heredado:** `[org]/layout.tsx` pone `robots: noindex`; una página bajo `[org]`
+  que defina su propio `robots` lo pisa. No redefinirlo.
+- **Next 16 reenvía una Server Action desde cualquier ruta.** Basta un POST con la cabecera
+  `Next-Action` (el id de la acción) a `/`, `/ayuda` o cualquier página para ejecutar
+  `enviarContacto`. Una regla del Firewall de Vercel «POST a `/contacto`» no frena a un bot:
+  la regla de *rate limit* (por IP) tiene que aplicarse a los POST con cabecera
+  `Next-Action`, o a todos los POST de páginas (fuera de `/api/`). Vale para cualquier
+  Server Action pública que se quiera limitar.
+- **Los slugs reservados solo los valida la app.** `SLUGS_RESERVADOS` vive en `lib/rutas.ts`;
+  la función de la base `crear_organizacion` no la conoce, así que una llamada directa a la
+  RPC (con la clave publicable y una sesión) podría crear una organización `estado` o
+  `contacto`. Pendiente para la Fase 13: una migración que valide la misma lista en la base.
+  `rutas.test.ts` sí lee las carpetas reales de `src/app` y exige que cada una esté reservada.
+- **`/estado` sin fila de `seguimiento` cuando el cron no tiene envíos.** El seguimiento
+  registra una operación `seguimiento` por grupo (empresa + ambiente + canal); si no hay
+  envíos por consultar, no hay grupos y no deja fila. Por eso la «última corrida» no sirve
+  sola como latido: el nivel se decide por los envíos atrasados (sin primera consulta, de
+  más de 15 min) y la última corrida `ok` solo se mira cuando hay atrasados. Sin atrasados,
+  la fila dice «Operativo» aunque la última corrida sea de hace horas.
+- **«Sin datos» en la conexión con el SII no es una falla:** con poco uso puede no haber
+  operaciones en la última hora. La página lo muestra como «Sin mediciones recientes.», igual
+  que una lectura fallida, para no revelar si hubo actividad. Los resultados 1, 2, 3 y 7 no
+  cuentan (no dicen nada de la conexión).
+- **`<details>` no se abre con el ancla.** El navegador salta a `/ayuda#por-verificar` pero
+  deja la pregunta cerrada; `AbrirPreguntaDelHash` la abre al cargar y en `hashchange`.
+- **`operaciones_sii` sin índice por fecha.** Los índices de la 0001 son
+  `(organizacion_id, iniciada_en)` y `(empresa_id, operacion, iniciada_en)`; los conteos de
+  `/estado` filtran por `ambiente`, `resultado` y `terminada_en` sin organización y recorren
+  la tabla. Con `revalidate = 60` son 7 lecturas por minuto como mucho, aceptable hoy. Para
+  la Fase 13 (con volumen): un índice aditivo, p. ej. sobre `(terminada_en)` o
+  `(ambiente, terminada_en)`, creado `concurrently`.
+- **Fuente por defecto en `ImageResponse`.** Las imágenes OG usan la fuente que trae
+  `next/og` (Geist, solo 400), no IBM Plex: cargar los `.ttf` exigiría versionarlos y
+  leerlos al cargar el módulo (unos 200 KB por peso contra el límite de 500 KB del paquete de
+  `ImageResponse`), y descargarlos de Google en cada generación se descartó. Satori tampoco
+  lee custom properties: los colores salen de `_seo/marca.ts`, que una prueba compara con
+  `tokens.json`.
+- **`next typegen` al mover `app/page.tsx`.** Al pasar la portada a `app/(publico)/page.tsx`
+  (y borrar `app/page.tsx`), los tipos de rutas generados en `.next/types` y
+  `.next/dev/types` (los dos están en `tsconfig.json`) siguen apuntando al archivo borrado y
+  el typecheck falla. Se regeneran con `pnpm --filter web exec next typegen` (o con un
+  `next build` / `next dev`). Pasa lo mismo al mover o borrar cualquier página.
+- **`NEXT_PUBLIC_APP_URL` se fija en el build.** El sitemap, `robots.txt`, las imágenes OG
+  y la canónica se generan con ella; cambiarla en Vercel no corrige un deploy ya hecho: hay
+  que redesplegar. Si falta o no es http(s), `urlSitio()` usa `https://boleteame.dev`.
+- **Sin `TURNSTILE_SECRET_KEY`, el formulario de contacto no verifica Turnstile fuera de
+  producción** (se trata como desactivado, igual que en las invitaciones). En *Production*
+  falla cerrado: responde «no disponible» y avisa a Sentry. Hoy la clave está configurada en
+  *Production*.
+- **`apple-icon` opaco:** iOS rellena de negro lo transparente; por eso lleva fondo `surface`.

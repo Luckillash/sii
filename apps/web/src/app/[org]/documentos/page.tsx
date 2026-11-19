@@ -37,7 +37,7 @@ import estilos from './documentos.module.css';
 import { EnVivo } from './EnVivo';
 import { ListaDocumentos } from './ListaDocumentos';
 
-export const metadata: Metadata = { title: 'Documentos emitidos · Boletéame' };
+export const metadata: Metadata = { title: 'Documentos emitidos' };
 
 // «Consultar estado en el SII» pide un token (y lo renueva si caducó) y consulta un envío,
 // hasta 45 s por petición según `TransporteUndici`: puede pasar de 2 minutos. En Next 16 el

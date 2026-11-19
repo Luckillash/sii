@@ -9,7 +9,7 @@ import { notFound } from 'next/navigation';
 // página llama a `soloDesarrollo()`.
 
 export const metadataDs: Metadata = {
-  title: 'Design system · Boletéame',
+  title: 'Design system',
   robots: { index: false, follow: false },
 };
 

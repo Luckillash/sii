@@ -9,16 +9,49 @@ import { destinoSeguro } from './redireccion';
 export const RUTA_INGRESAR = '/ingresar';
 export const RUTA_BIENVENIDA = '/bienvenida';
 
-/** Rutas públicas exactas. */
-const PUBLICAS_EXACTAS = new Set(['/', '/ingresar', '/crear-cuenta', '/recuperar', '/restablecer']);
+/**
+ * Rutas públicas exactas. Además de las pantallas de acceso, las rutas de metadatos de
+ * `src/app` (Fase 12): `sitemap.xml`, `robots.txt` y `manifest.webmanifest` ya calzan
+ * con `ESTATICO`, pero se listan para no depender del regex; las imágenes generadas
+ * (`opengraph-image`, `twitter-image`, `apple-icon`; `icon` si `icon.svg` pasa a ser
+ * `icon.tsx`) se sirven sin extensión (`/opengraph-image?<hash>`), así que `ESTATICO` no
+ * las cubre y van aquí. Solo la raíz: `/acme/opengraph-image` sigue protegida.
+ */
+const PUBLICAS_EXACTAS = new Set([
+  '/',
+  '/ingresar',
+  '/crear-cuenta',
+  '/recuperar',
+  '/restablecer',
+  '/sitemap.xml',
+  '/robots.txt',
+  '/manifest.webmanifest',
+  '/opengraph-image',
+  '/twitter-image',
+  '/icon',
+  '/apple-icon',
+]);
 
 /**
  * Prefijos públicos (la ruta es el prefijo o cuelga de él). `/api` autentica por su
  * cuenta (API keys, CRON_SECRET, firma de webhooks; el túnel de Sentry está en
  * `/api/monitoring`); `/auth` es el callback de los correos; `/invitacion` se ve antes
  * de iniciar sesión; `/docs` es la documentación pública de la API (Fase 11).
+ * Sitio público (Fase 12, `(publico)`): contacto, ayuda, estado del servicio y
+ * `/legal/*` (términos, privacidad). Son prefijos porque sus slugs están reservados:
+ * nada bajo ellos puede ser una organización.
  */
-const PREFIJOS_PUBLICOS = ['/auth', '/invitacion', '/api', '/monitoring', '/docs'];
+const PREFIJOS_PUBLICOS = [
+  '/auth',
+  '/invitacion',
+  '/api',
+  '/monitoring',
+  '/docs',
+  '/contacto',
+  '/ayuda',
+  '/estado',
+  '/legal',
+];
 
 /**
  * Slugs que una organización no puede usar porque chocan con rutas de primer nivel
@@ -41,6 +74,17 @@ export const SLUGS_RESERVADOS: ReadonlySet<string> = new Set([
   'ayuda',
   'contacto',
   'docs',
+  'estado',
+  'terminos',
+  'privacidad',
+  'soporte',
+  // Rutas de metadatos de la raíz (Fase 12). Las que llevan punto (`sitemap.xml`,
+  // `robots.txt`, `manifest.webmanifest`) no hace falta listarlas: `PATRON_SLUG` no
+  // admite puntos.
+  'opengraph-image',
+  'twitter-image',
+  'icon',
+  'apple-icon',
   'app',
   'admin',
   'cuenta',

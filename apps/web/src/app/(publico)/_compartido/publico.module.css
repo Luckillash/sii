@@ -1,0 +1,265 @@
+/* Layout del sitio público: cabecera, pie y enlace «Saltar al contenido». */
+
+.pagina {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+/* El `<main id="contenido">` de cada página ocupa el alto libre y no lleva anillo al
+   recibir el foco desde «Saltar al contenido». */
+.pagina > main {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.pagina > main:focus {
+  outline: none;
+}
+
+.saltar {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 20;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  color: var(--sello);
+  font-size: 14px;
+  font-weight: 500;
+  transform: translateY(calc(-100% - var(--space-4)));
+}
+
+.saltar:focus-visible {
+  transform: none;
+}
+
+/* --- Cabecera ------------------------------------------------------------------ */
+
+.cabecera {
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.barra {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-4) clamp(16px, 4vw, 32px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-8);
+}
+
+.marca,
+.marca:hover {
+  color: var(--ink);
+}
+
+.marca {
+  border-radius: var(--radius-sm);
+  font-size: var(--text-title-size);
+  line-height: var(--text-title-line);
+  font-weight: var(--text-title-weight);
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+/* Móvil: botón «Menú» y menú desplegable a todo el ancho. */
+.menuContenedor {
+  display: contents;
+}
+
+.botonMenu {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 36px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.botonMenu:hover {
+  background: var(--surface-sunken);
+}
+
+.botonMenu:focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: var(--focus-ring);
+}
+
+.menu {
+  display: none;
+  flex-basis: 100%;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-top: var(--space-2);
+}
+
+.menu[data-abierto="true"] {
+  display: flex;
+}
+
+.nav {
+  display: flex;
+}
+
+.navLista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.navEnlace,
+.navEnlace:hover {
+  color: var(--ink);
+}
+
+.navEnlace {
+  display: block;
+  padding: var(--space-2) 0;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.navEnlace:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+/* Pantallas anchas: todo en una fila y sin botón. */
+@media (min-width: 920px) {
+  .botonMenu {
+    display: none;
+  }
+
+  .menu,
+  .menu[data-abierto="true"] {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: row;
+    flex-basis: auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-8);
+    padding-top: 0;
+  }
+
+  .navLista {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-6);
+  }
+
+  .navEnlace {
+    padding: var(--space-1) 0;
+    font-size: 14px;
+  }
+}
+
+/* --- Pie ----------------------------------------------------------------------- */
+
+.pie {
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.pieInterior {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px clamp(16px, 4vw, 32px);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-6) 64px;
+}
+
+.pieMarca {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 360px;
+}
+
+.pieNombre {
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}
+
+.leyenda {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  color: var(--ink-muted);
+}
+
+.pieNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6) 48px;
+}
+
+.pieGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 140px;
+}
+
+.pieTitulo {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--text-label-weight);
+  color: var(--ink-muted);
+}
+
+.pieLista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.pieEnlace {
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .saltar {
+    transition: transform var(--duracion-rapida);
+  }
+
+  .botonMenu {
+    transition: background-color var(--duracion-rapida);
+  }
+}

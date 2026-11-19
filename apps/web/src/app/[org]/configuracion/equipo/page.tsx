@@ -10,7 +10,7 @@ import estilos from './equipo.module.css';
 import { FormularioInvitar } from './FormularioInvitar';
 import { TablasEquipo } from './TablasEquipo';
 
-export const metadata: Metadata = { title: 'Equipo · Boletéame' };
+export const metadata: Metadata = { title: 'Equipo' };
 
 export default async function PaginaEquipo({ params }: { params: Promise<{ org: string }> }) {
   const { org: slug } = await params;

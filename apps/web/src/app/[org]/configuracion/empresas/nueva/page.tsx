@@ -9,7 +9,7 @@ import org from '../../../organizacion.module.css';
 import estilos from '../empresas.module.css';
 import { FormularioEmpresa } from '../FormularioEmpresa';
 
-export const metadata: Metadata = { title: 'Agregar empresa · Boletéame' };
+export const metadata: Metadata = { title: 'Agregar empresa' };
 
 export default async function PaginaNuevaEmpresa({ params }: { params: Promise<{ org: string }> }) {
   const { org: slug } = await params;

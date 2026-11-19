@@ -56,6 +56,16 @@ describe('validarSlug', () => {
       expect(validarSlug(s), s).toMatch(/reservada/);
     }
   });
+
+  it('rechaza las rutas del sitio público y de metadatos (Fase 12)', () => {
+    for (const s of ['estado', 'terminos', 'privacidad', 'soporte', 'opengraph-image']) {
+      expect(validarSlug(s), s).toMatch(/reservada/);
+    }
+    // Con punto no pasan ni el patrón: nunca chocan con /sitemap.xml y compañía.
+    for (const s of ['sitemap.xml', 'robots.txt', 'manifest.webmanifest']) {
+      expect(validarSlug(s), s).toMatch(/minúsculas/);
+    }
+  });
 });
 
 describe('validarNombre', () => {

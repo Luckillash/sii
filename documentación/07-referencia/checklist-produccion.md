@@ -1,9 +1,9 @@
 ---
 title: "Checklist de paso a producción"
-description: "Lo que debe cumplirse antes de emitir boletas reales y antes de cobrar: el seguimiento y las alertas de la Fase 8 (CRON_SECRET, cron_token, migraciones 0013 y 0014, monitores de Sentry) y los planes y pagos con Flow de la Fase 10 (sandbox y paso a producción) y la API pública y los webhooks de la Fase 11 (migraciones 0018 y 0019, Firewall)."
-keywords: [checklist, producción, Fase 8, seguimiento, alertas, CRON_SECRET, cron_token, migración 0013, migración 0014, pg_cron, cron-seguimiento, cron-alertas, net._http_response, Resend, NEXT_PUBLIC_APP_URL, Fase 10, Flow, FLOW_API_URL, FLOW_API_KEY, FLOW_SECRET_KEY, planes de Flow, boleta propia, cron-suscripciones, 0017_cron_suscripciones, Fase 11, API pública, webhooks, 0018_api_webhooks, 0019_cron_webhooks, entregar-webhooks, cron-webhooks, Firewall de Vercel, rate limiting, 429]
-related: ["02-guias/certificacion-empresa.md", "02-guias/seguimiento-envios.md", "08-esquema-supabase/despliegue.md", "02-guias/planes-y-pagos.md", "02-guias/api-publica.md"]
-source: ["certificacion-node/docs/piloto-produccion.md", "PLAN-SAAS.md Fase 8, Fase 10 y Fase 13", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "supabase/migrations/0017_cron_suscripciones.sql", "apps/web/src/server/env.ts", "supabase/migrations/0018_api_webhooks.sql", "supabase/migrations/0019_cron_webhooks.sql"]
+description: "Lo que debe cumplirse antes de emitir boletas reales y antes de cobrar: el seguimiento y las alertas de la Fase 8 (CRON_SECRET, cron_token, migraciones 0013 y 0014, monitores de Sentry), los planes y pagos con Flow de la Fase 10 (sandbox y paso a producción), la API pública y los webhooks de la Fase 11 (migraciones 0018 y 0019, Firewall) y el sitio público de la Fase 12 (CORREO_CONTACTO, Firewall para las Server Actions con Next-Action, datos legales, NEXT_PUBLIC_APP_URL)."
+keywords: [checklist, producción, Fase 8, seguimiento, alertas, CRON_SECRET, cron_token, migración 0013, migración 0014, pg_cron, cron-seguimiento, cron-alertas, net._http_response, Resend, NEXT_PUBLIC_APP_URL, Fase 10, Flow, FLOW_API_URL, FLOW_API_KEY, FLOW_SECRET_KEY, planes de Flow, boleta propia, cron-suscripciones, 0017_cron_suscripciones, Fase 11, API pública, webhooks, 0018_api_webhooks, 0019_cron_webhooks, entregar-webhooks, cron-webhooks, Firewall de Vercel, rate limiting, 429, Fase 12, sitio público, CORREO_CONTACTO, /contacto, Next-Action, TURNSTILE_SECRET_KEY, falla cerrado, crear_organizacion, slugs reservados, RESPONSABLE, lib/legal.ts, revisión legal, sitemap]
+related: ["02-guias/certificacion-empresa.md", "02-guias/seguimiento-envios.md", "08-esquema-supabase/despliegue.md", "02-guias/planes-y-pagos.md", "02-guias/api-publica.md", "02-guias/sitio-publico.md"]
+source: ["certificacion-node/docs/piloto-produccion.md", "PLAN-SAAS.md Fase 8, Fase 10, Fase 12 y Fase 13", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "supabase/migrations/0017_cron_suscripciones.sql", "apps/web/src/server/env.ts", "supabase/migrations/0018_api_webhooks.sql", "supabase/migrations/0019_cron_webhooks.sql", "apps/web/src/lib/legal.ts", "apps/web/src/app/(publico)/contacto/acciones.ts"]
 ---
 
 # Checklist de paso a producción
@@ -108,11 +108,13 @@ aceptación cumplido en el sandbox de Flow (hallazgos corregidos en `a1f74eb`). 
       próximo cobro el 19-12-2026) se dejó a propósito y hay que cancelarla.
 - [ ] **Boleta propia de Boletéame por cada cobro** (cumplimiento tributario del SaaS): Flow
       envía su comprobante de pago, que no es un documento tributario. Pendiente, antes del
-      lanzamiento.
+      lanzamiento. Desde la Fase 12 los términos (`/legal/terminos#planes`) lo prometen
+      («Por cada cobro emitiremos el documento tributario que corresponda»).
 - [ ] Cambio de tarjeta registrada desde Configuración → Plan (pendiente; hoy solo se
       registra al contratar).
-- [ ] Términos del servicio con las condiciones de cobro, renovación, mora y cancelación al
-      fin del período (Fase 12).
+- [x] Términos del servicio con las condiciones de cobro, renovación, mora y cancelación al
+      fin del período (Fase 12: `/legal/terminos#planes`, código listo el 2026-11-19, sin
+      deploy; falta la revisión legal, ver [sitio público](#sitio-público-fase-12)).
 
 ## API pública y webhooks (Fase 11)
 
@@ -176,3 +178,82 @@ Estado (2026-11-19): Fase 11 desplegada en producción (`169e2e5`); `0018` y `00
 - [ ] `/docs/api` revisada en claro y oscuro; textos sin prometer factura ni otros DTE.
 - [ ] Decidir la agrupación de varias boletas en un solo envío para `POST /documentos/lote`
       (hoy cada boleta va en su propio envío).
+
+## Sitio público (Fase 12)
+
+Detalle en la [guía del sitio público](../02-guias/sitio-publico.md). Sin migraciones.
+
+Estado (2026-11-19): código listo, revisado (sin críticos ni altos; 4 medios y 7 bajos,
+corregidos salvo `RESPONSABLE` y los slugs en la base) y verificado en local (typecheck,
+Vitest de la app 1767 (+1 omitida) en 133 archivos, correos 77 en 9 archivos, Biome, stylelint y `pnpm build`);
+sin commit ni deploy.
+
+### Antes del deploy
+
+- [ ] **`NEXT_PUBLIC_APP_URL=https://boleteame.dev`** en Vercel *Production* antes del build:
+      es `NEXT_PUBLIC_`, se fija en el build, y de ella salen `metadataBase`, la canónica,
+      `og:url`, `/sitemap.xml`, `/robots.txt` y el JSON-LD. Si falta o no es http(s), el
+      código usa `https://boleteame.dev`; con un valor equivocado (p. ej. `localhost`) el
+      sitemap y las vistas previas quedan apuntando ahí hasta el siguiente deploy. Ya está
+      cargada desde la Fase 2; confirmar el valor.
+- [x] **`CORREO_CONTACTO`** en Vercel *Production* (cargada el 2026-11-19): solo la dirección del
+      buzón del equipo, no *sensitive* (`envContacto()` la valida como correo). Sin ella, el
+      formulario de `/contacto` responde «No pudimos enviar tu mensaje» y avisa a Sentry. Junto
+      con `RESEND_API_KEY`, `CORREO_REMITENTE` y `TURNSTILE_SECRET_KEY`, que ya están.
+- [x] **`TURNSTILE_SECRET_KEY` en *Production*** (confirmado el 2026-11-19, *sensitive*): `/contacto` falla cerrado en
+      producción. Sin la clave responde «La verificación de seguridad no está disponible…» y
+      avisa a Sentry (`contacto: Turnstile sin configurar en producción`). La respuesta de
+      `siteverify` debe traer `action = contacto` y `hostname` = el de `NEXT_PUBLIC_APP_URL`
+      (`boleteame.dev`): si el widget se sirve desde otro dominio (un alias de Vercel), el
+      formulario rechaza el token como inválido.
+- [x] Revisión de código de la fase: sin críticos ni altos; 4 medios y 7 bajos, corregidos
+      todos menos los datos de `RESPONSABLE` (los entrega el usuario) y los slugs en la base
+      (Fase 13).
+
+### Al desplegar
+
+- [ ] Deploy a *Production* y humo sin sesión: `/`, `/ayuda`, `/estado`, `/contacto`,
+      `/legal`, `/legal/terminos`, `/legal/privacidad`, `/sitemap.xml`, `/robots.txt`,
+      `/manifest.webmanifest`, `/opengraph-image`, `/twitter-image`, `/apple-icon` e `/icon.svg`
+      → 200 (ninguna 307 a `/ingresar`); `/<org>/tablero` sin sesión → 307; el sitemap y
+      `og:url` con `https://boleteame.dev`; `E2E_URL=https://boleteame.dev pnpm --filter web
+      test:e2e` (`despliegue.spec.ts`) en verde.
+- [ ] `/estado` muestra la base de datos «Operativo» y, con operaciones recientes, el nivel
+      de la conexión con el SII (sin horas de actividad); el resumen no dice «Todo funciona
+      con normalidad» si la base sale «Sin datos»; sin errores de runtime en Vercel ni avisos
+      `landing: precios de respaldo` en Sentry.
+- [ ] **Regla de *rate limit* del Firewall de Vercel para las Server Actions** (como la de
+      `/api/v1/*`): por IP, método `POST` **con la cabecera `Next-Action`** (o, si no se
+      puede filtrar por cabecera, todos los POST fuera de `/api/`), acción `rate_limit`.
+      **No limitarla a la ruta `/contacto`:** Next 16 ejecuta la Server Action desde
+      cualquier ruta si el POST trae `Next-Action`, así que un bot la mandaría a `/` o a
+      `/ayuda` y se saltaría la regla. Los GET de las páginas no deben contar. Un límite bajo
+      basta (p. ej. del orden de 5 a 10 por IP en 10 minutos), pero ojo con las demás Server
+      Actions del panel que también quedan cubiertas: revisar que el límite no estorbe el uso
+      normal. Turnstile y el honeypot son la primera barrera. El Firewall ya existe (Fase 11),
+      así que la regla se puede agregar con el MCP o el CLI y publicar.
+- [ ] Un mensaje de prueba desde `/contacto` llega a `CORREO_CONTACTO` con `reply_to` de quien
+      escribe (criterio de la fase, con Turnstile verificado en el servidor). Es el único
+      correo: no hay acuse a quien escribe.
+
+### Antes de lanzar
+
+- [ ] **Slugs reservados en la base (Fase 13):** `crear_organizacion` no conoce
+      `SLUGS_RESERVADOS` (`lib/rutas.ts`); una llamada directa a la RPC podría crear una
+      organización con un slug reservado (`estado`, `contacto`…). Requiere una migración que
+      valide la misma lista en la base, y revisar antes que ninguna organización existente
+      use uno.
+
+- [ ] **Datos del responsable en `RESPONSABLE`** (`apps/web/src/lib/legal.ts`): razón social,
+      RUT, domicilio, correo de contacto y correo de privacidad. Los entrega el usuario;
+      mientras tanto las páginas muestran un texto neutro («el titular de Boletéame»,
+      «escríbenos desde la página de contacto»). `camposPendientes()` debe quedar vacío.
+- [ ] **Revisión legal** de `/legal/terminos` y `/legal/privacidad` por un abogado (Ley 19.628 y
+      Ley 21.719, condiciones de cobro y responsabilidad). Si cambia el texto, actualizar
+      `VIGENCIA_TERMINOS` / `VIGENCIA_PRIVACIDAD` y la fecha de esa página en
+      `PAGINAS_SITEMAP`.
+- [ ] La boleta propia por cada cobro que prometen los términos (Fase 13, arriba en
+      [Al lanzar](#al-lanzar-pasar-flow-a-producción-fase-13)).
+- [ ] Los precios de la landing coinciden con `planes` y con los planes de Flow de producción.
+- [ ] Criterio de aceptación: axe en claro, oscuro y móvil en *Production*, precios iguales a
+      `planes` y un mensaje de contacto entregado con Turnstile verificado en el servidor.
