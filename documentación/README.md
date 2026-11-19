@@ -108,6 +108,7 @@ por fase están en `PLAN-SAAS.md`, en la raíz del repositorio.
 | Copiar un ejemplo de código | [07-referencia/ejemplos-de-codigo.md](07-referencia/ejemplos-de-codigo.md) |
 | Dato rápido (vigencia, tope, largo) | [07-referencia/reglas-y-limites.md](07-referencia/reglas-y-limites.md) |
 | Pasar una empresa a producción, o pasar Flow del sandbox a producción | [07-referencia/checklist-produccion.md](07-referencia/checklist-produccion.md) |
+| Revisar términos y privacidad con un abogado | [07-referencia/revision-legal.md](07-referencia/revision-legal.md) |
 | Algo no funciona como se espera | [07-referencia/trampas-conocidas.md](07-referencia/trampas-conocidas.md) |
 | Construir una pantalla, usar un componente o un token | [07-referencia/design-system.md](07-referencia/design-system.md) |
 | **Esquema:** entender o modificar el SQL | [08-esquema-supabase/arquitectura.md](08-esquema-supabase/arquitectura.md) |
@@ -183,6 +184,7 @@ documentación/
 │   ├── herramientas.md
 │   ├── reglas-y-limites.md
 │   ├── checklist-produccion.md
+│   ├── revision-legal.md          puntos para el abogado (términos y privacidad)
 │   ├── trampas-conocidas.md
 │   ├── design-system.md           tokens, componentes, layouts, /_ds, axe
 │   └── mapa-fuentes.md

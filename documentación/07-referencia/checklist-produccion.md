@@ -212,17 +212,17 @@ sin commit ni deploy.
 
 ### Al desplegar
 
-- [ ] Deploy a *Production* y humo sin sesión: `/`, `/ayuda`, `/estado`, `/contacto`,
+- [x] (2026-11-19, `fb0f6cf`: todo 200 salvo `/favicon.ico` 404, organizaciones 307, `despliegue.spec.ts` 10 pasan) Deploy a *Production* y humo sin sesión: `/`, `/ayuda`, `/estado`, `/contacto`,
       `/legal`, `/legal/terminos`, `/legal/privacidad`, `/sitemap.xml`, `/robots.txt`,
       `/manifest.webmanifest`, `/opengraph-image`, `/twitter-image`, `/apple-icon` e `/icon.svg`
       → 200 (ninguna 307 a `/ingresar`); `/<org>/tablero` sin sesión → 307; el sitemap y
       `og:url` con `https://boleteame.dev`; `E2E_URL=https://boleteame.dev pnpm --filter web
       test:e2e` (`despliegue.spec.ts`) en verde.
-- [ ] `/estado` muestra la base de datos «Operativo» y, con operaciones recientes, el nivel
+- [x] (2026-11-19: base «Operativo», SII «Sin datos», sin errores de runtime) `/estado` muestra la base de datos «Operativo» y, con operaciones recientes, el nivel
       de la conexión con el SII (sin horas de actividad); el resumen no dice «Todo funciona
       con normalidad» si la base sale «Sin datos»; sin errores de runtime en Vercel ni avisos
       `landing: precios de respaldo` en Sentry.
-- [ ] **Regla de *rate limit* del Firewall de Vercel para las Server Actions** (como la de
+- [x] (2026-11-19: «Server Actions: límite por IP», `POST` + cabecera `next-action` presente, 60 por 60 s por IP, ventana fija, 429; `live`) **Regla de *rate limit* del Firewall de Vercel para las Server Actions** (como la de
       `/api/v1/*`): por IP, método `POST` **con la cabecera `Next-Action`** (o, si no se
       puede filtrar por cabecera, todos los POST fuera de `/api/`), acción `rate_limit`.
       **No limitarla a la ruta `/contacto`:** Next 16 ejecuta la Server Action desde
@@ -232,7 +232,7 @@ sin commit ni deploy.
       Actions del panel que también quedan cubiertas: revisar que el límite no estorbe el uso
       normal. Turnstile y el honeypot son la primera barrera. El Firewall ya existe (Fase 11),
       así que la regla se puede agregar con el MCP o el CLI y publicar.
-- [ ] Un mensaje de prueba desde `/contacto` llega a `CORREO_CONTACTO` con `reply_to` de quien
+- [x] (2026-11-19: mensaje real recibido por el usuario, sin errores en Vercel ni Sentry) Un mensaje de prueba desde `/contacto` llega a `CORREO_CONTACTO` con `reply_to` de quien
       escribe (criterio de la fase, con Turnstile verificado en el servidor). Es el único
       correo: no hay acuse a quien escribe.
 
@@ -244,11 +244,13 @@ sin commit ni deploy.
       valide la misma lista en la base, y revisar antes que ninguna organización existente
       use uno.
 
-- [ ] **Datos del responsable en `RESPONSABLE`** (`apps/web/src/lib/legal.ts`): razón social,
-      RUT, domicilio, correo de contacto y correo de privacidad. Los entrega el usuario;
-      mientras tanto las páginas muestran un texto neutro («el titular de Boletéame»,
-      «escríbenos desde la página de contacto»). `camposPendientes()` debe quedar vacío.
-- [ ] **Revisión legal** de `/legal/terminos` y `/legal/privacidad` por un abogado (Ley 19.628 y
+- [x] **Datos del responsable en `RESPONSABLE`** (`apps/web/src/lib/legal.ts`, 2026-11-19):
+      nombre, RUT y domicilio del titular (persona natural). Los correos quedan en `null` a
+      propósito: `camposPendientes()` devuelve solo `correoContacto` y `correoPrivacidad`, y
+      las páginas llevan al formulario (privacidad, a `/contacto?motivo=privacidad`). Si se
+      crea una casilla del dominio, cargarla ahí.
+- [ ] **Revisión legal** de `/legal/terminos` y `/legal/privacidad` por un abogado, con los
+      puntos de [revision-legal.md](revision-legal.md) (Ley 19.628 y
       Ley 21.719, condiciones de cobro y responsabilidad). Si cambia el texto, actualizar
       `VIGENCIA_TERMINOS` / `VIGENCIA_PRIVACIDAD` y la fecha de esa página en
       `PAGINAS_SITEMAP`.

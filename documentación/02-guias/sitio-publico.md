@@ -278,16 +278,20 @@ una cookie o un dato nuevo, hay que actualizar la política y su vigencia.**
 
 ### `lib/legal.ts` y los datos del responsable
 
-`RESPONSABLE` tiene cinco campos, **todos pendientes (`null`)**: razón social, RUT, domicilio,
-correo de contacto y correo de privacidad. El usuario los entregará después. Mientras falten,
-las páginas muestran un texto neutro y nunca un marcador entre corchetes:
+`RESPONSABLE` tiene cinco campos. Desde el 2026-11-19 están el nombre, el RUT y el domicilio
+del titular (persona natural). Los dos correos quedan en `null` **a propósito**:
+`boleteame.dev` no recibe correo y el buzón de `CORREO_CONTACTO` es personal y no se publica,
+así que las páginas llevan al formulario de contacto, y el canal de privacidad a
+`/contacto?motivo=privacidad` (`RUTA_CONTACTO_PRIVACIDAD`). Los puntos para el abogado están
+en [revision-legal.md](../07-referencia/revision-legal.md). Con un campo en `null`, las páginas
+muestran un texto neutro y nunca un marcador entre corchetes:
 
 - `nombreTitular()` → «el titular de Boletéame» (con mayúscula al inicio de frase).
 - `identificacionTitular()` agrega solo lo que existe («…, RUT 76.354.771-K, con domicilio
   en …»).
 - `canalContacto()` → «escríbenos a <correo>» (`mailto:`) o, sin correo, «escríbenos desde la
   página de contacto». Para privacidad usa `correoPrivacidad`, luego `correoContacto`, luego
-  el formulario.
+  el formulario con `?motivo=privacidad`.
 - `camposPendientes()` lista lo que falta: revisarlo antes de publicar.
 - `legal.test.ts` comprueba que ningún texto de respaldo muestre corchetes, llaves, «TU»,
   `null` ni `undefined`.

@@ -5,7 +5,13 @@ import { formatearRut } from './formatos';
 //
 // Mientras un campo sea `null`, las páginas muestran un texto neutro («el titular de
 // Boletéame», «escríbenos desde la página de contacto») y nunca un marcador entre
-// corchetes. Completar aquí cuando estén los datos definitivos.
+// corchetes.
+//
+// Titular: persona natural (datos entregados por el usuario el 2026-11-19). Los correos
+// quedan en `null` a propósito: `boleteame.dev` no recibe correo y el buzón que recibe el
+// formulario (`CORREO_CONTACTO`) es personal y no se publica, así que las páginas llevan al
+// formulario de contacto (privacidad, con `?motivo=privacidad`). Si se crea una casilla del
+// dominio (p. ej. `contacto@boleteame.dev`), cargarla aquí.
 
 export interface DatosResponsable {
   /** Razón social o nombre de la persona titular del servicio. */
@@ -21,9 +27,9 @@ export interface DatosResponsable {
 }
 
 export const RESPONSABLE: DatosResponsable = {
-  razonSocial: null,
-  rut: null,
-  domicilio: null,
+  razonSocial: 'Lucas Salazar Cartes',
+  rut: '20.630.500-2',
+  domicilio: 'Tajamar 223, Las Condes',
   correoContacto: null,
   correoPrivacidad: null,
 };
@@ -35,6 +41,9 @@ export const VIGENCIA_TERMINOS = '2026-11-19';
 export const VIGENCIA_PRIVACIDAD = '2026-11-19';
 
 export const RUTA_CONTACTO = '/contacto';
+
+/** Formulario con el motivo «Privacidad y datos personales» ya elegido. */
+export const RUTA_CONTACTO_PRIVACIDAD = '/contacto?motivo=privacidad';
 
 const TITULAR_NEUTRO = 'el titular de Boletéame';
 
@@ -91,7 +100,8 @@ export interface CanalContacto {
 
 /**
  * Canal para escribirnos. Para `privacidad` usa `correoPrivacidad` y, si falta,
- * `correoContacto`; sin ninguno, la página de contacto.
+ * `correoContacto`; sin ninguno, la página de contacto (para `privacidad`, con el motivo
+ * «Privacidad y datos personales» ya elegido, para que la solicitud llegue identificada).
  */
 export function canalContacto(
   motivo: MotivoContacto = 'general',
@@ -109,7 +119,7 @@ export function canalContacto(
   return {
     antes: `${verbo} desde `,
     texto: 'la página de contacto',
-    href: RUTA_CONTACTO,
+    href: motivo === 'privacidad' ? RUTA_CONTACTO_PRIVACIDAD : RUTA_CONTACTO,
     tipo: 'formulario',
   };
 }

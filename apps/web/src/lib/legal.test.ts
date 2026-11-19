@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { MOTIVOS_CONTACTO } from '@/app/(publico)/contacto/esquema';
+import { validarRut } from './formatos';
 import {
   camposPendientes,
   canalContacto,
@@ -8,6 +10,7 @@ import {
   nombreTitular,
   RESPONSABLE,
   RUTA_CONTACTO,
+  RUTA_CONTACTO_PRIVACIDAD,
   textoCanal,
   VIGENCIA_PRIVACIDAD,
   VIGENCIA_TERMINOS,
@@ -76,13 +79,16 @@ describe('identificacionTitular', () => {
 });
 
 describe('canalContacto', () => {
-  it('sin correos lleva a la página de contacto', () => {
-    for (const motivo of ['general', 'privacidad'] as const) {
+  it('sin correos lleva a la página de contacto (privacidad, con su motivo elegido)', () => {
+    for (const [motivo, href] of [
+      ['general', RUTA_CONTACTO],
+      ['privacidad', RUTA_CONTACTO_PRIVACIDAD],
+    ] as const) {
       const canal = canalContacto(motivo, VACIO);
       expect(canal).toEqual({
         antes: 'escríbenos desde ',
         texto: 'la página de contacto',
-        href: RUTA_CONTACTO,
+        href,
         tipo: 'formulario',
       });
       expect(textoCanal(canal)).toBe('escríbenos desde la página de contacto');
@@ -129,6 +135,22 @@ describe('camposPendientes', () => {
     expect(camposPendientes({ ...COMPLETO, domicilio: ' ' })).toEqual(['domicilio']);
     expect(camposPendientes(COMPLETO)).toEqual([]);
     expect(etiquetaCampo('correoPrivacidad')).toBe('correo de privacidad');
+  });
+
+  it('la constante publicada identifica al titular (Ley 19.496 y Ley 21.719)', () => {
+    // Los correos quedan en null a propósito (el canal es el formulario de contacto).
+    expect(camposPendientes(RESPONSABLE)).toEqual(['correoContacto', 'correoPrivacidad']);
+    expect(validarRut(RESPONSABLE.rut)).toBe(true);
+    expect(identificacionTitular(RESPONSABLE)).toBe(
+      'Lucas Salazar Cartes, RUT 20.630.500-2, con domicilio en Tajamar 223, Las Condes',
+    );
+  });
+
+  it('el motivo de privacidad del enlace existe en el formulario de contacto', () => {
+    const motivo = new URL(RUTA_CONTACTO_PRIVACIDAD, 'https://boleteame.dev').searchParams.get(
+      'motivo',
+    );
+    expect(MOTIVOS_CONTACTO).toContain(motivo);
   });
 
   it('la constante publicada es coherente con sus textos de respaldo', () => {
