@@ -17,6 +17,7 @@ import {
   errorBorradorNoEncontrado,
   errorDocumentoIncierto,
   errorEmpresaNoEncontrada,
+  errorIdempotenciaEnUso,
   errorSinPermiso,
   esErrorEmision,
   falloSinEjecutar,
@@ -146,9 +147,19 @@ export interface BorradorEnBase {
   metadata: MetadataDocumento;
 }
 
+/** Lo que cambia cuando el borrador lo guarda la API pública (Fase 11). */
+export interface OpcionesGuardado {
+  /** `documentos.origen` de un borrador nuevo (por defecto `panel`). */
+  origen?: 'panel' | 'api';
+  /** `documentos.clave_idempotencia` de un borrador nuevo (`Idempotency-Key`). */
+  claveIdempotencia?: string;
+}
+
 /**
- * Guarda (o actualiza) el borrador y sus líneas con la sesión del usuario, reemplazando
- * las líneas. Lanza `ErrorEmision` (empresa, permiso, borrador ausente o emitido) o una
+ * Guarda (o actualiza) el borrador y sus líneas, reemplazando las líneas. El panel lo hace
+ * con la sesión del usuario (RLS); la API pública, con service_role (nunca hay sesión), y
+ * en los dos casos cada consulta filtra por organización y empresa. Lanza `ErrorEmision`
+ * (empresa, permiso, borrador ausente o emitido, clave de idempotencia ya usada) o una
  * falla de base (solo su código).
  */
 export async function guardarEnSesion(
@@ -156,6 +167,7 @@ export async function guardarEnSesion(
   ctx: ContextoEmision,
   borrador: BorradorValido,
   borradorId?: string,
+  opciones: OpcionesGuardado = {},
 ): Promise<BorradorEnBase> {
   if (borradorId !== undefined && !UUID.test(borradorId)) throw errorBorradorNoEncontrado();
 
@@ -213,12 +225,14 @@ export async function guardarEnSesion(
         organizacion_id: ctx.organizacionId,
         empresa_id: ctx.empresaId,
         estado: 'borrador',
-        origen: 'panel',
+        origen: opciones.origen ?? 'panel',
+        ...(opciones.claveIdempotencia ? { clave_idempotencia: opciones.claveIdempotencia } : {}),
         creado_por: ctx.usuarioId,
       })
       .select('id')
       .single();
     if (error?.code === '42501') throw errorSinPermiso();
+    if (error?.code === '23505' && opciones.claveIdempotencia) throw errorIdempotenciaEnUso();
     // `tg_validar_documento` revisa en TODO insert de producción (también un borrador sin
     // folio) que la empresa esté autorizada y que el plan lo permita.
     if (error?.code === 'P0001' && borrador.ambiente === 'produccion') {

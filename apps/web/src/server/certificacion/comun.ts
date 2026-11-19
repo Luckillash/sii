@@ -232,7 +232,7 @@ export async function actualizarProceso(
 /** Enlaza la fila de `operaciones_sii` con la solicitud o el envío que se creó adentro. */
 export async function enlazarOperacion(
   cliente: ClienteServicio,
-  ctx: ContextoCertificacion,
+  ctx: Pick<ContextoCertificacion, 'organizacionId'>,
   operacionId: string,
   enlace: { solicitud_id?: string; envio_id?: string; documento_id?: string },
 ): Promise<void> {
@@ -248,7 +248,7 @@ export async function enlazarOperacion(
 /** Titular y vigencia del certificado para el resumen del ensayo (sin secretos). */
 export async function resumenCertificado(
   cliente: ClienteServicio,
-  ctx: ContextoCertificacion,
+  ctx: Pick<ContextoCertificacion, 'organizacionId'>,
   credenciales: CredencialesCertificado,
 ): Promise<ResumenEnsayo['certificado']> {
   const { data } = await cliente
@@ -275,11 +275,22 @@ export interface OpcionesEjecucion {
   ambiente?: ContextoOperacion['ambiente'];
 }
 
-/** `ejecutarOperacion` en certificación, con la empresa y el usuario del contexto. */
+/**
+ * Quién ejecuta: el usuario del panel o, desde la API pública (Fase 11), una API key
+ * (`usuarioId: null` y `apiKeyId`; `ejecutarOperacion` confirma la sesión solo con usuario).
+ */
+export interface ContextoEjecucion {
+  organizacionId: string;
+  empresaId: string;
+  usuarioId: string | null;
+  apiKeyId?: string | null;
+}
+
+/** `ejecutarOperacion` en certificación, con la empresa y el usuario (o la API key) del contexto. */
 export function ejecutar<T>(
   deps: DependenciasCertificacion,
   cliente: ClienteServicio,
-  ctx: ContextoCertificacion,
+  ctx: ContextoEjecucion,
   opciones: OpcionesEjecucion,
   fn: (herramientas: HerramientasOperacion) => Promise<T>,
 ): Promise<ResultadoEjecucion<T>> {
@@ -289,6 +300,7 @@ export function ejecutar<T>(
       organizacionId: ctx.organizacionId,
       empresaId: ctx.empresaId,
       usuarioId: ctx.usuarioId,
+      apiKeyId: ctx.apiKeyId ?? null,
       operacion: opciones.operacion,
       ambiente: opciones.ambiente ?? AMBIENTE,
       canal: opciones.canal ?? null,

@@ -1,9 +1,9 @@
 ---
 title: "Probar el esquema (RLS, triggers, cuotas)"
 description: "Cómo verificar el esquema y simular roles en la única base (producción) sin dejar rastro."
-keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp, 0006_realtime_operaciones.sql, 0007_bloqueos_sii.sql, rls-fase4-bloqueos.sql, bloqueos_sii, arriendo, 0008_certificacion.sql, rls-fase5-certificacion.sql, registrar_caf, guardar_set_pruebas, CAF de mentira, 0009_autorizacion_externa.sql, rls-fase5-autorizacion-externa.sql, tg_resolucion_autoriza_produccion, autorizada_produccion, 0010_verificar_autorizacion.sql, rls-fase5-verificar-autorizacion.sql, verificar_autorizacion, PGlite, 0011_folios.sql, rls-fase6-folios.sql, anular_folios, trg_20_caf_sin_traslape, 23P01, 0012_folio_anulado.sql, rls-fase7-folio-anulado.sql, tg_validar_documento, folio anulado, for key share, 0013_notificaciones.sql, rls-fase8-notificaciones.sql, notificaciones, reclamar_notificacion, 0014_cron.sql, pg_cron, cron_token, fase9-tablero-control.sql, consulta de control, Tablero, Fase 9, Fase 10, 0015_planes_comerciales.sql, 0016_pagos.sql, rls-fase10-pagos.sql, activar_suscripcion, clientes_pago, pagos, eventos_pasarela]
+keywords: [verificaciones, solo lectura, producción, RLS, set local role, request.jwt.claims, auth.uid, auth.role, rollback, service_role, authenticated, anon, simulación de roles, rls-fase2-tenancy.sql, rls-fase3-empresas.sql, 0005_certificados_resoluciones.sql, ejemplo.invalid, pg_temp, 0006_realtime_operaciones.sql, 0007_bloqueos_sii.sql, rls-fase4-bloqueos.sql, bloqueos_sii, arriendo, 0008_certificacion.sql, rls-fase5-certificacion.sql, registrar_caf, guardar_set_pruebas, CAF de mentira, 0009_autorizacion_externa.sql, rls-fase5-autorizacion-externa.sql, tg_resolucion_autoriza_produccion, autorizada_produccion, 0010_verificar_autorizacion.sql, rls-fase5-verificar-autorizacion.sql, verificar_autorizacion, PGlite, 0011_folios.sql, rls-fase6-folios.sql, anular_folios, trg_20_caf_sin_traslape, 23P01, 0012_folio_anulado.sql, rls-fase7-folio-anulado.sql, tg_validar_documento, folio anulado, for key share, 0013_notificaciones.sql, rls-fase8-notificaciones.sql, notificaciones, reclamar_notificacion, 0014_cron.sql, pg_cron, cron_token, fase9-tablero-control.sql, consulta de control, Tablero, Fase 9, Fase 10, 0015_planes_comerciales.sql, 0016_pagos.sql, rls-fase10-pagos.sql, activar_suscripcion, clientes_pago, pagos, eventos_pasarela, rls-fase11-api.sql, migración 0018, api_idempotencia, webhook_entregas]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "08-esquema-supabase/despliegue.md", "02-guias/tablero-y-reportes.md", "02-guias/planes-y-pagos.md"]
-source: ["supabase_saas_sii.sql §15 §17", "supabase/verificaciones/", "supabase/verificaciones/rls-fase2-tenancy.sql", "supabase/verificaciones/fase9-tablero-control.sql", "supabase/verificaciones/rls-fase10-pagos.sql"]
+source: ["supabase_saas_sii.sql §15 §17", "supabase/verificaciones/", "supabase/verificaciones/rls-fase2-tenancy.sql", "supabase/verificaciones/fase9-tablero-control.sql", "supabase/verificaciones/rls-fase10-pagos.sql", "supabase/verificaciones/rls-fase11-api.sql", "supabase/verificaciones/0018_api_webhooks.sql"]
 ---
 
 # Probar el esquema (RLS, triggers, cuotas)
@@ -616,7 +616,77 @@ Corrida en producción el 2026-11-18, con la 0015 y la 0016 aplicadas
 cambiaron (`vault.secrets` 4, suscripciones 1, usuarios 2, organizaciones 1, miembros 1). En la
 misma sesión, `rls-fase2-tenancy.sql` (ajustada) 52/52.
 
-## 14. Lo que no se prueba con SQL
+## 14. Simulación de la API pública y los webhooks de la Fase 11 (`rls-fase11-api.sql`)
+
+`supabase/verificaciones/rls-fase11-api.sql` prueba la migración 0018: autenticación de API
+keys, idempotencia, encolado con filtro por plan, reclamo y cierre de entregas con backoff,
+las acciones del panel por rol, el check de la URL y el RLS de las tablas de integraciones.
+**Requiere la 0015, la 0016 y la 0018 aplicadas** (en producción desde el 2026-11-18 la 0015
+y la 0016, y desde el 2026-11-19 la 0018): sin la 0018 el script corre igual (cada paso captura su error), pero solo salen
+`true` la 1, la 35 y la 37 (lo que ya hacía la 0001).
+
+Mismo patrón que las anteriores (usuarios ficticios `api-…@ejemplo.invalid`, claims locales
++ `set local role`, `pg_temp.registrar`, parámetros locales `prueba.*`, `rollback` final).
+Crea tres organizaciones (`zz-prueba-api-fase11-a|b|c`; A y B pasan al plan `api` con
+`activar_suscripcion`, C sigue en Certificación), una empresa con un CAF de certificación
+**de mentira** (`registrar_caf`, secreto de prueba en Vault), una boleta de la API que el SII
+«acepta» (como `postgres`), API keys (`Prueba fase 11 …`), webhooks
+(`https://receptor-fase11-…`, secretos de prueba en Vault), entregas y claves de
+idempotencia (`fase11-…`). No llama al SII, a `pg_net` ni a ninguna URL.
+
+| # | Grupo | Comprobaciones |
+|---|---|---|
+| 1–8 | API keys | `crear_api_key` devuelve `sk_test_` + 64 hex y guarda solo sha256 y prefijo; en C (sin API) `P0001`; `autenticar_api_key` con la clave válida (organización, alcances, ambiente, motivo nulo, `ultimo_uso_en`); el *throttle* de un minuto; `invalida`, `revocada`, `vencida` y `plan_sin_api` con los ids nulos; `authenticated` y `anon` no la ejecutan (`42501`) |
+| 9–17 | Idempotencia | nueva; en curso; conflicto por otra huella u otro recurso; terminada con la respuesta guardada (y `terminar` no la pisa); retomada con el arriendo vencido; soltar conserva la huella y entrega el `recurso_id`; por organización; formato (`23514`, `22004`); el propietario no lee la tabla ni ejecuta las RPC (`42501`) |
+| 18–21 | Webhooks y encolado | `crear_webhook` con `whsec_` en Vault; el check `webhooks_url_permitida` rechaza 14 URL (localhost, IP v4/v6, `.internal`, `.local`, `.localhost`, otro puerto, usuario:clave, http, punto final, espacios, > 2.048) y acepta una https con `:443`, ruta y consulta; `encolar_evento` solo con plan con webhooks y solo para los suscritos; `documento.aceptado` lleva `estado`, `origen` y `clave_idempotencia` |
+| 22–28 | Cron | `reclamar_entregas_webhook` por turnos entre organizaciones, con intento, URL, id del secreto y arriendo; una segunda corrida no repite; `cerrar` (con el intento reclamado) entregada y ya cerrada (`null`); falla y timeout → 1 min ±10 %; 2 h y 24 h ±10 %; intento 8 y falla definitiva → `descartado`, respuesta truncada a 1.000; descarte al reclamar (webhook desactivado, 8 intentos, plan sin webhooks) con su motivo |
+| 29–34 | Panel | reenviar la misma fila (`intentos = 0`, `reenviada_por`); `22023` en cola o desactivado; `42501` emisor, `P0002` otra organización o inexistente, `42501` `anon`; `P0001` sin plan; `probar_webhook` y sus errores; `rotar_secreto_webhook` (secreto nuevo, el viejo fuera de Vault, `42501` para el emisor) |
+| 35–37 | RLS y borrado | el administrador ve claves, webhooks y entregas de A; emisor y otra organización 0/0/0; `anon` `42501`; el propietario no ejecuta las RPC del cron ni escribe entregas; borrar el webhook saca su secreto de Vault y sus entregas |
+| 38 | Reenvío en vuelo | una entrega `fallido` reclamada (intento 3) que el administrador reenvía queda `pendiente` con `intentos = 0`; el cierre del intento 3 devuelve `null` y no la pisa |
+| 39 | Revocar es definitivo | el administrador no reactiva una clave revocada (`22023`) ni toca `expira_en` (`42501`, sin grant); `service_role` tampoco alarga ni quita la expiración (`22023`) pero sí la acorta; la revocada sigue rechazada |
+
+Lo que no prueba: que `for update skip locked` reparta entre dos corridas **concurrentes**
+(hace falta una segunda sesión; la verificación 0018, 14, revisa el cuerpo) ni la entrega
+HTTP, la firma o el bloqueo SSRF (pruebas de Vitest de `server/webhooks/`).
+
+Cómo correrlo: el archivo **completo**, tal cual, con el MCP `execute_sql` o en el SQL
+Editor (como `postgres`). Debe dar 39/39. Después, la consulta de control del encabezado,
+todo en 0:
+
+```sql
+select
+  (select count(*) from auth.users where email like 'api-%@ejemplo.invalid') as usuarios,
+  (select count(*) from public.organizaciones where slug like 'zz-prueba-api-fase11%') as organizaciones,
+  (select count(*) from public.empresas where razon_social like 'Empresa api fase 11%') as empresas,
+  (select count(*) from public.api_keys where nombre like 'Prueba fase 11%') as api_keys,
+  (select count(*) from public.webhooks where url like 'https://receptor-fase11%') as webhooks,
+  (select count(*) from public.api_idempotencia where clave like 'fase11-%') as idempotencia,
+  (select count(*) from vault.secrets where description like 'webhook https://receptor-fase11%') as secretos_webhook,
+  (select count(*) from vault.secrets where description like 'caf:76543210-3:certificacion:39:1-%') as secretos_caf;
+```
+
+Antes de aplicar la 0018 la consulta falla (`api_idempotencia` no existe).
+
+Probada en PGlite (esquema 0001 y 0003–0019, con stubs de `pg_cron` y `pg_net`): 39/39 con
+la 0018 y 3/39 sin ella; la limpieza dio todo en 0. Verificaciones: `0018_api_webhooks.sql`
+23/23 (2/23 sin la 0018) y `0019_cron_webhooks.sql` 8/9 (la 1, extensiones, no aplica en
+PGlite; 2/9 sin la 0019). En la misma corrida siguen en verde `rls-fase2-tenancy` 52/52,
+`rls-fase3-empresas` 43/43, `rls-fase4-bloqueos` 21/21, `rls-fase5-certificacion` 16/16,
+`rls-fase5-autorizacion-externa` 12/12, `rls-fase5-verificar-autorizacion` 7/7,
+`rls-fase6-folios` 27/27, `rls-fase7-folio-anulado` 9/9, `rls-fase8-notificaciones` 26/26,
+`rls-fase10-pagos` 30/30 y las verificaciones `0004`, `0011`, `0012`, `0013`, `0015` y
+`0016`.
+
+Corrida en producción el 2026-11-19, con la 0018 aplicada
+([despliegue](../08-esquema-supabase/despliegue.md#fase-11-migraciones-0018-y-0019)): antes de
+migrar, `0018_api_webhooks.sql` 2/23; después, 23/23 y `rls-fase11-api.sql` 39/39 (con
+`supabase db query --remote --yes -f`: el CLI exige `--yes` en modo agente aunque el script
+termine en *rollback*), con la consulta de limpieza en 0 antes y después. Regresiones:
+`rls-fase8-notificaciones.sql` 26/26, `rls-fase10-pagos.sql` 30/30 y las verificaciones
+`0013_notificaciones.sql` 18/18 y `0016_pagos.sql` 20/20. La `0019_cron_webhooks.sql` sigue
+**pendiente** (se aplica después del deploy).
+
+## 15. Lo que no se prueba con SQL
 
 El aislamiento entre organizaciones y los permisos por rol también se prueban de punta a
 punta con la app (Fase 2): dos usuarios de organizaciones distintas, cada uno con su

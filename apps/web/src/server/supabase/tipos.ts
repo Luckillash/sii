@@ -17,6 +17,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_idempotencia: {
+        Row: {
+          api_key_id: string | null
+          clave: string
+          creado_en: string
+          estado: string
+          huella: string
+          organizacion_id: string
+          reclamada_en: string
+          recurso: string
+          recurso_id: string | null
+          respuesta: Json | null
+          status_http: number | null
+          terminada_en: string | null
+        }
+        Insert: {
+          api_key_id?: string | null
+          clave: string
+          creado_en?: string
+          estado?: string
+          huella: string
+          organizacion_id: string
+          reclamada_en?: string
+          recurso: string
+          recurso_id?: string | null
+          respuesta?: Json | null
+          status_http?: number | null
+          terminada_en?: string | null
+        }
+        Update: {
+          api_key_id?: string | null
+          clave?: string
+          creado_en?: string
+          estado?: string
+          huella?: string
+          organizacion_id?: string
+          reclamada_en?: string
+          recurso?: string
+          recurso_id?: string | null
+          respuesta?: Json | null
+          status_http?: number | null
+          terminada_en?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_idempotencia_api_key_id_fkey"
+            columns: ["api_key_id"]
+            isOneToOne: false
+            referencedRelation: "api_keys"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "api_idempotencia_organizacion_id_fkey"
+            columns: ["organizacion_id"]
+            isOneToOne: false
+            referencedRelation: "organizaciones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       api_keys: {
         Row: {
           alcances: string[]
@@ -2297,6 +2357,8 @@ export type Database = {
           intentos: number
           organizacion_id: string
           payload: Json
+          reenviada_en: string | null
+          reenviada_por: string | null
           siguiente_intento_en: string
           ultima_respuesta: string | null
           ultimo_status_http: number | null
@@ -2311,6 +2373,8 @@ export type Database = {
           intentos?: number
           organizacion_id: string
           payload: Json
+          reenviada_en?: string | null
+          reenviada_por?: string | null
           siguiente_intento_en?: string
           ultima_respuesta?: string | null
           ultimo_status_http?: number | null
@@ -2325,6 +2389,8 @@ export type Database = {
           intentos?: number
           organizacion_id?: string
           payload?: Json
+          reenviada_en?: string | null
+          reenviada_por?: string | null
           siguiente_intento_en?: string
           ultima_respuesta?: string | null
           ultimo_status_http?: number | null
@@ -2716,6 +2782,28 @@ export type Database = {
           folio: number
         }[]
       }
+      autenticar_api_key: {
+        Args: { p_clave_hash: string }
+        Returns: {
+          alcances: string[]
+          ambiente: Database["public"]["Enums"]["ambiente_sii"]
+          api_key_id: string
+          empresa_id: string
+          motivo: string
+          organizacion_id: string
+        }[]
+      }
+      cerrar_entrega_webhook: {
+        Args: {
+          p_definitiva?: boolean
+          p_entregada: boolean
+          p_id: number
+          p_intento: number
+          p_respuesta?: string
+          p_status_http?: number
+        }
+        Returns: Database["public"]["Enums"]["estado_entrega_webhook"]
+      }
       clasificar_envio: {
         Args: {
           p_aceptados: number
@@ -2822,7 +2910,37 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      probar_webhook: { Args: { p_webhook: string }; Returns: number }
       puede_emitir: { Args: { p_organizacion: string }; Returns: boolean }
+      reclamar_entregas_webhook: {
+        Args: { p_arriendo_segundos?: number; p_limite?: number }
+        Returns: {
+          evento: string
+          id: number
+          intentos: number
+          organizacion_id: string
+          payload: Json
+          secreto_secret_id: string
+          url: string
+          webhook_id: string
+        }[]
+      }
+      reclamar_idempotencia: {
+        Args: {
+          p_api_key?: string
+          p_arriendo_segundos?: number
+          p_clave: string
+          p_huella: string
+          p_organizacion: string
+          p_recurso: string
+        }
+        Returns: {
+          recurso_id: string
+          respuesta: Json
+          resultado: string
+          status_http: number
+        }[]
+      }
       reclamar_notificacion: {
         Args: {
           p_clave: string
@@ -2836,6 +2954,10 @@ export type Database = {
           id: string
           intentos: number
         }[]
+      }
+      reenviar_entrega_webhook: {
+        Args: { p_entrega: number }
+        Returns: undefined
       }
       registrar_caf: {
         Args: {
@@ -2880,10 +3002,25 @@ export type Database = {
         }
         Returns: string
       }
+      rotar_secreto_webhook: { Args: { p_webhook: string }; Returns: string }
       rut_valido: { Args: { p_rut: string }; Returns: boolean }
       sincronizar_documentos_envio: {
         Args: { p_envio: string }
         Returns: undefined
+      }
+      soltar_idempotencia: {
+        Args: { p_clave: string; p_organizacion: string; p_recurso_id?: string }
+        Returns: boolean
+      }
+      terminar_idempotencia: {
+        Args: {
+          p_clave: string
+          p_organizacion: string
+          p_recurso_id?: string
+          p_respuesta: Json
+          p_status_http: number
+        }
+        Returns: boolean
       }
       tiene_rol: {
         Args: {

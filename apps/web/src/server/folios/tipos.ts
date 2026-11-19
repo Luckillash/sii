@@ -12,6 +12,17 @@ export interface ContextoFolios {
   usuarioId: string;
 }
 
+/**
+ * Contexto de la API pública (Fase 11, `POST /folios/solicitudes`): sin usuario, con la
+ * API key ya autenticada con el alcance `folios:solicitar`. Solo para `solicitarFolios`.
+ */
+export interface ContextoFoliosApi {
+  organizacionId: string;
+  empresaId: string;
+  usuarioId: null;
+  apiKeyId: string;
+}
+
 /** Empresa, ambiente y tipo: la llave de la disponibilidad y de la alerta. */
 export interface ClaveFolios {
   organizacionId: string;

@@ -65,6 +65,7 @@ por fase están en `PLAN-SAAS.md`, en la raíz del repositorio.
 | Campos del sistema | `autorizada_produccion`, la etapa y el estado SII del proceso solo los cambia el sistema (triggers `trg_05_proteger_*`) ([triggers](08-esquema-supabase/triggers-y-logica.md)) |
 | Plan | Los límites salen de `plan_vigente()`; un plan `null` significa «sin suscripción vigente» (`morosa` o `cancelada`), no «ilimitado» ([RPC del backend](03-api-reference/rpc-backend.md#plan_vigente)) |
 | Planes y pagos | Fase 10, **sin desplegar**: grilla D5 (Certificación gratis y sin plazo; Pyme, Contador y API de autoservicio; Empresa a medida) y cobro con Flow (D4). El retorno del registro de tarjeta llega sin cookies (la organización sale del `customerId`), el callback solo trae `token` (se consulta firmado y siempre responde 200) y la mora la trae la sincronización (`morose = 1` → `morosa`). Los cambios de suscripción van por `activar_suscripcion` (`service_role`); la cuota de boletas es bloqueo duro con aviso al 80 % y al 100 %. Migraciones `0015` y `0016` **aplicadas el 2026-11-18** (antes del deploy; verificaciones 10/10 y 20/20, simulación 30/30); pendientes la `0017` (después del deploy), el deploy y las credenciales de Flow ([guía](02-guias/planes-y-pagos.md)) |
+| API pública y webhooks | Fase 11, **sin desplegar**: `/api/v1/*` con API keys (`sk_test_` certificación, `sk_live_` producción; solo se guarda su SHA-256), alcances, `Idempotency-Key` obligatoria al emitir (`api_idempotencia`: la repetición devuelve la misma respuesta con `Idempotent-Replayed: true`, otro cuerpo con la misma clave da 422) y emisión con el mismo `emitirDocumento` de la Fase 7 (`usuarioId` nulo, `api_key_id`, `origen = api`). Webhooks: outbox `webhook_entregas`, entrega cada minuto por `/api/cron/webhooks` con firma `Boleteame-Firma` (HMAC-SHA256 de `t.cuerpo`), protección SSRF y 8 intentos con *backoff*. OpenAPI en `/api/v1/openapi.json` y docs públicas en `/docs/api`. Migración `0018` aplicada el 2026-11-19 (antes del deploy) y `0019` (después) escrita, pendiente de aplicar; criterio pendiente ([guía](02-guias/api-publica.md)) |
 | Ambientes | Una sola base (producción) para local y Vercel; el ambiente del SII (`certificacion` / `produccion`) es un enum, nunca un texto libre, y en certificación se muestra `BannerAmbiente` |
 | Textos al SII | XML en ISO-8859-1 tal cual (`Buffer`, sin recodificar); montos en pesos enteros; fechas en hora de Chile ([formatos](01-fundamentos/formatos-y-validaciones.md)) |
 
@@ -85,6 +86,7 @@ por fase están en `PLAN-SAAS.md`, en la raíz del repositorio.
 | Recorrido mínimo ejecutable | [02-guias/quickstart.md](02-guias/quickstart.md) |
 | Alta de cliente, equipo, plan, certificado | [02-guias/onboarding-organizacion.md](02-guias/onboarding-organizacion.md) |
 | **Planes, contratar o cambiar de plan, cobro con Flow, mora y cuotas** | [02-guias/planes-y-pagos.md](02-guias/planes-y-pagos.md) |
+| **API pública (/api/v1), API keys, idempotencia, webhooks, OpenAPI y /docs/api** | [02-guias/api-publica.md](02-guias/api-publica.md) |
 | **Certificar una empresa ante el SII** | [02-guias/certificacion-empresa.md](02-guias/certificacion-empresa.md) |
 | **Pedir, subir o anular CAF; alerta de folios bajos; asignar folios** | [02-guias/folios-caf.md](02-guias/folios-caf.md) |
 | **Emitir una boleta** (pantalla, flujo, estados por camino, PDF, correo, borradores) | [02-guias/emision-boletas.md](02-guias/emision-boletas.md) |
@@ -151,6 +153,7 @@ documentación/
 │   ├── seguimiento-envios.md
 │   ├── tablero-y-reportes.md
 │   ├── planes-y-pagos.md
+│   ├── api-publica.md
 │   └── flujos-tipicos.md
 ├── 03-api-reference/                  ← contrato de RPC, tablas y servicios del SII (el "qué")
 │   ├── indice-operaciones.md
@@ -219,7 +222,7 @@ documentación/
 
 | Fuente | Qué aporta | Fuente de verdad para |
 |---|---|---|
-| `supabase/migrations/` (0001–0016 aplicadas, la 0011 y la 0012 el 2026-11-15, la 0013 y la 0014 el 2026-11-17, la 0014 después del deploy de la Fase 8; la 0015 y la 0016 el 2026-11-18; la 0017, de la Fase 10, escrita y pendiente hasta después del deploy) | Esquema aplicado en producción (y la 0017 pendiente) | Tablas, RLS, triggers y RPC |
+| `supabase/migrations/` (0001–0018 aplicadas, la 0011 y la 0012 el 2026-11-15, la 0013 y la 0014 el 2026-11-17, la 0014 después del deploy de la Fase 8; de la 0015 a la 0017 el 2026-11-18, la 0017 después del deploy de la Fase 10; la 0018, de la Fase 11, el 2026-11-19 antes del deploy; la 0019, escrita y pendiente hasta después del deploy) | Esquema aplicado en producción (y la 0019 pendiente) | Tablas, RLS, triggers y RPC |
 | `08-esquema-supabase/supabase_saas_sii.sql` | Esquema original (= `0001`), comentado | Intención de diseño de la `0001` |
 | `apps/web/src/server/` | Capa SII, certificación y Supabase | Comportamiento del backend |
 | `packages/certificacion` (`@winex/certificacion`, de `certificacion-node`) | Librería y CLI `sii`, con sus `docs/` | Protocolo con el SII y códigos de error |

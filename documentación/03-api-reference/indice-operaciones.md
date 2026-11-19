@@ -1,9 +1,9 @@
 ---
 title: "Índice de operaciones"
 description: "Todas las funciones RPC, vistas y servicios del SII, con quién puede llamarlos."
-keywords: [índice, operaciones, asistente de certificación, server/certificacion, Server Actions, postular, descargarSet, solicitarFoliosSet, enviarSet, consultarEstadoSet, solicitarRevision, consultarEstadoDeclaracion, declarar, marcarRevisada, leerAsistente, guardarDatosPostulacion, guardarDatosDeclaracion, registrar_caf, guardar_set_pruebas, folios, server/folios, leerFolios, solicitarFolios, subirCaf, anularFolios, puedeEmitir, alertaDespuesDeAsignar, alertarSiCruza, anular_folios, encolar_evento, folios.por_agotarse, migración 0011, emisión, server/emision, emitirDocumento, emitir, guardarBorrador, borrarBorrador, leerVistaEmision, buscarReceptores, buscarProductos, enlaceDocumento, ResultadoEmision, Fase 8, seguimiento, ejecutarSeguimiento, consultarEnvio, consultarEstado, consultar_envio, ejecutarAlertas, marcarEnvioRevisado, marcarRevisado, reenviarAlReceptor, enlaceArchivo, listarDocumentos, leerEnvio, enviosInciertos, reclamar_notificacion, /api/cron/seguimiento, /api/cron/alertas, Fase 9, Tablero, leerCifras, leerResumenFolios, armarResumen, generarExportacion, leerPedido, hrefExportacion, hrefExportar, /reportes/exportar, Fase 10, server/pagos, iniciarContratacion, activarDespuesDeRegistro, previsualizarCambio, cambiarDePlan, cancelarSuscripcion, procesarAvisoPago, sincronizarTodas, avisarMorosas, cuotaProduccion, leerVistaPlan, /api/pagos/flow/registro, /api/pagos/flow/confirmacion, /api/cron/suscripciones]
-related: ["03-api-reference/acceso-por-tabla.md", "03-api-reference/servicios-sii.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "02-guias/emision-boletas.md", "02-guias/seguimiento-envios.md", "03-api-reference/rpc-backend.md", "02-guias/tablero-y-reportes.md", "02-guias/planes-y-pagos.md"]
-source: ["apps/web/src/server/pagos/", "apps/web/src/app/[org]/configuracion/plan/acciones.ts", "apps/web/src/app/api/pagos/flow/", "apps/web/src/server/seguimiento/index.ts", "apps/web/src/server/documentos/index.ts", "apps/web/src/server/alertas/index.ts", "apps/web/src/app/[org]/documentos/acciones.ts", "apps/web/src/app/api/cron/", "apps/web/src/server/emision/index.ts", "apps/web/src/app/[org]/emitir/acciones.ts", "supabase_saas_sii.sql §15 §16 §17", "apps/web/src/server/certificacion/index.ts", "apps/web/src/app/[org]/certificacion/acciones.ts", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/folios/index.ts", "apps/web/src/app/[org]/folios/acciones.ts", "supabase/migrations/0011_folios.sql", "apps/web/src/server/tablero/index.ts", "apps/web/src/server/reportes/index.ts", "apps/web/src/lib/reportes.ts", "apps/web/src/app/[org]/reportes/exportar/route.ts"]
+keywords: [índice, operaciones, asistente de certificación, server/certificacion, Server Actions, postular, descargarSet, solicitarFoliosSet, enviarSet, consultarEstadoSet, solicitarRevision, consultarEstadoDeclaracion, declarar, marcarRevisada, leerAsistente, guardarDatosPostulacion, guardarDatosDeclaracion, registrar_caf, guardar_set_pruebas, folios, server/folios, leerFolios, solicitarFolios, subirCaf, anularFolios, puedeEmitir, alertaDespuesDeAsignar, alertarSiCruza, anular_folios, encolar_evento, folios.por_agotarse, migración 0011, emisión, server/emision, emitirDocumento, emitir, guardarBorrador, borrarBorrador, leerVistaEmision, buscarReceptores, buscarProductos, enlaceDocumento, ResultadoEmision, Fase 8, seguimiento, ejecutarSeguimiento, consultarEnvio, consultarEstado, consultar_envio, ejecutarAlertas, marcarEnvioRevisado, marcarRevisado, reenviarAlReceptor, enlaceArchivo, listarDocumentos, leerEnvio, enviosInciertos, reclamar_notificacion, /api/cron/seguimiento, /api/cron/alertas, Fase 9, Tablero, leerCifras, leerResumenFolios, armarResumen, generarExportacion, leerPedido, hrefExportacion, hrefExportar, /reportes/exportar, Fase 10, server/pagos, iniciarContratacion, activarDespuesDeRegistro, previsualizarCambio, cambiarDePlan, cancelarSuscripcion, procesarAvisoPago, sincronizarTodas, avisarMorosas, cuotaProduccion, leerVistaPlan, /api/pagos/flow/registro, /api/pagos/flow/confirmacion, /api/cron/suscripciones, Fase 11, API pública, /api/v1, manejarApi, manejarEmision, manejarLote, manejarListado, manejarDocumento, manejarArchivo, manejarFolios, manejarSolicitudFolios, manejarEnvio, ejecutarEntregas, /api/cron/webhooks, crearClaveApi, revocarClaveApi, crearWebhook, actualizarWebhook, cambiarEstadoWebhook, borrarWebhook, probarWebhook, rotarSecretoWebhook, reenviarEntrega, leerClavesApi, leerWebhooks, leerEntregas]
+related: ["03-api-reference/acceso-por-tabla.md", "03-api-reference/servicios-sii.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "02-guias/emision-boletas.md", "02-guias/seguimiento-envios.md", "03-api-reference/rpc-backend.md", "02-guias/tablero-y-reportes.md", "02-guias/planes-y-pagos.md", "02-guias/api-publica.md", "03-api-reference/rpc-integraciones.md"]
+source: ["apps/web/src/server/pagos/", "apps/web/src/app/[org]/configuracion/plan/acciones.ts", "apps/web/src/app/api/pagos/flow/", "apps/web/src/server/seguimiento/index.ts", "apps/web/src/server/documentos/index.ts", "apps/web/src/server/alertas/index.ts", "apps/web/src/app/[org]/documentos/acciones.ts", "apps/web/src/app/api/cron/", "apps/web/src/server/emision/index.ts", "apps/web/src/app/[org]/emitir/acciones.ts", "supabase_saas_sii.sql §15 §16 §17", "apps/web/src/server/certificacion/index.ts", "apps/web/src/app/[org]/certificacion/acciones.ts", "supabase/migrations/0008_certificacion.sql", "apps/web/src/server/folios/index.ts", "apps/web/src/app/[org]/folios/acciones.ts", "supabase/migrations/0011_folios.sql", "apps/web/src/server/tablero/index.ts", "apps/web/src/server/reportes/index.ts", "apps/web/src/lib/reportes.ts", "apps/web/src/app/[org]/reportes/exportar/route.ts", "apps/web/src/server/api-publica/index.ts", "apps/web/src/server/webhooks/", "apps/web/src/app/api/v1/", "apps/web/src/app/[org]/configuracion/api/acciones.ts", "apps/web/src/app/[org]/configuracion/webhooks/acciones.ts", "apps/web/src/server/integraciones/"]
 ---
 
 # Índice de operaciones
@@ -11,6 +11,46 @@ source: ["apps/web/src/server/pagos/", "apps/web/src/app/[org]/configuracion/pla
 > **Úsalo cuando:** buscas una operación por su función.
 
 <!-- TODO: índice completo de RPC, vistas y servicios (Fases 2–4 y 11 en adelante). -->
+
+## API pública y webhooks (Fase 11)
+
+Código escrito; migración `0018` **aplicada el 2026-11-19**; la `0019`, escrita y pendiente de
+aplicar (después del deploy). Detalle en la
+[guía](../02-guias/api-publica.md). Las RPC nuevas (0018) están en
+[RPC de integraciones](rpc-integraciones.md).
+
+**API (`/api/v1`, sin sesión: API key).** Cada `route.ts` delega en `server/api-publica/`
+(`index.ts`): `manejarApi` autentica (`autenticar_api_key` 🔒), exige el alcance y arma el
+contexto con `service_role` filtrado por la organización de la clave.
+
+| Ruta | Función | Sale al SII | Escribe |
+|---|---|---|---|
+| `POST /documentos` | `manejarEmision` → `emitirDocumento` (Fase 7) | sí (token, envío REST) | `api_idempotencia` (`reclamar_`/`terminar_`/`soltar_idempotencia` 🔒), `documentos` (`origen = 'api'`, `clave_idempotencia`), `operaciones_sii` (`api_key_id`), lo mismo que la emisión del panel |
+| `POST /documentos/lote` | `manejarLote` | sí, una emisión por ítem | igual, por ítem (`<clave>#<n>`) |
+| `GET /documentos`, `GET /documentos/{id}` | `manejarListado`, `manejarDocumento` | no | nada (`ultimo_uso_en` de la clave) |
+| `GET /documentos/{id}/xml`, `/pdf` | `manejarArchivo` (`enlaceDocumento`) | no | el PDF en Storage si faltaba |
+| `GET /folios` | `manejarFolios` (`leerResumenFolios`) | no | nada |
+| `POST /folios/solicitudes` | `manejarSolicitudFolios` → `solicitarFolios` (Fase 6) | revisión y timbrado | `solicitudes_folios`, `cafs` y Vault (timbrado), `operaciones_sii` |
+| `GET /envios/{id}` | `manejarEnvio` | no | nada |
+| `GET /openapi.json` | `ESPECIFICACION_V1` (`lib/openapi-v1.ts`) | no | nada (pública) |
+
+**Entrega de webhooks.** `POST`/`GET /api/cron/webhooks` (Bearer `CRON_SECRET`, monitor
+`cron-webhooks`) → `ejecutarEntregas` (`server/webhooks/cron.ts`): `reclamar_entregas_webhook`
+🔒, `leer_secreto` 🔒, firma (`firma.ts`), `lookupSeguro` (`ssrf.ts`), envío
+(`entregar.ts`) y `cerrar_entrega_webhook` 🔒. No sale al SII.
+
+**Panel.** Server Actions con la sesión, `exigirMembresia` + `puedeAdministrar` +
+`getUser()` antes de escribir:
+
+| Acción | Archivo | RPC o tabla (sesión) |
+|---|---|---|
+| `crearClaveApi`, `revocarClaveApi` | `app/[org]/configuracion/api/acciones.ts` | `crear_api_key`; `update api_keys.revocada_en` |
+| `crearWebhook`, `actualizarWebhook`, `cambiarEstadoWebhook`, `borrarWebhook` | `app/[org]/configuracion/webhooks/acciones.ts` | `crear_webhook`; `update`/`delete webhooks` |
+| `probarWebhook`, `rotarSecretoWebhook`, `reenviarEntrega` | ídem | `probar_webhook`, `rotar_secreto_webhook`, `reenviar_entrega_webhook` |
+
+Lecturas del panel en `server/integraciones/lectura.ts` (`leerPlanIntegraciones`,
+`leerClavesApi`, `leerWebhooks`, `leerWebhook`, `leerEntregas`), con la sesión (RLS
+`es_admin`).
 
 ## Planes y pagos (Fase 10)
 

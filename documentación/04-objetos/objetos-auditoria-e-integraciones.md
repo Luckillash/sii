@@ -1,9 +1,9 @@
 ---
 title: "Objetos: auditoría e integraciones"
-description: "Columnas de operaciones_sii (y qué guarda la capa SII en mensaje y detalle), api_keys, webhooks, webhook_entregas y notificaciones (migración 0013)."
-keywords: [operaciones_sii, auditoría, resultado, resultado_operacion, en_curso, confirmada, ensayo, mensaje, detalle, revisada_en, revisada_por, abandonada, detalleSeguro, sanearDetalle, agregarDetalle, operacion_sii, canal_sii, api_key_id, envio_id, solicitud_id, documento_id, iniciada_en, terminada_en, Realtime, api_keys, webhooks, webhook_entregas, seguimiento, consultar_envio, cerrarAbandonadas, notificaciones, migración 0013, reclamar_notificacion]
+description: "Columnas de operaciones_sii (y qué guarda la capa SII en mensaje y detalle), api_keys, webhooks, webhook_entregas, api_idempotencia (migración 0018) y notificaciones (migración 0013)."
+keywords: [operaciones_sii, auditoría, resultado, resultado_operacion, en_curso, confirmada, ensayo, mensaje, detalle, revisada_en, revisada_por, abandonada, detalleSeguro, sanearDetalle, agregarDetalle, operacion_sii, canal_sii, api_key_id, envio_id, solicitud_id, documento_id, iniciada_en, terminada_en, Realtime, api_keys, webhooks, webhook_entregas, seguimiento, consultar_envio, cerrarAbandonadas, notificaciones, migración 0013, reclamar_notificacion, api_idempotencia, migración 0018, reenviada_en, webhooks_url_permitida]
 related: ["01-fundamentos/errores-y-resultados.md", "09-libreria/backend-service-role.md", "06-integraciones/realtime-y-storage.md", "06-integraciones/overview.md", "03-api-reference/acceso-por-tabla.md"]
-source: ["supabase_saas_sii.sql §13 §14 §17", "supabase/migrations/0006_realtime_operaciones.sql", "apps/web/src/server/sii/operacion.ts", "apps/web/src/server/sii/errores.ts", "apps/web/src/server/seguimiento/cron.ts", "supabase/migrations/0013_notificaciones.sql"]
+source: ["supabase_saas_sii.sql §13 §14 §17", "supabase/migrations/0006_realtime_operaciones.sql", "apps/web/src/server/sii/operacion.ts", "apps/web/src/server/sii/errores.ts", "apps/web/src/server/seguimiento/cron.ts", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0018_api_webhooks.sql"]
 ---
 
 # Objetos: auditoría e integraciones
@@ -11,6 +11,10 @@ source: ["supabase_saas_sii.sql §13 §14 §17", "supabase/migrations/0006_realt
 > **Úsalo cuando:** necesitas los campos de auditoría, API keys o webhooks.
 
 Leyenda: ✔ obligatoria (`not null` sin default útil) · 🔒 solo `service_role`.
+
+> **Migración 0018 (Fase 11): aplicada en producción el 2026-11-19.** Lo marcado «0018» abajo
+> (`api_idempotencia`, columnas de reenvío, índices y el check de la URL) ya existe en
+> producción.
 
 ## `operaciones_sii`
 
@@ -27,7 +31,7 @@ y, con la migración 0006, la reciben por Realtime
 | `organizacion_id` ✔ | `uuid` | FK `organizaciones`, `on delete cascade`. Toda consulta de la capa filtra por ella |
 | `empresa_id` | `uuid` | FK `empresas`, `on delete set null`. Nulo si la operación no es de una empresa; las de efecto global siempre la llevan (sin ella, `ejecutarOperacion` devuelve `motivo: 'uso'` sin insertar) |
 | `usuario_id` | `uuid` | FK `auth.users`, `on delete set null`. Nulo en cron y API pública |
-| `api_key_id` | `uuid` | FK `api_keys` (`operaciones_api_key_fk`), `on delete set null`. La API pública (Fase 11) |
+| `api_key_id` | `uuid` | FK `api_keys` (`operaciones_api_key_fk`), `on delete set null`. Lo pone la API pública (Fase 11) con `usuario_id` nulo; índice parcial `operaciones_sii_api_key` (0018) |
 | `operacion` ✔ | `operacion_sii` | qué se hizo (tabla abajo) |
 | `ambiente` ✔ | `ambiente_sii` | `certificacion` o `produccion` |
 | `canal` | `canal_sii` | `rest` o `soap`, si aplica |
@@ -148,7 +152,7 @@ pasados 15 minutos (`cerrarAbandonadas`). «Ya lo revisé» de un envío inciert
 
 ## `notificaciones` (migración 0013)
 
-**Pendiente de aplicar.** Una fila por alerta por correo ya reclamada o enviada (Fase 8);
+**Aplicada** (2026-11-17). Una fila por alerta por correo ya reclamada o enviada (Fase 8);
 la escribe solo el backend (`reclamar_notificacion` y `update` con `service_role`), la leen
 los miembros de la organización. Sin Realtime.
 
@@ -181,4 +185,84 @@ insert (resultado = en_curso, terminada_en = null)
 - Si el cierre falla, la fila queda `en_curso`; pasados 15 min cuenta como abandonada.
 - No hay `delete` desde la app; las filas se van en cascada con la organización.
 
-<!-- TODO (Fase 11): api_keys, webhooks y webhook_entregas. -->
+## `api_keys` (0001)
+
+API keys de la API pública (Fase 11). Se crean solo con `crear_api_key` (la clave en claro
+se devuelve una vez); la fila guarda su sha256. Lectura, edición (`nombre`, `revocada_en`,
+`expira_en`) y borrado: administradores (`es_admin`). La API las autentica con
+`autenticar_api_key` 🔒 (0018).
+
+| Columna | Tipo | Notas |
+|---|---|---|
+| `id` | `uuid` | PK; va en `operaciones_sii.api_key_id` y `api_idempotencia.api_key_id` |
+| `organizacion_id` ✔ | `uuid` | FK `organizaciones`, `on delete cascade`; índice `api_keys_organizacion` (0018) |
+| `empresa_id` | `uuid` | FK `empresas`, `on delete cascade`. Nulo = todas las empresas de la organización |
+| `nombre` ✔ | `text` | lo pone el administrador |
+| `prefijo` ✔ | `text` | 6–16 caracteres visibles; `crear_api_key` guarda los 12 primeros (`sk_test_ab12`) |
+| `clave_hash` ✔ | `text` | sha256 hex (64), único. No se puede cambiar con la sesión |
+| `alcances` | `text[]` | default `{documentos:leer}`; ⊆ los 6 alcances (`certificacion:gestionar` reservado) |
+| `ambiente` | `ambiente_sii` | default `certificacion`; `sk_test_` = certificación, `sk_live_` = producción |
+| `ultimo_uso_en` | `timestamptz` | lo marca `autenticar_api_key`, como mucho una vez por minuto |
+| `expira_en`, `revocada_en` | `timestamptz` | vencida o revocada → la API responde 401 |
+| `creado_por`, `creado_en` | | FK `auth.users` `on delete set null` |
+
+## `webhooks` (0001)
+
+| Columna | Tipo | Notas |
+|---|---|---|
+| `id` | `uuid` | PK |
+| `organizacion_id` ✔ | `uuid` | FK `organizaciones`, `on delete cascade`; índice `webhooks_organizacion` (0018) |
+| `url` ✔ | `text` | `^https://` (0001) y check `webhooks_url_permitida` (0018: puerto 443, sin usuario, IP literal, `localhost`, `.local`, `.localhost`, `.internal` ni punto final; ≤ 2.048) |
+| `eventos` ✔ | `text[]` | al menos uno de los 8 eventos del catálogo |
+| `secreto_secret_id` ✔ | `uuid` | secreto HMAC en Vault (`whsec_…`); lo cambia `rotar_secreto_webhook`; al borrar la fila, `tg_borrar_secretos` lo saca de Vault |
+| `activo` | `boolean` | default `true`. Inactivo: no se encola y lo pendiente se descarta al reclamar |
+| `creado_en`, `actualizado_en` | `timestamptz` | |
+
+Editables con la sesión (administradores): `url`, `eventos`, `activo`.
+
+## `webhook_entregas` (0001, columnas e índices en la 0018)
+
+Outbox: una fila por evento y webhook suscrito, insertada por `encolar_evento` (triggers) o
+por `probar_webhook`. La entrega la hace `/api/cron/webhooks` con
+`reclamar_entregas_webhook` y `cerrar_entrega_webhook` 🔒. Lectura: administradores.
+
+| Columna | Tipo | Notas |
+|---|---|---|
+| `id` | `bigint` identity | PK. Es el id de entrega que recibe el cliente (`Boleteame-Entrega`); un reenvío conserva el mismo |
+| `organizacion_id` ✔, `webhook_id` ✔ | `uuid` | FK en cascada |
+| `evento` ✔ | `text` | uno del catálogo, o `webhook.prueba` |
+| `payload` ✔ | `jsonb` | `{evento, creado_en, datos}` |
+| `estado` | `estado_entrega_webhook` | `pendiente` · `fallido` (reintento programado) · `entregado` · `descartado` |
+| `intentos` | `integer` | lo suma `reclamar_entregas_webhook`; 8 = último |
+| `ultimo_status_http`, `ultima_respuesta` | | respuesta del receptor (≤ 1.000 caracteres) o el motivo del descarte |
+| `siguiente_intento_en` | `timestamptz` | vencida = se puede tomar; al tomarla se corre al fin del arriendo |
+| `entregado_en` | `timestamptz` | solo `entregado` |
+| `reenviada_en`, `reenviada_por` | | 0018: último reenvío manual (FK `auth.users` `on delete set null`) |
+| `creado_en` | `timestamptz` | |
+
+Índices: `webhook_entregas_pendientes` (0001), y en la 0018 `webhook_entregas_por_entregar`
+(`siguiente_intento_en` donde `pendiente` o `fallido`), `webhook_entregas_historial`
+(`webhook_id, id desc`) y `webhook_entregas_organizacion` (`organizacion_id, id desc`). El
+job `limpiar-webhook-entregas` (0019) borra las `entregado`/`descartado` de más de 30 días.
+
+## `api_idempotencia` (0018)
+
+🔒 Solo `service_role` (RLS activo sin políticas). Una fila por `Idempotency-Key` de la
+organización. Se maneja con `reclamar_idempotencia`, `terminar_idempotencia` y
+`soltar_idempotencia` ([contratos](../03-api-reference/rpc-integraciones.md#idempotencia-0018)).
+
+| Columna | Tipo | Notas |
+|---|---|---|
+| `organizacion_id` ✔, `clave` ✔ | `uuid`, `text` | llave primaria; `clave` `^[!-~]{1,255}$` |
+| `recurso` ✔ | `text` | `documento`, `lote` o `solicitud_folios` |
+| `huella` ✔ | `text` | sha256 hex del cuerpo normalizado: otra huella con la misma clave = conflicto |
+| `api_key_id` | `uuid` | FK `api_keys`, `on delete set null` (índice parcial) |
+| `estado` | `text` | `en_curso` o `terminada` |
+| `status_http`, `respuesta`, `terminada_en` | | obligatorios juntos cuando está `terminada` (check) |
+| `recurso_id` | `uuid` | documento, borrador o solicitud asociada |
+| `reclamada_en` | `timestamptz` | inicio del arriendo; `-infinity` = soltada (retomable) |
+| `creado_en` | `timestamptz` | |
+
+No va en `documentos.metadata` porque la emisión reescribe `metadata` entero; además sirve
+para lotes y folios. La boleta emitida por la API guarda la clave en
+`documentos.clave_idempotencia` (único por organización, 0001) con `origen = 'api'`.

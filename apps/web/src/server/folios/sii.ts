@@ -22,7 +22,7 @@ import type { Database } from '../supabase/tipos';
 import { type DatosCaf, leerDatosCaf, rangoDelCaf } from './caf';
 import { leerCafs } from './disponibles';
 import { codigoPg } from './errores';
-import type { ContextoFolios } from './tipos';
+import type { ContextoFolios, ContextoFoliosApi } from './tipos';
 
 // La solicitud de folios contra el SII (PLAN-SAAS Fases 5 y 6), dentro de
 // `ejecutarOperacion` (quien llama abre la operación). Paridad con
@@ -185,7 +185,7 @@ export interface SalidaSolicitud {
 export async function solicitarEnSii(
   deps: DependenciasCertificacion,
   cliente: ClienteServicio,
-  ctx: ContextoFolios,
+  ctx: ContextoFolios | ContextoFoliosApi,
   peticion: PeticionFolios,
   modo: { simular: boolean },
   { operacionId, agregarDetalle }: HerramientasOperacion,
@@ -345,7 +345,7 @@ export async function solicitarEnSii(
 /** El CAF ya cargado (mismo tipo y ambiente) cuyo rango se cruza con el timbrado. */
 async function cafQueChoca(
   cliente: ClienteServicio,
-  ctx: ContextoFolios,
+  ctx: ContextoFolios | ContextoFoliosApi,
   ambiente: AmbienteSii,
   datos: Pick<DatosCaf, 'tipoDte' | 'desde' | 'hasta'>,
 ): Promise<{ desde: number; hasta: number } | null> {

@@ -1,9 +1,9 @@
 ---
 title: "Esquema: despliegue"
 description: "Cómo se aplican las migraciones en la única base (Supabase en la nube, producción), requisitos (Vault, Realtime, pg_cron, pg_net) y tareas programadas."
-keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, aplicadas, 0008_certificacion, registrar_caf, guardar_set_pruebas, rls-fase5-certificacion, 0009_autorizacion_externa, tg_resolucion_autoriza_produccion, rls-fase5-autorizacion-externa, 0010_verificar_autorizacion, verificar_autorizacion, operacion_sii, rls-fase5-verificar-autorizacion, 0011_folios, anular_folios, trg_20_caf_sin_traslape, tg_caf_sin_traslape, rls-fase6-folios, Fase 6, 0012_folio_anulado, Fase 8, 0013_notificaciones, notificaciones, reclamar_notificacion, rls-fase8-notificaciones, 0014_cron, cron.schedule, seguimiento-envios, alertas, limpiar-tokens-sii, limpiar-historial-cron, net._http_response, cron.job_run_details, CRON_SECRET, execute_sql, 42501, _crypto_aead_det_decrypt, db:tipos, nulabilidad, retornos de funciones, Fase 10, 0015_planes_comerciales, 0016_pagos, 0017_cron_suscripciones, sincronizar-suscripciones, activar_suscripcion, rls-fase10-pagos]
+keywords: [migraciones, supabase db push, supabase link, producción, una sola base, Vault, pg_cron, pg_net, cron_token, Realtime, Storage, tipos, verificaciones, 0006_realtime_operaciones, 0007_bloqueos_sii, bloqueos_sii, aplicadas, 0008_certificacion, registrar_caf, guardar_set_pruebas, rls-fase5-certificacion, 0009_autorizacion_externa, tg_resolucion_autoriza_produccion, rls-fase5-autorizacion-externa, 0010_verificar_autorizacion, verificar_autorizacion, operacion_sii, rls-fase5-verificar-autorizacion, 0011_folios, anular_folios, trg_20_caf_sin_traslape, tg_caf_sin_traslape, rls-fase6-folios, Fase 6, 0012_folio_anulado, Fase 8, 0013_notificaciones, notificaciones, reclamar_notificacion, rls-fase8-notificaciones, 0014_cron, cron.schedule, seguimiento-envios, alertas, limpiar-tokens-sii, limpiar-historial-cron, net._http_response, cron.job_run_details, CRON_SECRET, execute_sql, 42501, _crypto_aead_det_decrypt, db:tipos, nulabilidad, retornos de funciones, Fase 10, 0015_planes_comerciales, 0016_pagos, 0017_cron_suscripciones, sincronizar-suscripciones, activar_suscripcion, rls-fase10-pagos, migración 0018, migración 0019, entregar-webhooks, limpiar-webhook-entregas, limpiar-api-idempotencia, trg_10_api_key_sin_reactivar]
 related: ["02-guias/quickstart.md", "05-pruebas/probar-el-esquema.md", "08-esquema-supabase/vault-y-secretos.md", "02-guias/planes-y-pagos.md"]
-source: ["supabase_saas_sii.sql (cabecera, opcional pg_cron)", "PLAN-SAAS.md §4.4 §6", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "supabase/migrations/0015_planes_comerciales.sql", "supabase/migrations/0016_pagos.sql", "supabase/migrations/0017_cron_suscripciones.sql"]
+source: ["supabase_saas_sii.sql (cabecera, opcional pg_cron)", "PLAN-SAAS.md §4.4 §6", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "supabase/migrations/0015_planes_comerciales.sql", "supabase/migrations/0016_pagos.sql", "supabase/migrations/0017_cron_suscripciones.sql", "supabase/migrations/0018_api_webhooks.sql", "supabase/migrations/0019_cron_webhooks.sql"]
 ---
 
 # Esquema: despliegue
@@ -33,7 +33,7 @@ Viven en `supabase/migrations/` con prefijo **secuencial de 4 dígitos** (no tim
 |---|---|
 | `0001_esquema_inicial.sql` | `supabase_saas_sii.sql` **byte a byte** (19 secciones: tipos, tablas, RLS, Vault, Storage, Realtime). Nunca se edita |
 | `0002_extensiones_cron.sql` | `pg_cron` (schema `pg_catalog`) y `pg_net` (schema `extensions`) |
-| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, y la `0010_verificar_autorizacion`, aplicada el 2026-11-14, son de la Fase 5: ver [abajo](#fase-5-migración-0008); la `0011_folios`, de la Fase 6, se aplicó el 2026-11-15: ver [abajo](#fase-6-migración-0011); la `0012_folio_anulado`, de la Fase 7, se aplicó el 2026-11-15: ver [abajo](#fase-7-migración-0012); la `0013_notificaciones` y la `0014_cron`, de la Fase 8, se aplicaron el 2026-11-17 (la 0014 después del deploy): ver [abajo](#fase-8-migraciones-0013-y-0014); la `0015_planes_comerciales` y la `0016_pagos`, de la Fase 10, se aplicaron el 2026-11-18 (antes del deploy) y la `0017_cron_suscripciones` está **pendiente** (después del deploy): ver [abajo](#fase-10-migraciones-0015-0016-y-0017)) |
+| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, y la `0010_verificar_autorizacion`, aplicada el 2026-11-14, son de la Fase 5: ver [abajo](#fase-5-migración-0008); la `0011_folios`, de la Fase 6, se aplicó el 2026-11-15: ver [abajo](#fase-6-migración-0011); la `0012_folio_anulado`, de la Fase 7, se aplicó el 2026-11-15: ver [abajo](#fase-7-migración-0012); la `0013_notificaciones` y la `0014_cron`, de la Fase 8, se aplicaron el 2026-11-17 (la 0014 después del deploy): ver [abajo](#fase-8-migraciones-0013-y-0014); la `0015_planes_comerciales` y la `0016_pagos`, de la Fase 10, se aplicaron el 2026-11-18 (antes del deploy) y la `0017_cron_suscripciones` después del deploy, el mismo día: ver [abajo](#fase-10-migraciones-0015-0016-y-0017); la `0018_api_webhooks` y la `0019_cron_webhooks`, de la Fase 11: la 0018 se aplicó el 2026-11-19, antes del deploy, y la 0019 está **escrita, pendiente de aplicar** (después del deploy): ver [abajo](#fase-11-migraciones-0018-y-0019)) |
 
 Reglas, todas derivadas de que la única base es producción:
 
@@ -620,6 +620,98 @@ registro de arriba; 7 en adelante, pendientes):
     `05-pruebas/probar-el-esquema.md` (§1 y §13), `07-referencia/trampas-conocidas.md`,
     `checklist-produccion.md` y `README.md` (`grep -rn "pendientes\? de aplicar" documentación/`).
 
+### Fase 11: migraciones 0018 y 0019
+
+**Estado: la 0018 aplicada en producción el 2026-11-19, antes del deploy de la Fase 11; la 0019 escrita y probada en PGlite, pendiente de aplicar (después del deploy).** Orden: **`0018` antes del
+deploy de la Fase 11** (la API pública y el cron de webhooks la necesitan); **`0019`
+después** (si no, `pg_cron` llamaría cada minuto a una ruta que responde 404).
+
+- `0018_api_webhooks`: tabla `api_idempotencia` (solo `service_role`); RPC
+  `autenticar_api_key`, `reclamar_idempotencia`, `terminar_idempotencia`,
+  `soltar_idempotencia`, `reclamar_entregas_webhook` y `cerrar_entrega_webhook` (solo
+  `service_role`) y `reenviar_entrega_webhook`, `probar_webhook` y `rotar_secreto_webhook`
+  (también `authenticated`, verifican `es_admin`); `webhook_entregas.reenviada_en` /
+  `reenviada_por` e índices; `encolar_evento` filtra por `plan_vigente().incluye_webhooks`;
+  `tg_evento_documento` agrega `estado`, `origen` y `clave_idempotencia`; check
+  `webhooks_url_permitida` (`not valid` + `validate`); en `api_keys`, `expira_en` fuera del
+  grant de `authenticated` y trigger `trg_10_api_key_sin_reactivar` (revocar es definitivo,
+  la expiración no se alarga); `cerrar_entrega_webhook` solo cierra en el intento
+  reclamado (`p_intento`); índices `api_keys_organizacion`,
+  `webhooks_organizacion`, `operaciones_sii_api_key` y `documentos_api_listado` (sin
+  `concurrently`: las tablas son chicas hoy). Contratos en
+  [RPC de integraciones](../03-api-reference/rpc-integraciones.md).
+- `0019_cron_webhooks`: jobs `entregar-webhooks` (`* * * * *`, Bearer de Vault en cada
+  corrida, timeout 60 s), `limpiar-webhook-entregas` (`37 4 * * *`) y
+  `limpiar-api-idempotencia` (`47 4 * * *`: claves `terminada` de más de 30 días y
+  `en_curso` abandonadas de más de 7). Idempotente; `55000`
+  sin `cron_token`.
+
+Pruebas en PGlite (esquema 0001 y 0003–0019 con stubs de `pg_cron` y `pg_net`, en el
+scratchpad, sin tocar la base real): `0018_api_webhooks.sql` **23/23** (2/23 sin la 0018),
+`rls-fase11-api.sql` **39/39** (3/39 sin la 0018, limpieza en 0), `0019_cron_webhooks.sql`
+**8/9** (la 1, extensiones, no aplica en PGlite; 2/9 sin la 0019), y en verde las
+simulaciones de las Fases 2 a 10 y las verificaciones 0004, 0011, 0012, 0013, 0015 y 0016.
+
+Comprobado en producción el 2026-11-18 (solo lectura): `webhooks`, `webhook_entregas` y
+`api_keys` vacías (el `validate` del check de la URL no puede fallar) y ninguna boleta con
+`clave_idempotencia`.
+
+Registro del 2026-11-19 (todo en producción):
+
+- Antes de migrar (03:38 UTC): `0018_api_webhooks.sql` **2/23** (la 20 y la 21), como se
+  esperaba; `webhooks`, `webhook_entregas` y `api_keys` vacías; última migración registrada,
+  la 0017.
+- La `0019` se sacó de `supabase/migrations/` durante el push y se devolvió después. Los dos
+  primeros `db push --dry-run` fallaron por red del CLI (`DbConnectError` con *connection
+  timed out* y `DbConfigLoginRoleNetworkError`); el tercero listó solo `0018_api_webhooks.sql`.
+- `db push --yes` aplicó la `0018` a las 03:40:29 UTC.
+- Después: `0018_api_webhooks.sql` **23/23** (con `supabase db query --remote --read-only -f`)
+  y la simulación `rls-fase11-api.sql` **39/39** (con `supabase db query --remote --yes -f`:
+  el CLI exige `--yes` en modo agente aunque el script termine en *rollback*), con la
+  consulta de limpieza en 0 antes y después.
+- Regresiones: `rls-fase8-notificaciones.sql` **26/26**, `rls-fase10-pagos.sql` **30/30** y
+  las verificaciones `0013_notificaciones.sql` **18/18** y `0016_pagos.sql` **20/20**.
+- `pnpm db:tipos` solo difiere de lo agregado a mano en 9 líneas de nulabilidad: el
+  generador marca no nulas las columnas de retorno de `autenticar_api_key` y
+  `status_http`, `respuesta` y `recurso_id` de `reclamar_idempotencia` (Postgres no informa
+  la nulabilidad de los retornos de funciones). Se versionó lo generado; `typecheck` y
+  Vitest de la app (1597) en verde; el código trata esos campos como posiblemente nulos.
+- *Advisors*: solo lo esperado y nuevo: `rls_enabled_no_policy` en `api_idempotencia` y
+  `authenticated_security_definer_function_executable` en `probar_webhook`,
+  `reenviar_entrega_webhook` y `rotar_secreto_webhook`. Ninguna de las seis RPC solo
+  `service_role` aparece.
+
+Pasos (con el OK del usuario; 1 a 4 hechos el 2026-11-19, los resultados en el registro de
+arriba; 5 a 7, pendientes):
+
+1. Anotar la hora para PITR. Correr `0018_api_webhooks.sql` antes de migrar: debe dar
+   **2/23** (la 20 y la 21, lo de la 0001).
+2. Sacar la `0019` de `supabase/migrations/` durante el push (como la 0014 y la 0017):
+   `db push --remote=rbrntkztzijaxsnpgpqn --dry-run` debe listar **solo `0018`**; `db push`.
+3. `0018_api_webhooks.sql` **23/23**; `rls-fase11-api.sql` **39/39** con la consulta de
+   limpieza en 0 antes y después; regresiones `rls-fase8-notificaciones.sql` y
+   `rls-fase10-pagos.sql`; `pnpm db:tipos` y comparar con lo agregado a mano (el generador
+   marcará `p_api_key` de `reclamar_idempotencia` como opcional y las columnas de los
+   retornos como no nulas).
+4. *Advisors*: esperado `authenticated_security_definer_function_executable` para
+   `reenviar_entrega_webhook`, `probar_webhook` y `rotar_secreto_webhook` (las llama el
+   administrador con su sesión y revisan `es_admin` adentro) y `rls_enabled_no_policy` para
+   `api_idempotencia` (diseño). Ninguna de las otras seis debe aparecer.
+5. **Deploy** de la Fase 11 y humo: `/api/v1/documentos` sin clave → 401;
+   `POST /api/cron/webhooks` sin Bearer → 401.
+6. **0019**: devolver el archivo, `--dry-run` debe listar **solo `0019`**; `db push`;
+   `0019_cron_webhooks.sql` **9/9** con el MCP `execute_sql` como `postgres` (la 6 descifra
+   `cron_token`). Después de un par de minutos: `cron.job_run_details` `succeeded`,
+   `net._http_response` con 200 y el monitor `cron-webhooks` de Sentry en verde. La
+   comprobación 10 de `0014_cron.sql` sigue en `false` (ahora también con
+   `entregar-webhooks`): esperado.
+7. Actualizar la documentación con los resultados reales (hecho para la 0018 el 2026-11-19;
+   falta la 0019, el deploy y el humo; `grep -rn "pendiente de aplicar" documentación/`): esta sección, la tabla de Migraciones y la de Tareas programadas,
+   `rls-y-privilegios.md`, `triggers-y-logica.md`, `vault-y-secretos.md`,
+   `03-api-reference/rpc-integraciones.md`, `rpc-backend.md`, `acceso-por-tabla.md`,
+   `04-objetos/objetos-auditoria-e-integraciones.md` y `05-pruebas/probar-el-esquema.md`
+   (§14).
+
 ## Requisitos del proyecto
 
 - Postgres 17 (`supabase/config.toml` declara `major_version = 17`).
@@ -677,8 +769,10 @@ select cron.schedule(
 | `alertas` → `/api/cron/alertas` (documento rechazado, envío incierto, certificado por vencer; la de folios sale sin cron desde la Fase 6, al cruzar el 15 %) | `*/10 * * * *` | 8 | `0014_cron` (aplicada) |
 | `limpiar-tokens-sii` (tokens vencidos hace más de un día) | `17 * * * *` | 8 | `0014_cron` (aplicada) |
 | `limpiar-historial-cron` (`cron.job_run_details` de más de 7 días) | `23 3 * * *` | 8 | `0014_cron` (aplicada) |
-| `sincronizar-suscripciones` → `/api/cron/suscripciones` (mora, vuelta a Certificación tras cancelar, pagos y correo de mora; timeout 120 s) | `41 * * * *` | 10 | `0017_cron_suscripciones` (pendiente, después del deploy) |
-| `/api/cron/webhooks` | cada minuto | 11 | — |
+| `sincronizar-suscripciones` → `/api/cron/suscripciones` (mora, vuelta a Certificación tras cancelar, pagos y correo de mora; timeout 120 s) | `41 * * * *` | 10 | `0017_cron_suscripciones` (aplicada el 2026-11-18, después del deploy) |
+| `entregar-webhooks` → `/api/cron/webhooks` (entrega de webhooks con firma HMAC y backoff; timeout 60 s; siempre llama, para el monitor `cron-webhooks`) | `* * * * *` | 11 | `0019_cron_webhooks` (pendiente, después del deploy) |
+| `limpiar-webhook-entregas` (entregas `entregado`/`descartado` de más de 30 días) | `37 4 * * *` | 11 | `0019_cron_webhooks` (pendiente, después del deploy) |
+| `limpiar-api-idempotencia` (claves `terminada` de más de 30 días y `en_curso` abandonadas de más de 7) | `47 4 * * *` | 11 | `0019_cron_webhooks` (pendiente, después del deploy) |
 
 `net._http_response` no necesita limpieza: `pg_net` borra las respuestas de más de
 `pg_net.ttl` (6 horas en este proyecto).

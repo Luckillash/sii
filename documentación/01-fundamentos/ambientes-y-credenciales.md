@@ -1,9 +1,9 @@
 ---
 title: "Ambientes del SII y credenciales"
 description: "Certificación vs producción, hosts del SII, IDK del CAF, certificado digital, roles y claves API de Supabase, sesiones y su revocación, y dónde vive cada secreto."
-keywords: [ambiente, certificacion, produccion, maullin, palena, apicert, pangal, rahue, herculesr, zeusr, IDK, service_role, Vault, SII_TOKENS_KEY, variables de entorno, spike, sb_publishable, sb_secret, claves legadas, JWKS, getClaims, getUser, revocación, jwt_expiry, CRON_SECRET, cron_token, envCron, autorizarCron, /api/cron, FLOW_API_KEY, FLOW_SECRET_KEY, FLOW_API_URL, envFlow, Flow, sandbox]
-related: ["01-fundamentos/autenticacion-sii.md", "08-esquema-supabase/vault-y-secretos.md", "07-referencia/herramientas.md", "02-guias/planes-y-pagos.md"]
-source: ["supabase_saas_sii.sql §1 §6 §7", "certificacion-node/docs/canales.md", "PLAN-SAAS.md §4.4 §5", "apps/web/src/server/env.ts", "apps/web/src/server/cron/autorizacion.ts", "supabase/migrations/0014_cron.sql", "apps/web/src/server/pagos/flow.ts"]
+keywords: [ambiente, certificacion, produccion, maullin, palena, apicert, pangal, rahue, herculesr, zeusr, IDK, service_role, Vault, SII_TOKENS_KEY, variables de entorno, spike, sb_publishable, sb_secret, claves legadas, JWKS, getClaims, getUser, revocación, jwt_expiry, CRON_SECRET, cron_token, envCron, autorizarCron, /api/cron, FLOW_API_KEY, FLOW_SECRET_KEY, FLOW_API_URL, envFlow, Flow, sandbox, API key de la API pública, sk_test_, sk_live_, whsec_, autenticar_api_key]
+related: ["01-fundamentos/autenticacion-sii.md", "08-esquema-supabase/vault-y-secretos.md", "07-referencia/herramientas.md", "02-guias/planes-y-pagos.md", "06-integraciones/api-keys.md", "02-guias/api-publica.md"]
+source: ["supabase_saas_sii.sql §1 §6 §7", "certificacion-node/docs/canales.md", "PLAN-SAAS.md §4.4 §5", "apps/web/src/server/env.ts", "apps/web/src/server/cron/autorizacion.ts", "supabase/migrations/0014_cron.sql", "apps/web/src/server/pagos/flow.ts", "apps/web/src/lib/api-publica.ts"]
 ---
 
 # Ambientes del SII y credenciales
@@ -152,7 +152,8 @@ Reglas para el desarrollo:
 |---|---|---|
 | `.pfx` (base64) y su clave | Supabase Vault (`certificados.pfx_secret_id`, `clave_secret_id`) | `leer_secreto()` con `service_role` |
 | XML del CAF (con la llave `RSASK`) | Supabase Vault (`cafs.caf_secret_id`) | `leer_secreto()` con `service_role` |
-| Secreto HMAC de cada webhook | Supabase Vault (`webhooks.secreto_secret_id`) | `leer_secreto()` con `service_role` |
+| Secreto HMAC de cada webhook (`whsec_…`) | Supabase Vault (`webhooks.secreto_secret_id`) | `leer_secreto()` con `service_role`, solo en la entrega (`server/webhooks/`, Fase 11). Se muestra una vez al crear o rotar (`rotar_secreto_webhook`, 0018: borra el viejo de Vault en el acto) |
+| API keys de la API pública (`sk_test_…`, `sk_live_…`, Fase 11) | **No se guardan**: solo su SHA-256 en `api_keys.clave_hash` y el prefijo visible | El cliente la guarda; cada petición se verifica con `autenticar_api_key(sha256)` (0018, `service_role`). Nunca en logs ni Sentry (`lib/sentry/depurar.ts` depura `sk_…` y `whsec_…`) |
 | Token del SII (REST/SOAP) | `tokens_sii.token_cifrado` | AES-256-GCM en la app con `SII_TOKENS_KEY` |
 | Cookies AUT2000 | `sesiones_sii.cookies_cifradas` | AES-256-GCM en la app con `SII_TOKENS_KEY` |
 | `SII_TOKENS_KEY`, `SUPABASE_SECRET_KEY`, `CRON_SECRET` | variables de entorno de Vercel (*sensitive*) | `process.env`; `SUPABASE_SECRET_KEY` se valida en `src/server/env.ts` y `SII_TOKENS_KEY` en `leerLlave()` de `src/server/cifrado.ts` (32 bytes en base64) |
@@ -211,6 +212,17 @@ a producción en el lanzamiento ([checklist](../07-referencia/checklist-producci
 Las claves de sandbox y de producción son distintas: no se mezclan con la otra URL. Al
 2026-11-17 no están cargadas ni en `.env.local` ni en Vercel, y `apps/web/.env.example`
 todavía no las lista ([planes y pagos](../02-guias/planes-y-pagos.md#variables-de-entorno)).
+
+## API keys de la API pública y ambiente del SII (Fase 11)
+
+No confundir con las claves API de Supabase (arriba): estas son las que crea un cliente en
+Configuración → API para llamar a `/api/v1`. **El prefijo fija el ambiente del SII:**
+`sk_test_…` opera solo en `certificacion` y `sk_live_…` solo en `produccion`; un
+`ambiente` distinto en la petición da `422 ambiente_no_coincide`, y un documento de otro
+ambiente, `404`. Crear una clave de producción exige un plan con producción. La creación
+confirma la sesión con `getUser()` antes de la RPC, igual que las demás operaciones ⚠️.
+No hay variables de entorno nuevas en la Fase 11 (la entrega de webhooks usa `CRON_SECRET`).
+Detalle en [API keys](../06-integraciones/api-keys.md) y [la guía](../02-guias/api-publica.md).
 
 ## Spike de conectividad (Fase 0, retirado)
 

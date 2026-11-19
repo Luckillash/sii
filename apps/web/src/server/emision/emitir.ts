@@ -25,7 +25,7 @@ import {
 import { enlazarOperacion, fallaBase, resumenCertificado } from '../certificacion/comun';
 import { alertaDespuesDeAsignar } from '../folios/alertas';
 import { AlmacenDocumentos } from '../sii/almacen';
-import { ErrorIncierto, type MensajeError } from '../sii/errores';
+import { ErrorIncierto, ErrorUso, type MensajeError } from '../sii/errores';
 import { ejecutarOperacion, type HerramientasOperacion } from '../sii/operacion';
 import type { ClienteServicio } from '../supabase/service';
 import type { Json } from '../supabase/tipos';
@@ -587,6 +587,13 @@ export async function emitirDocumento(
   const { ambiente, tipoDte } = borrador;
   const preparar = () => prepararEmision(cliente, ctx, borrador, credenciales, deps.reloj.ahora());
 
+  // Sin usuario ni API key nadie respondería por la emisión: uso incorrecto de la capa.
+  if (ctx.usuarioId === null && !ctx.apiKeyId) {
+    return falloSinEjecutar(
+      new ErrorUso('La emisión necesita un usuario o una API key. No se envió nada al SII.'),
+    );
+  }
+
   if (entrada.nivel === 'ensayo') {
     try {
       return {
@@ -605,10 +612,24 @@ export async function emitirDocumento(
     return falloSinEjecutar(error);
   }
 
-  // 2. El borrador con la sesión del usuario (RLS).
+  // 2. El borrador: con la sesión del usuario (RLS) desde el panel, o con service_role
+  //    filtrando por organización y empresa desde la API pública (Fase 11: no hay sesión;
+  //    la clave ya se autenticó con el alcance `documentos:emitir`).
+  const porApi = Boolean(ctx.apiKeyId);
   let guardado: Awaited<ReturnType<typeof guardarEnSesion>>;
   try {
-    guardado = await guardarEnSesion(await deps.sesion(), ctx, borrador, entrada.borradorId);
+    guardado = await guardarEnSesion(
+      porApi ? cliente : await deps.sesion(),
+      ctx,
+      borrador,
+      entrada.borradorId,
+      porApi
+        ? {
+            origen: 'api',
+            ...(entrada.claveIdempotencia ? { claveIdempotencia: entrada.claveIdempotencia } : {}),
+          }
+        : {},
+    );
   } catch (error) {
     return falloSinEjecutar(error);
   }
@@ -622,6 +643,7 @@ export async function emitirDocumento(
       organizacionId: ctx.organizacionId,
       empresaId: ctx.empresaId,
       usuarioId: ctx.usuarioId,
+      apiKeyId: ctx.apiKeyId ?? null,
       operacion: 'emitir',
       ambiente,
       canal: 'rest',

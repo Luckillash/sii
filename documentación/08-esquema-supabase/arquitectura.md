@@ -57,11 +57,12 @@ solo lectura en `supabase/verificaciones/` ([despliegue](despliegue.md)).
 | `0014_cron` (**aplicada el 2026-11-17**, después del deploy de la Fase 8; verificación 12/12) | Jobs de `pg_cron`: `seguimiento-envios`, `alertas`, `limpiar-tokens-sii`, `limpiar-historial-cron` (Bearer leído de Vault) |
 | `0015_planes_comerciales` (**aplicada el 2026-11-18**, antes del deploy de la Fase 10; verificación 10/10) | `planes.autoservicio` y `planes.orden`; grilla D5 (`pyme`, `contador`, `api`, `empresa`; `emprendedor` inactivo); `crear_organizacion` sin `periodo_fin` (Certificación sin plazo) ([despliegue](despliegue.md#fase-10-migraciones-0015-0016-y-0017)) |
 | `0016_pagos` (**aplicada el 2026-11-18**, antes del deploy de la Fase 10; verificación 20/20) | Tablas `clientes_pago`, `pagos`, `eventos_pasarela`; `suscripciones.cancelar_al_fin_periodo`, `sincronizada_en` e índice `suscripciones_externa_unica`; RPC `activar_suscripcion` (solo `service_role`) |
-| `0017_cron_suscripciones` (**pendiente de aplicar**, después del deploy de la Fase 10) | Job de `pg_cron` `sincronizar-suscripciones` (`41 * * * *`, `/api/cron/suscripciones`) |
+| `0017_cron_suscripciones` (**aplicada el 2026-11-18**, después del deploy de la Fase 10) | Job de `pg_cron` `sincronizar-suscripciones` (`41 * * * *`, `/api/cron/suscripciones`) |
+| `0018_api_webhooks` (**aplicada el 2026-11-19**, antes del deploy de la Fase 11; verificación 23/23) | Tabla `api_idempotencia`; RPC de la API pública y de los webhooks (`autenticar_api_key`, idempotencia, `reclamar_entregas_webhook`, `cerrar_entrega_webhook`, `reenviar_entrega_webhook`, `probar_webhook`, `rotar_secreto_webhook`); `encolar_evento` filtrado por plan ([despliegue](despliegue.md#fase-11-migraciones-0018-y-0019)) |
 
-Aplicadas en producción: `0001`–`0016` (la `0011` y la `0012`, el 2026-11-15; la `0013` y la
+Aplicadas en producción: `0001`–`0018` (la `0011` y la `0012`, el 2026-11-15; la `0013` y la
 `0014`, el 2026-11-17, la 0014 después del deploy de la Fase 8; la `0015` y la `0016`, el
-2026-11-18). Escrita y pendiente: `0017` (después del deploy de la Fase 10). Los índices de FK
+2026-11-18, la `0017` después del deploy de la Fase 10; la `0018` el 2026-11-19). Escrita y pendiente: `0019` (después del deploy de la Fase 11). Los índices de FK
 (`unindexed_foreign_keys`) van en la `0018_indices_fk` (Fase 13).
 
 ## Relaciones

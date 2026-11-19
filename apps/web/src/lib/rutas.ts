@@ -16,9 +16,9 @@ const PUBLICAS_EXACTAS = new Set(['/', '/ingresar', '/crear-cuenta', '/recuperar
  * Prefijos públicos (la ruta es el prefijo o cuelga de él). `/api` autentica por su
  * cuenta (API keys, CRON_SECRET, firma de webhooks; el túnel de Sentry está en
  * `/api/monitoring`); `/auth` es el callback de los correos; `/invitacion` se ve antes
- * de iniciar sesión.
+ * de iniciar sesión; `/docs` es la documentación pública de la API (Fase 11).
  */
-const PREFIJOS_PUBLICOS = ['/auth', '/invitacion', '/api', '/monitoring'];
+const PREFIJOS_PUBLICOS = ['/auth', '/invitacion', '/api', '/monitoring', '/docs'];
 
 /**
  * Slugs que una organización no puede usar porque chocan con rutas de primer nivel

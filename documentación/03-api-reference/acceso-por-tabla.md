@@ -1,9 +1,9 @@
 ---
 title: "Acceso por tabla (PostgREST + RLS)"
 description: "Qué puede hacer cada rol en cada tabla: select, insert, update, delete."
-keywords: [RLS, PostgREST, políticas, grant, revoke, privilegios por columna, anon, authenticated, service_role, lector, emisor, administrador, propietario, select, insert, update, delete, "new row violates row-level security policy", "permission denied for table", 42501, folios_anulados, anular_folios, migración 0011, borrador, alta_borrador, edicion_borrador, receptores, upsert, emisión, P0001, notificaciones, migración 0013, rls-fase8-notificaciones, seguimiento, Fase 9, Tablero, exportación, v_ventas_diarias, Fase 10, clientes_pago, pagos, eventos_pasarela, migración 0016, rls-fase10-pagos]
+keywords: [RLS, PostgREST, políticas, grant, revoke, privilegios por columna, anon, authenticated, service_role, lector, emisor, administrador, propietario, select, insert, update, delete, "new row violates row-level security policy", "permission denied for table", 42501, folios_anulados, anular_folios, migración 0011, borrador, alta_borrador, edicion_borrador, receptores, upsert, emisión, P0001, notificaciones, migración 0013, rls-fase8-notificaciones, seguimiento, Fase 9, Tablero, exportación, v_ventas_diarias, Fase 10, clientes_pago, pagos, eventos_pasarela, migración 0016, rls-fase10-pagos, api_idempotencia, migración 0018]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "01-fundamentos/tenancy-y-roles.md", "03-api-reference/rpc-organizacion.md", "05-pruebas/probar-el-esquema.md", "02-guias/tablero-y-reportes.md", "02-guias/planes-y-pagos.md"]
-source: ["supabase_saas_sii.sql §17", "supabase/verificaciones/rls-fase2-tenancy.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/verificaciones/rls-fase3-empresas.sql", "supabase/migrations/0016_pagos.sql", "supabase/verificaciones/rls-fase10-pagos.sql"]
+source: ["supabase_saas_sii.sql §17", "supabase/verificaciones/rls-fase2-tenancy.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/verificaciones/rls-fase3-empresas.sql", "supabase/migrations/0016_pagos.sql", "supabase/verificaciones/rls-fase10-pagos.sql", "supabase/migrations/0018_api_webhooks.sql", "supabase/verificaciones/rls-fase11-api.sql"]
 ---
 
 # Acceso por tabla (PostgREST + RLS)
@@ -19,8 +19,9 @@ Una operación pasa solo si se cumplen las dos capas:
    privilegios por defecto de Supabase en todas las tablas, salvo: nada en `tokens_sii` ni
    `sesiones_sii`; en `invitaciones`, `api_keys` y `webhooks` solo `select` y `delete`,
    más `update` en columnas puntuales. `service_role` tiene todo.
-2. **Política RLS.** RLS está activo en las 36 tablas (33 de la `0001` y las 3 que sumó la
-   `0016_pagos`, aplicada el 2026-11-18: `clientes_pago`, `pagos` y `eventos_pasarela`). Sin política para una operación,
+2. **Política RLS.** RLS está activo en las 37 tablas (33 de la `0001`, las 3 que sumó la
+   `0016_pagos`, aplicada el 2026-11-18: `clientes_pago`, `pagos` y `eventos_pasarela`, y la
+   que sumó la `0018_api_webhooks`, aplicada el 2026-11-19: `api_idempotencia`). Sin política para una operación,
    `authenticated` no puede hacerla aunque tenga el privilegio. `service_role` salta RLS.
 
 Cómo falla cada caso (lo que ve el cliente en `error`):
@@ -118,8 +119,9 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
 | `operaciones_sii` | — | S | S | S | S | SIUD |
 | `api_keys` | — | — | — | S U ¹² D | S U ¹² D | SIUD |
 | `webhooks` | — | — | — | S U ¹³ D | S U ¹³ D | SIUD |
-| `webhook_entregas` | — | — | — | S | S | SIUD |
+| `webhook_entregas` ²³ | — | — | — | S | S | SIUD |
 | `notificaciones` ²¹ | — | S | S | S | S | SIUD |
+| `api_idempotencia` ²³ | — | — | — | — | — | SIUD |
 
 ### Notas
 
@@ -221,6 +223,20 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
     (`server/pagos/`), filtrando por organización; la organización del retorno de Flow sale
     del `customerId` que Flow confirma, no de la sesión
     ([planes y pagos](../02-guias/planes-y-pagos.md)).
+23. Migración `0018_api_webhooks` (Fase 11, **aplicada el 2026-11-19**).
+    `api_idempotencia`: RLS sin políticas y `revoke all` a `anon` y `authenticated` (`42501`
+    al leer, también un propietario); la maneja solo la API pública con
+    `reclamar_idempotencia`, `terminar_idempotencia` y `soltar_idempotencia`
+    (`service_role`). `webhook_entregas` no cambia de privilegios (lectura `es_admin`; un
+    emisor recibe 0 filas): se escribe con `encolar_evento` (triggers), con
+    `reclamar_entregas_webhook` / `cerrar_entrega_webhook` (solo `service_role`) y, desde el
+    panel, solo por `reenviar_entrega_webhook` y `probar_webhook` (`security definer`, también
+    `authenticated`, verifican `es_admin`). `webhooks` suma el check `webhooks_url_permitida`,
+    que también rige para el `update` de `url` con la sesión (nota 13), y el secreto se
+    cambia con `rotar_secreto_webhook`. La API pública (`/api/v1/*`) no usa sesión: autentica
+    la API key con `autenticar_api_key` y trabaja con `service_role` filtrando por la
+    organización (y la empresa) de la clave
+    ([RPC](rpc-integraciones.md)).
 
 La Fase 8 (seguimiento) escribe `envios`, `envio_estadisticas`, `envio_rechazos`,
 `consultas_envio` y `operaciones_sii` con `service_role`, filtrando por organización; las
@@ -286,3 +302,8 @@ cambios por Realtime ([Realtime](../06-integraciones/realtime-y-storage.md#realt
   lector, otra organización, `anon`, `service_role`) y `activar_suscripcion`:
   `supabase/verificaciones/rls-fase10-pagos.sql` (30). Requiere las migraciones 0015 y
   0016, aplicadas el 2026-11-18; corrida en producción ese día (30/30, limpieza en 0).
+- `api_keys`, `webhooks`, `webhook_entregas` y `api_idempotencia` por rol (propietario,
+  administrador, emisor, otra organización, `anon`, `service_role`) y las RPC de la 0018:
+  `supabase/verificaciones/rls-fase11-api.sql` (39). Requiere las migraciones 0015, 0016 y
+  0018, aplicada el 2026-11-19; en PGlite 39/39 (3/39 sin la 0018). Corrida en producción
+  ese día (39/39, limpieza en 0 antes y después).

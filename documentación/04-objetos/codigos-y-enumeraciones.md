@@ -1,9 +1,9 @@
 ---
 title: "Códigos y enumeraciones"
-description: "Tipos enum del esquema, estados del SII, tipos de DTE, P90/P91, STATUS de DTEUpload y reparos frecuentes."
-keywords: [ambiente_sii, canal_sii, rol_miembro, estado_suscripcion, estado_caf, estado_solicitud_folios, tipo_descuento, estado_documento, origen_documento, proposito_envio, clasificacion_envio, tipo_observacion, etapa_certificacion, operacion_sii, resultado_operacion, estado_entrega_webhook, tipos_dte, estados_sii, EPR, REC, SOK, CRT, FOK, PRD, RSC, RFR, RCT, RCH, P90, P91, IDK, códigos de salida]
-related: ["01-fundamentos/errores-y-resultados.md"]
-source: ["supabase_saas_sii.sql §1 §3", "certificacion-node/docs/glosario.md"]
+description: "Tipos enum del esquema, estados del SII, tipos de DTE, P90/P91, STATUS de DTEUpload y reparos frecuentes; códigos de error de la API pública y estados de las entregas de webhooks (Fase 11)."
+keywords: [ambiente_sii, canal_sii, rol_miembro, estado_suscripcion, estado_caf, estado_solicitud_folios, tipo_descuento, estado_documento, origen_documento, proposito_envio, clasificacion_envio, tipo_observacion, etapa_certificacion, operacion_sii, resultado_operacion, estado_entrega_webhook, tipos_dte, estados_sii, EPR, REC, SOK, CRT, FOK, PRD, RSC, RFR, RCT, RCH, P90, P91, IDK, códigos de salida, CODIGOS_ERROR, MENSAJES_ERROR, errores de la API, api_idempotencia, alcances, sk_test_, sk_live_]
+related: ["01-fundamentos/errores-y-resultados.md", "02-guias/api-publica.md", "06-integraciones/webhooks.md"]
+source: ["supabase_saas_sii.sql §1 §3", "certificacion-node/docs/glosario.md", "apps/web/src/lib/api-publica.ts"]
 ---
 
 # Códigos y enumeraciones
@@ -66,7 +66,7 @@ Fuente: §1 (tipos) y §3 (catálogos) de `supabase_saas_sii.sql`. Ninguna migra
 |---|---|---|
 | `rol_miembro` | `propietario`, `administrador`, `emisor`, `lector` | `es_admin` = propietario o administrador; `puede_emitir` = esos más emisor |
 | `estado_suscripcion` | `prueba`, `activa`, `morosa`, `cancelada` | `plan_vigente()` solo considera `prueba` y `activa`. Desde la Fase 10: `prueba` = plan gratis Certificación (sin plazo); `activa` = pagada en Flow (también durante la gracia, mientras Flow reintenta); `morosa` = Flow informó un importe vencido (`morose = 1`); `cancelada` = reemplazada o terminada. En la UI: «Gratis», «Activa», «Pago vencido», «Cancelada» ([planes y pagos](../02-guias/planes-y-pagos.md)) |
-| `estado_entrega_webhook` | `pendiente`, `entregado`, `fallido`, `descartado` | Fase 11 |
+| `estado_entrega_webhook` | `pendiente`, `entregado`, `fallido`, `descartado` | Fase 11. `pendiente`: en cola sin intentos o reenviada; `fallido`: falló y tiene otro intento programado; `entregado`: 2xx; `descartado`: 8 intentos, webhook inactivo, plan sin webhooks o URL bloqueada. En la UI: «Pendiente», «Reintentando», «Entregada», «Descartada» ([webhooks](../06-integraciones/webhooks.md#reintentos-y-estados)) |
 
 ## Códigos de salida de la CLI ↔ `resultado_operacion`
 
@@ -130,3 +130,61 @@ La librería ya los evita; si reaparecen, alguien alteró el XML después de arm
 | `SesionCaducaError` | — | La sesión venció antes de timbrar: autenticar y reintentar (no se gastaron folios) |
 | `FolioInicialRequeridoError` | 3 (`rechazo_sii` en la app) | Primer timbraje del tipo en el ambiente: repetir con folio inicial |
 | `FoliosSinCafError` | 6 (`incierto`) | **No reintentar**: bajar el CAF desde «Folios ya autorizados» |
+
+## Errores de la API pública (Fase 11)
+
+Cuerpo `{ "error": { "codigo", "mensaje", "campos"?, "documento"?, "operacion_pendiente_id"? } }`.
+La fuente es `CODIGOS_ERROR` y `MENSAJES_ERROR` de `apps/web/src/lib/api-publica.ts` (esta tabla es una
+copia: si difieren, manda el código). Los clientes programan contra `codigo`; el mensaje puede
+cambiar. 409 y 503 llevan `Retry-After`. Detalle por ruta en la [guía](../02-guias/api-publica.md).
+
+| HTTP | Código | Mensaje |
+|---|---|---|
+| 401 | `no_autenticado` | Falta la API key. Envíala en la cabecera Authorization: Bearer sk_test_… o sk_live_…. |
+| 401 | `clave_invalida` | La API key no es válida. Revisa que la copiaste completa o crea una nueva en Configuración → API. |
+| 401 | `clave_revocada` | Esta API key fue revocada. Crea una nueva en Configuración → API. |
+| 401 | `clave_vencida` | Esta API key venció. Crea una nueva en Configuración → API. |
+| 403 | `plan_sin_api` | El plan vigente de tu organización no incluye acceso por API. Cámbialo en Configuración → Plan. |
+| 403 | `alcance_insuficiente` | Esta API key no tiene el alcance que pide esta operación. Crea una clave con ese alcance en Configuración → API. |
+| 403 | `empresa_no_permitida` | Esta API key solo sirve para otra empresa. Usa la clave de esa empresa o una que sirva para todas. |
+| 403 | `plan_sin_produccion` | El plan vigente no permite emitir en producción. Cámbialo en Configuración → Plan o usa una clave de certificación. |
+| 403 | `cuota_agotada` | Tu organización usó todas las boletas del plan este mes. Sube de plan en Configuración → Plan para seguir emitiendo. |
+| 404 | `no_encontrado` | No encontramos ese recurso. Revisa el id y que pertenezca a la empresa y al ambiente de tu API key. |
+| 400 | `json_invalido` | El cuerpo de la petición no es JSON válido. Revisa su formato y vuelve a enviarla. |
+| 400 | `parametro_invalido` | Un parámetro de la consulta no es válido. Revisa el detalle en campos y corrígelo. |
+| 400 | `cursor_invalido` | El cursor no es válido. Usa el valor de siguiente_cursor de la respuesta anterior, sin cambiarlo. |
+| 400 | `idempotencia_requerida` | Falta la cabecera Idempotency-Key. Envía una clave única por boleta para poder repetir la petición sin duplicarla. |
+| 400 | `idempotencia_invalida` | La Idempotency-Key no es válida. Usa entre 1 y 200 caracteres ASCII visibles, sin espacios. |
+| 409 | `idempotencia_en_curso` | Otra petición con esta Idempotency-Key se está procesando. Espera unos segundos y repítela con la misma clave. |
+| 409 | `operacion_en_curso` | Ya hay una operación igual en curso con el SII. Espera a que termine y vuelve a intentarlo. |
+| 409 | `incierto_sin_revisar` | La operación anterior quedó sin respuesta clara del SII. Revísala en el panel y márcala como revisada antes de repetirla. |
+| 413 | `cuerpo_muy_grande` | El cuerpo de la petición supera los 256 KB. Envía menos datos por petición. |
+| 415 | `tipo_contenido` | El cuerpo tiene que ser JSON. Envía la cabecera Content-Type: application/json. |
+| 422 | `datos_invalidos` | Algunos datos no son válidos. Revisa el detalle en campos y corrígelos. |
+| 422 | `ambiente_no_coincide` | El ambiente pedido no es el de tu API key. Las claves sk_test_ son de certificación y las sk_live_, de producción. |
+| 422 | `empresa_requerida` | Indica la empresa en el campo empresa (RUT o id), porque esta API key sirve para todas. |
+| 422 | `empresa_inactiva` | La empresa está desactivada. Actívala en Configuración → Empresas. |
+| 422 | `idempotencia_conflicto` | Ya usaste esta Idempotency-Key con otra boleta. Usa una clave nueva para cada boleta distinta. |
+| 422 | `sin_folios` | No quedan folios para este tipo de documento. Pide más en Folios o con POST /folios/solicitudes. |
+| 422 | `sin_certificado` | La empresa no tiene un certificado digital vigente. Súbelo en Configuración → Certificados. |
+| 422 | `sin_resolucion` | La empresa no tiene registrada la resolución del SII de este ambiente. Regístrala en Configuración → Empresas. |
+| 422 | `sin_autorizacion` | La empresa no está autorizada por el SII para emitir en producción. Termina la certificación primero. |
+| 422 | `revision_requerida` | En producción hay que revisar la solicitud con el SII antes de timbrar. Pide primero el nivel revision y envía su revision_id. |
+| 422 | `rechazado_por_sii` | El SII rechazó la boleta y su folio quedó anulado. Revisa el detalle, corrige los datos y emítela con una Idempotency-Key nueva. |
+| 429 | `limite_excedido` | Reservado: hoy la app no lo emite. El 429 lo responde el Firewall de Vercel, **sin** cuerpo JSON garantizado; trátalo por el status (espera y reintenta). |
+| 500 | `error_interno` | Tuvimos un problema al procesar la petición. Repítela con la misma Idempotency-Key en unos minutos. |
+| 503 | `sii_no_disponible` | No pudimos comunicarnos con el SII y la boleta no se envió. Repite la petición con la misma Idempotency-Key en unos minutos. |
+
+### Otros valores de la API (Fase 11)
+
+| Dónde | Valores | Notas |
+|---|---|---|
+| Alcances de `api_keys.alcances` | `documentos:leer`, `documentos:emitir`, `folios:leer`, `folios:solicitar`, `envios:leer`, `certificacion:gestionar` | El último está reservado: la UI no lo ofrece y ninguna ruta lo usa |
+| Prefijo de la API key | `sk_test_` → `certificacion`, `sk_live_` → `produccion` | El prefijo y 64 caracteres hex (`FORMATO_CLAVE`) |
+| `autenticar_api_key().motivo` | `null`, `invalida`, `revocada`, `vencida`, `plan_sin_api` | → `clave_invalida`, `clave_revocada`, `clave_vencida`, `plan_sin_api` |
+| `api_idempotencia.recurso` | `documento`, `lote`, `solicitud_folios` | |
+| `api_idempotencia.estado` | `en_curso`, `terminada` | |
+| `reclamar_idempotencia().resultado` | `nueva`, `retomada`, `en_curso`, `terminada`, `conflicto` | |
+| Nivel de `POST /folios/solicitudes` | `ensayo`, `revision`, `timbrar` | En producción, `timbrar` exige `revision_id` |
+| Estado de folios en `GET /folios` | `ok`, `por_agotarse`, `agotado`, `sin_folios` | `por_agotarse` = 15 % o menos (como `MedidorFolios`) |
+| Eventos de webhook | los 8 de `webhooks.eventos` + `webhook.prueba` | [catálogo](../06-integraciones/webhooks.md#catálogo) |

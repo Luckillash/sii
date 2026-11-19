@@ -42,7 +42,7 @@ import {
 } from './errores';
 import { planPermiteProduccion } from './plan';
 import { type SalidaSolicitud, solicitarEnSii } from './sii';
-import type { ContextoFolios } from './tipos';
+import type { ContextoFolios, ContextoFoliosApi } from './tipos';
 
 // Solicitar folios (CAF) de boleta, 39 o 41, en certificación o producción (PLAN-SAAS
 // Fase 6, punto 2). Tres niveles, de menos a más:
@@ -91,7 +91,7 @@ interface Preparado {
   revision: { id: string; desde: number | null; hasta: number | null } | null;
 }
 
-async function cargarEmpresa(cliente: ClienteServicio, ctx: ContextoFolios) {
+async function cargarEmpresa(cliente: ClienteServicio, ctx: ContextoFolios | ContextoFoliosApi) {
   const { data, error } = await cliente
     .from('empresas')
     .select('id, rut, razon_social, activa, autorizada_produccion')
@@ -107,7 +107,7 @@ async function cargarEmpresa(cliente: ClienteServicio, ctx: ContextoFolios) {
 /** La revisión con el SII que habilita timbrar en producción (ver el encabezado). */
 async function exigirRevision(
   cliente: ClienteServicio,
-  ctx: ContextoFolios,
+  ctx: ContextoFolios | ContextoFoliosApi,
   op: OpcionesSolicitud,
   ahora: Date,
 ): Promise<Preparado['revision']> {
@@ -182,7 +182,7 @@ async function preparar(
   deps: DependenciasCertificacion,
   cliente: ClienteServicio,
   credenciales: ReturnType<DependenciasCertificacion['credenciales']>,
-  ctx: ContextoFolios,
+  ctx: ContextoFolios | ContextoFoliosApi,
   op: OpcionesSolicitud,
 ): Promise<Preparado> {
   validarEntrada(op);
@@ -213,7 +213,7 @@ async function preparar(
 
 async function ensayo(
   cliente: ClienteServicio,
-  ctx: ContextoFolios,
+  ctx: ContextoFolios | ContextoFoliosApi,
   op: OpcionesSolicitud,
   p: Preparado,
 ): Promise<ResultadoFolios> {
@@ -276,7 +276,7 @@ async function ensayo(
 
 /** Solicita folios: ensayo, revisión con el SII o timbraje (ver el encabezado). */
 export async function solicitarFolios(
-  ctx: ContextoFolios,
+  ctx: ContextoFolios | ContextoFoliosApi,
   op: OpcionesSolicitud,
   dependencias?: Partial<DependenciasCertificacion>,
 ): Promise<ResultadoFolios> {
@@ -284,6 +284,11 @@ export async function solicitarFolios(
   const cliente = deps.servicio();
   const credenciales = deps.credenciales(cliente);
   const prep = () => preparar(deps, cliente, credenciales, ctx, op);
+  if (ctx.usuarioId === null && !ctx.apiKeyId) {
+    return falloSinEjecutar(
+      new ErrorUso('La solicitud de folios necesita un usuario o una API key.'),
+    );
+  }
 
   let previo: Preparado;
   try {
@@ -304,9 +309,11 @@ export async function solicitarFolios(
     // La revisión sale al SII con el certificado de la empresa, pero `ejecutarOperacion`
     // no la vigila (`confirmada: false`): se le aplican aquí, antes de abrir la
     // operación, la confirmación de la sesión con Auth y el mismo control de un
-    // `incierto` sin revisar o de una confirmada en curso que tiene el timbraje.
+    // `incierto` sin revisar o de una confirmada en curso que tiene el timbraje. Desde la
+    // API pública (Fase 11) no hay sesión: la API key ya se autenticó (con el alcance
+    // `folios:solicitar`) y el control previo se aplica igual.
     const confirmar = deps.operacion.confirmarSesion ?? confirmarSesionConAuth;
-    if (!(await confirmar(ctx.usuarioId).catch(() => false))) {
+    if (ctx.usuarioId !== null && !(await confirmar(ctx.usuarioId).catch(() => false))) {
       return {
         tipo: 'error',
         mensaje: { ...MENSAJE_SESION_INVALIDA },

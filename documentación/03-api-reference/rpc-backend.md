@@ -1,9 +1,9 @@
 ---
 title: "RPC del backend (service_role)"
-description: "registrar_certificado, registrar_caf, guardar_set_pruebas, anular_folios (también administradores) y el trigger trg_20_caf_sin_traslape, token_*, leer_secreto, tomar/liberar_bloqueo_certificado, asignar_folio, guardar_secreto, encolar_evento, plan_vigente, activar_suscripcion (migración 0016), sincronizar_documentos_envio y las de notificaciones (migración 0013: reclamar_notificacion, notificacion_cerrada, alertas_*)."
-keywords: [service_role, registrar_certificado, registrar_caf, guardar_set_pruebas, migración 0008, CAF, RSASK, "caf:<rut>", idempotente, for no key update, set_pruebas_casos, set_descargado, P0002, "La empresa no existe en la organización", "El IDK del CAF no corresponde al ambiente", "Ya hay un CAF que empieza en el folio", Vault, vault.create_secret, guardar_secreto, leer_secreto, pfx_secret_id, clave_secret_id, huella_sha256, "certificado:<huella>:pfx", 23503, 22023, 23505, 22004, "El certificado ya está registrado en la organización", "permission denied for function", token_obtener, token_guardar, token_borrar, TokenStoreSupabase, tomar_bloqueo_certificado, liberar_bloqueo_certificado, bloqueos_sii, arriendo, titular, conBloqueoCertificado, "La duración del bloqueo debe estar entre 1 y 900 segundos", migración 0007, anular_folios, migración 0011, folios_anulados, cola completa, "El CAF no existe", "Solo un administrador de la organización puede anular folios", "ya tiene un documento emitido", tg_caf_sin_traslape, trg_20_caf_sin_traslape, 23P01, "se traslapa con otro CAF", asignar_folio, "No quedan folios", encolar_evento, folios.por_agotarse, sincronizar_documentos_envio, migración 0013, notificaciones, reclamar_notificacion, notificacion_cerrada, alertas_documentos_rechazados, alertas_envios_inciertos, alertas_certificados_por_vencer, grupo, Idempotency-Key, por turnos, activar_suscripcion, migración 0016, suscripciones_externa_unica, "ya terminó", Flow]
-related: ["09-libreria/backend-service-role.md", "08-esquema-supabase/vault-y-secretos.md", "04-objetos/objetos-empresas-y-credenciales.md", "04-objetos/objetos-folios.md", "02-guias/folios-caf.md", "02-guias/onboarding-organizacion.md", "01-fundamentos/autenticacion-sii.md"]
-source: ["supabase_saas_sii.sql §15 §17", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0011_folios.sql", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0016_pagos.sql", "apps/web/src/server/pagos/suscripciones.ts", "apps/web/src/server/sii/", "apps/web/src/server/certificacion/", "apps/web/src/server/folios/", "apps/web/src/server/alertas/datos.ts"]
+description: "registrar_certificado, registrar_caf, guardar_set_pruebas, anular_folios (también administradores) y el trigger trg_20_caf_sin_traslape, token_*, leer_secreto, tomar/liberar_bloqueo_certificado, asignar_folio, guardar_secreto, encolar_evento, plan_vigente, activar_suscripcion (migración 0016), sincronizar_documentos_envio y las de notificaciones (migración 0013: reclamar_notificacion, notificacion_cerrada, alertas_*). La Fase 11 (migración 0018) se resume aquí y se detalla en rpc-integraciones."
+keywords: [service_role, registrar_certificado, registrar_caf, guardar_set_pruebas, migración 0008, CAF, RSASK, "caf:<rut>", idempotente, for no key update, set_pruebas_casos, set_descargado, P0002, "La empresa no existe en la organización", "El IDK del CAF no corresponde al ambiente", "Ya hay un CAF que empieza en el folio", Vault, vault.create_secret, guardar_secreto, leer_secreto, pfx_secret_id, clave_secret_id, huella_sha256, "certificado:<huella>:pfx", 23503, 22023, 23505, 22004, "El certificado ya está registrado en la organización", "permission denied for function", token_obtener, token_guardar, token_borrar, TokenStoreSupabase, tomar_bloqueo_certificado, liberar_bloqueo_certificado, bloqueos_sii, arriendo, titular, conBloqueoCertificado, "La duración del bloqueo debe estar entre 1 y 900 segundos", migración 0007, anular_folios, migración 0011, folios_anulados, cola completa, "El CAF no existe", "Solo un administrador de la organización puede anular folios", "ya tiene un documento emitido", tg_caf_sin_traslape, trg_20_caf_sin_traslape, 23P01, "se traslapa con otro CAF", asignar_folio, "No quedan folios", encolar_evento, folios.por_agotarse, sincronizar_documentos_envio, migración 0013, notificaciones, reclamar_notificacion, notificacion_cerrada, alertas_documentos_rechazados, alertas_envios_inciertos, alertas_certificados_por_vencer, grupo, Idempotency-Key, por turnos, activar_suscripcion, migración 0016, suscripciones_externa_unica, "ya terminó", Flow, migración 0018, autenticar_api_key, reclamar_idempotencia, reclamar_entregas_webhook, cerrar_entrega_webhook, incluye_webhooks]
+related: ["09-libreria/backend-service-role.md", "08-esquema-supabase/vault-y-secretos.md", "04-objetos/objetos-empresas-y-credenciales.md", "04-objetos/objetos-folios.md", "02-guias/folios-caf.md", "02-guias/onboarding-organizacion.md", "01-fundamentos/autenticacion-sii.md", "03-api-reference/rpc-integraciones.md"]
+source: ["supabase_saas_sii.sql §15 §17", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0011_folios.sql", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0016_pagos.sql", "apps/web/src/server/pagos/suscripciones.ts", "apps/web/src/server/sii/", "apps/web/src/server/certificacion/", "apps/web/src/server/folios/", "apps/web/src/server/alertas/datos.ts", "supabase/migrations/0018_api_webhooks.sql"]
 ---
 
 # RPC del backend (service_role)
@@ -24,7 +24,13 @@ La Fase 8 suma las funciones de la migración
 [`0013_notificaciones`](#notificaciones-migración-0013) (**aplicada el 2026-11-17**), todas
 solo `service_role`. La Fase 10 suma
 [`activar_suscripcion`](#activar_suscripcion-migración-0016) (migración `0016`, **aplicada el
-2026-11-18**), también solo `service_role`.
+2026-11-18**), también solo `service_role`. La Fase 11 suma las de la migración
+`0018_api_webhooks` (**aplicada el 2026-11-19**): `autenticar_api_key`, la
+idempotencia (`reclamar_idempotencia`, `terminar_idempotencia`, `soltar_idempotencia`) y la
+entrega de webhooks (`reclamar_entregas_webhook`, `cerrar_entrega_webhook`), todas solo
+`service_role`, documentadas en [RPC de integraciones](rpc-integraciones.md) junto con las
+tres del panel (`reenviar_entrega_webhook`, `probar_webhook`, `rotar_secreto_webhook`), que
+también ejecuta `authenticated`.
 
 ## `sincronizar_documentos_envio`
 
@@ -293,6 +299,10 @@ en base64 y su clave, por los ids `pfx_secret_id` / `clave_secret_id` de una fil
 `certificados` **ya filtrada por organización**. Un error de la RPC se traduce a
 `ErrorCredenciales('base')`; un valor vacío o nulo, a `ErrorCredenciales('vault')`.
 Detalle en [vault y secretos](../08-esquema-supabase/vault-y-secretos.md#quién-lee).
+
+Desde la Fase 11 la llama también `/api/cron/webhooks` para el secreto HMAC de cada
+webhook, con el `secreto_secret_id` que devuelve `reclamar_entregas_webhook` (caché por
+webhook dentro de la corrida; el secreto nunca se registra).
 
 ## `tomar_bloqueo_certificado` y `liberar_bloqueo_certificado` (migración 0007)
 
@@ -665,6 +675,13 @@ dispara `envio.actualizado` y `documento.<estado>` al guardar el estado de un en
 desde la Fase 6 la app para `folios.por_agotarse` (`server/folios/alertas.ts`, con
 `service_role`)
 ([webhooks](../06-integraciones/webhooks.md)).
+
+**Migración 0018 (aplicada el 2026-11-19):** `create or replace` con el mismo cuerpo
+más `and coalesce((public.plan_vigente(p_organizacion)).incluye_webhooks, false)`: sin un
+plan que incluya webhooks no encola nada (el outbox no crece con entregas que nunca
+saldrían; lo que ya estaba en cola se descarta al reclamar). En la misma migración,
+`tg_evento_documento` agrega `estado`, `origen` y `clave_idempotencia` a los datos de
+`documento.*`. Privilegios sin cambios (`create or replace` los conserva).
 
 ## `guardar_set_pruebas` (migración 0008)
 

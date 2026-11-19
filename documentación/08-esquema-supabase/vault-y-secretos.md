@@ -1,9 +1,9 @@
 ---
 title: "Esquema: Vault y secretos"
 description: "Qué secretos hay, dónde van, cómo se guardan, leen y borran, y qué se cifra fuera de la base."
-keywords: [Vault, vault.secrets, vault.decrypted_secrets, vault.create_secret, guardar_secreto, leer_secreto, registrar_certificado, tg_borrar_secretos, trg_borrar_secretos, pfx_secret_id, clave_secret_id, caf_secret_id, secreto_secret_id, cron_token, "certificado:<huella>:pfx", "certificado:<huella>:clave", depurar.ts, depurarEvento, beforeSend, beforeSendSpan, beforeBreadcrumb, server_action_form_data, "[Filtrado]", AES-256-GCM, SII_TOKENS_KEY, AAD, cifrado.ts, crearCredenciales, ErrorCredenciales, sanearTexto, sanearDetalle, detalleSeguro, contextoSesion, SesionesSupabase, registrar_caf, "caf:<rut>", xmlCaf, migración 0008, subirCaf, validarCaf, carga manual, CAF de producción]
+keywords: [Vault, vault.secrets, vault.decrypted_secrets, vault.create_secret, guardar_secreto, leer_secreto, registrar_certificado, tg_borrar_secretos, trg_borrar_secretos, pfx_secret_id, clave_secret_id, caf_secret_id, secreto_secret_id, cron_token, "certificado:<huella>:pfx", "certificado:<huella>:clave", depurar.ts, depurarEvento, beforeSend, beforeSendSpan, beforeBreadcrumb, server_action_form_data, "[Filtrado]", AES-256-GCM, SII_TOKENS_KEY, AAD, cifrado.ts, crearCredenciales, ErrorCredenciales, sanearTexto, sanearDetalle, detalleSeguro, contextoSesion, SesionesSupabase, registrar_caf, "caf:<rut>", xmlCaf, migración 0008, subirCaf, validarCaf, carga manual, CAF de producción, whsec_, rotar_secreto_webhook, migración 0018, sk_test_, sk_live_]
 related: ["01-fundamentos/ambientes-y-credenciales.md", "03-api-reference/rpc-backend.md", "04-objetos/objetos-empresas-y-credenciales.md", "02-guias/onboarding-organizacion.md"]
-source: ["supabase_saas_sii.sql §6 §7 §14 §15", "supabase/migrations/0002_extensiones_cron.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0014_cron.sql", "apps/web/src/server/folios/", "apps/web/src/lib/sentry/depurar.ts", "apps/web/src/server/cifrado.ts", "PLAN-SAAS.md §2 §4.4 §4.8"]
+source: ["supabase_saas_sii.sql §6 §7 §14 §15", "supabase/migrations/0002_extensiones_cron.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0014_cron.sql", "apps/web/src/server/folios/", "apps/web/src/lib/sentry/depurar.ts", "apps/web/src/server/cifrado.ts", "PLAN-SAAS.md §2 §4.4 §4.8", "supabase/migrations/0018_api_webhooks.sql"]
 ---
 
 # Esquema: Vault y secretos
@@ -29,7 +29,7 @@ solo como hash sha256: `invitaciones.token_hash`, `api_keys.clave_hash`.
 | .pfx en base64 | `certificados.pfx_secret_id` | `registrar_certificado()` → `guardar_secreto()` | `certificado:<huella>:pfx` | 3 (0005) |
 | Clave del .pfx | `certificados.clave_secret_id` | ídem | `certificado:<huella>:clave` | 3 (0005) |
 | XML del CAF (con `RSASK`) | `cafs.caf_secret_id` | `registrar_caf()` → `guardar_secreto()` | `caf:<rut>:<ambiente>:<tipo>:<desde>-<hasta>` | 5 (0008, aplicada el 2026-11-13) |
-| Secreto HMAC del webhook | `webhooks.secreto_secret_id` | `crear_webhook()` llama directo a `vault.create_secret` | `webhook <url>` | 11 |
+| Secreto HMAC del webhook (`whsec_` + 64 hex) | `webhooks.secreto_secret_id` | `crear_webhook()` llama directo a `vault.create_secret`; `rotar_secreto_webhook()` (0018, aplicada el 2026-11-19) crea uno nuevo y borra el anterior | `webhook <url>` (la URL al crearlo o rotarlo) | 11 |
 | `cron_token` | ninguna (secreto con nombre) | a mano en el SQL Editor (`0002_extensiones_cron.sql`); existe en producción. Lo leen los jobs de la `0014_cron` (Fase 8, aplicada el 2026-11-17) desde `vault.decrypted_secrets` en cada corrida; la 0014 no corre sin él | `Bearer para /api/cron/*` | 0 (uso: 8) |
 
 `<huella>` es `huella_sha256` del certificado (sha256 hex del DER de la hoja). Es
@@ -128,6 +128,13 @@ dentro de la operación y nunca lo registra), y el certificado, `crearCredencial
 
 Detalle en [contrato del backend](../09-libreria/backend-service-role.md#credencialests).
 
+**Secreto HMAC de los webhooks (Fase 11):** lo lee `/api/cron/webhooks` con `leer_secreto`
+a partir del `secreto_secret_id` que devuelve `reclamar_entregas_webhook` (migración 0018),
+con caché por webhook solo dentro de la corrida. Se usa para firmar
+(`Boleteame-Firma: t=…,v1=<HMAC-SHA256>`) y nunca se guarda en `webhook_entregas`, logs ni
+Sentry. El cliente lo ve solo dos veces: al crear el webhook (`crear_webhook`) y al rotarlo
+(`rotar_secreto_webhook`).
+
 - El esquema `vault` no está expuesto por la Data API (`supabase/config.toml` expone
   solo `public` y `graphql_public`).
 - Los miembros sí pueden leer `pfx_secret_id` y `clave_secret_id` por la API (la
@@ -153,7 +160,10 @@ argumentos los nombres de las columnas `*_secret_id` y borra esos ids de
   Vault hasta que se elimina.
 - No hay trigger de `update`: cambiar un `*_secret_id` dejaría el secreto anterior
   huérfano. `authenticated` no puede (no escribe `certificados` ni `cafs`, y en
-  `webhooks` solo actualiza `url`, `eventos` y `activo`); el backend no debe hacerlo.
+  `webhooks` solo actualiza `url`, `eventos` y `activo`); el backend no debe hacerlo. La
+  excepción es `rotar_secreto_webhook` (0018, aplicada el 2026-11-19), que cambia
+  `secreto_secret_id` y borra el secreto anterior de `vault.secrets` en la misma
+  transacción (`rls-fase11-api.sql`, 34: Vault queda con la misma cantidad).
 
 Verificado por las comprobaciones 11 de `0005_certificados_resoluciones.sql` (el trigger
 existe con esas columnas) y 41 de `rls-fase3-empresas.sql` (borrar un certificado deja 0
@@ -189,6 +199,7 @@ filtrado se reemplaza por `[Filtrado]`.
 | Campos con nombre sensible | cualquier clave que contenga `authorization`, `cookie`, `token`, `clave`, `contrase`, `password`, `passwd`, `pfx`, `p12`, `secret`, `secreto`, `rsask`, `rsapk`, `api_key`/`apikey`, `llave`, `private_key`, `set-cookie` o `captcha` (sin distinguir mayúsculas) |
 | **Formularios de Server Actions** | `server_action_form_data` y **todos** sus campos (`server_action_form_data.<campo>`, que agrega la instrumentación de Server Actions de Sentry), y claves `body`, `raw_body`, `request_body`, `form_data`. Se filtran por nombre de campo, sin importar el contenido: un campo `archivo` o `rut_titular` tampoco sale |
 | Archivos | `Blob`, `File`, `FormData` o un `File` ya serializado (`{ name, size, type, lastModified }`): contenido y nombre |
+| API keys y secretos de webhook (Fase 11) | `sk_test_…` / `sk_live_…` y `whsec_…` en textos libres (patrones que agrega la Fase 11 en `depurar.ts`); la API key solo viaja en `Authorization`, que ya se filtra |
 | Textos libres (mensajes, URLs, breadcrumbs) | bloques PEM; `<RSASK>…</RSASK>`; `TOKEN=…` y `<TOKEN>…</TOKEN>`; `Bearer`/`Basic …`; JWT (`eyJ…`); query `token`, `clave`, `password`, `secret`, `secreto`, `api_key`, `apikey`, `key`, `invitacion`; `/invitacion/<token>` (también codificado); `filename=` de un multipart; nombres sueltos `*.pfx` / `*.p12`; y cualquier tira base64 de 120 caracteres o más que mezcle mayúsculas, minúsculas y dígitos (un .pfx, un CAF, una llave DER) |
 
 `depurar.test.ts` prueba cada regla. Si agregas un formulario con un campo sensible de

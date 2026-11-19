@@ -1,9 +1,9 @@
 ---
 title: "Checklist de paso a producción"
-description: "Lo que debe cumplirse antes de emitir boletas reales y antes de cobrar: el seguimiento y las alertas de la Fase 8 (CRON_SECRET, cron_token, migraciones 0013 y 0014, monitores de Sentry) y los planes y pagos con Flow de la Fase 10 (sandbox y paso a producción)."
-keywords: [checklist, producción, Fase 8, seguimiento, alertas, CRON_SECRET, cron_token, migración 0013, migración 0014, pg_cron, cron-seguimiento, cron-alertas, net._http_response, Resend, NEXT_PUBLIC_APP_URL, Fase 10, Flow, FLOW_API_URL, FLOW_API_KEY, FLOW_SECRET_KEY, planes de Flow, boleta propia, cron-suscripciones, 0017_cron_suscripciones]
-related: ["02-guias/certificacion-empresa.md", "02-guias/seguimiento-envios.md", "08-esquema-supabase/despliegue.md", "02-guias/planes-y-pagos.md"]
-source: ["certificacion-node/docs/piloto-produccion.md", "PLAN-SAAS.md Fase 8, Fase 10 y Fase 13", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "supabase/migrations/0017_cron_suscripciones.sql", "apps/web/src/server/env.ts"]
+description: "Lo que debe cumplirse antes de emitir boletas reales y antes de cobrar: el seguimiento y las alertas de la Fase 8 (CRON_SECRET, cron_token, migraciones 0013 y 0014, monitores de Sentry) y los planes y pagos con Flow de la Fase 10 (sandbox y paso a producción) y la API pública y los webhooks de la Fase 11 (migraciones 0018 y 0019, Firewall)."
+keywords: [checklist, producción, Fase 8, seguimiento, alertas, CRON_SECRET, cron_token, migración 0013, migración 0014, pg_cron, cron-seguimiento, cron-alertas, net._http_response, Resend, NEXT_PUBLIC_APP_URL, Fase 10, Flow, FLOW_API_URL, FLOW_API_KEY, FLOW_SECRET_KEY, planes de Flow, boleta propia, cron-suscripciones, 0017_cron_suscripciones, Fase 11, API pública, webhooks, 0018_api_webhooks, 0019_cron_webhooks, entregar-webhooks, cron-webhooks, Firewall de Vercel, rate limiting, 429]
+related: ["02-guias/certificacion-empresa.md", "02-guias/seguimiento-envios.md", "08-esquema-supabase/despliegue.md", "02-guias/planes-y-pagos.md", "02-guias/api-publica.md"]
+source: ["certificacion-node/docs/piloto-produccion.md", "PLAN-SAAS.md Fase 8, Fase 10 y Fase 13", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "supabase/migrations/0017_cron_suscripciones.sql", "apps/web/src/server/env.ts", "supabase/migrations/0018_api_webhooks.sql", "supabase/migrations/0019_cron_webhooks.sql"]
 ---
 
 # Checklist de paso a producción
@@ -105,3 +105,47 @@ Pendientes la `0017`, las credenciales de Flow, el deploy y el sandbox.
       registra al contratar).
 - [ ] Términos del servicio con las condiciones de cobro, renovación, mora y cancelación al
       fin del período (Fase 12).
+
+## API pública y webhooks (Fase 11)
+
+Estado (2026-11-19): código escrito; `0018` aplicada en producción el 2026-11-19; `0019`
+escrita, pendiente de aplicar (después del deploy); criterio pendiente ([guía](../02-guias/api-publica.md)).
+
+### Al desplegar la fase
+
+- [x] Antes del `db push` de la `0018`: `select count(*) from webhooks` (o revisar que cada
+      `url` pase el check `webhooks_url_permitida`); si alguna no pasa, el `validate
+      constraint` hace fallar la migración. Hecho el 2026-11-19: `webhooks`,
+      `webhook_entregas` y `api_keys` vacías.
+- [x] `0018_api_webhooks` aplicada **antes** del deploy (2026-11-19, 03:40:29 UTC; con la
+      `0019` fuera de `supabase/migrations/` durante el `--dry-run` y el push), verificación
+      `0018_api_webhooks.sql` 23/23 (2/23 antes) y simulación `rls-fase11-api.sql` 39/39 con la
+      limpieza en 0 antes y después, más las regresiones `rls-fase8-notificaciones` 26/26 y
+      `rls-fase10-pagos` 30/30 (y las verificaciones `0013` 18/18 y `0016` 20/20); tipos
+      regenerados con `pnpm db:tipos` (los retornos de `autenticar_api_key` y
+      `reclamar_idempotencia` salen no nulos en el generador: el código los trata como
+      nulables; solo 9 líneas de nulabilidad difieren de lo escrito a mano). *Advisors*: solo
+      `rls_enabled_no_policy` en `api_idempotencia` y
+      `authenticated_security_definer_function_executable` en `probar_webhook`,
+      `reenviar_entrega_webhook` y `rotar_secreto_webhook`.
+- [ ] Deploy y humo sin sesión: `GET /api/v1/documentos` → 401 JSON `no_autenticado`;
+      `GET /api/v1/openapi.json` → 200; `/docs/api` → 200; `POST /api/cron/webhooks` sin
+      Bearer → 401 (no 503: `CRON_SECRET` está configurado).
+- [ ] `0019_cron_webhooks` aplicada **después** del deploy: jobs `entregar-webhooks`
+      (`* * * * *`, timeout 60 s) y `limpiar-webhook-entregas` (`37 4 * * *`) activos;
+      `net._http_response` con 200 y el monitor de Sentry `cron-webhooks` en `ok`. La
+      comprobación 10 de `0014_cron.sql` pasa a `false` (es lo esperado).
+- [ ] **Firewall de Vercel:** regla de *rate limiting* por IP en `/api/v1/*` (propuesta: 120
+      peticiones por minuto, acción 429), revisando el límite de reglas del plan de Vercel.
+      Probar que una ráfaga recibe 429 y que `/api/cron/*` no queda afectado.
+- [ ] Sentry: alerta para los 5xx con la etiqueta `api_publica_ruta` (§4.8 del plan).
+
+### Antes de abrir la API a clientes
+
+- [ ] Ninguna ruta de `/api/v1` lee o escribe sin filtrar por la organización de la clave
+      (revisión de seguridad de la Fase 13).
+- [ ] Claves y webhooks de prueba del criterio revocados o borrados; receptor de prueba
+      apagado.
+- [ ] `/docs/api` revisada en claro y oscuro; textos sin prometer factura ni otros DTE.
+- [ ] Decidir la agrupación de varias boletas en un solo envío para `POST /documentos/lote`
+      (hoy cada boleta va en su propio envío).

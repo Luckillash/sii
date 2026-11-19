@@ -1,9 +1,9 @@
 ---
 title: "Trampas conocidas"
 description: "Comportamientos no obvios del SII, de la librería y del esquema."
-keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna, ad_empresa1, ad_empresa2, Actualización de datos del contribuyente, representante legal, no está autorizado para operar en esta modalidad, verificar_autorizacion, ConsultaAutorizacion, situación tributaria de terceros, STC, stc/noauthz, getConsultaData, timbrajes, documentos autorizados, reCAPTCHA, SituacionTributaria, Fase 6, folios, migración 0011, anular_folios, cola completa, trg_20_caf_sin_traslape, 23P01, revisión con el SII, simulada, TransporteSinTimbrar, of_genera_folio, revisionId, folios.por_agotarse, Idempotency-Key, denominador, folio asignado sin documento, política alta, subirCaf, RSAPK, Fase 7, emisión, emitirDocumento, FABRICA_REST_EMISION, FABRICAS_SII.rest, documentoId, doble clic, borradorId, clave_idempotencia, sessionStorage, Ya la revisé, esFolioAnulado, INTENTOS_FOLIO, PDF417, bwip-js, bwip-js/node, binarytext, pdfkit, serverExternalPackages, AFM, ted_xml, latin1, instructivo de representación impresa, enlaceDocumento, uso_mensual.envios, Fase 8, seguimiento, ejecutarSeguimiento, consultarEnvio, consultar_envio, server/sii/clientes.ts, backoff, filtroPorConsultar, inconsistente, lista blanca, ESTADOS_CONOCIDOS, -11, RPR, ErrorTokenSoap, QueryEstUp, detalleIncompleto, orden de escritura, documento.aceptado falso, ya_final, cerrarAbandonadas, envio_sin_cerrar, Ya lo revisé, notificaciones, reclamar_notificacion, migración 0013, migración 0014, pg_cron, cron_token, CRON_SECRET, PRESUPUESTO_MS, LIMITE_MS, Fase 9, Tablero, v_ventas_diarias, set_pruebas, agregaciones de PostgREST, db-aggregates-enabled, max-rows, exportación, CSV, BOM, separador, inyección de fórmulas, neutralizarFormula, XLSX, inlineStr, escaparXml, serieExcel, crc32, keyset, armarResumen, Fase 10, Flow, pagos, suscripciones, SameSite=Lax, retorno sin cookies, callback sin firma, token, morose, status, instanteFlow, diaFlow, asegurarPlan, precio distinto, urlCallback, suscripciones_externa_unica, ya terminó, planes.lectura, plan_vigente, proveedor_pago, firma s, eventos_pasarela, cuotaProduccion]
-related: ["02-guias/planes-y-pagos.md", "08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md", "02-guias/emision-boletas.md", "02-guias/seguimiento-envios.md", "02-guias/tablero-y-reportes.md"]
-source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/", "supabase/migrations/0011_folios.sql", "apps/web/src/server/folios/", "apps/web/src/app/[org]/folios/", "apps/web/src/server/emision/", "apps/web/src/server/pdf/", "apps/web/src/app/[org]/emitir/", "apps/web/next.config.ts", "apps/web/src/server/seguimiento/", "apps/web/src/server/alertas/", "apps/web/src/server/documentos/", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "apps/web/src/server/tablero/", "apps/web/src/server/reportes/", "apps/web/src/app/[org]/reportes/exportar/route.ts", "apps/web/src/server/pagos/", "apps/web/src/app/api/pagos/flow/", "supabase/migrations/0015_planes_comerciales.sql", "supabase/migrations/0016_pagos.sql"]
+keywords: [claves legadas, Legacy API keys are disabled, sesión revocada, getClaims, getUser, user_not_found, índice único parcial, predeterminado, vigente, fijar_certificado_predeterminado, registrar_resolucion, pfx_legacy, 3DES, RC2, otherName, 1.3.6.1.4.1.8321.1, serialNumber, RUT del titular, tokens_sii, huella, activa, desactivada, ISO-8859-1, comillas tipográficas, Word, server_action_form_data, "[Filtrado]", 42883, migración 0005, migración 0006, migración 0007, PGRST202, advisory lock, pg_try_advisory_xact_lock, arriendo, reentrante, BloqueoOcupadoError, ErrorBloqueo, maxDuration, en_curso, abandonada, marcarInciertaRevisada, ensayo, FolioInicialRequeridoError, SesionCaducaError, sanearTexto, token corto, content-type, charset, application/xml, caché por invocación, await using, crearCredenciales, huella_distinta, migración 0008, registrar_caf, guardar_set_pruebas, asistente de certificación, ensayo sin red, bloqueoEnvioSet, enviar_set, verificar_portal, P91, set ilegible, folios_anulados, Track ID, envio_set_id, consultas_envio, sanearTexto, set_con_reparos, set_rechazado, en_curso abandonada, operacionEnCurso, aceptado_con_reparos, resolución número 0, sin trámite, codigo null, autorizada fuera de Boletéame, migración 0009, tg_resolucion_autoriza_produccion, resolución de producción, empresa_autorizada, autorizacionExterna, ad_empresa1, ad_empresa2, Actualización de datos del contribuyente, representante legal, no está autorizado para operar en esta modalidad, verificar_autorizacion, ConsultaAutorizacion, situación tributaria de terceros, STC, stc/noauthz, getConsultaData, timbrajes, documentos autorizados, reCAPTCHA, SituacionTributaria, Fase 6, folios, migración 0011, anular_folios, cola completa, trg_20_caf_sin_traslape, 23P01, revisión con el SII, simulada, TransporteSinTimbrar, of_genera_folio, revisionId, folios.por_agotarse, Idempotency-Key, denominador, folio asignado sin documento, política alta, subirCaf, RSAPK, Fase 7, emisión, emitirDocumento, FABRICA_REST_EMISION, FABRICAS_SII.rest, documentoId, doble clic, borradorId, clave_idempotencia, sessionStorage, Ya la revisé, esFolioAnulado, INTENTOS_FOLIO, PDF417, bwip-js, bwip-js/node, binarytext, pdfkit, serverExternalPackages, AFM, ted_xml, latin1, instructivo de representación impresa, enlaceDocumento, uso_mensual.envios, Fase 8, seguimiento, ejecutarSeguimiento, consultarEnvio, consultar_envio, server/sii/clientes.ts, backoff, filtroPorConsultar, inconsistente, lista blanca, ESTADOS_CONOCIDOS, -11, RPR, ErrorTokenSoap, QueryEstUp, detalleIncompleto, orden de escritura, documento.aceptado falso, ya_final, cerrarAbandonadas, envio_sin_cerrar, Ya lo revisé, notificaciones, reclamar_notificacion, migración 0013, migración 0014, pg_cron, cron_token, CRON_SECRET, PRESUPUESTO_MS, LIMITE_MS, Fase 9, Tablero, v_ventas_diarias, set_pruebas, agregaciones de PostgREST, db-aggregates-enabled, max-rows, exportación, CSV, BOM, separador, inyección de fórmulas, neutralizarFormula, XLSX, inlineStr, escaparXml, serieExcel, crc32, keyset, armarResumen, Fase 10, Flow, pagos, suscripciones, SameSite=Lax, retorno sin cookies, callback sin firma, token, morose, status, instanteFlow, diaFlow, asegurarPlan, precio distinto, urlCallback, suscripciones_externa_unica, ya terminó, planes.lectura, plan_vigente, proveedor_pago, firma s, eventos_pasarela, cuotaProduccion, Fase 11, API pública, api_idempotencia, soltar_idempotencia, Idempotent-Replayed, 202 incierto, autenticar_api_key, webhook_entregas, DNS rebinding, lookup, 3xx, rotar_secreto_webhook, webhooks_url_permitida, openapi.json, /docs]
+related: ["02-guias/planes-y-pagos.md", "08-esquema-supabase/solucion-de-problemas.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "01-fundamentos/ambientes-y-credenciales.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/vault-y-secretos.md", "01-fundamentos/errores-y-resultados.md", "01-fundamentos/autenticacion-sii.md", "09-libreria/backend-service-role.md", "02-guias/emision-boletas.md", "02-guias/seguimiento-envios.md", "02-guias/tablero-y-reportes.md", "02-guias/api-publica.md", "06-integraciones/webhooks.md"]
+source: ["supabase_saas_sii.sql", "certificacion-node/docs/solucion-de-problemas.md", "supabase/migrations/0005_certificados_resoluciones.sql", "apps/web/src/server/certificados/", "apps/web/src/lib/sentry/depurar.ts", "supabase/migrations/0006_realtime_operaciones.sql", "supabase/migrations/0007_bloqueos_sii.sql", "apps/web/src/server/sii/", "supabase/migrations/0008_certificacion.sql", "supabase/migrations/0009_autorizacion_externa.sql", "apps/web/src/server/certificacion/", "apps/web/src/app/[org]/certificacion/", "supabase/migrations/0011_folios.sql", "apps/web/src/server/folios/", "apps/web/src/app/[org]/folios/", "apps/web/src/server/emision/", "apps/web/src/server/pdf/", "apps/web/src/app/[org]/emitir/", "apps/web/next.config.ts", "apps/web/src/server/seguimiento/", "apps/web/src/server/alertas/", "apps/web/src/server/documentos/", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "apps/web/src/server/tablero/", "apps/web/src/server/reportes/", "apps/web/src/app/[org]/reportes/exportar/route.ts", "apps/web/src/server/pagos/", "apps/web/src/app/api/pagos/flow/", "supabase/migrations/0015_planes_comerciales.sql", "supabase/migrations/0016_pagos.sql", "apps/web/src/lib/api-publica.ts", "apps/web/src/server/api-publica/", "apps/web/src/server/webhooks/", "supabase/migrations/0018_api_webhooks.sql"]
 ---
 
 # Trampas conocidas
@@ -1041,3 +1041,113 @@ Código en `apps/web/src/server/pagos/`, desplegado el 2026-11-18 (`9d2fd8b`); m
 - **Desde la 0017, la comprobación 10 de `0014_cron.sql` sale `false`.** «Ningún otro job llama
   a `/api/cron`» se escribió para los jobs de la Fase 8; `sincronizar-suscripciones` también
   llama a `/api/cron/suscripciones`. Es esperado.
+
+## API pública y webhooks (Fase 11)
+
+Decisiones del diseño de la fase (detalle en la [guía](../02-guias/api-publica.md)).
+
+- **La idempotencia no va en `documentos.metadata`:** `representarYEnviar` (Fase 7)
+  reescribe `metadata` entero después del `ok` y borraría la huella o la respuesta guardada.
+  Por eso existe `api_idempotencia` (0018) con reclamo atómico y arriendo de 120 s, además de
+  la unicidad `documentos (organizacion_id, clave_idempotencia)` de la 0001.
+- **Un error que no llegó a emitir no se guarda** (`soltar_idempotencia`): si se guardara,
+  repetir con la misma clave devolvería para siempre «sin folios» o «el SII no respondió»
+  aunque el problema ya se hubiera resuelto. `soltar` conserva la huella: otro cuerpo con la
+  misma clave sigue dando `conflicto`.
+- **La función puede morir entre emitir y guardar la respuesta.** La repetición busca el
+  documento por `clave_idempotencia` antes de emitir: si ya no es `borrador`, responde su
+  estado actual en vez de emitir otro. Un documento `firmado` sin envío (murió entre el
+  update y el envío) se responde 202 con `aviso`, sin certeza: hay que revisarlo como un
+  incierto.
+- **202 = incierto:** no sabemos si el envío llegó al SII. La documentación pública pide no
+  reemitir con otra clave; reemitir puede duplicar la boleta ante el SII.
+- **`usuarioId` nulo desactiva `getUser()`:** `ejecutarOperacion` solo confirma la sesión
+  cuando hay usuario. Con la API la autoridad es la clave (`autenticar_api_key`), y la
+  emisión exige `apiKeyId` cuando `usuarioId` es `null` (si faltan los dos, falla de uso).
+- **El ambiente lo fija el prefijo de la clave**, y la fila de `api_keys` tiene que calzar
+  con él: una fila `produccion` con prefijo `sk_test_` (imposible con `crear_api_key`, pero
+  posible editando a mano) responde `clave_invalida`.
+- **404 para lo ajeno:** un id de otra organización, empresa o ambiente responde igual que
+  uno inexistente, para no revelar qué existe.
+- **XML y PDF por stream,** no por redirección a la URL firmada: la URL de Storage nunca sale
+  y el cliente no necesita seguir redirecciones.
+- **Lote = emisiones independientes.** Agrupar varias boletas en un solo EnvioBOLETA exigiría
+  un camino de emisión paralelo al de la Fase 7, y en ese camino falla todo junto (un 4xx
+  anula N folios; un incierto bloquea N boletas). Queda para decidir.
+- **`certificacion:gestionar` está reservado:** la base lo acepta en `api_keys.alcances`
+  (0001), pero la UI no lo ofrece y no hay rutas.
+- **Webhooks: el `id` del cuerpo es el de la fila de `webhook_entregas`** y se conserva en
+  los reintentos y en el reenvío manual (`reenviar_entrega_webhook` reinicia la misma fila):
+  es la llave de deduplicación del receptor. `t` de la firma cambia en cada intento.
+- **`fetch` no sirve para entregar webhooks con protección SSRF:** no acepta un `lookup`
+  propio, así que la IP validada podría no ser la que se conecta (*DNS rebinding*). La
+  entrega usa `node:https` con un `lookup` que fija la IP ya validada.
+- **3xx es falla:** no se siguen redirecciones (una redirección podría llevar a una IP
+  interna).
+- **`encolar_evento` filtra por plan desde la 0018:** una organización que baja a un plan sin
+  webhooks deja de acumular entregas; las ya encoladas se descartan al reclamarlas.
+- **Sin autodesactivación de webhooks:** cortar en silencio la integración de un cliente es
+  peor que reintentar; la UI avisa cuando las últimas entregas fallaron.
+- **El check de URL de la 0018 es defensa en profundidad:** `authenticated` puede hacer
+  `update webhooks set url` por PostgREST (grant de columna de la 0001), así que la
+  validación de la UI no basta. La protección real contra SSRF está en la entrega (DNS).
+- **Rotar el secreto es inmediato:** el secreto viejo se borra de Vault en el acto; las
+  entregas que ya salieron con la firma vieja y se reintenten saldrán con la nueva.
+- **La carpeta `app/api/v1/openapi.json/`** es un segmento con punto, permitido por Next
+  (`app/rss.xml/route.ts` en la guía de Route Handlers). `/api/v1/openapi.json` es pública
+  por dos lados en `lib/rutas.ts` (`/api` y la extensión `.json`).
+- **`/docs` es prefijo público** (`PREFIJOS_PUBLICOS`) y `docs` ya estaba en
+  `SLUGS_RESERVADOS`, así que ninguna organización puede llamarse `docs`.
+- **El verificador de firmas de los clientes** (`scripts/ejemplo-api/verificar-firma.mjs`)
+  usa los mismos motivos que `server/webhooks/firma.ts` (`cabecera_invalida`,
+  `fuera_de_tolerancia`, `firma_invalida`); `lib/ejemplo-api.test.ts` los compara.
+
+Notas de la implementación (rutas, entrega y base):
+
+- **La respuesta guardada es una foto del momento de la emisión:** repetir una petición que
+  dio 202 (incierto) devuelve 202 aunque la boleta ya esté aceptada. El estado actual sale de
+  `GET /documentos/{id}` o del webhook.
+- **Solo se guarda (`terminar`) cuando hay documento con folio** (201, 202 o 422
+  `rechazado_por_sii`). `sin_folios`, `cuota_agotada`, `sii_no_disponible` o un 500 sueltan la
+  clave; repetir con la misma clave reutiliza el borrador ya guardado con ella.
+- **La validación y la empresa se revisan antes de reclamar**, así que un 4xx de datos no ocupa
+  la clave. La huella incluye empresa y ambiente: la misma clave con otra empresa, con
+  `sk_live` o con otro cuerpo da `idempotencia_conflicto`; el orden de las llaves del JSON no
+  cambia la huella.
+- **Los objetos JSON son estrictos:** un campo desconocido (p. ej. `razonSocial` en vez de
+  `razon_social`) es 422. En la boleta 41, `exento` vale `true` por defecto. Las reglas de toda
+  la boleta (41 solo exenta) se informan solo cuando pasan las de cada campo (así funciona zod).
+- **Lote:** cada ítem usa la clave `<clave>#<n>` (n desde 1) y un ítem pendiente lleva
+  `status: null`. No se empieza una boleta después de los 200 s (una emisión puede tardar 60 s
+  y la ruta tiene 300). La respuesta del lote se guarda solo si todas sus boletas quedaron con
+  documento; si no, se suelta y se repite con la misma clave. Arriendo de 330 s para el lote y
+  para el timbraje de folios.
+- **Entregas postergadas:** una entrega que no alcanza a empezar dentro del presupuesto de 45 s
+  ya tiene el intento sumado al reclamarla y vuelve a salir cuando vence el arriendo (120 s).
+- **Node no llama al `lookup` con una IP literal,** por eso `entregar.ts` rechaza las IP
+  literales antes de conectar (además del check de la 0018).
+- **Si la conexión se corta después del status, vale lo recibido:** un 2xx cuenta como
+  entregado.
+- **`cerrar_entrega_webhook` recibe el intento reclamado (`p_intento`)** y solo cierra si la
+  fila sigue en ese intento. Si un administrador la reenvió en medio de la entrega
+  (`intentos` vuelve a 0) u otra corrida la reclamó después, devuelve `null` sin pisarla: el
+  cron lo cuenta como error con aviso a Sentry, sin datos. El receptor puede recibir dos POST
+  con el mismo `id` (el del intento en vuelo y el del reenvío): deduplica por `id`.
+- **Revocar una API key es definitivo:** el trigger `trg_10_api_key_sin_reactivar` (0018,
+  todos los roles, también `service_role`) impide volver `revocada_en` a nulo y alargar o
+  quitar `expira_en` (`22023`), y `authenticated` ya no tiene grant sobre `expira_en`. Sin
+  eso, un administrador podía revivir por PostgREST una clave filtrada, porque la 0001 le
+  dejaba editar las dos columnas. Para recuperar el acceso se crea otra clave.
+- **`api_idempotencia` se limpia** (job `limpiar-api-idempotencia` de la 0019): las claves
+  `terminada` de más de 30 días y las `en_curso` abandonadas de más de 7. Guardan la
+  respuesta completa (RUT, razón social, líneas). Pasado ese plazo la misma
+  `Idempotency-Key` vuelve a ser nueva, pero la unicidad de `documentos.clave_idempotencia`
+  impide emitir otra boleta con ella (la repetición encuentra el documento existente).
+- **Secreto ilegible en Vault:** no se envía nada; la entrega queda fallida reintentable con el
+  texto «rota el secreto».
+- **Host con punto final** (`https://ejemplo.cl./`): lo rechazan la 0018 y `validarUrlWebhook`.
+- **`certificado.por_vencer` no se encola todavía:** encolarlo desde el cron de alertas lo
+  ataría a los reintentos del correo (duplicaría el evento) y a que haya correo configurado;
+  necesita una deduplicación propia.
+- **`skip locked` entre dos corridas concurrentes** no está probado (PGlite tiene una sola
+  conexión); la verificación solo revisa el cuerpo de la función.

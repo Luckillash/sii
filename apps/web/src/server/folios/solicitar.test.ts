@@ -3,7 +3,7 @@ import {
   FolioInicialRequeridoError,
   FoliosSinCafError,
 } from '@winex/certificacion';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { cafPrueba } from '../../../test/caf-prueba';
 import {
   COOKIE_SII,
@@ -479,5 +479,56 @@ describe('solicitarFolios: timbrar', () => {
     );
     expect(r).toMatchObject({ tipo: 'error', motivo: 'empresa_no_encontrada' });
     expect(EMPRESA).not.toBe('99999999-9999-4999-8999-999999999999');
+  });
+});
+
+describe('solicitarFolios: desde la API pública (Fase 11)', () => {
+  const API_KEY = '66666666-6666-4666-8666-666666666666';
+
+  it('la revisión no pide getUser() y la operación queda con la API key, sin usuario', async () => {
+    const e = escenarioFolios();
+    revisionQueAsigna(e, 1, 20);
+    const confirmarSesion = vi.fn(async () => false);
+    e.deps.operacion = { ...e.deps.operacion, confirmarSesion };
+    const r = await solicitarFolios(
+      { organizacionId: ORG, empresaId: EMPRESA, usuarioId: null, apiKeyId: API_KEY },
+      { ...BASE, nivel: 'revision' },
+      e.deps,
+    );
+    expect(r).toMatchObject({ tipo: 'revision', revision: { desde: 1, hasta: 20 } });
+    expect(confirmarSesion).not.toHaveBeenCalled();
+    expect(e.falso.tabla('operaciones_sii')[0]).toMatchObject({
+      operacion: 'solicitar_folios',
+      usuario_id: null,
+      api_key_id: API_KEY,
+    });
+    expect(e.falso.tabla('solicitudes_folios')[0]).toMatchObject({ solicitado_por: null });
+  });
+
+  it('el control de un incierto sin revisar se aplica igual', async () => {
+    const e = escenarioFolios({
+      tablas: {
+        operaciones_sii: [
+          {
+            id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+            organizacion_id: ORG,
+            empresa_id: EMPRESA,
+            operacion: 'solicitar_folios',
+            ambiente: 'certificacion',
+            confirmada: true,
+            resultado: 'incierto',
+            detalle: {},
+            iniciada_en: '2026-11-13T14:00:00Z',
+          },
+        ],
+      },
+    });
+    const r = await solicitarFolios(
+      { organizacionId: ORG, empresaId: EMPRESA, usuarioId: null, apiKeyId: API_KEY },
+      { ...BASE, nivel: 'revision' },
+      e.deps,
+    );
+    expect(r).toMatchObject({ tipo: 'error', motivo: 'incierto_sin_revisar' });
+    expect(e.folios.autenticar).not.toHaveBeenCalled();
   });
 });

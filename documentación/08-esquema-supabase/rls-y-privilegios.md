@@ -1,9 +1,9 @@
 ---
 title: "Esquema: RLS y privilegios"
 description: "Políticas por tabla, grants de columnas y funciones, y protección de campos del sistema."
-keywords: [RLS, políticas, es_miembro, tiene_rol, es_admin, puede_emitir, comparte_organizacion, anon, service_role, grants de columnas, tg_proteger_autorizacion, tg_proteger_proceso, tokens_sii, sesiones_sii, registrar_certificado, registrar_resolucion, fijar_certificado_predeterminado, security definer, security invoker, grant execute, anular_folios, tg_caf_sin_traslape, migración 0011, folios_anulados, notificaciones, migración 0013, reclamar_notificacion, notificacion_cerrada, alertas_documentos_rechazados, alertas_envios_inciertos, alertas_certificados_por_vencer, migración 0016, clientes_pago, pagos, eventos_pasarela, activar_suscripcion]
+keywords: [RLS, políticas, es_miembro, tiene_rol, es_admin, puede_emitir, comparte_organizacion, anon, service_role, grants de columnas, tg_proteger_autorizacion, tg_proteger_proceso, tokens_sii, sesiones_sii, registrar_certificado, registrar_resolucion, fijar_certificado_predeterminado, security definer, security invoker, grant execute, anular_folios, tg_caf_sin_traslape, migración 0011, folios_anulados, notificaciones, migración 0013, reclamar_notificacion, notificacion_cerrada, alertas_documentos_rechazados, alertas_envios_inciertos, alertas_certificados_por_vencer, migración 0016, clientes_pago, pagos, eventos_pasarela, activar_suscripcion, migración 0018, api_idempotencia, autenticar_api_key, reenviar_entrega_webhook, probar_webhook, rotar_secreto_webhook]
 related: ["03-api-reference/acceso-por-tabla.md", "02-guias/planes-y-pagos.md"]
-source: ["supabase_saas_sii.sql §17", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0016_pagos.sql"]
+source: ["supabase_saas_sii.sql §17", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0016_pagos.sql", "supabase/migrations/0018_api_webhooks.sql"]
 ---
 
 # Esquema: RLS y privilegios
@@ -16,7 +16,7 @@ agregan funciones y tablas con sus propios grants (abajo, la `0005`; las demás 
 
 ## Reglas generales
 
-- **RLS activo en las 36 tablas de `public`** (33 de la `0001` y 3 de la `0016`, aplicada el 2026-11-18). Una tabla sin política para una acción la
+- **RLS activo en las 37 tablas de `public`** (33 de la `0001` y 3 de la `0016`, aplicada el 2026-11-18; la `0018`, aplicada el 2026-11-19, suma `api_idempotencia`: 37). Una tabla sin política para una acción la
   niega a `authenticated`; `service_role` omite RLS.
 - **Autoridad = RLS, no la UI.** La UI oculta acciones según el rol, pero la base decide.
 - **Helpers** (`security definer`, con `execute` para `authenticated`):
@@ -63,10 +63,12 @@ agregan funciones y tablas con sus propios grants (abajo, la `0005`; las demás 
 
 | Tabla | Columnas que `authenticated` puede actualizar |
 |---|---|
-| `api_keys` | `nombre`, `revocada_en`, `expira_en` |
+| `api_keys` | `nombre`, `revocada_en` (la 0001 también daba `expira_en`; la 0018 lo quita) |
 | `webhooks` | `url`, `eventos`, `activo` |
 
-El resto (`clave_hash`, `secreto_secret_id`, …) no se puede cambiar desde la API.
+El resto (`clave_hash`, `secreto_secret_id`, …) no se puede cambiar desde la API. Con la
+migración 0018 (aplicada el 2026-11-19), el `update` de `url` además pasa por el check
+`webhooks_url_permitida` (`23514`), y el secreto se cambia solo con `rotar_secreto_webhook`.
 
 ## Campos del sistema protegidos por triggers
 
@@ -180,3 +182,36 @@ esperado) y no lista `activar_suscripcion` como ejecutable por `anon` ni `authen
 Lo comprueban `supabase/verificaciones/0016_pagos.sql` (11–13 y 18) y
 `rls-fase10-pagos.sql` (18 y 22–28): 20/20 y 30/30 en producción el 2026-11-18 (y en PGlite)
 ([contrato](../03-api-reference/rpc-backend.md#activar_suscripcion-migración-0016)).
+
+## Tabla y funciones de la migración 0018 (aplicada el 2026-11-19)
+
+API pública y webhooks (Fase 11). Se aplicó antes del deploy de la fase.
+
+| Tabla | RLS y política | Privilegios |
+|---|---|---|
+| `api_idempotencia` | activo, **sin políticas** | `revoke all` a `anon` y `authenticated`; `grant all` a `service_role` (como `eventos_pasarela`) |
+
+`api_keys`, `webhooks` y `webhook_entregas` no cambian de políticas (lectura `es_admin`;
+edición de columnas permitidas en `api_keys` y `webhooks`). En `api_keys` la 0018 quita
+`expira_en` del grant de `authenticated` (queda `nombre` y `revocada_en`) y agrega el
+trigger `trg_10_api_key_sin_reactivar` (todos los roles): revocar es definitivo y la
+expiración no se alarga ni se quita (`22023`). Ninguna de las
+cuatro está en `supabase_realtime`.
+
+| Función | Seguridad | `execute` | Por qué |
+|---|---|---|---|
+| `autenticar_api_key(text)` | `security definer`, `search_path = ` | solo `service_role` | lee `api_keys` por hash y escribe `ultimo_uso_en`; la llama la API pública, sin sesión |
+| `reclamar_idempotencia(uuid, text, text, text, uuid, integer)`, `terminar_idempotencia(uuid, text, integer, jsonb, uuid)`, `soltar_idempotencia(uuid, text, uuid)` | ídem | solo `service_role` | escriben `api_idempotencia`; la API filtra por la organización de la clave |
+| `reclamar_entregas_webhook(integer, integer)`, `cerrar_entrega_webhook(bigint, integer, boolean, integer, text, boolean)` | ídem | solo `service_role` | el cron toma y cierra entregas de todas las organizaciones |
+| `reenviar_entrega_webhook(bigint)`, `probar_webhook(uuid)`, `rotar_secreto_webhook(uuid)` | ídem | `authenticated` y `service_role` (`revoke` a `public`, `anon`) | las llama el administrador con su sesión; revisan por dentro `service_role` o `es_admin` (`P0002` a otra organización, `42501` a un miembro sin serlo); escriben `webhook_entregas` o Vault, sin políticas de escritura |
+
+`encolar_evento` y `tg_evento_documento` se reemplazan con `create or replace`, que
+conserva sus privilegios (`encolar_evento` sigue solo para `service_role`).
+
+*Advisors* debería listar `rls_enabled_no_policy` en `api_idempotencia` (INFO, esperado) y
+las tres del panel en `authenticated_security_definer_function_executable` (WARN, esperado,
+como `anular_folios`); ninguna de las otras seis. Lo comprueban
+`supabase/verificaciones/0018_api_webhooks.sql` (3, 9 y 10) y `rls-fase11-api.sql` (8, 17,
+31, 35, 36 y 39) y la 23 de la verificación (trigger y grant de `api_keys`), 23/23 y 39/39 en
+PGlite
+([contratos](../03-api-reference/rpc-integraciones.md)).

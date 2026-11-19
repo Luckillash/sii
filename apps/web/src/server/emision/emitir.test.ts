@@ -1,5 +1,5 @@
 import { ErrorRespuestaSii, ErrorTransporte } from '@winex/certificacion';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   EMPRESA,
   ORG,
@@ -572,5 +572,104 @@ describe('emitirDocumento: emisión', () => {
     });
     const sobre = Buffer.from(e.rest.enviarBoleta.mock.calls[0]?.[3] ?? []).toString('latin1');
     expect(sobre).toContain('<DescuentoMonto>1000</DescuentoMonto>');
+  });
+});
+
+describe('emitirDocumento: desde la API pública (Fase 11)', () => {
+  const API_KEY = '66666666-6666-4666-8666-666666666666';
+
+  function contextoApi(e: EscenarioEmision) {
+    return {
+      organizacionId: e.ctx.organizacionId,
+      empresaId: e.ctx.empresaId,
+      usuarioId: null,
+      apiKeyId: API_KEY,
+    };
+  }
+
+  it('guarda el borrador con service_role (origen api, clave de idempotencia) y audita la API key', async () => {
+    const e = escenarioEmision();
+    const confirmarSesion = vi.fn(async () => true);
+    const sesion = vi.fn(async () => e.sesion.cliente);
+    const deps = { ...e.deps, sesion, operacion: { ...e.deps.operacion, confirmarSesion } };
+    const r = await emitirDocumento(
+      contextoApi(e),
+      { nivel: 'emitir', borrador: borradorPrueba(), claveIdempotencia: 'pedido-1' },
+      deps,
+    );
+    expect(r.tipo).toBe('ok');
+    const [doc] = documentos(e);
+    expect(doc).toMatchObject({
+      origen: 'api',
+      clave_idempotencia: 'pedido-1',
+      creado_por: null,
+      estado: 'enviado',
+      folio: 1,
+    });
+    expect(e.falso.tabla('operaciones_sii')[0]).toMatchObject({
+      operacion: 'emitir',
+      resultado: 'ok',
+      usuario_id: null,
+      api_key_id: API_KEY,
+    });
+    // Sin sesión: ni el cliente de sesión ni getUser().
+    expect(sesion).not.toHaveBeenCalled();
+    expect(confirmarSesion).not.toHaveBeenCalled();
+    expect(e.sesion.escrituras).toEqual([]);
+  });
+
+  it('retoma un borrador ya guardado con la clave (no crea otro)', async () => {
+    const e = escenarioEmision();
+    const primero = await emitirDocumento(
+      contextoApi(e),
+      { nivel: 'emitir', borrador: borradorPrueba(), claveIdempotencia: 'pedido-2' },
+      {
+        ...e.deps,
+        rest: () => {
+          throw new Error('sin red');
+        },
+      },
+    );
+    expect(primero.tipo).toBe('error');
+    const [borrador] = documentos(e);
+    expect(borrador).toMatchObject({ estado: 'borrador', clave_idempotencia: 'pedido-2' });
+    const r = await emitirDocumento(
+      contextoApi(e),
+      {
+        nivel: 'emitir',
+        borrador: borradorPrueba(),
+        borradorId: String(borrador?.id),
+        claveIdempotencia: 'pedido-2',
+      },
+      e.deps,
+    );
+    expect(r.tipo).toBe('ok');
+    expect(documentos(e)).toHaveLength(1);
+  });
+
+  it('23505 de la clave de idempotencia: motivo idempotencia_en_uso, sin folio', async () => {
+    const e = escenarioEmision();
+    e.falso.fallas.set('documentos:insert', {
+      code: '23505',
+      message: 'duplicate key value violates unique constraint',
+    });
+    const r = await emitirDocumento(
+      contextoApi(e),
+      { nivel: 'emitir', borrador: borradorPrueba(), claveIdempotencia: 'pedido-3' },
+      e.deps,
+    );
+    expect(r).toMatchObject({ tipo: 'error', motivo: 'idempotencia_en_uso', operacionId: null });
+    expect(e.falso.rpcs.map((x) => x.nombre)).not.toContain('asignar_folio');
+  });
+
+  it('sin usuario ni API key es uso incorrecto: no escribe nada', async () => {
+    const e = escenarioEmision();
+    const r = await emitirDocumento(
+      { ...e.ctx, usuarioId: null },
+      { nivel: 'emitir', borrador: borradorPrueba() },
+      e.deps,
+    );
+    expect(r).toMatchObject({ tipo: 'error', motivo: 'uso' });
+    expect(e.falso.escrituras).toEqual([]);
   });
 });

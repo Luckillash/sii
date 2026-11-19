@@ -31,7 +31,8 @@ export type MotivoEmision =
   | 'documento_incierto'
   | 'folio_anulado'
   | 'borrador_cambio'
-  | 'sin_permiso';
+  | 'sin_permiso'
+  | 'idempotencia_en_uso';
 
 interface DatosErrorEmision {
   readonly motivo: MotivoEmision;
@@ -218,6 +219,19 @@ export function errorSinPermiso(): ErrorEmision {
   return errorEmision('sin_permiso', {
     titulo: 'No tienes permiso para emitir',
     detalle: 'Solo un propietario, un administrador o un emisor puede emitir boletas.',
+  });
+}
+
+/**
+ * API pública (Fase 11): ya hay otro documento de la organización con esa
+ * `Idempotency-Key` (`23505` del único `(organizacion_id, clave_idempotencia)` de la 0001).
+ * Solo pasa si dos peticiones con la misma clave se cruzan fuera del reclamo de
+ * `api_idempotencia`: se repite con la misma clave y se recibe el documento ya creado.
+ */
+export function errorIdempotenciaEnUso(): ErrorEmision {
+  return errorEmision('idempotencia_en_uso', {
+    titulo: 'Ya hay una boleta con esta Idempotency-Key',
+    detalle: `Otra petición con la misma clave creó la boleta. Repite la petición con la misma Idempotency-Key para recibirla. ${NADA_AL_SII}`,
   });
 }
 

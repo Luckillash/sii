@@ -1,4 +1,12 @@
-import { Building2, CreditCard, KeyRound, type LucideIcon, Users } from 'lucide-react';
+import {
+  Braces,
+  Building2,
+  CreditCard,
+  KeyRound,
+  type LucideIcon,
+  Users,
+  Webhook,
+} from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Tarjeta } from '@/components/boleteame';
@@ -7,8 +15,8 @@ import org from '../organizacion.module.css';
 
 export const metadata: Metadata = { title: 'Configuración · Boletéame' };
 
-// Empresas, certificados y equipo (Fases 2 y 3) y plan (Fase 10); API y webhooks llegan
-// en la Fase 11 (PLAN-SAAS §3.1).
+// Empresas, certificados y equipo (Fases 2 y 3), plan (Fase 10) y API y webhooks
+// (Fase 11) (PLAN-SAAS §3.1).
 
 type Seccion = {
   id: string;
@@ -52,6 +60,24 @@ const SECCIONES: readonly Seccion[] = [
     texto: 'Revisa tu plan, el uso del mes y tus pagos, y cambia de plan cuando lo necesites.',
     enlace: 'Ir a Plan',
     icono: CreditCard,
+  },
+  {
+    id: 'api',
+    ruta: 'configuracion/api',
+    titulo: 'API',
+    texto:
+      'Crea API keys para que tu sistema emita boletas y consulte su estado, y revócalas cuando ya no se usen.',
+    enlace: 'Ir a API',
+    icono: Braces,
+  },
+  {
+    id: 'webhooks',
+    ruta: 'configuracion/webhooks',
+    titulo: 'Webhooks',
+    texto:
+      'Recibe en tu sistema un aviso firmado cuando el SII acepta o rechaza una boleta, y revisa cada entrega.',
+    enlace: 'Ir a Webhooks',
+    icono: Webhook,
   },
 ];
 

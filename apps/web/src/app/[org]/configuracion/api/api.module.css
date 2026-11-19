@@ -1,0 +1,214 @@
+/* Configuración → API y Webhooks (Fase 11). Solo tokens de tokens.css. */
+
+.seccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.bloque {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.subtitulo {
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}
+
+.nota {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  color: var(--ink-muted);
+}
+
+.nota:empty {
+  display: none;
+}
+
+.avisos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.avisos:empty {
+  display: none;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.fila > * {
+  flex: 1 1 220px;
+}
+
+.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.opciones legend {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--text-label-weight);
+  color: var(--ink);
+}
+
+.casilla {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.casilla input {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  accent-color: var(--sello);
+}
+
+.casilla input:disabled + span {
+  color: var(--ink-muted);
+}
+
+.casillaTexto {
+  display: flex;
+  flex-direction: column;
+}
+
+.casillaAyuda {
+  color: var(--ink-muted);
+}
+
+.errorCampo {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  color: var(--error);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.accionesFila {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-1);
+}
+
+.secreto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.secretoCampo {
+  width: 100%;
+}
+
+.secretoAcciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.url {
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.etiqueta {
+  padding: 0 var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+.estadoActivo {
+  color: var(--exito);
+  font-weight: 500;
+}
+
+.estadoInactivo {
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+
+.estadoAviso {
+  color: var(--aviso);
+  font-weight: 500;
+}
+
+.estadoError {
+  color: var(--error);
+  font-weight: 500;
+}
+
+.respuesta summary {
+  cursor: pointer;
+  color: var(--ink-muted);
+}
+
+.respuesta pre {
+  max-width: 48ch;
+  margin: var(--space-2) 0 0;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  font-family: var(--font-mono);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.paginacion {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+}

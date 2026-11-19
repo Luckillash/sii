@@ -1,9 +1,9 @@
 ---
 title: "Esquema: triggers y lógica"
 description: "Cada trigger, su orden de ejecución y lo que hace."
-keywords: [tg_resolucion_autoriza_produccion, trg_50_resolucion_autoriza_produccion, autorizada_produccion, autorizada_en, resoluciones, tg_proteger_autorizacion, tg_certificacion_autorizada, autorizada fuera de Boletéame, migración 0009, trg_20_caf_sin_traslape, tg_caf_sin_traslape, 23P01, traslape, migración 0011, tg_validar_documento, folio anulado, for key share, migración 0012, sincronizar_documentos_envio, trg_50_envio_actualizado, trg_50_envio_rechazo_sincronizar, orden de escritura, seguimiento, Fase 8, documento.aceptado, notificaciones]
+keywords: [tg_resolucion_autoriza_produccion, trg_50_resolucion_autoriza_produccion, autorizada_produccion, autorizada_en, resoluciones, tg_proteger_autorizacion, tg_certificacion_autorizada, autorizada fuera de Boletéame, migración 0009, trg_20_caf_sin_traslape, tg_caf_sin_traslape, 23P01, traslape, migración 0011, tg_validar_documento, folio anulado, for key share, migración 0012, sincronizar_documentos_envio, trg_50_envio_actualizado, trg_50_envio_rechazo_sincronizar, orden de escritura, seguimiento, Fase 8, documento.aceptado, notificaciones, encolar_evento, tg_evento_documento, migración 0018, incluye_webhooks, clave_idempotencia]
 related: ["02-guias/seguimiento-envios.md", "02-guias/certificacion-empresa.md", "02-guias/folios-caf.md", "04-objetos/objetos-certificacion.md", "04-objetos/objetos-empresas-y-credenciales.md", "08-esquema-supabase/despliegue.md"]
-source: ["supabase_saas_sii.sql §15", "supabase/migrations/0009_autorizacion_externa.sql", "supabase/migrations/0011_folios.sql", "supabase/migrations/0012_folio_anulado.sql", "supabase/migrations/0013_notificaciones.sql", "apps/web/src/server/seguimiento/persistencia.ts"]
+source: ["supabase_saas_sii.sql §15", "supabase/migrations/0009_autorizacion_externa.sql", "supabase/migrations/0011_folios.sql", "supabase/migrations/0012_folio_anulado.sql", "supabase/migrations/0013_notificaciones.sql", "apps/web/src/server/seguimiento/persistencia.ts", "supabase/migrations/0018_api_webhooks.sql"]
 ---
 
 # Esquema: triggers y lógica
@@ -50,7 +50,7 @@ prefijo numérico (`trg_00_…` primero, `trg_90_…` al final). Los `before` co
 | `trg_10_validar_documento` (`tg_validar_documento`, `security definer`; reemplazada por la migración 0012, **aplicada el 2026-11-15**) | `documentos` | `before insert or update of folio, caf_id, ambiente, tipo_dte` | El CAF debe ser de la misma empresa, ambiente y tipo, y el folio estar en su rango; en producción, empresa autorizada (P91) y plan con `permite_produccion`. Con la 0012: lee el CAF con `for key share` y, si el documento fija su folio (INSERT con folio, o UPDATE que cambia `folio` o `caf_id`), rechaza con `23514` un folio que esté en `folios_anulados` ([abajo](#tg_validar_documento-migración-0012)) |
 | `trg_20_contar_uso` (`tg_contar_uso_documento`) | `documentos` | `before insert or update of folio` | Suma en `uso_mensual` cuando el documento recibe folio (no los borradores); las de producción se controlan contra `max_boletas_mes` |
 | `trg_60_contar_uso` (`tg_contar_uso_otros`) | `cafs`, `envios` | `after insert` | Suma `folios_timbrados` y `envios` en `uso_mensual` |
-| `trg_50_evento_documento` | `documentos` | `after update of estado`, si cambió | Encola un evento de webhook (`encolar_evento`) |
+| `trg_50_evento_documento` (`tg_evento_documento`, `security definer`) | `documentos` | `after update of estado`, si cambió | Encola `documento.<estado>` (solo `aceptado`, `aceptado_con_reparos`, `rechazado` e `incierto`) con `encolar_evento`. Con la migración 0018 (**aplicada el 2026-11-19**) los datos llevan además `estado`, `origen` y `clave_idempotencia`, y no se encola nada si el plan no incluye webhooks ([abajo](#webhooks-encolar_evento-y-tg_evento_documento-migración-0018)) |
 | `trg_50_envio_actualizado` | `envios` | `after update` de `estado_sii`, `incierto` o los contadores, si cambiaron (no `consultas` ni `ultima_consulta_en`) | Lleva el estado del envío a sus documentos (`sincronizar_documentos_envio`) y encola `envio.actualizado` |
 | `trg_10_envio_rechazo` (`security definer`) | `envio_rechazos` | `before insert` | Si falta `documento_id`, lo busca por empresa, ambiente, tipo y folio del envío |
 | `trg_50_envio_rechazo_sincronizar` (`security definer`) | `envio_rechazos` | `after insert or update` | Llama a `sincronizar_documentos_envio(envio_id)` |
@@ -161,3 +161,29 @@ resolución de producción vigente (al escribirla no había ninguna).
 Pruebas: verificación de solo lectura `supabase/verificaciones/0009_autorizacion_externa.sql`
 y simulación con `rollback` `rls-fase5-autorizacion-externa.sql`
 ([cómo](../05-pruebas/probar-el-esquema.md#7-simulación-de-la-autorización-externa-rls-fase5-autorizacion-externasql)).
+
+## Webhooks: `encolar_evento` y `tg_evento_documento` (migración 0018)
+
+**Escrita, pendiente de aplicar** (Fase 11, antes del deploy). Las dos funciones se
+reemplazan con `create or replace` (los triggers y los privilegios no cambian):
+
+- `encolar_evento(org, evento, payload)` inserta, igual que en la 0001, una fila en
+  `webhook_entregas` por cada webhook **activo** de la organización suscrito al evento,
+  pero ahora solo si `plan_vigente(org).incluye_webhooks` (hoy los planes `api` y
+  `empresa`). Sin plan con webhooks, los triggers de documentos, envíos y certificación y
+  `folios.por_agotarse` no dejan entregas. Lo que ya estaba en cola cuando la organización
+  bajó de plan lo descarta `reclamar_entregas_webhook` con el motivo «El plan vigente no
+  incluye webhooks.».
+- `tg_evento_documento` arma los mismos datos que en la 0001 (`documento_id`,
+  `empresa_id`, `ambiente`, `tipo_dte`, `folio`, `mnt_total`, `envio_id`) más `estado`,
+  `origen` (`panel`, `api`, `set_pruebas`) y `clave_idempotencia` (la `Idempotency-Key`
+  de la boleta emitida por la API, o `null`), para que un integrador asocie el
+  `documento.aceptado` con su petición.
+
+No hay triggers nuevos en la 0018. La entrega la hace `/api/cron/webhooks` con
+`reclamar_entregas_webhook` y `cerrar_entrega_webhook`
+([RPC](../03-api-reference/rpc-integraciones.md#entregas-de-webhooks-0018)).
+
+Pruebas: `supabase/verificaciones/0018_api_webhooks.sql` (18 y 19) y
+`rls-fase11-api.sql` (20 y 21)
+([cómo](../05-pruebas/probar-el-esquema.md#14-simulación-de-la-api-pública-y-los-webhooks-de-la-fase-11-rls-fase11-apisql)).

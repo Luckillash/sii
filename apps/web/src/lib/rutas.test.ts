@@ -15,6 +15,9 @@ describe('esRutaPublica', () => {
     '/api/cron/seguimiento',
     '/api/monitoring',
     '/monitoring',
+    '/docs',
+    '/docs/api',
+    '/api/v1/openapi.json',
     '/_ds',
     '/_ds/ingreso',
     '/%5Fds/app',
@@ -38,6 +41,8 @@ describe('esRutaPublica', () => {
     '/authx',
     '/invitaciones',
     '/apix/algo',
+    '/docsx',
+    '/acme/docs',
   ])('%s exige sesión', (ruta) => {
     expect(esRutaPublica(ruta)).toBe(false);
   });

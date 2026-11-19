@@ -243,6 +243,16 @@ describe('depurarTexto', () => {
     expect(depurado).toContain('https://sandbox.flow.cl/api/payment/getStatus?');
   });
 
+  it('filtra API keys (sk_test_/sk_live_) y secretos de webhooks (whsec_) en textos libres (Fase 11)', () => {
+    const hex = 'a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90';
+    const texto = `falló con sk_test_${hex}, sk_live_${hex} y el secreto whsec_${hex}`;
+    const limpio = depurarTexto(texto);
+    expect(limpio).not.toContain(hex);
+    expect(limpio).toBe(`falló con ${FILTRADO}, ${FILTRADO} y el secreto ${FILTRADO}`);
+    // El prefijo visible de la UI (`sk_test_ab12`, 12 caracteres) no es un secreto.
+    expect(depurarTexto('clave sk_test_ab12')).toBe('clave sk_test_ab12');
+  });
+
   it('no toca textos sin secretos', () => {
     const texto = 'Boleta 39 folio 1520 aceptada por el SII (Track ID 123456).';
     expect(depurarTexto(texto)).toBe(texto);

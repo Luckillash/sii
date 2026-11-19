@@ -50,6 +50,9 @@ const PATRONES_TEXTO: readonly [RegExp, string][] = [
   [/<TOKEN>[\s\S]*?<\/TOKEN>/gi, `<TOKEN>${FILTRADO}</TOKEN>`],
   // Bearer / Basic en cualquier texto.
   [/\b(Bearer|Basic)\s+[A-Za-z0-9._~+/=-]+/g, `$1 ${FILTRADO}`],
+  // API keys de la API pública y secretos HMAC de los webhooks (Fase 11).
+  [/\bsk_(?:test|live)_[0-9a-f]{16,}\b/gi, FILTRADO],
+  [/\bwhsec_[0-9a-f]{16,}\b/gi, FILTRADO],
   // JWT (por ejemplo, claves de Supabase).
   [/\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b/g, FILTRADO],
   // Parámetros de query con nombre sensible (?token=..., &clave=...). `s` es la firma
