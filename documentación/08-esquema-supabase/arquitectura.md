@@ -59,10 +59,11 @@ solo lectura en `supabase/verificaciones/` ([despliegue](despliegue.md)).
 | `0016_pagos` (**aplicada el 2026-11-18**, antes del deploy de la Fase 10; verificación 20/20) | Tablas `clientes_pago`, `pagos`, `eventos_pasarela`; `suscripciones.cancelar_al_fin_periodo`, `sincronizada_en` e índice `suscripciones_externa_unica`; RPC `activar_suscripcion` (solo `service_role`) |
 | `0017_cron_suscripciones` (**aplicada el 2026-11-18**, después del deploy de la Fase 10) | Job de `pg_cron` `sincronizar-suscripciones` (`41 * * * *`, `/api/cron/suscripciones`) |
 | `0018_api_webhooks` (**aplicada el 2026-11-19**, antes del deploy de la Fase 11; verificación 23/23) | Tabla `api_idempotencia`; RPC de la API pública y de los webhooks (`autenticar_api_key`, idempotencia, `reclamar_entregas_webhook`, `cerrar_entrega_webhook`, `reenviar_entrega_webhook`, `probar_webhook`, `rotar_secreto_webhook`); `encolar_evento` filtrado por plan ([despliegue](despliegue.md#fase-11-migraciones-0018-y-0019)) |
+| `0019_cron_webhooks` (**aplicada el 2026-11-19**, después del deploy de la Fase 11; verificación 9/9) | Jobs de `pg_cron` `entregar-webhooks` (`* * * * *`, `/api/cron/webhooks`), `limpiar-webhook-entregas` (`37 4 * * *`) y `limpiar-api-idempotencia` (`47 4 * * *`) |
 
-Aplicadas en producción: `0001`–`0018` (la `0011` y la `0012`, el 2026-11-15; la `0013` y la
+Aplicadas en producción: `0001`–`0019` (la `0011` y la `0012`, el 2026-11-15; la `0013` y la
 `0014`, el 2026-11-17, la 0014 después del deploy de la Fase 8; la `0015` y la `0016`, el
-2026-11-18, la `0017` después del deploy de la Fase 10; la `0018` el 2026-11-19). Escrita y pendiente: `0019` (después del deploy de la Fase 11). Los índices de FK
+2026-11-18, la `0017` después del deploy de la Fase 10; la `0018` y la `0019` el 2026-11-19, la 0019 después del deploy de la Fase 11). Los índices de FK
 (`unindexed_foreign_keys`) van en la `0018_indices_fk` (Fase 13).
 
 ## Relaciones

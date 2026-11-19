@@ -10,10 +10,10 @@ source: ["supabase_saas_sii.sql §14 §18 §19", "PLAN-SAAS.md Fase 11", "apps/w
 
 > **Úsalo cuando:** el cliente quiere integrar su sistema con el SaaS.
 
-**Estado (2026-11-19).** Fase 11 con el código escrito; migración `0018` aplicada el
-2026-11-19 y `0019` escrita, pendiente de aplicar (después del deploy); criterio de
-aceptación pendiente
-([guía](../02-guias/api-publica.md)).
+**Estado (2026-11-19).** Fase 11 desplegada en producción (`169e2e5`); migraciones
+`0018` (antes del deploy) y `0019` (después) aplicadas el 2026-11-19; Firewall de Vercel
+con el límite por IP en `/api/v1/*`; criterio de aceptación **cumplido** el 2026-11-19
+([guía](../02-guias/api-publica.md#criterio-de-aceptación-2026-11-19)).
 
 | Mecanismo | Para qué | Quién | Detalle |
 |---|---|---|---|

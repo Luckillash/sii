@@ -14,8 +14,8 @@ source: ["apps/web/src/server/pagos/", "apps/web/src/app/[org]/configuracion/pla
 
 ## API pública y webhooks (Fase 11)
 
-Código escrito; migración `0018` **aplicada el 2026-11-19**; la `0019`, escrita y pendiente de
-aplicar (después del deploy). Detalle en la
+Desplegada en *Production* (`169e2e5`) y con el criterio de aceptación cumplido el 2026-11-19;
+migraciones `0018` y `0019` **aplicadas el 2026-11-19**. Detalle en la
 [guía](../02-guias/api-publica.md). Las RPC nuevas (0018) están en
 [RPC de integraciones](rpc-integraciones.md).
 

@@ -161,7 +161,7 @@ Reglas para el desarrollo:
 | `SUPABASE_SECRET_KEY` (`sb_secret_…`), segundo uso | la misma variable | `src/server/supabase/clave-auth.ts`: llamadas a `supabase.auth.*` en nombre de la persona con `sb-forwarded-for` (su IP real), para que los límites por IP de Auth no vean solo la IP de Vercel. Con esta clave Auth omite el captcha (la app verifica Turnstile) y la Data API correría como service_role: nunca usar esos clientes para datos |
 | `cron_token` | Supabase Vault (secreto con nombre, creado a mano; existe en producción) | los jobs de `pg_cron` de la `0014_cron` (aplicada el 2026-11-17) lo leen de `vault.decrypted_secrets` **en cada corrida** y lo envían como `Authorization: Bearer` a `/api/cron/*`; nunca queda en `cron.job.command`. Igual a `CRON_SECRET` |
 | `CRON_SECRET` (detalle) | variable de entorno de Vercel (*Production*, *sensitive*) y `.env.local` | `envCron()` de `src/server/env.ts` (mínimo 16 caracteres; opcional: sin ella las rutas `/api/cron/*` responden **503** y no ejecutan nada). `autorizarCron` (`src/server/cron/autorizacion.ts`) compara el Bearer en tiempo constante (SHA-256 de los dos lados y `timingSafeEqual`); otro valor → **401**. Rotar: cambiar `cron_token` en Vault y `CRON_SECRET` en Vercel a la vez y redesplegar, sin migración |
-| `FLOW_API_KEY`, `FLOW_SECRET_KEY` (Fase 10) | variables de entorno de Vercel (*Production*, *sensitive*) y `.env.local`. **Pendiente: aún no están cargadas** | `envFlow()` de `src/server/env.ts` (mínimo 10 caracteres cada una). Solo `server/pagos/flow.ts` las usa: la `apiKey` va en cada llamada y la secreta firma los parámetros (HMAC-SHA256, parámetro `s`); ninguna de las dos va a logs ni a Sentry (`s`, `apiKey` y `token` se filtran en las query strings) |
+| `FLOW_API_KEY`, `FLOW_SECRET_KEY` (Fase 10) | variables de entorno de Vercel (*Production*, *sensitive*) y `.env.local`. Las de **sandbox** están cargadas desde el 2026-11-18 (las cargó el usuario) | `envFlow()` de `src/server/env.ts` (mínimo 10 caracteres cada una). Solo `server/pagos/flow.ts` las usa: la `apiKey` va en cada llamada y la secreta firma los parámetros (HMAC-SHA256, parámetro `s`); ninguna de las dos va a logs ni a Sentry (`s`, `apiKey` y `token` se filtran en las query strings) |
 
 ### Cifrado de tokens y cookies
 
@@ -209,9 +209,9 @@ tarjeta y el `urlCallback` de los planes, que Flow tiene que poder alcanzar desd
 
 Durante la Fase 10 las tres de *Production* apuntan al **sandbox** (decisión D4); se pasan
 a producción en el lanzamiento ([checklist](../07-referencia/checklist-produccion.md)).
-Las claves de sandbox y de producción son distintas: no se mezclan con la otra URL. Al
-2026-11-17 no están cargadas ni en `.env.local` ni en Vercel, y `apps/web/.env.example`
-todavía no las lista ([planes y pagos](../02-guias/planes-y-pagos.md#variables-de-entorno)).
+Las claves de sandbox y de producción son distintas: no se mezclan con la otra URL. Las de
+sandbox están cargadas desde el 2026-11-18 en `.env.local` y en Vercel *Production* (las
+cargó el usuario), y `apps/web/.env.example` las lista ([planes y pagos](../02-guias/planes-y-pagos.md#variables-de-entorno)).
 
 ## API keys de la API pública y ambiente del SII (Fase 11)
 

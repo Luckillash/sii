@@ -185,7 +185,9 @@ Lo comprueban `supabase/verificaciones/0016_pagos.sql` (11–13 y 18) y
 
 ## Tabla y funciones de la migración 0018 (aplicada el 2026-11-19)
 
-API pública y webhooks (Fase 11). Se aplicó antes del deploy de la fase.
+API pública y webhooks (Fase 11). Se aplicó antes del deploy de la fase. La `0019_cron_webhooks`
+(aplicada el 2026-11-19, después del deploy) solo agrega jobs de `pg_cron` (`entregar-webhooks`,
+`limpiar-webhook-entregas`, `limpiar-api-idempotencia`): no cambia tablas, políticas ni privilegios.
 
 | Tabla | RLS y política | Privilegios |
 |---|---|---|

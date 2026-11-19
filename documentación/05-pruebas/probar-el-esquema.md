@@ -683,8 +683,13 @@ migrar, `0018_api_webhooks.sql` 2/23; después, 23/23 y `rls-fase11-api.sql` 39/
 `supabase db query --remote --yes -f`: el CLI exige `--yes` en modo agente aunque el script
 termine en *rollback*), con la consulta de limpieza en 0 antes y después. Regresiones:
 `rls-fase8-notificaciones.sql` 26/26, `rls-fase10-pagos.sql` 30/30 y las verificaciones
-`0013_notificaciones.sql` 18/18 y `0016_pagos.sql` 20/20. La `0019_cron_webhooks.sql` sigue
-**pendiente** (se aplica después del deploy).
+`0013_notificaciones.sql` 18/18 y `0016_pagos.sql` 20/20.
+
+La `0019_cron_webhooks.sql` se aplicó el mismo 2026-11-19 a las 03:54 UTC, después del deploy
+(el `--dry-run` listó solo la 0019; `db push --yes`), y la verificación dio **9/9** con el MCP
+`execute_sql` como `postgres` (la 6 descifra `cron_token`). La primera corrida de `entregar-webhooks` (03:55) quedó `succeeded`,
+`net._http_response` 200 con `{reclamadas:0,…,errores:0}` y el monitor `cron-webhooks` de
+Sentry en `ok`. La comprobación 10 de `0014_cron.sql` queda en `false` (esperado).
 
 ## 15. Lo que no se prueba con SQL
 

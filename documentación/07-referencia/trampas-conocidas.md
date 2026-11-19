@@ -1151,3 +1151,12 @@ Notas de la implementación (rutas, entrega y base):
   necesita una deduplicación propia.
 - **`skip locked` entre dos corridas concurrentes** no está probado (PGlite tiene una sola
   conexión); la verificación solo revisa el cuerpo de la función.
+- **El Firewall de un proyecto sin configuración previa solo se puede crear con el CLI.** El
+  MCP de Vercel responde 404 «Seawall Config not found» y no puede crear la primera regla.
+  Se usa `vercel firewall rules add` y luego `vercel firewall publish`, que exige
+  `--confirm-name <proyecto>` y `--effects-digest <digest>`.
+  Así se creó, el 2026-11-19, la regla «API pública: límite por IP».
+- **El plan Contador no incluye la API.** Para probar el criterio hubo que pasar `servicio` a
+  API desde Configuración → Plan (con Flow sandbox, el 2026-11-19); sin `planes.incluye_api`
+  no se pueden crear claves ni usar `/api/v1`, y sin `incluye_webhooks` `encolar_evento` no
+  encola entregas.

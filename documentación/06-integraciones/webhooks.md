@@ -10,11 +10,14 @@ source: ["supabase_saas_sii.sql §14 §15", "supabase/migrations/0018_api_webhoo
 
 > **Úsalo cuando:** implementas la entrega o la recepción de webhooks.
 
-**Estado (2026-11-19).** Fase 11: alta, entrega y panel escritos y probados con Vitest;
-migración `0018_api_webhooks` **aplicada en producción el 2026-11-19** (antes del deploy);
-`0019_cron_webhooks` (job `entregar-webhooks`, después del deploy) **escrita, pendiente de
-aplicar**. Hasta que se despliegue y se aplique la 0019, las filas se encolan pero nadie las
-entrega. Implementación en la
+**Estado (2026-11-19).** Fase 11 desplegada en producción (`169e2e5`): alta, entrega y
+panel funcionando. Migración `0018_api_webhooks` aplicada el 2026-11-19 (antes del deploy) y
+`0019_cron_webhooks` (job `entregar-webhooks`) aplicada el mismo día a las 03:54 UTC, después
+del deploy; sin la 0019 las filas se encolarían pero nadie las entregaría. Criterio de
+aceptación cumplido el 2026-11-19: `webhook.prueba` y `documento.aceptado` (folio 43)
+entregados con firma válida, `envio.actualizado` también, todos `entregado` al primer
+intento ([registro](../02-guias/api-publica.md#criterio-de-aceptación-2026-11-19)).
+Implementación en la
 [guía de la API pública](../02-guias/api-publica.md#webhooks).
 
 ## Alta y administración

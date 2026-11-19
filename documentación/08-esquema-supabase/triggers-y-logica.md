@@ -164,7 +164,7 @@ y simulación con `rollback` `rls-fase5-autorizacion-externa.sql`
 
 ## Webhooks: `encolar_evento` y `tg_evento_documento` (migración 0018)
 
-**Escrita, pendiente de aplicar** (Fase 11, antes del deploy). Las dos funciones se
+**Aplicada el 2026-11-19** (Fase 11, antes del deploy). Las dos funciones se
 reemplazan con `create or replace` (los triggers y los privilegios no cambian):
 
 - `encolar_evento(org, evento, payload)` inserta, igual que en la 0001, una fila en

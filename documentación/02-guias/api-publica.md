@@ -12,12 +12,13 @@ source: ["PLAN-SAAS.md Fase 11", "apps/web/src/lib/api-publica.ts", "apps/web/sr
 > Configuración → API o Webhooks, la especificación OpenAPI o la página `/docs/api`, o
 > tienes que explicarle a un cliente cómo integrar su sistema.
 
-**Estado (2026-11-19).** Fase 11 con el código escrito y probado con Vitest y dobles (sin
-salir al SII). Migración `0018_api_webhooks` **aplicada en producción el 2026-11-19**, antes
-del deploy; `0019_cron_webhooks` (después del deploy) **escrita, pendiente de aplicar**. **Criterio de aceptación
-pendiente:** un cliente de ejemplo emite una boleta por la API, repite la petición con la
-misma `Idempotency-Key` sin duplicar y recibe el webhook `documento.aceptado` con firma
-válida.
+**Estado (2026-11-19).** Fase 11 **desplegada en producción** (`169e2e5`) y con el
+[criterio de aceptación cumplido](#criterio-de-aceptación-2026-11-19) el mismo día. Migración
+`0018_api_webhooks` aplicada el 2026-11-19, antes del deploy; `0019_cron_webhooks` aplicada
+el 2026-11-19 a las 03:54 UTC, después del deploy. Firewall de Vercel con la regla de
+límite por IP en `/api/v1/*` configurada. El criterio: un cliente de ejemplo emite una
+boleta por la API, repite la petición con la misma `Idempotency-Key` sin duplicar y recibe
+el webhook `documento.aceptado` con firma válida.
 
 La documentación para los clientes es la página pública **`/docs/api`** (sale del mismo
 objeto que `/api/v1/openapi.json`); esta guía es la de quien mantiene el código.
@@ -184,7 +185,7 @@ datos. Catálogo de eventos y payloads en [webhooks](../06-integraciones/webhook
 
 ### Entrega (`/api/cron/webhooks`)
 
-- `pg_cron` `entregar-webhooks` cada minuto (0019, después del deploy) → `POST
+- `pg_cron` `entregar-webhooks` cada minuto (0019, aplicada el 2026-11-19 después del deploy) → `POST
   /api/cron/webhooks` con el Bearer de Vault. `autorizarCron`, monitor de Sentry
   `cron-webhooks`, `maxDuration = 60`; responde solo conteos.
 - `reclamar_entregas_webhook(32, 120)`: descarta primero las que ya no corresponden
@@ -212,9 +213,11 @@ datos. Catálogo de eventos y payloads en [webhooks](../06-integraciones/webhook
 
 ## Rate limiting
 
-Regla del Firewall de Vercel por IP en `/api/v1/*` (se configura por MCP al desplegar; ver
-[checklist](../07-referencia/checklist-produccion.md#api-pública-y-webhooks-fase-11)), que
-responde 429 **antes de llegar a la app**: su cuerpo no es el JSON de error de la API (puede
+Regla del Firewall de Vercel por IP en `/api/v1/*`, **configurada el 2026-11-19** (ver
+[checklist](../07-referencia/checklist-produccion.md#api-pública-y-webhooks-fase-11)):
+«API pública: límite por IP», ruta que empieza con `/api/v1/`, ventana fija (`fixed_window`)
+de 60 s, **120 peticiones por IP**, acción `rate_limit` (429). El Firewall quedó `Enabled`
+con 1 regla activa. Responde 429 **antes de llegar a la app**: su cuerpo no es el JSON de error de la API (puede
 ser HTML o vacío), así que el cliente no debe leer `error.codigo`; espera y repite con la misma
 `Idempotency-Key`. `limite_excedido` sigue en el contrato pero la app no lo emite, y el
 OpenAPI documenta el 429 sin cuerpo. No hay limitador en la base: la cuota
@@ -228,8 +231,9 @@ del plan y los folios ya acotan las emisiones.
    `rls-fase11-api.sql`, tipos. Deploy y humo: `/api/v1/documentos` sin clave → 401 JSON;
    `/api/v1/openapi.json` → 200; `/docs/api` → 200; `/api/cron/webhooks` sin Bearer → 401.
    Aplicar la 0019 y configurar el Firewall.
-2. Organización con un plan que incluya API y webhooks (`servicio` está en Contador, que no
-   los incluye: lo decide el usuario).
+2. Organización con un plan que incluya API y webhooks (`servicio` estaba en Contador, que no
+   los incluye: el 2026-11-19 se pasó a API con Flow sandbox, ver el
+   [registro](#criterio-de-aceptación-2026-11-19)).
 3. En Configuración → API, una clave `sk_test` de la empresa del piloto (`documentos:emitir`,
    `documentos:leer`, `envios:leer`).
 4. Receptor `receptor.mjs` publicado en una URL https:443 (Vercel Sandbox o túnel), webhook
@@ -242,3 +246,59 @@ del plan y los folios ya acotan las emisiones.
 6. Cuando el seguimiento deja la boleta `aceptado`, el receptor registra
    `documento.aceptado` con firma válida y `webhook_entregas` queda `entregado` con 200.
 7. Limpieza: revocar la clave, pausar o borrar el webhook, cerrar el receptor.
+
+## Criterio de aceptación (2026-11-19)
+
+Cumplido en producción el 2026-11-19, con el OK del usuario y contra el sandbox de Flow y la
+certificación del SII (sin folios de producción).
+
+**Despliegue y humo** (deploy `169e2e5`, `READY`):
+
+- `/api/v1/documentos` sin clave → 401 `no_autenticado`; con una clave bien formada que no
+  existe → 401 `clave_invalida`.
+- `/api/v1/openapi.json` y `/docs/api` → 200.
+- `POST /api/cron/webhooks` sin Bearer → 401.
+- `/servicio/configuracion/api` y `/servicio/configuracion/webhooks` sin sesión → 307 a
+  `/ingresar?siguiente=…`.
+- Sin errores de runtime.
+
+**`0019` y cron.** Aplicada a las 03:54 UTC, después del deploy (`--dry-run` con solo la
+0019; `db push --yes`); verificación `0019_cron_webhooks.sql` 9/9 con el MCP `execute_sql`
+como `postgres`. La primera corrida de `entregar-webhooks` (03:55) quedó `succeeded`, con
+`net._http_response` 200 y `{reclamadas:0,…,errores:0}`, y el monitor `cron-webhooks` de
+Sentry en `ok` (Production). La comprobación 10 de `0014_cron.sql` queda en `false`
+(esperado).
+
+**Firewall.** El proyecto no tenía configuración de Firewall: el MCP de Vercel responde 404
+«Seawall Config not found» y no puede crear la primera regla, así que se creó con el CLI
+(`vercel firewall rules add` y `vercel firewall publish --confirm-name sii --effects-digest …`).
+Regla «API pública: límite por IP»: ruta que empieza con `/api/v1/`, `fixed_window` de 60 s,
+120 peticiones por IP, acción `rate_limit` (429). Firewall `Enabled`, 1 regla activa. El 429
+lo responde Vercel, sin cuerpo JSON garantizado.
+
+**Plan.** `servicio` pasó de Contador a API desde `/servicio/configuracion/plan` con Flow
+sandbox (saldo a favor $ 8.334, próximo cobro 19-12-2026; período del 19-11 al 18-12-2026;
+misma suscripción de Flow sandbox).
+
+**Recorrido:**
+
+1. Clave `sk_test_fba8…` «Prueba criterio Fase 11» (empresa 20.630.500-2; alcances
+   `documentos:leer`, `documentos:emitir`, `envios:leer`; 30 días). Receptor
+   `scripts/ejemplo-api/receptor.mjs` en el puerto 3000, expuesto con un túnel rápido de
+   `cloudflared` (`*.trycloudflare.com`). Webhook con `documento.aceptado`,
+   `documento.aceptado_con_reparos`, `documento.rechazado`, `documento.incierto` y
+   `envio.actualizado`.
+2. «Enviar prueba»: `webhook.prueba` entregado a las 04:07:01 UTC con firma válida (entrega
+   17, HTTP 200).
+3. `emitir.mjs --clave=criterio-fase11-20261119-01`: 201, boleta 39 folio 43, Track ID
+   34120364. Repetición con la misma clave: 201, mismo documento y folio, con
+   `Idempotent-Replayed: true`.
+4. En la base: 1 documento con esa clave y `origen = 'api'`; `siguiente_folio = 44`; 1
+   operación `emitir` `ok` con `api_key_id` y `usuario_id` nulo; `api_idempotencia`
+   `terminada` con 201; 0 folios anulados.
+5. Seguimiento: envío EPR (1 aceptado, 0 rechazos, 0 reparos) y boleta `aceptado`.
+   `documento.aceptado` del folio 43 entregado a las 04:11:01 UTC con firma válida (entrega
+   19, intento 1, HTTP 200); también `envio.actualizado` (entregas 18 y 20). Todas
+   `entregado` al primer intento.
+6. Limpieza: webhook pausado (0 entregas en cola), clave revocada (la API responde 401
+   `clave_revocada`), túnel y receptor detenidos. Quedan 2 folios de certificación (44–45).

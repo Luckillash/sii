@@ -25,7 +25,7 @@ Fuente: `apps/web/src/lib/api-publica.ts` (constantes sincronizadas con la 0018 
 | Página de un listado | 20 por defecto, 100 como máximo (`LIMITE_PAGINA`, `LIMITE_PAGINA_MAXIMO`) | `400 parametro_invalido` |
 | `Idempotency-Key` | 1 a 200 caracteres ASCII visibles (`FORMATO_IDEMPOTENCIA`; la base acepta 255 por el `#n` del lote) | `400 idempotencia_invalida` |
 | Arriendo de una clave en curso | 120 s (`SEGUNDOS_ARRIENDO_IDEMPOTENCIA`) | Después, otra petición con la misma clave la retoma |
-| Peticiones por IP | Regla del Firewall de Vercel en `/api/v1/*` (propuesta: 120 por minuto) | `429` del firewall, sin el JSON de error de la API |
+| Peticiones por IP | Regla «API pública: límite por IP» del Firewall de Vercel en `/api/v1/*` (configurada el 2026-11-19): ventana fija de 60 s, 120 por IP | `429` del firewall, sin el JSON de error de la API |
 | `ultimo_uso_en` de una clave | Se actualiza como máximo una vez por minuto | — |
 | Boletas del mes | Cupo del plan (`plan_vigente`) | `403 cuota_agotada` |
 | Revisión antes de timbrar folios (producción) | 30 minutos, un solo uso | `422 revision_requerida` |

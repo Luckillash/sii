@@ -364,8 +364,9 @@ Ninguna devuelve datos del pago, de la tarjeta ni de la organización.
 
 ## Probar en el sandbox de Flow
 
-**Todavía no se ha hecho.** Criterio de aceptación de la fase: cambiar de plan en el sandbox
-actualiza `suscripciones` y los límites se aplican en la siguiente emisión.
+Criterio de aceptación de la fase: cambiar de plan en el sandbox actualiza `suscripciones` y
+los límites se aplican en la siguiente emisión. **Cumplido el 2026-11-18**: el
+[registro](#criterio-de-aceptación-2026-11-18) está al final de esta sección.
 
 Requisitos: las migraciones `0015` y `0016` aplicadas (hecho el 2026-11-18), las `FLOW_*` del sandbox cargadas y
 la Fase 10 desplegada en *Production*. Conviene probar en el deploy de *Production* y no
@@ -418,3 +419,48 @@ La mora no se puede forzar fácil en el sandbox (hace falta un cobro que falle y
 7 días); el comportamiento de `activar_suscripcion` con una `morosa` lo cubre
 `rls-fase10-pagos.sql` (11), y la lógica de `morose`, `suscripciones.test.ts` y
 `flow-pasarela.test.ts`.
+
+## Criterio de aceptación (2026-11-18)
+
+Cumplido en producción el 2026-11-18, contra el sandbox de Flow y con la organización
+`servicio`.
+
+**Recorrido:**
+
+1. Contratar Pyme desde `/servicio/configuracion/plan` llevó a Flow a registrar la tarjeta
+   (la ingresó el usuario: tarjeta de prueba, Visa terminada en 6623) y volvió con
+   `?pago=suscrita`. Certificación quedó `cancelada` y Pyme `activa` con
+   `proveedor_pago = flow`, período del 18-11 al 17-12, un pago de $ 14.990 `pagado`, un
+   evento `registro` `procesado` y `plan_vigente` = Pyme (1.000 boletas, producción).
+2. Cambiar a Contador desde la UI mostró el prorrateo de Flow ($ 35.000 ahora, próximo cobro
+   el 18-12-2026) y, al confirmar, la misma suscripción de Flow quedó en Contador:
+   `plan_vigente` = Contador (10.000 boletas, 15 empresas, 10 usuarios), que es lo que leen
+   los triggers de cupos en la siguiente emisión. Comprobado con emisiones reales en
+   `rls-fase10-pagos.sql`: con Pyme la boleta 1.001 se rechaza y con Contador entra. Segundo
+   pago de $ 35.000 `pagado`.
+3. El callback de Flow llegó a producción: evento `pago` `procesado`, orden 11777257.
+
+**Hallazgos de la prueba**, corregidos y desplegados en `a1f74eb` (2026-11-18; verificado
+con una sincronización manual de `/api/cron/suscripciones`, `revisadas: 1`, `errores: 0`: los
+dos pagos quedaron con fecha, «Cargo automático» y su orden de Flow, 11777257 y 11777279):
+
+- Los importes de `subscription/get` vienen sin `payment`, así que los pagos quedaban sin
+  fecha ni medio (la tabla decía «Vence el …»). Ahora `completarFacturas` los completa con
+  `invoice/get` una sola vez y nunca borra una fecha ya guardada.
+- La orden de comercio de Flow es `sus_<id>_<importe>_<fecha hora>`, no un número: el aviso
+  quedaba `sin_asociar` y sincronizaba todas las vigentes. Ahora `suscripcionDeOrden` la lee.
+- Antes: el mensaje del contrato faltante ya no culpa a la tarjeta y la barra de boletas no
+  sale roja con cupo 0.
+
+**Primer intento fallido** (2026-11-18, 17:28 UTC): Flow respondió
+`Commerce has not automatic charge contract`, porque la cuenta sandbox no tenía cargos
+automáticos. Flow ya había creado el plan `boleteame-pyme` (14.990, 7 días, 3 reintentos,
+callback `https://boleteame.dev/api/pagos/flow/confirmacion`) y el cliente; la organización
+siguió en Certificación. El usuario habilitó los cargos automáticos en la cuenta.
+
+**Suscripción que queda a propósito.** `servicio` mantiene la suscripción de Flow sandbox
+`sus_l78a6791ff` (decisión del usuario, 2026-11-18). Desde el 2026-11-19 está en el plan
+**API** (cambiado para el criterio de la Fase 11), con el próximo cobro el 19-12-2026: Flow
+sandbox hará el cargo de prueba de la renovación y servirá para ver una renovación real por
+el callback y el cron. **Al pasar Flow a producción hay que cancelarla**: las credenciales y
+los planes de sandbox no existen en producción.

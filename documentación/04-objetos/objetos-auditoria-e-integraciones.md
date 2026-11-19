@@ -243,7 +243,7 @@ por `probar_webhook`. La entrega la hace `/api/cron/webhooks` con
 Índices: `webhook_entregas_pendientes` (0001), y en la 0018 `webhook_entregas_por_entregar`
 (`siguiente_intento_en` donde `pendiente` o `fallido`), `webhook_entregas_historial`
 (`webhook_id, id desc`) y `webhook_entregas_organizacion` (`organizacion_id, id desc`). El
-job `limpiar-webhook-entregas` (0019) borra las `entregado`/`descartado` de más de 30 días.
+job `limpiar-webhook-entregas` (0019, aplicada el 2026-11-19) borra las `entregado`/`descartado` de más de 30 días.
 
 ## `api_idempotencia` (0018)
 

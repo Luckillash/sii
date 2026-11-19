@@ -56,8 +56,9 @@ y el criterio de aceptación quedó cumplido.
 Detalle en [planes y pagos](../02-guias/planes-y-pagos.md) y los pasos de las migraciones en
 [despliegue](../08-esquema-supabase/despliegue.md#fase-10-migraciones-0015-0016-y-0017).
 
-Estado al 2026-11-18: código escrito; migraciones `0015` y `0016` aplicadas en producción.
-Pendientes la `0017`, las credenciales de Flow, el deploy y el sandbox.
+Estado al 2026-11-18: desplegada (`9d2fd8b`), migraciones `0015` a `0017` aplicadas y criterio de
+aceptación cumplido en el sandbox de Flow (hallazgos corregidos en `a1f74eb`). Falta lo de
+`Al lanzar`.
 
 ### Durante la Fase 10 (sandbox)
 
@@ -66,18 +67,23 @@ Pendientes la `0017`, las credenciales de Flow, el deploy y el sandbox.
       `rls-fase10-pagos.sql` 30/30 y `rls-fase2-tenancy.sql` 52/52, con limpieza en 0.
 - [x] `pnpm db:tipos` regenerado (2026-11-18): solo difiere de lo agregado a mano en el orden
       de `estados_sii` y `eventos_pasarela`.
-- [ ] `FLOW_API_KEY`, `FLOW_SECRET_KEY` (*Sensitive*) y
-      `FLOW_API_URL=https://sandbox.flow.cl/api` en Vercel *Production* y en `.env.local`.
-- [ ] Deploy de la Fase 10; `/api/cron/suscripciones` sin Bearer → 401;
+- [x] `FLOW_API_KEY`, `FLOW_SECRET_KEY` (*Sensitive*) y
+      `FLOW_API_URL=https://sandbox.flow.cl/api` en Vercel *Production* y en `.env.local`
+      (2026-11-18, las cargó el usuario).
+- [x] Deploy de la Fase 10 (`9d2fd8b`, 2026-11-18); `/api/cron/suscripciones` sin Bearer → 401;
       `/api/pagos/flow/confirmacion` sin `token` → 400.
-- [ ] Migración `0017_cron_suscripciones` aplicada **después** del deploy; job
-      `sincronizar-suscripciones` en `cron.job`, `net._http_response` con 200 y el monitor
-      `cron-suscripciones` en verde en Sentry.
-- [ ] Criterio de aceptación en sandbox: contratar Pyme con la tarjeta de prueba, cambiar a
-      Contador y comprobar `suscripciones`, `pagos` y que la siguiente emisión usa el cupo
-      nuevo ([cómo](../02-guias/planes-y-pagos.md#probar-en-el-sandbox-de-flow)).
-- [ ] Los planes `boleteame-pyme`, `boleteame-contador` y `boleteame-api` de la cuenta de
-      sandbox con el `urlCallback` de *Production* (no de `localhost`).
+- [x] Migración `0017_cron_suscripciones` aplicada **después** del deploy (2026-11-18); job
+      `sincronizar-suscripciones` en `cron.job` y corridas de las 17:41 a las 20:41 UTC en
+      `succeeded` con respuesta 200 de la ruta.
+- [x] Criterio de aceptación en sandbox (2026-11-18): Pyme contratada con la tarjeta de
+      prueba, cambio a Contador con el prorrateo de Flow, `suscripciones`, `pagos` y
+      `plan_vigente` comprobados, y el cupo nuevo usado por los triggers
+      ([registro](../02-guias/planes-y-pagos.md#criterio-de-aceptación-2026-11-18); [cómo](../02-guias/planes-y-pagos.md#probar-en-el-sandbox-de-flow)).
+- [x] Los planes `boleteame-pyme`, `boleteame-contador` y `boleteame-api` de la cuenta de
+      sandbox con el `urlCallback` de *Production* (no de `localhost`). Comprobado el
+      2026-11-19 con `plans/get`: los tres con `https://boleteame.dev/api/pagos/flow/confirmacion`,
+      7 días de vencimiento y 3 reintentos (creados el 18-11 y, `boleteame-api`, el 19-11 al
+      cambiar `servicio` a API).
 
 ### Al lanzar (pasar Flow a producción, Fase 13)
 
@@ -98,6 +104,8 @@ Pendientes la `0017`, las credenciales de Flow, el deploy y el sandbox.
       organizaciones que contrataron en sandbox quedan con una suscripción `activa` cuyo
       `id_externo` Flow de producción no conoce: devolverlas a Certificación con
       `activar_suscripcion` (como `service_role`) antes de cambiar las credenciales.
+      Hoy es el caso de `servicio`: su suscripción de Flow sandbox `sus_l78a6791ff` (plan API,
+      próximo cobro el 19-12-2026) se dejó a propósito y hay que cancelarla.
 - [ ] **Boleta propia de Boletéame por cada cobro** (cumplimiento tributario del SaaS): Flow
       envía su comprobante de pago, que no es un documento tributario. Pendiente, antes del
       lanzamiento.
@@ -108,8 +116,9 @@ Pendientes la `0017`, las credenciales de Flow, el deploy y el sandbox.
 
 ## API pública y webhooks (Fase 11)
 
-Estado (2026-11-19): código escrito; `0018` aplicada en producción el 2026-11-19; `0019`
-escrita, pendiente de aplicar (después del deploy); criterio pendiente ([guía](../02-guias/api-publica.md)).
+Estado (2026-11-19): Fase 11 desplegada en producción (`169e2e5`); `0018` y `0019` aplicadas el
+2026-11-19; Firewall configurado; criterio de aceptación cumplido el mismo día
+([guía](../02-guias/api-publica.md#criterio-de-aceptación-2026-11-19)).
 
 ### Al desplegar la fase
 
@@ -128,24 +137,42 @@ escrita, pendiente de aplicar (después del deploy); criterio pendiente ([guía]
       `rls_enabled_no_policy` en `api_idempotencia` y
       `authenticated_security_definer_function_executable` en `probar_webhook`,
       `reenviar_entrega_webhook` y `rotar_secreto_webhook`.
-- [ ] Deploy y humo sin sesión: `GET /api/v1/documentos` → 401 JSON `no_autenticado`;
+- [x] Deploy `169e2e5` (`READY`) y humo sin sesión (2026-11-19): `GET /api/v1/documentos` →
+      401 JSON `no_autenticado` (con una clave bien formada inexistente, 401 `clave_invalida`);
       `GET /api/v1/openapi.json` → 200; `/docs/api` → 200; `POST /api/cron/webhooks` sin
-      Bearer → 401 (no 503: `CRON_SECRET` está configurado).
-- [ ] `0019_cron_webhooks` aplicada **después** del deploy: jobs `entregar-webhooks`
-      (`* * * * *`, timeout 60 s) y `limpiar-webhook-entregas` (`37 4 * * *`) activos;
-      `net._http_response` con 200 y el monitor de Sentry `cron-webhooks` en `ok`. La
-      comprobación 10 de `0014_cron.sql` pasa a `false` (es lo esperado).
-- [ ] **Firewall de Vercel:** regla de *rate limiting* por IP en `/api/v1/*` (propuesta: 120
-      peticiones por minuto, acción 429), revisando el límite de reglas del plan de Vercel.
-      Probar que una ráfaga recibe 429 y que `/api/cron/*` no queda afectado.
+      Bearer → 401 (no 503: `CRON_SECRET` está configurado); `/servicio/configuracion/api` y
+      `/webhooks` sin sesión → 307 a `/ingresar?siguiente=…`. Sin errores de runtime.
+- [x] `0019_cron_webhooks` aplicada **después** del deploy (2026-11-19, 03:54 UTC; el
+      `--dry-run` listó solo la 0019; `db push --yes`): jobs `entregar-webhooks`
+      (`* * * * *`, timeout 60 s), `limpiar-webhook-entregas` (`37 4 * * *`) y
+      `limpiar-api-idempotencia` (`47 4 * * *`). Verificación `0019_cron_webhooks.sql` 9/9 con
+      el MCP `execute_sql` como `postgres`. Primera corrida (03:55) `succeeded`,
+      `net._http_response` 200 con `{reclamadas:0,…,errores:0}` y el monitor de Sentry
+      `cron-webhooks` en `ok` (Production). La comprobación 10 de `0014_cron.sql` queda en
+      `false` (es lo esperado).
+- [x] **Firewall de Vercel** (2026-11-19): el proyecto no tenía configuración de Firewall y el
+      MCP de Vercel no puede crear la primera regla (404 «Seawall Config not found»), así que
+      se creó con el CLI (`vercel firewall rules add` y `vercel firewall publish
+      --confirm-name sii --effects-digest …`). Regla «API pública: límite por IP»: ruta que
+      empieza con `/api/v1/`, `fixed_window` de 60 s, 120 peticiones por IP, acción
+      `rate_limit` (429). Firewall `Enabled`, 1 regla activa; el 429 lo responde Vercel, sin
+      cuerpo JSON garantizado. Como la regla solo cubre `/api/v1/`, `/api/cron/*` no queda
+      afectado.
+- [x] **Criterio de aceptación cumplido (2026-11-19):** `servicio` pasó a API con Flow sandbox;
+      clave `sk_test_` de prueba; `webhook.prueba` con firma válida; boleta 39 folio 43 (Track
+      ID 34120364) emitida por la API, repetición con la misma clave devuelve el mismo
+      documento con `Idempotent-Replayed: true`; `documento.aceptado` entregado con firma
+      válida al primer intento
+      ([registro](../02-guias/api-publica.md#criterio-de-aceptación-2026-11-19)).
 - [ ] Sentry: alerta para los 5xx con la etiqueta `api_publica_ruta` (§4.8 del plan).
 
 ### Antes de abrir la API a clientes
 
 - [ ] Ninguna ruta de `/api/v1` lee o escribe sin filtrar por la organización de la clave
       (revisión de seguridad de la Fase 13).
-- [ ] Claves y webhooks de prueba del criterio revocados o borrados; receptor de prueba
-      apagado.
+- [x] Claves y webhooks de prueba del criterio revocados o borrados; receptor de prueba
+      apagado (2026-11-19: webhook pausado con 0 entregas en cola, clave revocada, túnel y
+      receptor detenidos).
 - [ ] `/docs/api` revisada en claro y oscuro; textos sin prometer factura ni otros DTE.
 - [ ] Decidir la agrupación de varias boletas en un solo envío para `POST /documentos/lote`
       (hoy cada boleta va en su propio envío).

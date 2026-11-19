@@ -10,8 +10,11 @@ source: ["supabase_saas_sii.sql §14", "supabase/migrations/0018_api_webhooks.sq
 
 > **Úsalo cuando:** implementas o usas la autenticación por API key.
 
-**Estado (2026-11-19).** Fase 11: código escrito; `autenticar_api_key` y `api_idempotencia`
-llegan con la migración `0018` (aplicada en producción el 2026-11-19).
+**Estado (2026-11-19).** Fase 11 desplegada en producción; `autenticar_api_key` y
+`api_idempotencia` llegan con la migración `0018` (aplicada el 2026-11-19). Criterio de
+aceptación cumplido el mismo día con una clave `sk_test_` de prueba, ya revocada (la API
+responde 401 `clave_revocada`)
+([registro](../02-guias/api-publica.md#criterio-de-aceptación-2026-11-19)).
 
 ## Crear
 

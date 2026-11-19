@@ -13,7 +13,9 @@ source: ["supabase_saas_sii.sql §14 §15", "supabase/migrations/0018_api_webhoo
 
 > **Estado:** las RPC de la 0001 están aplicadas. Las de la **0018** se aplicaron en
 > producción el 2026-11-19, antes del deploy de la Fase 11 (verificación 23/23 y simulación
-> `rls-fase11-api.sql` 39/39, con la limpieza en 0).
+> `rls-fase11-api.sql` 39/39, con la limpieza en 0). La **0019** (aplicada el mismo día, después
+> del deploy) solo agrega los jobs de `pg_cron` que llaman a `/api/cron/webhooks` y limpian
+> entregas e idempotencia: no crea RPC.
 
 ## Resumen
 

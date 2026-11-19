@@ -33,7 +33,7 @@ Viven en `supabase/migrations/` con prefijo **secuencial de 4 dígitos** (no tim
 |---|---|
 | `0001_esquema_inicial.sql` | `supabase_saas_sii.sql` **byte a byte** (19 secciones: tipos, tablas, RLS, Vault, Storage, Realtime). Nunca se edita |
 | `0002_extensiones_cron.sql` | `pg_cron` (schema `pg_catalog`) y `pg_net` (schema `extensions`) |
-| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, y la `0010_verificar_autorizacion`, aplicada el 2026-11-14, son de la Fase 5: ver [abajo](#fase-5-migración-0008); la `0011_folios`, de la Fase 6, se aplicó el 2026-11-15: ver [abajo](#fase-6-migración-0011); la `0012_folio_anulado`, de la Fase 7, se aplicó el 2026-11-15: ver [abajo](#fase-7-migración-0012); la `0013_notificaciones` y la `0014_cron`, de la Fase 8, se aplicaron el 2026-11-17 (la 0014 después del deploy): ver [abajo](#fase-8-migraciones-0013-y-0014); la `0015_planes_comerciales` y la `0016_pagos`, de la Fase 10, se aplicaron el 2026-11-18 (antes del deploy) y la `0017_cron_suscripciones` después del deploy, el mismo día: ver [abajo](#fase-10-migraciones-0015-0016-y-0017); la `0018_api_webhooks` y la `0019_cron_webhooks`, de la Fase 11: la 0018 se aplicó el 2026-11-19, antes del deploy, y la 0019 está **escrita, pendiente de aplicar** (después del deploy): ver [abajo](#fase-11-migraciones-0018-y-0019)) |
+| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, y la `0010_verificar_autorizacion`, aplicada el 2026-11-14, son de la Fase 5: ver [abajo](#fase-5-migración-0008); la `0011_folios`, de la Fase 6, se aplicó el 2026-11-15: ver [abajo](#fase-6-migración-0011); la `0012_folio_anulado`, de la Fase 7, se aplicó el 2026-11-15: ver [abajo](#fase-7-migración-0012); la `0013_notificaciones` y la `0014_cron`, de la Fase 8, se aplicaron el 2026-11-17 (la 0014 después del deploy): ver [abajo](#fase-8-migraciones-0013-y-0014); la `0015_planes_comerciales` y la `0016_pagos`, de la Fase 10, se aplicaron el 2026-11-18 (antes del deploy) y la `0017_cron_suscripciones` después del deploy, el mismo día: ver [abajo](#fase-10-migraciones-0015-0016-y-0017); la `0018_api_webhooks` y la `0019_cron_webhooks`, de la Fase 11: la 0018 se aplicó el 2026-11-19, antes del deploy, y la 0019 el mismo día, después del deploy: ver [abajo](#fase-11-migraciones-0018-y-0019)) |
 
 Reglas, todas derivadas de que la única base es producción:
 
@@ -511,9 +511,9 @@ en el estado de arriba):
 ### Fase 10: migraciones 0015, 0016 y 0017
 
 **Estado: la 0015 y la 0016 aplicadas en producción el 2026-11-18, con autorización del
-usuario, antes del deploy de la Fase 10; la 0017 sigue pendiente (después del deploy).**
-Todavía no hay deploy ni credenciales de Flow. Orden: **`0015` y `0016` antes del deploy;
-`0017` después.**
+usuario, antes del deploy de la Fase 10 (`9d2fd8b`); la 0017 aplicada el mismo día, después
+del deploy. Criterio de aceptación cumplido el 2026-11-18.** Orden: **`0015` y `0016` antes
+del deploy; `0017` después.**
 
 Registro del 2026-11-18:
 
@@ -576,8 +576,9 @@ usuarios y el lector, cuarto miembro, ya no cabría. Sirve con y sin la 0015. En
 `rls-fase3-empresas.sql` solo cambió la cabecera (el alta directa como `postgres` no revisa
 el cupo, así que Pyme con 1 empresa no la afecta).
 
-Pasos, **con autorización del usuario** (1 a 6 hechos el 2026-11-18; los resultados, en el
-registro de arriba; 7 en adelante, pendientes):
+Pasos, **con autorización del usuario** (todos hechos el 2026-11-18; los resultados de 1 a 6,
+en el registro de arriba, y los de 7 a 10, en el registro del deploy, la 0017 y el criterio
+que sigue a la lista):
 
 1. Leer las tres migraciones completas y revisar el respaldo (panel → *Database → Backups*).
 2. Antes de migrar: `0015_planes_comerciales.sql` en **1/10 o 2/10** (la 7; la 9 solo si
@@ -612,17 +613,36 @@ registro de arriba; 7 en adelante, pendientes):
    `/api/cron`») sale `false` con detalle `sincronizar-suscripciones`; es esperado (esa
    verificación se escribió para los jobs de la Fase 8).
 10. Criterio de aceptación en sandbox ([cómo probar](../02-guias/planes-y-pagos.md#probar-en-el-sandbox-de-flow)).
-11. Actualizar la documentación con los resultados reales (hecho para la 0015 y la 0016 el
-    2026-11-18; falta la 0017, el deploy y el sandbox): esta sección y la tabla de Migraciones, `rls-y-privilegios.md`,
+11. Actualizar la documentación con los resultados reales (hecho el 2026-11-18 para la 0015
+    y la 0016 y el 2026-11-19 para el deploy, la 0017 y el criterio): esta sección y la tabla de Migraciones, `rls-y-privilegios.md`,
     `03-api-reference/rpc-backend.md`, `acceso-por-tabla.md`, `indice-operaciones.md`,
     `04-objetos/objetos-tenancy.md`, `01-fundamentos/tenancy-y-roles.md`,
     `ambientes-y-credenciales.md`, `02-guias/planes-y-pagos.md`, `onboarding-organizacion.md`,
     `05-pruebas/probar-el-esquema.md` (§1 y §13), `07-referencia/trampas-conocidas.md`,
     `checklist-produccion.md` y `README.md` (`grep -rn "pendientes\? de aplicar" documentación/`).
 
+Registro del deploy, la 0017 y el criterio (2026-11-18, todo en producción):
+
+- Variables (paso 7): credenciales de Flow **sandbox** en `.env.local` y en Vercel
+  *Production* (las cargó el usuario; `FLOW_API_KEY` y `FLOW_SECRET_KEY` *sensitive*,
+  `FLOW_API_URL=https://sandbox.flow.cl/api`).
+- Deploy (paso 8): `9d2fd8b` `READY`, creado después de las variables `FLOW_*`. Humo sin
+  sesión: `/` 200, `/servicio/configuracion/plan` 307 a `/ingresar?siguiente=…`,
+  `/api/pagos/flow/registro` sin token 303 a `/bienvenida`, `/api/pagos/flow/confirmacion` sin
+  token 400 y `/api/cron/suscripciones` sin Bearer 401. Con sesión, la página de plan muestra
+  la grilla con los botones de contratar.
+- `0017` (paso 9), aplicada después del deploy (`--dry-run` con solo la 0017): job
+  `sincronizar-suscripciones` activo, `41 * * * *`, URL de producción, Bearer leído de Vault,
+  timeout 120 s. Corridas de las 17:41, 18:41, 19:41 y 20:41 UTC en `succeeded`; la ruta
+  respondió 200 `{revisadas: 0, …, avisos: {candidatas: 0, correoConfigurado: true}}` (aún no
+  había suscripciones de Flow). Sin errores de runtime salvo el rechazo de Flow del criterio.
+- Criterio (paso 10): cumplido, con el primer intento fallido, los hallazgos corregidos en
+  `a1f74eb` y la suscripción de Flow sandbox que queda a propósito en `servicio`
+  ([registro](../02-guias/planes-y-pagos.md#criterio-de-aceptación-2026-11-18)).
+
 ### Fase 11: migraciones 0018 y 0019
 
-**Estado: la 0018 aplicada en producción el 2026-11-19, antes del deploy de la Fase 11; la 0019 escrita y probada en PGlite, pendiente de aplicar (después del deploy).** Orden: **`0018` antes del
+**Estado: la 0018 aplicada en producción el 2026-11-19, antes del deploy de la Fase 11 (`169e2e5`); la 0019 aplicada el mismo día a las 03:54 UTC, después del deploy. Criterio de aceptación cumplido el 2026-11-19.** Orden: **`0018` antes del
 deploy de la Fase 11** (la API pública y el cron de webhooks la necesitan); **`0019`
 después** (si no, `pg_cron` llamaría cada minuto a una ruta que responde 404).
 
@@ -644,7 +664,7 @@ después** (si no, `pg_cron` llamaría cada minuto a una ruta que responde 404).
   corrida, timeout 60 s), `limpiar-webhook-entregas` (`37 4 * * *`) y
   `limpiar-api-idempotencia` (`47 4 * * *`: claves `terminada` de más de 30 días y
   `en_curso` abandonadas de más de 7). Idempotente; `55000`
-  sin `cron_token`.
+  sin `cron_token`. Aplicada el 2026-11-19 (registro abajo).
 
 Pruebas en PGlite (esquema 0001 y 0003–0019 con stubs de `pg_cron` y `pg_net`, en el
 scratchpad, sin tocar la base real): `0018_api_webhooks.sql` **23/23** (2/23 sin la 0018),
@@ -680,9 +700,32 @@ Registro del 2026-11-19 (todo en producción):
   `authenticated_security_definer_function_executable` en `probar_webhook`,
   `reenviar_entrega_webhook` y `rotar_secreto_webhook`. Ninguna de las seis RPC solo
   `service_role` aparece.
+- **Deploy** `169e2e5` en `READY` (después de la 0018). Humo: `/api/v1/documentos` sin clave →
+  401 `no_autenticado`; con una clave bien formada inexistente → 401 `clave_invalida`;
+  `/api/v1/openapi.json` y `/docs/api` → 200; `POST /api/cron/webhooks` sin Bearer → 401;
+  `/servicio/configuracion/api` y `/webhooks` sin sesión → 307 a `/ingresar?siguiente=…`. Sin
+  errores de runtime.
+- **0019 aplicada a las 03:54 UTC**, después del deploy: el `--dry-run` listó solo la
+  `0019_cron_webhooks`; `db push --yes`. Verificación `0019_cron_webhooks.sql` **9/9** con el
+  MCP `execute_sql` como `postgres`. Primera corrida de `entregar-webhooks` a las 03:55:
+  `succeeded`, `net._http_response` 200 con `{reclamadas:0,…,errores:0}`, y el monitor
+  `cron-webhooks` de Sentry en `ok` (Production). La comprobación 10 de `0014_cron.sql` queda
+  en `false` (esperado, ahora también con `entregar-webhooks`).
+- **Firewall de Vercel:** el proyecto no tenía configuración de Firewall (el MCP de Vercel
+  responde 404 «Seawall Config not found» y no puede crear la primera regla), así que se creó
+  con el CLI: `vercel firewall rules add` y `vercel firewall publish --confirm-name sii
+  --effects-digest …`. Regla «API pública: límite por IP»: ruta que empieza con `/api/v1/`,
+  `fixed_window` de 60 s, 120 peticiones por IP, acción `rate_limit` (429). Firewall
+  `Enabled`, 1 regla activa. El 429 lo responde Vercel, sin cuerpo JSON garantizado
+  ([trampa](../07-referencia/trampas-conocidas.md#api-pública-y-webhooks-fase-11)).
+- **Criterio de aceptación cumplido** (con el OK del usuario): `servicio` pasó de Contador a
+  API con Flow sandbox; clave `sk_test_` de prueba; `webhook.prueba` con firma válida; boleta
+  39 folio 43 (Track ID 34120364) emitida por la API y repetida con la misma clave
+  (`Idempotent-Replayed: true`); `documento.aceptado` entregado con firma válida. Detalle en la
+  [guía](../02-guias/api-publica.md#criterio-de-aceptación-2026-11-19).
 
-Pasos (con el OK del usuario; 1 a 4 hechos el 2026-11-19, los resultados en el registro de
-arriba; 5 a 7, pendientes):
+Pasos (con el OK del usuario; 1 a 7 hechos el 2026-11-19, los resultados en el registro de
+arriba):
 
 1. Anotar la hora para PITR. Correr `0018_api_webhooks.sql` antes de migrar: debe dar
    **2/23** (la 20 y la 21, lo de la 0001).
@@ -705,8 +748,8 @@ arriba; 5 a 7, pendientes):
    `net._http_response` con 200 y el monitor `cron-webhooks` de Sentry en verde. La
    comprobación 10 de `0014_cron.sql` sigue en `false` (ahora también con
    `entregar-webhooks`): esperado.
-7. Actualizar la documentación con los resultados reales (hecho para la 0018 el 2026-11-19;
-   falta la 0019, el deploy y el humo; `grep -rn "pendiente de aplicar" documentación/`): esta sección, la tabla de Migraciones y la de Tareas programadas,
+7. Actualizar la documentación con los resultados reales (hecho el 2026-11-19 para la 0018, la
+   0019, el deploy, el humo, el Firewall y el criterio; `grep -rn "pendiente de aplicar" documentación/`): esta sección, la tabla de Migraciones y la de Tareas programadas,
    `rls-y-privilegios.md`, `triggers-y-logica.md`, `vault-y-secretos.md`,
    `03-api-reference/rpc-integraciones.md`, `rpc-backend.md`, `acceso-por-tabla.md`,
    `04-objetos/objetos-auditoria-e-integraciones.md` y `05-pruebas/probar-el-esquema.md`
@@ -770,9 +813,9 @@ select cron.schedule(
 | `limpiar-tokens-sii` (tokens vencidos hace más de un día) | `17 * * * *` | 8 | `0014_cron` (aplicada) |
 | `limpiar-historial-cron` (`cron.job_run_details` de más de 7 días) | `23 3 * * *` | 8 | `0014_cron` (aplicada) |
 | `sincronizar-suscripciones` → `/api/cron/suscripciones` (mora, vuelta a Certificación tras cancelar, pagos y correo de mora; timeout 120 s) | `41 * * * *` | 10 | `0017_cron_suscripciones` (aplicada el 2026-11-18, después del deploy) |
-| `entregar-webhooks` → `/api/cron/webhooks` (entrega de webhooks con firma HMAC y backoff; timeout 60 s; siempre llama, para el monitor `cron-webhooks`) | `* * * * *` | 11 | `0019_cron_webhooks` (pendiente, después del deploy) |
-| `limpiar-webhook-entregas` (entregas `entregado`/`descartado` de más de 30 días) | `37 4 * * *` | 11 | `0019_cron_webhooks` (pendiente, después del deploy) |
-| `limpiar-api-idempotencia` (claves `terminada` de más de 30 días y `en_curso` abandonadas de más de 7) | `47 4 * * *` | 11 | `0019_cron_webhooks` (pendiente, después del deploy) |
+| `entregar-webhooks` → `/api/cron/webhooks` (entrega de webhooks con firma HMAC y backoff; timeout 60 s; siempre llama, para el monitor `cron-webhooks`) | `* * * * *` | 11 | `0019_cron_webhooks` (aplicada el 2026-11-19, después del deploy) |
+| `limpiar-webhook-entregas` (entregas `entregado`/`descartado` de más de 30 días) | `37 4 * * *` | 11 | `0019_cron_webhooks` (aplicada el 2026-11-19, después del deploy) |
+| `limpiar-api-idempotencia` (claves `terminada` de más de 30 días y `en_curso` abandonadas de más de 7) | `47 4 * * *` | 11 | `0019_cron_webhooks` (aplicada el 2026-11-19, después del deploy) |
 
 `net._http_response` no necesita limpieza: `pg_net` borra las respuestas de más de
 `pg_net.ttl` (6 horas en este proyecto).
