@@ -93,7 +93,7 @@ de cada fase sigue en sus secciones de abajo.
 
 ### Seguridad
 
-- [x] (2026-11-19/20: RLS 52/52, `service_role` auditado, `server-only` y `getUser()` con pruebas; deploy `c619a1a` con la CSP en *Report-Only* y, tras revisar en Production 13 páginas con sesión y las públicas sin violaciones, CSP en `enforce` con reportes por `/api/csp` (código listo, falta su deploy)) Revisión de seguridad: RLS por tabla según `acceso-por-tabla` (simulación de roles
+- [x] (2026-11-19/20: RLS 52/52, `service_role` auditado, `server-only` y `getUser()` con pruebas; deploy `c619a1a` con la CSP en *Report-Only* y, tras revisar en Production 13 páginas con sesión y las públicas sin violaciones, CSP en `enforce` con reportes por `/api/csp`, desplegada en `ed5df22` y verificada: Turnstile funciona y un reporte de prueba llega a Sentry) Revisión de seguridad: RLS por tabla según `acceso-por-tabla` (simulación de roles
       con `rollback`), ninguna ruta con `service_role` sin filtrar por organización (incluida
       `/api/v1`), cabeceras (CSP con Turnstile y Sentry, HSTS), `server-only` en todo
       `server/`, y `getUser()` antes de toda operación ⚠️ y de crear API keys y webhooks.
@@ -101,7 +101,7 @@ de cada fase sigue en sus secciones de abajo.
       en `crear_organizacion` (revisar antes que ninguna organización use uno), índices de
       las FK y de `operaciones_sii` (hoy `/estado` recorre la tabla). Aplicarla con su
       verificación, como las demás ([despliegue](../08-esquema-supabase/despliegue.md)).
-- [ ] **Retiro de la clave HS256 legada**: confirmar en `edge_logs` que nadie usa claves sin
+- [x] (2026-11-20: revocada, sin incidentes; Storage, PostgREST, Realtime y el panel verificados después) **Retiro de la clave HS256 legada**: confirmar en `edge_logs` que nadie usa claves sin
       prefijo `sb_` y revocar la *Previously used* en *Settings → JWT Keys*
       ([claves](../01-fundamentos/ambientes-y-credenciales.md#claves-api-de-supabase)).
 

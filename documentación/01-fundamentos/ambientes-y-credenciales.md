@@ -102,11 +102,14 @@ Solo se usan las claves nuevas (*Settings → API Keys*):
   vuelve a activarlas al instante. Para buscar quién las usa, filtra los logs del
   gateway (`edge_logs`) por `request.sb.apikey.apikey.prefix` (las legadas no tienen
   prefijo `sb_`).
-- **Retiro definitivo (pendiente, 2027):** en *Settings → JWT Keys* sigue la clave
-  HS256 legada como *Previously used* (verifica tokens antiguos). Revocarla es el paso
-  final. A diferencia del interruptor de *API Keys*, revocar una clave de firma no es
-  un cambio de un clic que se deshace: hazlo solo cuando las legadas lleven tiempo
-  desactivadas sin incidentes.
+- **Retiro definitivo (hecho el 2026-11-20, Fase 13):** la clave HS256 legada de
+  *Settings → JWT Keys* está **revocada**. Ya no se acepta ningún JWT firmado con ella,
+  incluidos los `anon` y `service_role` legados. Solo vale la ES256 vigente.
+  - Las URL firmadas de Storage ya salían con ES256.
+  - La plataforma sigue usando HS256 en algunas llamadas internas (`/admin/v1/*`, agente
+    `@supabase-infra/mgmt-api`), que respondieron 200 después de revocar.
+  - Si algo dependiera de ella, la clave revocada se puede mover a *standby* y rotar de
+    vuelta. Solo borrarla (*Delete*) es irreversible: no hacerlo.
 
 ## Sesiones de usuario y revocación
 
