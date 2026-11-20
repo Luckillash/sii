@@ -55,8 +55,9 @@ const PREFIJOS_PUBLICOS = [
 
 /**
  * Slugs que una organización no puede usar porque chocan con rutas de primer nivel
- * (`/[org]` cuelga de la raíz). El onboarding (`crear_organizacion`) debe rechazarlos;
- * la base no los conoce. Agregar aquí cada carpeta nueva de `src/app`.
+ * (`/[org]` cuelga de la raíz). El onboarding los rechaza, y la base también desde la
+ * migración 0020 (check `organizaciones_slug_no_reservado`). Agregar aquí cada carpeta
+ * nueva de `src/app`, y una migración con la lista completa (`slugs-reservados-db.test.ts`).
  */
 export const SLUGS_RESERVADOS: ReadonlySet<string> = new Set([
   'api',

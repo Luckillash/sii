@@ -93,11 +93,11 @@ de cada fase sigue en sus secciones de abajo.
 
 ### Seguridad
 
-- [ ] Revisión de seguridad: RLS por tabla según `acceso-por-tabla` (simulación de roles
+- [x] (2026-11-19/20: RLS 52/52, `service_role` auditado, `server-only` y `getUser()` con pruebas; deploy `c619a1a` con la CSP en *Report-Only* y, tras revisar en Production 13 páginas con sesión y las públicas sin violaciones, CSP en `enforce` con reportes por `/api/csp` (código listo, falta su deploy)) Revisión de seguridad: RLS por tabla según `acceso-por-tabla` (simulación de roles
       con `rollback`), ninguna ruta con `service_role` sin filtrar por organización (incluida
       `/api/v1`), cabeceras (CSP con Turnstile y Sentry, HSTS), `server-only` en todo
       `server/`, y `getUser()` antes de toda operación ⚠️ y de crear API keys y webhooks.
-- [ ] **Migración `0020`** (la escribe otro agente en la Fase 13): slugs reservados también
+- [x] (2026-11-20, 01:23 UTC: aplicada; verificación 9/9, `unindexed_foreign_keys` resuelto, tipos sin cambios) **Migración `0020_endurecimiento`**: slugs reservados también
       en `crear_organizacion` (revisar antes que ninguna organización use uno), índices de
       las FK y de `operaciones_sii` (hoy `/estado` recorre la tabla). Aplicarla con su
       verificación, como las demás ([despliegue](../08-esquema-supabase/despliegue.md)).
@@ -452,7 +452,7 @@ sin commit ni deploy.
 
 ### Antes de lanzar
 
-- [ ] **Slugs reservados en la base (Fase 13):** `crear_organizacion` no conoce
+- [x] (2026-11-20: check `organizaciones_slug_no_reservado` de la `0020`; ninguna organización usaba uno) **Slugs reservados en la base (Fase 13):** `crear_organizacion` no conocía
       `SLUGS_RESERVADOS` (`lib/rutas.ts`); una llamada directa a la RPC podría crear una
       organización con un slug reservado (`estado`, `contacto`…). Requiere una migración que
       valide la misma lista en la base, y revisar antes que ninguna organización existente

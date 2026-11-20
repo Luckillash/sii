@@ -11,19 +11,25 @@
 //   compensado con: hosts de scripts limitados a la app y Turnstile, `object-src 'none'`,
 //   `base-uri 'self'`, `form-action 'self'` y `frame-ancestors 'none'`. React escapa todo
 //   texto y el único `dangerouslySetInnerHTML` (JSON-LD) va escapado (`serializarJsonLd`).
-// - `MODO_CSP`: empieza en `report-only` porque solo hay *Production* (sin Preview donde
-//   probar las páginas con sesión: Realtime, Turnstile de las invitaciones). Los reportes
-//   van a Sentry (`report-uri` desde el DSN). Sin violaciones durante unos días, se cambia a
-//   `enforce`. X-Frame-Options, HSTS, nosniff, Referrer-Policy y Permissions-Policy se
-//   aplican desde ya.
+// - `MODO_CSP`: empezó en `report-only` (deploy `c619a1a`, 2026-11-19) y pasó a `enforce`
+//   el 2026-11-20, tras revisar en Production 13 páginas del panel con sesión, el detalle de
+//   un envío y las 10 públicas sin violaciones. En las cargas completas, nada se cargó desde
+//   fuera del propio origen.
+// - Reportes: `report-uri` apunta a la ruta propia `/api/csp`, que los reenvía saneados a
+//   Sentry desde el servidor (`lib/reporte-csp.ts`). Antes iban directo a
+//   `ingest.sentry.io`, y los bloqueadores de anuncios los frenaban: el mismo motivo del
+//   túnel `/api/monitoring`.
 // - HSTS sin `preload`: `.dev` ya está en la lista de precarga de los navegadores como TLD
 //   completo (todo `*.dev` es solo HTTPS), así que `preload` no agrega nada y solo
 //   comprometería al dominio si algún día se postula a hstspreload.org.
 
 export type ModoCsp = 'enforce' | 'report-only';
 
-/** Cambiar a `enforce` cuando Sentry lleve unos días sin reportes de CSP en Production. */
-export const MODO_CSP: ModoCsp = 'report-only';
+/** `enforce` desde el 2026-11-20. Para diagnosticar una página rota, volver a `report-only`. */
+export const MODO_CSP: ModoCsp = 'enforce';
+
+/** Ruta de la app que recibe los reportes de CSP y los reenvía a Sentry (`app/api/csp`). */
+export const RUTA_REPORTE_CSP = '/api/csp';
 
 /** Turnstile (PLAN-SAAS §4.7): el script y el iframe del desafío. */
 export const ORIGEN_TURNSTILE = 'https://challenges.cloudflare.com';
@@ -36,7 +42,7 @@ export interface OpcionesCabeceras {
   supabaseUrl?: string | undefined;
   /** `NEXT_PUBLIC_APP_URL`: con https se agrega `upgrade-insecure-requests`. */
   appUrl?: string | undefined;
-  /** `NEXT_PUBLIC_SENTRY_DSN`: destino de los reportes de CSP. */
+  /** `NEXT_PUBLIC_SENTRY_DSN`: sin un DSN válido no hay a dónde reenviar, y no se pide `report-uri`. */
   sentryDsn?: string | undefined;
   /** `NEXT_PUBLIC_VERCEL_ENV`, para separar los reportes por ambiente en Sentry. */
   ambiente?: string | undefined;
@@ -88,7 +94,8 @@ export function urlReporteSentry(dsn: string | undefined, ambiente?: string): st
 export function politicaCsp(o: OpcionesCabeceras = {}): string {
   const modo = o.modo ?? MODO_CSP;
   const supabase = origenesSupabase(o.supabaseUrl);
-  const reporte = urlReporteSentry(o.sentryDsn, o.ambiente);
+  // El navegador reporta a la ruta propia (mismo origen); ella reenvía a Sentry.
+  const reporte = urlReporteSentry(o.sentryDsn, o.ambiente) ? RUTA_REPORTE_CSP : null;
   const https = o.appUrl?.startsWith('https://') ?? false;
 
   const directivas: [string, ...string[]][] = [

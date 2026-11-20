@@ -102,8 +102,8 @@ Avisos de *Advisors* que son **esperados** y no se corrigen (revisados el 2026-1
 | `auth_leaked_password_protection` (WARN) y `auth_db_connections_absolute` (INFO) | Configuración de Auth en el panel, no de la base: los decide el usuario (*Authentication → Attack Protection* y *Project Settings → Database / Auth*); ver la [Fase 13](#fase-13-migración-0020) |
 
 `unindexed_foreign_keys` (INFO, 54 FK sin índice al 2026-11-19, la mayoría `organizacion_id`,
-que filtran todas las políticas RLS) lo resuelve la `0020_endurecimiento` (Fase 13, pendiente
-de aplicar).
+que filtran todas las políticas RLS) quedó resuelto con la `0020_endurecimiento` (Fase 13, aplicada
+el 2026-11-20 a las 01:23 UTC).
 
 ### Fase 4: migraciones 0006 y 0007 (aplicadas el 2026-11-13)
 
@@ -780,9 +780,15 @@ Antes del deploy van `NEXT_PUBLIC_APP_URL` (se fija en el build: sitemap, canón
 
 ### Fase 13: migración 0020
 
-**Estado: escrita y probada el 2026-11-19 dentro de `begin … rollback` contra producción;
-pendiente de aplicar (lo decide el usuario).** `supabase db push --dry-run` lista solo
-`0020_endurecimiento.sql`.
+**Estado: aplicada el 2026-11-20 a las 01:23 UTC** (`db push --remote=rbrntkztzijaxsnpgpqn --yes`,
+después del deploy `c619a1a`; la app no depende de ella), tras probarla el 2026-11-19 dentro
+de `begin … rollback`.
+- Antes del push: respaldo diario del 2026-11-19 a las 10:11 UTC (PITR apagado). La
+  verificación daba 2/9 (la 2 y la 8) y el `--dry-run` listaba solo `0020_endurecimiento.sql`.
+- Después: verificación **9/9** con `supabase db query --read-only -f`.
+- *Advisors*: `unindexed_foreign_keys` desapareció; los índices nuevos salen como
+  `unused_index` (esperado), y los avisos de seguridad no cambiaron.
+- `pnpm db:tipos`: sin cambios. La landing, `/estado` e `/ingresar` responden 200.
 
 `0020_endurecimiento` es aditiva (no cambia columnas, políticas ni funciones):
 

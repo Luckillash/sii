@@ -395,10 +395,11 @@ el `<script>`.
   `_…`, segmentos dinámicos como `[org]` y `%5Fds`, y entra en los grupos `(…)`, cuyas
   carpetas hijas son rutas de primer nivel): una carpeta nueva sin su slug reservado rompe la
   prueba.
-- **Pendiente (Fase 13):** la reserva vive solo en la app. La función de la base
-  `crear_organizacion` no conoce `SLUGS_RESERVADOS`: quien la llame directo (con la clave
-  publicable y una sesión) podría crear una organización con un slug reservado. Requiere una
-  migración que valide la misma lista en la base.
+- **En la base desde la Fase 13:** el check `organizaciones_slug_no_reservado` (migración
+  `0020_endurecimiento`, aplicada el 2026-11-20) rechaza con 23514 la misma lista, también en
+  llamadas directas a `crear_organizacion` y en cambios de slug. Las dos listas se comparan en
+  `slugs-reservados-db.test.ts`: al agregar un slug en `lib/rutas.ts` hace falta una migración
+  nueva con la lista completa entre los marcadores `-- slugs-reservados:inicio/fin`.
 
 **Agregar una página pública nueva:** crearla en `(publico)/` con su `<main id="contenido">`;
 agregar el prefijo a `PREFIJOS_PUBLICOS`, el slug a `SLUGS_RESERVADOS` y ambos a la lista de

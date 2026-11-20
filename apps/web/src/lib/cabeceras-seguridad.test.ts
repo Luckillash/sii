@@ -7,6 +7,7 @@ import {
   ORIGEN_TURNSTILE,
   origenesSupabase,
   politicaCsp,
+  RUTA_REPORTE_CSP,
   urlReporteSentry,
 } from './cabeceras-seguridad';
 
@@ -75,7 +76,18 @@ describe('cabeceras de seguridad', () => {
     expect(d.get('form-action')).toEqual(["'self'"]);
     expect(d.get('img-src')).toEqual(["'self'", 'data:', 'blob:']);
     expect(d.has('upgrade-insecure-requests')).toBe(true);
-    expect(d.get('report-uri')?.[0]).toBe(
+    // Los reportes van a la ruta propia (los bloqueadores frenan ingest.sentry.io).
+    expect(d.get('report-uri')).toEqual([RUTA_REPORTE_CSP]);
+  });
+
+  it('la CSP se aplica (enforce) desde el 2026-11-20', () => {
+    expect(MODO_CSP).toBe('enforce');
+    expect(cabecerasSeguridad(PRODUCCION)[0]?.key).toBe('Content-Security-Policy');
+    expect(politicaCsp(PRODUCCION)).toContain('upgrade-insecure-requests');
+  });
+
+  it('el endpoint de Sentry para reenviar sale del DSN', () => {
+    expect(urlReporteSentry(DSN, 'production')).toBe(
       'https://o4500000000000000.ingest.us.sentry.io/api/4500000000000001/security/?sentry_key=abc123&sentry_environment=production',
     );
   });

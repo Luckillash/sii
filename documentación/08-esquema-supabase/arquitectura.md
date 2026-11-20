@@ -60,12 +60,12 @@ solo lectura en `supabase/verificaciones/` ([despliegue](despliegue.md)).
 | `0017_cron_suscripciones` (**aplicada el 2026-11-18**, después del deploy de la Fase 10) | Job de `pg_cron` `sincronizar-suscripciones` (`41 * * * *`, `/api/cron/suscripciones`) |
 | `0018_api_webhooks` (**aplicada el 2026-11-19**, antes del deploy de la Fase 11; verificación 23/23) | Tabla `api_idempotencia`; RPC de la API pública y de los webhooks (`autenticar_api_key`, idempotencia, `reclamar_entregas_webhook`, `cerrar_entrega_webhook`, `reenviar_entrega_webhook`, `probar_webhook`, `rotar_secreto_webhook`); `encolar_evento` filtrado por plan ([despliegue](despliegue.md#fase-11-migraciones-0018-y-0019)) |
 | `0019_cron_webhooks` (**aplicada el 2026-11-19**, después del deploy de la Fase 11; verificación 9/9) | Jobs de `pg_cron` `entregar-webhooks` (`* * * * *`, `/api/cron/webhooks`), `limpiar-webhook-entregas` (`37 4 * * *`) y `limpiar-api-idempotencia` (`47 4 * * *`) |
-| `0020_endurecimiento` (**pendiente de aplicar**; probada con `rollback` el 2026-11-19, verificación 8/9 con la 9 = registro) | Check `organizaciones_slug_no_reservado` (los 26 `SLUGS_RESERVADOS` de `lib/rutas.ts`); 53 índices para las 54 FK sin índice (`unindexed_foreign_keys`); índices de `operaciones_sii` por `(ambiente, terminada_en)` y `(operacion, resultado, terminada_en desc)` para `/estado`; `revoke execute` de `tg_api_key_sin_reactivar` a PUBLIC ([despliegue](despliegue.md#fase-13-migración-0020)) |
+| `0020_endurecimiento` (**aplicada** el 2026-11-20 a las 01:23 UTC; verificación 9/9) | Check `organizaciones_slug_no_reservado` (los 26 `SLUGS_RESERVADOS` de `lib/rutas.ts`); 53 índices para las 54 FK sin índice (`unindexed_foreign_keys`); índices de `operaciones_sii` por `(ambiente, terminada_en)` y `(operacion, resultado, terminada_en desc)` para `/estado`; `revoke execute` de `tg_api_key_sin_reactivar` a PUBLIC ([despliegue](despliegue.md#fase-13-migración-0020)) |
 
 Aplicadas en producción: `0001`–`0019` (la `0011` y la `0012`, el 2026-11-15; la `0013` y la
 `0014`, el 2026-11-17, la 0014 después del deploy de la Fase 8; la `0015` y la `0016`, el
 2026-11-18, la `0017` después del deploy de la Fase 10; la `0018` y la `0019` el 2026-11-19, la 0019 después del deploy de la Fase 11). Los índices de FK
-(`unindexed_foreign_keys`) van en la `0020_endurecimiento` (Fase 13, pendiente de aplicar).
+(`unindexed_foreign_keys`) los agregó la `0020_endurecimiento` (Fase 13, aplicada el 2026-11-20).
 
 ## Relaciones
 

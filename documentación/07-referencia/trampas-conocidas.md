@@ -1251,7 +1251,9 @@ Decisiones y trampas de la fase (detalle en la [guía](../02-guias/sitio-publico
 - **Los slugs reservados solo los valida la app.** `SLUGS_RESERVADOS` vive en `lib/rutas.ts`;
   la función de la base `crear_organizacion` no la conoce, así que una llamada directa a la
   RPC (con la clave publicable y una sesión) podría crear una organización `estado` o
-  `contacto`. Pendiente para la Fase 13: una migración que valide la misma lista en la base.
+  `contacto`. **Resuelto en la Fase 13** con el check `organizaciones_slug_no_reservado` de
+  la `0020` (aplicada el 2026-11-20). Al reservar un slug nuevo, la prueba
+  `slugs-reservados-db.test.ts` falla hasta escribir una migración con la lista completa.
   `rutas.test.ts` sí lee las carpetas reales de `src/app` y exige que cada una esté reservada.
 - **`/estado` sin fila de `seguimiento` cuando el cron no tiene envíos.** El seguimiento
   registra una operación `seguimiento` por grupo (empresa + ambiente + canal); si no hay
@@ -1320,6 +1322,18 @@ Decisiones y trampas de la fase (detalle en la [guía](../02-guias/sitio-publico
   (`server/certificacion/set.ts`): «Descargar el set» fallaba siempre con «El transporte
   HTTP ya se cerró». Lo destapó la e2e del flujo crítico (2026-11-19). Si la promesa que se
   devuelve usa el transporte, va `return await`.
+- **Los reportes de CSP directos a `ingest.sentry.io` no llegan si el navegador tiene un
+  bloqueador.** Comprobado el 2026-11-20 en Production: una violación provocada en Chrome
+  nunca llegó a Sentry, y desde esa misma página un `fetch` a `ingest.sentry.io` daba
+  `Failed to fetch`; en cambio, un reporte enviado con curl llegó en segundos. Por eso
+  `report-uri` apunta a la ruta propia `/api/csp`, que los reenvía saneados desde el
+  servidor (`lib/reporte-csp.ts`). Que Sentry no tenga reportes no prueba que no haya
+  violaciones mientras sigan yendo directo.
+- **La consola del navegador que lee la extensión de Chrome no muestra los avisos de CSP**
+  (los genera el navegador, no `console.*`). Para revisar una página, usar el evento
+  `securitypolicyviolation` registrado antes de cargarla (`addInitScript` en Playwright) o
+  la navegación del lado del cliente, y en las cargas completas listar los orígenes de
+  `performance.getEntriesByType('resource')`.
 - **El SII falso de las e2e (`E2E_SII_FALSO_URL`)** solo funciona fuera de Vercel, con
   `NODE_ENV` distinto de `production` y hacia loopback. El cron de seguimiento de
   *Production* lee la misma base: un envío de prueba que quede en `enviado` lo consultaría
