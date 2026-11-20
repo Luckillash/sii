@@ -1,15 +1,15 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { EstadoDocumentoBd } from '@/lib/documentos-presentacion';
+import type { MensajeError } from '@/lib/equipo-errores';
 import type { TipoFolio } from '@/lib/folios';
 import { formatearMiles } from '@/lib/formatos';
 import { enviarBoletaPorCorreo } from '../correo/boleta';
 import { leerMetadata } from '../emision/borradores';
 import { enlaceDocumento } from '../emision/enlaces';
-import type { MensajeError } from '../equipo-errores';
 import { clienteServicio } from '../supabase/service';
 import { clienteServidor } from '../supabase/servidor';
 import type { Database, Json } from '../supabase/tipos';
-import type { EstadoDocumentoBd } from './presentacion';
 
 // «Reenviar al receptor» (PLAN-SAAS Fase 8, punto 3). Reutiliza lo de la Fase 7: el PDF
 // carta se obtiene con `enlaceDocumento` (URL firmada; lo regenera si falta) y sale por

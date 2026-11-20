@@ -1,3 +1,4 @@
+import 'server-only';
 import { crc32, deflateRawSync } from 'node:zlib';
 
 // ZIP mínimo para el .xlsx de las exportaciones (PLAN-SAAS Fase 9). Un .xlsx es un ZIP

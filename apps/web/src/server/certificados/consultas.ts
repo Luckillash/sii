@@ -1,6 +1,10 @@
 import 'server-only';
+import {
+  type EstadoCertificado,
+  esEstadoCertificado,
+  type FilaEstadoCertificado,
+} from '@/lib/certificados-estado';
 import { clienteServidor } from '../supabase/servidor';
-import { type EstadoCertificado, esEstadoCertificado, type FilaEstadoCertificado } from './estado';
 
 // Lecturas de certificados y de sus asociaciones con empresas, con el cliente de
 // sesión (RLS: `lectura` de `certificados`, `empresa_certificados` y `empresas` para

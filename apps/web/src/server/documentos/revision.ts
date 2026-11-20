@@ -5,6 +5,8 @@
 // un envío está revisado cuando todas sus operaciones inciertas lo están. Puro: lo usan la
 // lectura, la acción y Vitest.
 
+import 'server-only';
+
 /** Resultados de una operación que dejan el envío por verificar. */
 export const RESULTADOS_POR_REVISAR = ['incierto', 'en_curso'] as const;
 

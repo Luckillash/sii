@@ -9,7 +9,7 @@
 
 import type { Tono } from '@/components/boleteame';
 import { formatearFecha } from '@/lib/formatos';
-import type { MensajeError } from './errores';
+import type { MensajeError } from './equipo-errores';
 
 export type EstadoCertificado = 'vigente' | 'por_vencer' | 'vencido' | 'revocado';
 

@@ -61,6 +61,7 @@ Devuelve el `id` de la organización.
 | `42501` | `Requiere sesión` | sin `auth.uid()` |
 | `23505` | `duplicate key value violates unique constraint "organizaciones_slug_key"` | el slug ya existe (es único en todo el SaaS) |
 | `23514` | `… violates check constraint "organizaciones_slug_check"` | el slug (ya en minúsculas) no calza con `^[a-z0-9][a-z0-9-]{1,62}$`: 2 a 63 caracteres, letras, dígitos y guion, sin empezar con guion |
+| `23514` | `… violates check constraint "organizaciones_slug_no_reservado"` | el slug es uno de `SLUGS_RESERVADOS` (`apps/web/src/lib/rutas.ts`: `api`, `docs`, `estado`…). Desde la migración `0020_endurecimiento` (Fase 13, **pendiente de aplicar**); antes solo lo rechazaba la app. Rige también para el `update` de `slug` y para `service_role` |
 | `23514` | `… violates check constraint "organizaciones_nombre_check"` | nombre vacío o solo espacios |
 
 ```ts

@@ -1,14 +1,14 @@
 import Link from 'next/link';
 import { Alerta, Monto, PanelDetalle, Tabla, Td, Th, TipoDTE } from '@/components/boleteame';
-import { formatearFecha, formatearFechaHora, formatearMiles, formatearRut } from '@/lib/formatos';
-import type { DetalleDocumento } from '@/server/documentos/lectura';
 import {
   guiaIncierto,
   guiaObservacion,
   mensajeRechazoEnvio,
   nombreAmbiente,
   textoEstadoSii,
-} from '@/server/documentos/presentacion';
+} from '@/lib/documentos-presentacion';
+import { formatearFecha, formatearFechaHora, formatearMiles, formatearRut } from '@/lib/formatos';
+import type { DetalleDocumento } from '@/server/documentos/lectura';
 import { AccionesDocumento, ConsultarEstado } from './AccionesPanel';
 import estilos from './documentos.module.css';
 import { Enfocar } from './Enfocar';

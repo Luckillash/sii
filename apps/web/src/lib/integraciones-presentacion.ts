@@ -1,8 +1,8 @@
 import type { Alcance, AmbienteSii, EstadoEntregaWebhook, EventoWebhook } from '@/lib/api-publica';
 
 // Tipos y reglas de presentación de Configuración → API y Webhooks (PLAN-SAAS Fase 11).
-// Puro, sin `server-only`: lo importan los componentes cliente (como `equipo-errores`) y
-// `lectura.ts`. Nada de secretos: `clave_hash` y `secreto_secret_id` nunca salen de la base.
+// Puro y en `lib/` (no en `server/`): lo importan los componentes cliente y
+// `server/integraciones/lectura.ts`. Nada de secretos: `clave_hash` y `secreto_secret_id` nunca salen de la base.
 
 export type EstadoClave = 'activa' | 'revocada' | 'vencida';
 

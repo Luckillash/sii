@@ -22,10 +22,10 @@ import {
   type ResumenEnsayo,
   type SugerenciaPaso,
 } from '@/lib/certificacion';
+import type { MensajeError } from '@/lib/equipo-errores';
 import { formatearFecha, formatearFechaHora, formatearMiles, formatearRut } from '@/lib/formatos';
 // Solo tipos (se borran al compilar): no arrastran `server-only` al bundle.
 import type { VistaAsistente } from '@/server/certificacion';
-import type { MensajeError } from '@/server/equipo-errores';
 import {
   consultarEstadoDeclaracion,
   consultarEstadoSet,

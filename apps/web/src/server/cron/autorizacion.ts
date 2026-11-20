@@ -1,7 +1,11 @@
 import 'server-only';
 import { createHash, timingSafeEqual } from 'node:crypto';
 import * as Sentry from '@sentry/nextjs';
+import { MONITOR_SEGUIMIENTO } from '@/lib/seguimiento';
+import { MONITOR_ALERTAS } from '@/server/alertas/constantes';
 import { envCron } from '@/server/env';
+import { MONITOR_SUSCRIPCIONES } from '@/server/pagos/constantes';
+import { MONITOR_WEBHOOKS } from '@/server/webhooks/constantes';
 
 // Base común de las rutas /api/cron/* (PLAN-SAAS §4.4 y §4.8). pg_cron + pg_net las
 // llaman con `Authorization: Bearer <cron_token de Vault>`, que es igual a CRON_SECRET.
@@ -32,6 +36,22 @@ export function rechazoCron(resultado: ResultadoAutorizacion): Response | null {
 }
 
 /**
+ * Fallas seguidas que abren un issue en Sentry, por monitor. Van en el código porque el
+ * SDK reescribe la configuración del monitor en cada check-in: un umbral puesto en la UI
+ * de Sentry se pierde en la corrida siguiente. Webhooks corre cada minuto y reintenta solo
+ * (3); seguimiento, cada 5 minutos (2); alertas y suscripciones avisan a la primera (1).
+ */
+export const UMBRAL_FALLAS_MONITOR: Readonly<Record<string, number>> = Object.freeze({
+  [MONITOR_WEBHOOKS]: 3,
+  [MONITOR_SEGUIMIENTO]: 2,
+  [MONITOR_ALERTAS]: 1,
+  [MONITOR_SUSCRIPCIONES]: 1,
+});
+
+/** Check-ins `ok` seguidos que cierran el issue (todos los monitores). */
+export const UMBRAL_RECUPERACION_MONITOR = 1;
+
+/**
  * Ejecuta el trabajo de un cron dentro de un *cron monitor* de Sentry (check-in
  * `in_progress` → `ok`/`error`), que avisa si el cron deja de correr o falla.
  */
@@ -46,5 +66,7 @@ export function conMonitorCron<T>(
     checkinMargin: 2,
     maxRuntime: opciones.maxMinutos ?? 5,
     timezone: 'UTC',
+    failureIssueThreshold: UMBRAL_FALLAS_MONITOR[slug] ?? 1,
+    recoveryThreshold: UMBRAL_RECUPERACION_MONITOR,
   });
 }

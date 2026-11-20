@@ -1,6 +1,6 @@
+import { textoError, ubicacionError } from '@/lib/documentos-presentacion';
 import { formatearMiles, nombreTipoDte } from '@/lib/formatos';
 import type { ObservacionSii } from '@/server/documentos/lectura';
-import { textoError, ubicacionError } from '@/server/documentos/presentacion';
 import estilos from './documentos.module.css';
 
 // Rechazos y reparos del SII con sus errores (`seccion`, `linea`, `codigo`, `descripcion`)

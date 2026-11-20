@@ -1,13 +1,13 @@
 'use client';
 
 import { EstadoDTE } from '@/components/boleteame';
-import type { ClasificacionEnvio } from '@/lib/seguimiento';
 import {
   type EstadoDocumentoBd,
   estadoDeEnvio,
   estadoUi,
   textoEstadoSii,
-} from '@/server/documentos/presentacion';
+} from '@/lib/documentos-presentacion';
+import type { ClasificacionEnvio } from '@/lib/seguimiento';
 import { envioVigente, estadoVigente } from '@/stores/enVivo';
 import { useEnVivoStore } from '@/stores/ProveedorEnVivo';
 

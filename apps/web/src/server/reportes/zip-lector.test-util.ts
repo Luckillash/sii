@@ -1,3 +1,4 @@
+import 'server-only';
 import { crc32, inflateRawSync } from 'node:zlib';
 
 // Lector de ZIP para las pruebas del .xlsx: recorre el directorio central, descomprime

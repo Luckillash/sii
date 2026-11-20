@@ -3,6 +3,8 @@
 // solo de servidor (cada módulo importa `server-only`). El contrato con la UI está en
 // `@/lib/folios`.
 
+import 'server-only';
+
 export {
   alertaDespuesDeAsignar,
   alertarSiCruza,

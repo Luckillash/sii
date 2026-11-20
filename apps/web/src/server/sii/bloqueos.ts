@@ -1,6 +1,6 @@
 import 'server-only';
 import { randomUUID } from 'node:crypto';
-import type { MensajeError } from '../equipo-errores';
+import type { MensajeError } from '@/lib/equipo-errores';
 import type { ClienteServicio } from '../supabase/service';
 import type { Database } from '../supabase/tipos';
 

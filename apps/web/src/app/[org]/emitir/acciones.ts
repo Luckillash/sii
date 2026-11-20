@@ -9,10 +9,10 @@ import {
   type ReceptorCatalogo,
   type ResultadoEmision,
 } from '@/lib/emision';
+import { MENSAJE_GENERICO, type MensajeError } from '@/lib/equipo-errores';
 import { puedeEmitir } from '@/lib/permisos';
 import * as emision from '@/server/emision';
 import { obtenerEmpresa } from '@/server/empresas';
-import { MENSAJE_GENERICO, type MensajeError } from '@/server/equipo-errores';
 import { exigirMembresia } from '@/server/sesion';
 import { erroresDelBorrador } from './logica';
 

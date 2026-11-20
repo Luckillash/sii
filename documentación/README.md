@@ -104,10 +104,14 @@ por fase están en `PLAN-SAAS.md`, en la raíz del repositorio.
 | Probar en certificación | [05-pruebas/ambiente-certificacion.md](05-pruebas/ambiente-certificacion.md) |
 | Set de pruebas del SII | [05-pruebas/set-de-pruebas.md](05-pruebas/set-de-pruebas.md) |
 | Probar RLS, triggers o cuotas | [05-pruebas/probar-el-esquema.md](05-pruebas/probar-el-esquema.md) |
+| E2E del flujo crítico con el SII falso | [05-pruebas/e2e-flujo-critico.md](05-pruebas/e2e-flujo-critico.md) |
 | Integrar un sistema externo (API, webhooks) | [06-integraciones/overview.md](06-integraciones/overview.md) |
 | Copiar un ejemplo de código | [07-referencia/ejemplos-de-codigo.md](07-referencia/ejemplos-de-codigo.md) |
 | Dato rápido (vigencia, tope, largo) | [07-referencia/reglas-y-limites.md](07-referencia/reglas-y-limites.md) |
-| Pasar una empresa a producción, o pasar Flow del sandbox a producción | [07-referencia/checklist-produccion.md](07-referencia/checklist-produccion.md) |
+| Pasar una empresa a producción, lanzar (Fase 13), llevar el piloto o pasar Flow del sandbox a producción | [07-referencia/checklist-produccion.md](07-referencia/checklist-produccion.md) |
+| **Atender un incidente** (incierto, SII caído, CAF agotado, cron, Flow, Resend, certificado vencido, secreto expuesto) | [07-referencia/runbooks.md](07-referencia/runbooks.md) |
+| Alertas, cron monitors, etiquetas y tableros de Sentry | [07-referencia/observabilidad-sentry.md](07-referencia/observabilidad-sentry.md) |
+| Respaldo, PITR, restaurar la base o rotar `SII_TOKENS_KEY` | [07-referencia/respaldo-y-restauracion.md](07-referencia/respaldo-y-restauracion.md) |
 | Revisar términos y privacidad con un abogado | [07-referencia/revision-legal.md](07-referencia/revision-legal.md) |
 | Algo no funciona como se espera | [07-referencia/trampas-conocidas.md](07-referencia/trampas-conocidas.md) |
 | Construir una pantalla, usar un componente o un token | [07-referencia/design-system.md](07-referencia/design-system.md) |
@@ -173,7 +177,8 @@ documentación/
 ├── 05-pruebas/
 │   ├── ambiente-certificacion.md
 │   ├── set-de-pruebas.md
-│   └── probar-el-esquema.md
+│   ├── probar-el-esquema.md
+│   └── e2e-flujo-critico.md
 ├── 06-integraciones/                  ← cómo se conecta un sistema externo
 │   ├── overview.md
 │   ├── api-keys.md
@@ -183,7 +188,10 @@ documentación/
 │   ├── ejemplos-de-codigo.md
 │   ├── herramientas.md
 │   ├── reglas-y-limites.md
-│   ├── checklist-produccion.md
+│   ├── checklist-produccion.md     habilitar empresa, lanzamiento, piloto y registro diario
+│   ├── runbooks.md                qué hacer ante cada incidente
+│   ├── observabilidad-sentry.md   inventario de Sentry y alertas por crear
+│   ├── respaldo-y-restauracion.md PITR, simulacro de restauración, rotación de SII_TOKENS_KEY
 │   ├── revision-legal.md          puntos para el abogado (términos y privacidad)
 │   ├── trampas-conocidas.md
 │   ├── design-system.md           tokens, componentes, layouts, /_ds, axe

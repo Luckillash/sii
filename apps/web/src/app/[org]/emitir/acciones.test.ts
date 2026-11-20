@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Borrador, ResultadoEmision } from '@/lib/emision';
-import { MENSAJE_GENERICO } from '@/server/equipo-errores';
+import { MENSAJE_GENERICO } from '@/lib/equipo-errores';
 
 // Server Actions de `/[org]/emitir` con dobles: la sesión, la empresa y `server/emision`
 // (que hoy es un esqueleto) se simulan. No hay red, base ni SII.

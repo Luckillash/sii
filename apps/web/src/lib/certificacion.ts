@@ -1,4 +1,4 @@
-import type { MensajeError } from '@/server/equipo-errores';
+import type { MensajeError } from '@/lib/equipo-errores';
 import type { Database } from '@/server/supabase/tipos';
 
 // Contrato compartido de la Fase 5 (PLAN-SAAS §7, «Certificación ante el SII»):

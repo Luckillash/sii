@@ -2,6 +2,8 @@
 // HORARIO_SUSCRIPCIONES = horario del job `sincronizar-suscripciones` de la migración
 // 0017_cron_suscripciones (UTC) y del *cron monitor* de Sentry.
 
+import 'server-only';
+
 /** Cada hora, en el minuto 41 (no coincide con los demás jobs). */
 export const HORARIO_SUSCRIPCIONES = '41 * * * *';
 export const MONITOR_SUSCRIPCIONES = 'cron-suscripciones';

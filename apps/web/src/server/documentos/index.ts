@@ -5,7 +5,7 @@ import 'server-only';
 // vive aquí: es `consultarEnvio` de `@/server/seguimiento`.
 //
 //   filtros.ts       filtros desde la URL y armado de la consulta (puro)
-//   presentacion.ts  estados, errores del SII y avisos con el tono del design system (puro)
+//   @/lib/documentos-presentacion  estados, errores del SII y avisos (puro, también cliente)
 //   lectura.ts       listado paginado, detalle de documento y de envío, inciertos (sesión, RLS)
 //   reenviar.ts      reenvío del PDF al receptor (Resend)
 

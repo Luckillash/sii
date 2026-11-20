@@ -7,8 +7,8 @@ import type { Database } from '@/server/supabase/tipos';
 // el navegador (signIn, signUp con captchaToken, resetPasswordForEmail) y Realtime.
 // Las lecturas de datos van por RSC con `clienteServidor()`.
 //
-// `Database` se importa solo como tipo: `tipos.ts` no tiene código ni `server-only`,
-// y `import type` se borra al compilar, así que nada del servidor llega al bundle.
+// `Database` se importa solo como tipo: `tipos.ts` es de servidor (`server-only`), pero
+// `import type` se borra al compilar, así que nada del servidor llega al bundle.
 
 let cliente: SupabaseClient<Database> | undefined;
 

@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { Alerta, Boton, Dialogo } from '@/components/boleteame';
-import type { MensajeError } from '@/server/equipo-errores';
+import type { MensajeError } from '@/lib/equipo-errores';
 import { marcarRevisado } from '../../documentos/acciones';
 
 // «Ya lo revisé» de un envío incierto (PLAN-SAAS Fase 8, punto 2), con confirmación: no

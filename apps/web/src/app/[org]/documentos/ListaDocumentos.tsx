@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 import { type DocumentoFila, TablaDTE } from '@/components/boleteame';
+import { estadoUi } from '@/lib/documentos-presentacion';
 import type { FilaDocumento } from '@/server/documentos/lectura';
-import { estadoUi } from '@/server/documentos/presentacion';
 import { esMasNuevo } from '@/stores/enVivo';
 import { useEnVivoStore } from '@/stores/ProveedorEnVivo';
 

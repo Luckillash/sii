@@ -1,6 +1,13 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { EstadoDte } from '@/components/boleteame/tipos';
+import {
+  type AmbienteSii,
+  type ErrorSii,
+  type EstadoDocumentoBd,
+  estadoUi,
+  leerErroresSii,
+} from '@/lib/documentos-presentacion';
 import { formatearFecha } from '@/lib/formatos';
 import type { ClasificacionEnvio } from '@/lib/seguimiento';
 import { fallaBase } from '../certificacion/comun';
@@ -14,13 +21,6 @@ import {
   type FiltrosDocumentos,
   ultimaPagina,
 } from './filtros';
-import {
-  type AmbienteSii,
-  type ErrorSii,
-  type EstadoDocumentoBd,
-  estadoUi,
-  leerErroresSii,
-} from './presentacion';
 import { RESULTADOS_POR_REVISAR, revisionEnvio } from './revision';
 
 // Lecturas de `/[org]/documentos`, `/[org]/envios/[id]` y del Tablero (PLAN-SAAS Fase 8)

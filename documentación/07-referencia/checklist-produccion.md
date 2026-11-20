@@ -1,8 +1,8 @@
 ---
 title: "Checklist de paso a producción"
-description: "Lo que debe cumplirse antes de emitir boletas reales y antes de cobrar: el seguimiento y las alertas de la Fase 8 (CRON_SECRET, cron_token, migraciones 0013 y 0014, monitores de Sentry), los planes y pagos con Flow de la Fase 10 (sandbox y paso a producción), la API pública y los webhooks de la Fase 11 (migraciones 0018 y 0019, Firewall) y el sitio público de la Fase 12 (CORREO_CONTACTO, Firewall para las Server Actions con Next-Action, datos legales, NEXT_PUBLIC_APP_URL)."
-keywords: [checklist, producción, Fase 8, seguimiento, alertas, CRON_SECRET, cron_token, migración 0013, migración 0014, pg_cron, cron-seguimiento, cron-alertas, net._http_response, Resend, NEXT_PUBLIC_APP_URL, Fase 10, Flow, FLOW_API_URL, FLOW_API_KEY, FLOW_SECRET_KEY, planes de Flow, boleta propia, cron-suscripciones, 0017_cron_suscripciones, Fase 11, API pública, webhooks, 0018_api_webhooks, 0019_cron_webhooks, entregar-webhooks, cron-webhooks, Firewall de Vercel, rate limiting, 429, Fase 12, sitio público, CORREO_CONTACTO, /contacto, Next-Action, TURNSTILE_SECRET_KEY, falla cerrado, crear_organizacion, slugs reservados, RESPONSABLE, lib/legal.ts, revisión legal, sitemap]
-related: ["02-guias/certificacion-empresa.md", "02-guias/seguimiento-envios.md", "08-esquema-supabase/despliegue.md", "02-guias/planes-y-pagos.md", "02-guias/api-publica.md", "02-guias/sitio-publico.md"]
+description: "Lo que debe cumplirse antes de emitir boletas reales y antes de cobrar: la lista para habilitar una empresa en producción (plan, empresa, certificado, resolución y autorización, CAF de producción, primera boleta, seguimiento), el lanzamiento de la Fase 13 (seguridad, migración 0020, clave HS256 legada, e2e, PITR y simulacro de restauración, alertas de Sentry, Flow a producción, boleta propia, revisión legal) con el piloto y su registro diario, el seguimiento y las alertas de la Fase 8 (CRON_SECRET, cron_token, migraciones 0013 y 0014, monitores de Sentry), los planes y pagos con Flow de la Fase 10 (sandbox y paso a producción), la API pública y los webhooks de la Fase 11 (migraciones 0018 y 0019, Firewall) y el sitio público de la Fase 12 (CORREO_CONTACTO, Firewall para las Server Actions con Next-Action, datos legales, NEXT_PUBLIC_APP_URL)."
+keywords: [checklist, producción, habilitar empresa, autorizada_produccion, resolución de producción, CAF de producción, IDK 300, primera boleta, piloto, registro diario, EPR, Fase 13, lanzamiento, PITR, simulacro de restauración, alertas de Sentry, migración 0020, HS256, e2e, Fase 8, seguimiento, alertas, CRON_SECRET, cron_token, migración 0013, migración 0014, pg_cron, cron-seguimiento, cron-alertas, net._http_response, Resend, NEXT_PUBLIC_APP_URL, Fase 10, Flow, FLOW_API_URL, FLOW_API_KEY, FLOW_SECRET_KEY, planes de Flow, boleta propia, cron-suscripciones, 0017_cron_suscripciones, Fase 11, API pública, webhooks, 0018_api_webhooks, 0019_cron_webhooks, entregar-webhooks, cron-webhooks, Firewall de Vercel, rate limiting, 429, Fase 12, sitio público, CORREO_CONTACTO, /contacto, Next-Action, TURNSTILE_SECRET_KEY, falla cerrado, crear_organizacion, slugs reservados, RESPONSABLE, lib/legal.ts, revisión legal, sitemap]
+related: ["07-referencia/runbooks.md", "07-referencia/observabilidad-sentry.md", "07-referencia/respaldo-y-restauracion.md", "02-guias/onboarding-organizacion.md", "02-guias/folios-caf.md", "02-guias/emision-boletas.md", "02-guias/certificacion-empresa.md", "02-guias/seguimiento-envios.md", "08-esquema-supabase/despliegue.md", "02-guias/planes-y-pagos.md", "02-guias/api-publica.md", "02-guias/sitio-publico.md"]
 source: ["certificacion-node/docs/piloto-produccion.md", "PLAN-SAAS.md Fase 8, Fase 10, Fase 12 y Fase 13", "supabase/migrations/0013_notificaciones.sql", "supabase/migrations/0014_cron.sql", "supabase/migrations/0017_cron_suscripciones.sql", "apps/web/src/server/env.ts", "supabase/migrations/0018_api_webhooks.sql", "supabase/migrations/0019_cron_webhooks.sql", "apps/web/src/lib/legal.ts", "apps/web/src/app/(publico)/contacto/acciones.ts"]
 ---
 
@@ -10,7 +10,218 @@ source: ["certificacion-node/docs/piloto-produccion.md", "PLAN-SAAS.md Fase 8, F
 
 > **Úsalo cuando:** vas a habilitar a una empresa en producción.
 
-<!-- TODO (Fase 13): redactar el checklist completo (empresa, certificado, resolución, CAF de producción, plan, piloto). -->
+Tres partes: [habilitar una empresa](#habilitar-una-empresa-en-producción) (se repite por
+cada empresa), [lanzamiento](#lanzamiento-fase-13) (una vez, Fase 13) con el
+[piloto](#piloto) y su [registro diario](#registro-diario-del-piloto), y abajo lo que dejó
+cada fase (8, 10, 11 y 12). Lo marcado `[x]` está hecho y fechado; lo demás, pendiente.
+
+## Habilitar una empresa en producción
+
+Por cada empresa. Copia la lista en el registro del piloto (o en el ticket del cliente) y
+marca con la fecha. Cada paso que sale al SII de producción tiene ensayo antes y se
+confirma con el responsable de la empresa: en producción cada boleta es un documento
+tributario real y consume un folio.
+
+**1. Organización y plan**
+
+- [ ] La organización tiene un plan con producción (`pyme`, `contador`, `api` o `empresa`;
+      `certificacion` no la permite) y la suscripción está `activa`, no `morosa`
+      (`plan_vigente(org).permite_produccion`; [planes](../02-guias/planes-y-pagos.md)).
+- [ ] Hay al menos un propietario o administrador con correo (destinatarios de las alertas
+      de rechazo, incierto, certificado, folios y mora).
+- [ ] El cupo del plan alcanza (empresas, usuarios y boletas del mes).
+
+**2. Empresa**
+
+- [ ] Empresa creada con el RUT correcto (no se puede cambiar después), razón social, giro,
+      dirección y comuna tal como están en el SII, en ISO-8859-1
+      ([onboarding](../02-guias/onboarding-organizacion.md#4-empresa-fase-3)).
+- [ ] Empresa **activa**.
+
+**3. Certificado**
+
+- [ ] `.pfx` subido, vigente al menos 30 días más (si vence antes, renovarlo primero) y
+      asociado a la empresa como **predeterminado**.
+- [ ] El titular es **representante electrónico** de la empresa en el SII (lo exige el
+      timbraje de folios) y, para «Verificar autorización», representante legal.
+
+**4. Resolución y autorización**
+
+- [ ] Empresa autorizada en producción (`empresas.autorizada_produccion = true`), por uno de
+      dos caminos:
+  - certificada en Boletéame: el asistente llegó a «Autorizada» (P91)
+    ([certificación](../02-guias/certificacion-empresa.md)); o
+  - autorizada fuera de Boletéame: resolución de producción registrada (número ≥ 1 y fecha)
+    o «Verificar autorización en el SII» en `ok`
+    ([autorización externa](../02-guias/certificacion-empresa.md#empresa-autorizada-fuera-de-boletéame)).
+- [ ] Resolución de **producción** vigente con el número y la fecha correctos (van en la
+      carátula de cada envío; si es falsa, el SII rechaza).
+- [ ] La autorización es de **boleta** (39/41), no solo de factura: el STC muestra
+      timbrajes `0039` (riesgo de §10 del plan con `ad_empresa`).
+
+**5. CAF de producción**
+
+- [ ] En `/<org>/folios`, ambiente producción, tipo 39 (y 41 si emite exentas): ensayo →
+      **«Revisar con el SII»** → **«Timbrar N folios»** ⚠️, con una cantidad acorde al
+      volumen (el aviso llega al 15 %). En el primer timbraje del tipo, el SII pide folio
+      inicial (en el piloto de la librería fue 1)
+      ([folios](../02-guias/folios-caf.md#solicitar-folios)).
+- [ ] El CAF aparece `activo` con IDK 300 y `siguiente_folio = folio_desde`; ninguna
+      solicitud queda `incierta` (si queda, [runbook](runbooks.md#envío-u-operación-incierta-código-6)).
+
+**6. Primera boleta**
+
+- [ ] Ensayo en Emitir (ambiente producción, sin banner de certificación) con una venta
+      real de bajo monto.
+- [ ] Emisión ⚠️ confirmada por el responsable: Track ID recibido, documento `enviado`.
+- [ ] PDF carta y rollo generados; el PDF417 se lee y `sii util verificar-ted` da OK con el
+      TED de la boleta.
+- [ ] Si quedó **incierta**: no reemitir; [runbook](runbooks.md#envío-u-operación-incierta-código-6).
+
+**7. Seguimiento**
+
+- [ ] La corrida de `cron-seguimiento` la consulta y el documento pasa a `aceptado` (EPR)
+      sin recargar la página; si hay rechazo, se lee el error del SII y no se emite más
+      hasta entender la causa.
+- [ ] La empresa entra al [registro diario del piloto](#registro-diario-del-piloto) (o, después
+      del lanzamiento, al seguimiento normal con las alertas de Sentry).
+
+## Lanzamiento (Fase 13)
+
+Reúne lo pendiente del plan (`PLAN-SAAS.md`, Fase 13) y de las fases anteriores. El detalle
+de cada fase sigue en sus secciones de abajo.
+
+### Seguridad
+
+- [ ] Revisión de seguridad: RLS por tabla según `acceso-por-tabla` (simulación de roles
+      con `rollback`), ninguna ruta con `service_role` sin filtrar por organización (incluida
+      `/api/v1`), cabeceras (CSP con Turnstile y Sentry, HSTS), `server-only` en todo
+      `server/`, y `getUser()` antes de toda operación ⚠️ y de crear API keys y webhooks.
+- [ ] **Migración `0020`** (la escribe otro agente en la Fase 13): slugs reservados también
+      en `crear_organizacion` (revisar antes que ninguna organización use uno), índices de
+      las FK y de `operaciones_sii` (hoy `/estado` recorre la tabla). Aplicarla con su
+      verificación, como las demás ([despliegue](../08-esquema-supabase/despliegue.md)).
+- [ ] **Retiro de la clave HS256 legada**: confirmar en `edge_logs` que nadie usa claves sin
+      prefijo `sb_` y revocar la *Previously used* en *Settings → JWT Keys*
+      ([claves](../01-fundamentos/ambientes-y-credenciales.md#claves-api-de-supabase)).
+
+### Pruebas
+
+- [ ] e2e con Playwright del flujo crítico: registro → organización → empresa → certificado
+      → certificación (con SII falso) → folios → emisión → seguimiento, en verde.
+
+### Respaldo
+
+Detalle en [respaldo y restauración](respaldo-y-restauracion.md). Estado al 2026-11-19:
+**PITR apagado** (`supabase backups list`: `pitr_enabled: false`), respaldos físicos diarios
+con 7 días de retención; hoy se puede perder hasta un día de datos.
+
+- [ ] PITR activo (7 días como mínimo; requiere compute Small o mayor). Lo decide y activa
+      el usuario.
+- [ ] Simulacro de restauración a un proyecto nuevo hecho, con las verificaciones de
+      `supabase/verificaciones/` en `ok`, Vault descifrando y la duración anotada; proyecto
+      del simulacro borrado. Resultado: _(fecha, respaldo, duración, resultado)_.
+- [x] Rotación de `SII_TOKENS_KEY` documentada (2026-11-19,
+      [procedimiento](respaldo-y-restauracion.md#rotación-de-sii_tokens_key)).
+- [ ] Decidido el respaldo de los archivos de Storage (`documentos-xml`), que no entran en
+      ningún respaldo de la base.
+
+### Observabilidad
+
+Detalle en [observabilidad](observabilidad-sentry.md) y qué hacer en
+[runbooks](runbooks.md). Estado al 2026-11-19: los 4 *cron monitors* existen y están
+`ok`, pero **ninguno tiene una alerta conectada**; no hay alertas de issues ni de métricas
+propias ni tableros propios; no hay token de Sentry con `alerts:write`.
+
+- [ ] A1 «Cron: corrida perdida o fallida» conectada a `cron-seguimiento`, `cron-alertas`,
+      `cron-webhooks` y `cron-suscripciones`, con el umbral de fallas de cada monitor.
+- [ ] A2 «SII: operación incierta (código 6)».
+- [ ] A3 «SII: verificación fallida (código 7)».
+- [ ] A4 «API pública: error 5xx» (`api_publica_ruta`).
+- [ ] M1 «SII: fallas de conexión en producción» (`transporte` con `host_sii`).
+- [ ] Tablero «Boletéame — operación».
+- [ ] Prueba de una alerta: que un correo de Sentry llegue de verdad (p. ej. con «Send test
+      notification» de la regla).
+- [x] Runbooks de incierto, caída del SII, CAF agotado, verificación fallida, cron, Flow,
+      Resend, certificado vencido y secreto expuesto (2026-11-19, [runbooks](runbooks.md)).
+
+### Cobro y legal
+
+- [ ] Flow a producción ([abajo](#al-lanzar-pasar-flow-a-producción-fase-13)), incluida la
+      cancelación de la suscripción de sandbox de `servicio`.
+- [ ] **Boleta propia de Boletéame por cada cobro** (la prometen los términos).
+- [ ] **Revisión legal** de términos y privacidad ([nota](revision-legal.md)).
+- [ ] Precios de la landing = `planes` = planes de Flow de producción.
+
+### Piloto
+
+Criterio de la Fase 13: **dos semanas de piloto sin incidentes de seguridad y con todas las
+boletas EPR o explicadas.**
+
+- [ ] **Empresa del piloto de `certificacion-node`** (ya autorizada, con 5 boletas reales
+      EPR emitidas con la CLI) habilitada en Boletéame con la lista de
+      [arriba](#habilitar-una-empresa-en-producción), con un CAF de producción tipo 39 pedido
+      desde Boletéame (sin reutilizar los folios del CAF de la CLI: los dos sistemas no deben
+      repartirse un mismo rango).
+- [ ] Primera boleta real desde Boletéame en EPR.
+- [ ] 3 a 5 clientes en producción, cada uno habilitado con la lista de arriba.
+- [ ] Dos semanas de seguimiento diario con el [registro](#registro-diario-del-piloto),
+      del _(fecha)_ al _(fecha)_.
+- [ ] Al cierre: 0 incidentes de seguridad; todas las boletas del piloto `aceptado` (EPR,
+      o con reparos explicados) o con su rechazo explicado; ningún incierto sin resolver;
+      registro con una entrada por día.
+
+### Registro diario del piloto
+
+Una entrada por día (aunque no haya novedades) y una fila por boleta con algo que explicar.
+Las consultas son de solo lectura.
+
+```sql
+-- Boletas de producción del día (ajustar la fecha, hora de Chile)
+select o.slug, em.rut, d.tipo_dte, d.folio, d.estado, e.track_id, e.estado_sii, e.incierto
+from public.documentos d
+join public.envios e on e.id = d.envio_id
+join public.empresas em on em.id = d.empresa_id
+join public.organizaciones o on o.id = d.organizacion_id
+where d.ambiente = 'produccion'
+  and d.creado_en >= ('2026-12-01'::date)::timestamp at time zone 'America/Santiago'
+  and d.creado_en <  ('2026-12-02'::date)::timestamp at time zone 'America/Santiago'
+order by d.creado_en;
+
+-- Pendientes de todo el piloto: no aceptados, inciertos o sin cerrar
+select o.slug, d.folio, d.estado, e.estado_sii, e.incierto, e.consultas, e.enviado_en
+from public.documentos d
+join public.envios e on e.id = d.envio_id
+join public.organizaciones o on o.id = d.organizacion_id
+where d.ambiente = 'produccion' and d.estado <> 'aceptado'
+order by e.enviado_en;
+```
+
+Plantilla (copiar un bloque por día):
+
+```markdown
+### AAAA-MM-DD — revisó: <nombre>
+
+| Revisión | Resultado |
+|---|---|
+| Boletas emitidas hoy (producción) | N (por empresa: …) |
+| Aceptadas (EPR) / con reparos / rechazadas / en proceso | N / N / N / N |
+| Inciertas nuevas / resueltas | N / N |
+| Envíos sin cerrar (> 7 días) | N |
+| Alertas de Sentry (A1–A4, M1) | ninguna / cuáles |
+| Cron monitors | todos ok / cuál falló y cuánto |
+| `/estado` | Operativo / Con demoras / Con problemas |
+| Folios: empresas bajo el 15 % | ninguna / cuáles |
+| Certificados que vencen en < 30 días | ninguno / cuáles |
+| Correos de alerta que no salieron (`notificaciones` fallidas) | N |
+| Incidentes de seguridad | ninguno / descripción |
+
+| Empresa | Folio | Track ID | Estado | Explicación / acción |
+|---|---|---|---|---|
+| | | | | |
+
+Conclusión del día: sin novedades / pendiente: …
+```
 
 ## Seguimiento de envíos y alertas (Fase 8)
 
@@ -38,8 +249,9 @@ y el criterio de aceptación quedó cumplido.
       sin fallas (2026-11-17: `seguimiento-envios` 3 corridas y `alertas` 1, todas
       `succeeded`).
 - [ ] *Cron monitors* `cron-seguimiento` y `cron-alertas` en verde en Sentry, con alerta si
-      un cron no corre (los dos en `ok` el 2026-11-17; la alerta por corrida perdida, sin
-      confirmar).
+      un cron no corre (los dos en `ok` el 2026-11-17; el 2026-11-19 se confirmó por la API
+      que **no hay ninguna alerta conectada** a los monitores: falta la A1 de
+      [observabilidad](observabilidad-sentry.md#a1-cron-corrida-perdida-o-fallida)).
 - [x] Resend y `NEXT_PUBLIC_APP_URL` configurados (sin ellos las alertas cuentan pero no
       envían: el resumen dice `sin_configurar` o `sin_url`). La primera corrida de alertas
       (2026-11-17) dijo `correo: "configurado"`, con 0 correos.
@@ -63,7 +275,8 @@ aceptación cumplido en el sandbox de Flow (hallazgos corregidos en `a1f74eb`). 
 ### Durante la Fase 10 (sandbox)
 
 - [x] Migraciones `0015_planes_comerciales` y `0016_pagos` aplicadas **antes** del deploy
-      (2026-11-18; hora previa para PITR 17:01:47 UTC); verificaciones 10/10 y 20/20,
+      (2026-11-18; hora previa anotada para PITR 17:01:47 UTC, que no sirve: PITR está apagado,
+      ver [respaldo](respaldo-y-restauracion.md#estado-actual-comprobado-el-2026-11-19)); verificaciones 10/10 y 20/20,
       `rls-fase10-pagos.sql` 30/30 y `rls-fase2-tenancy.sql` 52/52, con limpieza en 0.
 - [x] `pnpm db:tipos` regenerado (2026-11-18): solo difiere de lo agregado a mano en el orden
       de `estados_sii` y `eventos_pasarela`.
@@ -166,7 +379,8 @@ Estado (2026-11-19): Fase 11 desplegada en producción (`169e2e5`); `0018` y `00
       documento con `Idempotent-Replayed: true`; `documento.aceptado` entregado con firma
       válida al primer intento
       ([registro](../02-guias/api-publica.md#criterio-de-aceptación-2026-11-19)).
-- [ ] Sentry: alerta para los 5xx con la etiqueta `api_publica_ruta` (§4.8 del plan).
+- [ ] Sentry: alerta para los 5xx con la etiqueta `api_publica_ruta` (§4.8 del plan; especificación
+      A4 en [observabilidad](observabilidad-sentry.md#a4-api-pública-error-5xx)).
 
 ### Antes de abrir la API a clientes
 

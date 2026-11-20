@@ -1,9 +1,9 @@
 ---
 title: "Acceso por tabla (PostgREST + RLS)"
 description: "Qué puede hacer cada rol en cada tabla: select, insert, update, delete."
-keywords: [RLS, PostgREST, políticas, grant, revoke, privilegios por columna, anon, authenticated, service_role, lector, emisor, administrador, propietario, select, insert, update, delete, "new row violates row-level security policy", "permission denied for table", 42501, folios_anulados, anular_folios, migración 0011, borrador, alta_borrador, edicion_borrador, receptores, upsert, emisión, P0001, notificaciones, migración 0013, rls-fase8-notificaciones, seguimiento, Fase 9, Tablero, exportación, v_ventas_diarias, Fase 10, clientes_pago, pagos, eventos_pasarela, migración 0016, rls-fase10-pagos, api_idempotencia, migración 0018]
+keywords: [RLS, PostgREST, políticas, grant, revoke, privilegios por columna, anon, authenticated, service_role, lector, emisor, administrador, propietario, select, insert, update, delete, "new row violates row-level security policy", "permission denied for table", 42501, folios_anulados, anular_folios, migración 0011, borrador, alta_borrador, edicion_borrador, receptores, upsert, emisión, P0001, notificaciones, migración 0013, rls-fase8-notificaciones, seguimiento, Fase 9, Tablero, exportación, v_ventas_diarias, Fase 10, clientes_pago, pagos, eventos_pasarela, migración 0016, rls-fase10-pagos, api_idempotencia, migración 0018, Fase 13, rls-fase13-acceso-por-tabla, slug reservado, organizaciones_slug_no_reservado, migración 0020, 23514]
 related: ["08-esquema-supabase/rls-y-privilegios.md", "01-fundamentos/tenancy-y-roles.md", "03-api-reference/rpc-organizacion.md", "05-pruebas/probar-el-esquema.md", "02-guias/tablero-y-reportes.md", "02-guias/planes-y-pagos.md"]
-source: ["supabase_saas_sii.sql §17", "supabase/verificaciones/rls-fase2-tenancy.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/verificaciones/rls-fase3-empresas.sql", "supabase/migrations/0016_pagos.sql", "supabase/verificaciones/rls-fase10-pagos.sql", "supabase/migrations/0018_api_webhooks.sql", "supabase/verificaciones/rls-fase11-api.sql"]
+source: ["supabase_saas_sii.sql §17", "supabase/verificaciones/rls-fase2-tenancy.sql", "supabase/migrations/0005_certificados_resoluciones.sql", "supabase/verificaciones/rls-fase3-empresas.sql", "supabase/migrations/0016_pagos.sql", "supabase/verificaciones/rls-fase10-pagos.sql", "supabase/migrations/0018_api_webhooks.sql", "supabase/verificaciones/rls-fase11-api.sql", "supabase/verificaciones/rls-fase13-acceso-por-tabla.sql", "supabase/migrations/0020_endurecimiento.sql"]
 ---
 
 # Acceso por tabla (PostgREST + RLS)
@@ -16,12 +16,14 @@ Una operación pasa solo si se cumplen las dos capas:
 
 1. **Privilegio de tabla (o de columna).** `anon` solo tiene `select` en `tipos_dte`,
    `estados_sii` y `planes` (`revoke all … from anon`). `authenticated` tiene los
-   privilegios por defecto de Supabase en todas las tablas, salvo: nada en `tokens_sii` ni
-   `sesiones_sii`; en `invitaciones`, `api_keys` y `webhooks` solo `select` y `delete`,
-   más `update` en columnas puntuales. `service_role` tiene todo.
-2. **Política RLS.** RLS está activo en las 37 tablas (33 de la `0001`, las 3 que sumó la
-   `0016_pagos`, aplicada el 2026-11-18: `clientes_pago`, `pagos` y `eventos_pasarela`, y la
-   que sumó la `0018_api_webhooks`, aplicada el 2026-11-19: `api_idempotencia`). Sin política para una operación,
+   privilegios por defecto de Supabase en todas las tablas, salvo: nada en `tokens_sii`,
+   `sesiones_sii`, `bloqueos_sii`, `eventos_pasarela` y `api_idempotencia`; solo `select` en
+   `folios_anulados`, `notificaciones`, `clientes_pago` y `pagos`; solo `select` y `delete`
+   en `invitaciones`, `api_keys` y `webhooks`, más `update` de columnas puntuales en las dos
+   últimas (notas 12 y 13; en `invitaciones`, ninguno). `service_role` tiene todo.
+2. **Política RLS.** RLS está activo en las 39 tablas (33 de la `0001`, `bloqueos_sii` de la
+   `0007`, `notificaciones` de la `0013`, `clientes_pago`, `pagos` y `eventos_pasarela` de la
+   `0016_pagos` y `api_idempotencia` de la `0018_api_webhooks`). Sin política para una operación,
    `authenticated` no puede hacerla aunque tenga el privilegio. `service_role` salta RLS.
 
 Cómo falla cada caso (lo que ve el cliente en `error`):
@@ -57,7 +59,7 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
 | Tabla | anon | lector | emisor | administrador | propietario | service_role |
 |---|---|---|---|---|---|---|
 | `perfiles` | — | S ² U ³ | S ² U ³ | S ² U ³ | S ² U ³ | SIUD |
-| `organizaciones` | — | S | S | SU | SUD | SIUD |
+| `organizaciones` | — | S | S | SU ²⁴ | SUD ²⁴ | SIUD |
 | `miembros_organizacion` | — | S D ⁴ | S D ⁴ | SIUD ⁵ | SIUD ⁶ | SIUD |
 | `invitaciones` | — | — | — | S D ⁷ | S D ⁷ | SIUD |
 | `suscripciones` | — | S | S | S | S | SIUD |
@@ -158,7 +160,9 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
     líneas de un borrador (borra e inserta) con la sesión.
 11. `tg_proteger_proceso`: en el `insert` la etapa queda `borrador` y el estado SII en
     `null`; cambiar `etapa`, `codigo_estado_sii` o `paso_sii` en un `update` lanza error.
-12. Solo las columnas `nombre`, `revocada_en` y `expira_en`. Se crean con `crear_api_key()`.
+12. Solo las columnas `nombre` y `revocada_en` (la 0001 también daba `expira_en`; la 0018 lo
+    quitó: un `update` de `expira_en` con la sesión da `42501`). Revocar es definitivo
+    (`trg_10_api_key_sin_reactivar`, `22023`). Se crean con `crear_api_key()`.
 13. Solo las columnas `url`, `eventos` y `activo`. Se crean con `crear_webhook()`.
 14. `organizacion_id` se hereda de la empresa (`tg_heredar_organizacion`). Para cambiar
     la vigente, la app usa `registrar_resolucion()` (migración 0005, aplicada el
@@ -237,6 +241,14 @@ filas de sus organizaciones. `service_role` siempre tiene **SIUD** sin RLS (filt
     la API key con `autenticar_api_key` y trabaja con `service_role` filtrando por la
     organización (y la empresa) de la clave
     ([RPC](rpc-integraciones.md)).
+24. La política `edicion` deja a un administrador cambiar cualquier columna de su
+    organización, también `slug`. Con la migración `0020_endurecimiento` (Fase 13,
+    **pendiente de aplicar**), el check `organizaciones_slug_no_reservado` rechaza con `23514`
+    los slugs de `SLUGS_RESERVADOS` (`apps/web/src/lib/rutas.ts`) en toda vía: este `update`,
+    `crear_organizacion()` y `service_role`. Antes de la 0020 solo los rechazaba la app
+    ([despliegue](../08-esquema-supabase/despliegue.md#fase-13-migración-0020)). Nadie inserta
+    organizaciones directo con su sesión (sin política de `insert`): se crean con
+    `crear_organizacion()`.
 
 La Fase 8 (seguimiento) escribe `envios`, `envio_estadisticas`, `envio_rechazos`,
 `consultas_envio` y `operaciones_sii` con `service_role`, filtrando por organización; las
@@ -282,8 +294,18 @@ cambios por Realtime ([Realtime](../06-integraciones/realtime-y-storage.md#realt
   `authenticated` y `service_role` (2026-11-12); coinciden con esta página.
 - Comportamiento por rol en tenancy, empresas y borradores:
   `supabase/verificaciones/rls-fase2-tenancy.sql` (simulación con `rollback`,
-  [cómo correrla](../05-pruebas/probar-el-esquema.md)). El resto de las tablas se cubre
-  con la simulación por tabla de la Fase 13.
+  [cómo correrla](../05-pruebas/probar-el-esquema.md)).
+- **Toda la matriz (Fase 13):** `supabase/verificaciones/rls-fase13-acceso-por-tabla.sql`
+  (52 comprobaciones, con `rollback`): las 39 tablas y las 4 vistas, cada una con
+  select/insert/update/delete para `anon`, otra organización, lector, emisor,
+  administrador, propietario y `service_role`, comparadas con esta página (el esperado se
+  calcula de la matriz y del párrafo de privilegios: letra = pasa; `0` = 0 filas sin error;
+  `x` = `42501`), más las notas 2–6, 9, 10, 12 y 13 y los privilegios de tabla. Corrida en
+  producción el 2026-11-19: las 39 tablas coinciden; las 3 diferencias de la primera corrida
+  eran del script y se corrigieron (ver
+  [despliegue](../08-esquema-supabase/despliegue.md#fase-13-migración-0020)). Las
+  discrepancias con esta página estaban en la página (37 tablas en vez de 39; `expira_en`
+  en la nota 12) y se corrigieron ese día.
 - Empresas, resoluciones, certificados, asociaciones y `v_certificados_estado` por rol:
   `supabase/verificaciones/rls-fase3-empresas.sql`. Requiere la migración 0005; corrida en
   producción el 2026-11-13 (43/43).

@@ -4,6 +4,15 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import {
+  MENSAJE_GENERICO,
+  MENSAJE_SIN_EFECTO,
+  type MensajeError,
+  mensajeCupo,
+  type OperacionEquipo,
+  SESION_VENCIDA,
+  traducirErrorEquipo,
+} from '@/lib/equipo-errores';
+import {
   ETIQUETA_ROL,
   puedeAdministrar,
   puedeCambiarRol,
@@ -12,16 +21,9 @@ import {
   type RolMiembro,
   rolesInvitables,
 } from '@/lib/permisos';
+import { confirmarSesion } from '@/server/certificados/acceso';
 import { enviarInvitacion } from '@/server/correo/invitacion';
 import { cupoUsuarios, listarMiembros, urlBaseApp } from '@/server/equipo';
-import {
-  MENSAJE_GENERICO,
-  MENSAJE_SIN_EFECTO,
-  type MensajeError,
-  mensajeCupo,
-  type OperacionEquipo,
-  traducirErrorEquipo,
-} from '@/server/equipo-errores';
 import { type ContextoOrganizacion, exigirMembresia, obtenerPerfil } from '@/server/sesion';
 import { clienteServidor } from '@/server/supabase/servidor';
 
@@ -31,6 +33,12 @@ import { clienteServidor } from '@/server/supabase/servidor';
 // `tg_proteger_ultimo_propietario` y `exigir_cupo_usuarios`. Aquí se revisa el rol
 // solo para responder antes y con un mensaje claro. Todo con la sesión del usuario:
 // nada de service_role.
+//
+// Lo que da o quita acceso a otra persona (invitar, reenviar una invitación, cambiar un
+// rol, quitar a un miembro) confirma antes la sesión con Auth (`getUser()`, PLAN-SAAS
+// Fase 13, punto 1): `getClaims()` acepta el JWT de una sesión revocada o de un usuario
+// baneado hasta su `exp`, y con él un administrador baneado podría invitar a una cuenta
+// propia y conservar el acceso después del baneo.
 //
 // El token de una invitación existe solo en esta petición: se usa para armar el enlace
 // y, si no hay Resend, se devuelve UNA vez al administrador. Nunca a logs ni a Sentry.
@@ -175,6 +183,8 @@ export async function invitar(
     rol: String(formulario.get('rol') ?? ''),
   };
   if (!puedeAdministrar(ctx.rol)) return { ok: false, error: SIN_PERMISO, valores };
+  if (!(await confirmarSesion(ctx.usuario.id)))
+    return { ok: false, error: SESION_VENCIDA, valores };
 
   const datos = esquemaInvitar.safeParse(valores);
   if (!datos.success) {
@@ -244,6 +254,7 @@ export async function reenviarInvitacion(
   const ctx = await exigirMembresia(slug);
   if (!puedeAdministrar(ctx.rol)) return { ok: false, error: SIN_PERMISO };
   if (!esquemaId.safeParse(invitacionId).success) return { ok: false, error: DATOS_INVALIDOS };
+  if (!(await confirmarSesion(ctx.usuario.id))) return { ok: false, error: SESION_VENCIDA };
 
   const supabase = await clienteServidor();
   const { data: invitacion, error } = await supabase
@@ -302,6 +313,7 @@ export async function cambiarRol(
   if (!rolActual) return { ok: false, error: MENSAJE_SIN_EFECTO };
   if (rolActual === rol.data) return { ok: true, mensaje: 'El rol ya era ese.' };
   if (!puedeCambiarRol(ctx.rol, rolActual, rol.data)) return { ok: false, error: SIN_PERMISO };
+  if (!(await confirmarSesion(ctx.usuario.id))) return { ok: false, error: SESION_VENCIDA };
 
   const supabase = await clienteServidor();
   const { error, count } = await supabase
@@ -325,6 +337,7 @@ export async function quitarMiembro(slug: string, usuarioId: string): Promise<Re
   const rolObjetivo = await rolActualDe(ctx, id.data);
   if (!rolObjetivo) return { ok: false, error: MENSAJE_SIN_EFECTO };
   if (!puedeQuitarMiembro(ctx.rol, rolObjetivo, false)) return { ok: false, error: SIN_PERMISO };
+  if (!(await confirmarSesion(ctx.usuario.id))) return { ok: false, error: SESION_VENCIDA };
 
   const supabase = await clienteServidor();
   const { error, count } = await supabase

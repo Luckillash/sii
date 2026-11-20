@@ -1,3 +1,4 @@
+import 'server-only';
 import { FECHA_ISO, type Tabla, type TipoColumna, type Valor } from './tabla';
 import { armarZip } from './zip';
 

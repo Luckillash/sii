@@ -13,7 +13,7 @@ import {
   textoRevisado,
   textoSinConsulta,
   ubicacionError,
-} from './presentacion';
+} from './documentos-presentacion';
 
 describe('bitácora y revisión', () => {
   it('textoBitacora distingue una falla sin respuesta de una nota sobre una respuesta', () => {

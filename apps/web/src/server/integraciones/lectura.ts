@@ -1,7 +1,12 @@
 import 'server-only';
 import { esAlcance, esEventoWebhook } from '@/lib/api-publica';
+import type {
+  ClaveApiVista,
+  EntregaVista,
+  WebhookConResumen,
+  WebhookVista,
+} from '@/lib/integraciones-presentacion';
 import { clienteServidor } from '../supabase/servidor';
-import type { ClaveApiVista, EntregaVista, WebhookConResumen, WebhookVista } from './presentacion';
 
 // Lecturas de Configuración → API y Webhooks (PLAN-SAAS Fase 11), con la sesión del
 // usuario: RLS `lectura` con `es_admin` en `api_keys`, `webhooks` y `webhook_entregas`

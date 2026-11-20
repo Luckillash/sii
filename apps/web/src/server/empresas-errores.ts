@@ -1,5 +1,5 @@
 // Traducción de errores de Postgres/PostgREST a mensajes del design system (qué pasó y
-// qué hacer) para empresas y resoluciones. Puro, sin `server-only`: se prueba con
+// qué hacer) para empresas y resoluciones. Puro (solo de servidor): se prueba con
 // Vitest. Cada caso sale de supabase/migrations/0001_esquema_inicial.sql y
 // 0005_certificados_resoluciones.sql:
 //
@@ -17,12 +17,13 @@
 //   22004  registrar_resolucion(): falta el ambiente, el número o la fecha.
 //   22007/22008/22P02  fecha o uuid con formato inválido.
 
+import 'server-only';
 import {
   type ErrorBase,
   MENSAJE_GENERICO,
   MENSAJE_SIN_EFECTO,
   type MensajeError,
-} from './equipo-errores';
+} from '@/lib/equipo-errores';
 
 export { type ErrorBase, MENSAJE_GENERICO, MENSAJE_SIN_EFECTO, type MensajeError };
 

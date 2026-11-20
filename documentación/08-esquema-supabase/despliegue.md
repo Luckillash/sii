@@ -33,7 +33,7 @@ Viven en `supabase/migrations/` con prefijo **secuencial de 4 dígitos** (no tim
 |---|---|
 | `0001_esquema_inicial.sql` | `supabase_saas_sii.sql` **byte a byte** (19 secciones: tipos, tablas, RLS, Vault, Storage, Realtime). Nunca se edita |
 | `0002_extensiones_cron.sql` | `pg_cron` (schema `pg_catalog`) y `pg_net` (schema `extensions`) |
-| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, y la `0010_verificar_autorizacion`, aplicada el 2026-11-14, son de la Fase 5: ver [abajo](#fase-5-migración-0008); la `0011_folios`, de la Fase 6, se aplicó el 2026-11-15: ver [abajo](#fase-6-migración-0011); la `0012_folio_anulado`, de la Fase 7, se aplicó el 2026-11-15: ver [abajo](#fase-7-migración-0012); la `0013_notificaciones` y la `0014_cron`, de la Fase 8, se aplicaron el 2026-11-17 (la 0014 después del deploy): ver [abajo](#fase-8-migraciones-0013-y-0014); la `0015_planes_comerciales` y la `0016_pagos`, de la Fase 10, se aplicaron el 2026-11-18 (antes del deploy) y la `0017_cron_suscripciones` después del deploy, el mismo día: ver [abajo](#fase-10-migraciones-0015-0016-y-0017); la `0018_api_webhooks` y la `0019_cron_webhooks`, de la Fase 11: la 0018 se aplicó el 2026-11-19, antes del deploy, y la 0019 el mismo día, después del deploy: ver [abajo](#fase-11-migraciones-0018-y-0019)) |
+| `0003_…` en adelante | las previstas en PLAN-SAAS §6 (la `0008_certificacion` y la `0009_autorizacion_externa`, aplicadas el 2026-11-13, y la `0010_verificar_autorizacion`, aplicada el 2026-11-14, son de la Fase 5: ver [abajo](#fase-5-migración-0008); la `0011_folios`, de la Fase 6, se aplicó el 2026-11-15: ver [abajo](#fase-6-migración-0011); la `0012_folio_anulado`, de la Fase 7, se aplicó el 2026-11-15: ver [abajo](#fase-7-migración-0012); la `0013_notificaciones` y la `0014_cron`, de la Fase 8, se aplicaron el 2026-11-17 (la 0014 después del deploy): ver [abajo](#fase-8-migraciones-0013-y-0014); la `0015_planes_comerciales` y la `0016_pagos`, de la Fase 10, se aplicaron el 2026-11-18 (antes del deploy) y la `0017_cron_suscripciones` después del deploy, el mismo día: ver [abajo](#fase-10-migraciones-0015-0016-y-0017); la `0018_api_webhooks` y la `0019_cron_webhooks`, de la Fase 11: la 0018 se aplicó el 2026-11-19, antes del deploy, y la 0019 el mismo día, después del deploy: ver [abajo](#fase-11-migraciones-0018-y-0019); la `0020_endurecimiento`, de la Fase 13, escrita y probada con `rollback` el 2026-11-19, **pendiente de aplicar**: ver [abajo](#fase-13-migración-0020)) |
 
 Reglas, todas derivadas de que la única base es producción:
 
@@ -91,17 +91,19 @@ Aplicadas el 2026-11-10 con `db push`: `0001_esquema_inicial` y `0002_extensione
 (`supabase_migrations.schema_migrations` = `0001`, `0002`). La verificación
 `supabase/verificaciones/0001_esquema.sql` dio las 13 comprobaciones en `ok`.
 
-Avisos de *Advisors* que son **esperados** y no se corrigen:
+Avisos de *Advisors* que son **esperados** y no se corrigen (revisados el 2026-11-19, Fase 13):
 
 | Aviso | Por qué es correcto |
 |---|---|
-| `rls_enabled_no_policy` en `tokens_sii` y `sesiones_sii` (INFO) | Diseño: RLS activo y sin políticas = solo `service_role` |
-| `authenticated_security_definer_function_executable` (WARN, 10 funciones) | Son las RPC pensadas para el panel (`crear_organizacion`, `crear_invitacion`, `aceptar_invitacion`, `crear_api_key`, `crear_webhook`) y las funciones de acceso que usan las políticas (`es_miembro`, `tiene_rol`, `es_admin`, `puede_emitir`, `comparte_organizacion`). Validan `auth.uid()` adentro; las de acceso solo responden sobre el propio usuario |
-| `unused_index` (INFO) | La base está vacía; se revisa con datos reales |
+| `rls_enabled_no_policy` (INFO) en `tokens_sii`, `sesiones_sii`, `bloqueos_sii` (0007), `eventos_pasarela` (0016) y `api_idempotencia` (0018) | Diseño: RLS activo y sin políticas = solo `service_role` |
+| `authenticated_security_definer_function_executable` (WARN, 15 funciones) | Son las RPC pensadas para el panel (`crear_organizacion`, `crear_invitacion`, `aceptar_invitacion`, `ver_invitacion`, `crear_api_key`, `crear_webhook`, `anular_folios`, `reenviar_entrega_webhook`, `probar_webhook`, `rotar_secreto_webhook`) y las funciones de acceso que usan las políticas (`es_miembro`, `tiene_rol`, `es_admin`, `puede_emitir`, `comparte_organizacion`). Validan `auth.uid()` adentro; las de acceso solo responden sobre el propio usuario. Revocarlas rompería el panel o las políticas |
+| `anon_security_definer_function_executable` (WARN) en `ver_invitacion` | A propósito: `/invitacion/[token]` se ve antes de iniciar sesión (0003). Solo devuelve datos de la invitación cuyo token se conoce |
+| `unused_index` (INFO) | Con pocos datos casi ningún índice se usa todavía; se revisa con volumen real |
+| `auth_leaked_password_protection` (WARN) y `auth_db_connections_absolute` (INFO) | Configuración de Auth en el panel, no de la base: los decide el usuario (*Authentication → Attack Protection* y *Project Settings → Database / Auth*); ver la [Fase 13](#fase-13-migración-0020) |
 
-Pendiente (rendimiento, antes de tener volumen): `unindexed_foreign_keys` (INFO, 52 FK sin
-índice, la mayoría `organizacion_id`, que filtran todas las políticas RLS). Se resuelve con
-una migración aditiva de índices `concurrently` (prevista en PLAN-SAAS §6).
+`unindexed_foreign_keys` (INFO, 54 FK sin índice al 2026-11-19, la mayoría `organizacion_id`,
+que filtran todas las políticas RLS) lo resuelve la `0020_endurecimiento` (Fase 13, pendiente
+de aplicar).
 
 ### Fase 4: migraciones 0006 y 0007 (aplicadas el 2026-11-13)
 
@@ -435,8 +437,8 @@ Alertas: `correo: "configurado"`, 0 correos. Monitores de Sentry `cron-seguimien
 
 El número: el plan reservaba `0014` para los planes comerciales (Fase 10); por orden de
 creación quedaron `0015_planes_comerciales`, `0016_pagos` y `0017_cron_suscripciones`
-([Fase 10](#fase-10-migraciones-0015-0016-y-0017)); los índices de FK van en la
-`0018_indices_fk` (Fase 13).
+([Fase 10](#fase-10-migraciones-0015-0016-y-0017)); los índices de FK quedaron en la
+`0020_endurecimiento` ([Fase 13](#fase-13-migración-0020)).
 
 **Orden: la 0013 antes del deploy, la 0014 después.** La 0013 es aditiva y el código
 anterior no la usa. La 0014 empieza a llamar a las rutas apenas se aplica: antes del deploy
@@ -535,7 +537,7 @@ Registro del 2026-11-18:
 - *Advisors*: lo nuevo es esperado. `rls_enabled_no_policy` en `eventos_pasarela` (como
   `tokens_sii`) y `unindexed_foreign_keys` en `clientes_pago.plan_pendiente_id`,
   `clientes_pago.plan_pendiente_por`, `eventos_pasarela.organizacion_id` y
-  `pagos.suscripcion_id` (van en la `0018_indices_fk` de la Fase 13). `activar_suscripcion`
+  `pagos.suscripcion_id` (van en la `0020_endurecimiento` de la Fase 13). `activar_suscripcion`
   no aparece como ejecutable por `anon` ni `authenticated`.
 
 | Migración | Contenido | Qué falla si falta |
@@ -597,7 +599,7 @@ que sigue a la lista):
    `apps/web/src/server/supabase/tipos.ts` (columnas nuevas de `planes` y `suscripciones`, las
    tres tablas y `activar_suscripcion`); se versiona lo generado.
 6. *Advisors*: `rls_enabled_no_policy` en `eventos_pasarela` (INFO) y las 4 FK sin índice de
-   las tablas nuevas son **esperados** (índices en la `0018_indices_fk`, Fase 13).
+   las tablas nuevas son **esperados** (índices en la `0020_endurecimiento`, Fase 13).
    `activar_suscripcion` no debe aparecer en
    `authenticated_security_definer_function_executable`.
 7. `FLOW_API_KEY`, `FLOW_SECRET_KEY` y `FLOW_API_URL=https://sandbox.flow.cl/api` en
@@ -766,15 +768,111 @@ ya existe:
   `operaciones_sii` (por `ambiente`, `resultado`, `operacion` y `terminada_en`) y
   `v_envios_por_consultar`, más una lectura `head` de `planes` para medir la base. Como mucho
   7 lecturas por minuto (`revalidate = 60`).
-- **Pendiente para la Fase 13:** `operaciones_sii` no tiene índice por fecha sin
-  organización (solo `(organizacion_id, iniciada_en)` y `(empresa_id, operacion,
-  iniciada_en)`), así que los conteos de `/estado` recorren la tabla. Cuando haya volumen, una
-  migración aditiva con un índice `concurrently` (p. ej. `(terminada_en)` o
-  `(ambiente, terminada_en)`), junto con los de `unindexed_foreign_keys`.
+- `operaciones_sii` no tenía índice por fecha sin organización (solo `(organizacion_id,
+  iniciada_en)` y `(empresa_id, operacion, iniciada_en)`), así que los conteos de `/estado`
+  recorrían la tabla. Los agrega la `0020_endurecimiento`
+  ([Fase 13](#fase-13-migración-0020)): `(ambiente, terminada_en) include (resultado)` y
+  `(operacion, resultado, terminada_en desc)`, ambos `where terminada_en is not null`.
 
 Antes del deploy van `NEXT_PUBLIC_APP_URL` (se fija en el build: sitemap, canónica, OG) y
 `CORREO_CONTACTO` en Vercel *Production*; después, la regla del Firewall para los POST a
 `/contacto` ([checklist](../07-referencia/checklist-produccion.md#sitio-público-fase-12)).
+
+### Fase 13: migración 0020
+
+**Estado: escrita y probada el 2026-11-19 dentro de `begin … rollback` contra producción;
+pendiente de aplicar (lo decide el usuario).** `supabase db push --dry-run` lista solo
+`0020_endurecimiento.sql`.
+
+`0020_endurecimiento` es aditiva (no cambia columnas, políticas ni funciones):
+
+| Parte | Qué hace |
+|---|---|
+| Slugs reservados | Check `organizaciones_slug_no_reservado`: `slug <> all (array[…])` con los 26 slugs de `SLUGS_RESERVADOS` (`apps/web/src/lib/rutas.ts`). Cubre todas las vías: `crear_organizacion()` (sin cambios), el `update` de `slug` de un administrador con su sesión y `service_role`. Error `23514` (`check_violation`), que `traducirErrorOrganizacion` ya muestra como «La dirección no es válida». Antes de escribirla se revisó que ninguna organización use uno (la única es `servicio`) |
+| Índices de FK | 53 índices para las 54 FK que reporta `unindexed_foreign_keys` (el de `empresa_certificados (organizacion_id, certificado_id)` cubre dos). Parciales `where … is not null` en las columnas opcionales (quién lo hizo, referencias opcionales) |
+| `operaciones_sii` por fecha | `operaciones_sii_ambiente_terminada_en_idx` `(ambiente, terminada_en) include (resultado)` y `operaciones_sii_operacion_resultado_terminada_en_idx` `(operacion, resultado, terminada_en desc)`, ambos `where terminada_en is not null`: los dos conteos y la «última corrida ok» de `/estado` (`server/estado/index.ts`) pasan a *Index Only Scan* |
+| Privilegios | `revoke execute` de `tg_api_key_sin_reactivar()` (0018) a PUBLIC, `anon` y `authenticated`, como las demás `tg_*`. El trigger sigue disparando (el privilegio solo se exige al crear el trigger) |
+
+**Sin `concurrently`, a propósito.** `db push` corre cada archivo en una transacción y la
+0020, como las anteriores, trae su `begin`/`commit`; `create index concurrently` no se puede
+usar ahí. Las tablas tienen de 0 a decenas de filas, así que cada índice bloquea escrituras
+milisegundos. La migración fija `lock_timeout = 5s`: si una transacción larga tiene la
+tabla, falla entera (no queda nada a medias) y se reintenta. Con volumen, los índices nuevos
+irían en una migración propia sin transacción (regla de [Migraciones](#migraciones)).
+
+**Mantener las dos listas de slugs iguales.** La lista va en la migración entre los
+marcadores `-- slugs-reservados:inicio` y `-- slugs-reservados:fin`. La prueba
+`apps/web/src/lib/slugs-reservados-db.test.ts` (Vitest, en `pnpm test`) lee la última
+migración que tenga esos marcadores y falla si su lista no es igual a `SLUGS_RESERVADOS`. Para
+reservar un slug nuevo: agregarlo en `rutas.ts` (la prueba de `rutas.test.ts` ya exige que
+toda carpeta de primer nivel de `src/app` esté reservada) **y** en una migración nueva que
+haga `drop constraint organizaciones_slug_no_reservado` + `add constraint` con la lista
+completa y los mismos marcadores. Antes de aplicarla, revisar que ninguna organización use
+el slug nuevo.
+
+**Cuándo: antes o después del deploy, da igual.** La app ya rechaza los mismos slugs desde la
+Fase 12 y no depende de los índices. Se recomienda aplicarla sin un deploy en curso:
+
+1. Leer `supabase/migrations/0020_endurecimiento.sql` completa y confirmar que es aditiva.
+2. Respaldo al día (panel → *Database → Backups*; con PITR, anotar la hora).
+3. Revisar que ninguna organización use un slug reservado (la comprobación 2 de la
+   verificación, que se puede correr antes; el 2026-11-19 daba `true`).
+4. `pnpm exec supabase db push --remote=rbrntkztzijaxsnpgpqn --dry-run` → debe listar
+   **solo** `0020_endurecimiento.sql`.
+5. `pnpm exec supabase db push --remote=rbrntkztzijaxsnpgpqn`.
+6. Verificación de solo lectura `supabase/verificaciones/0020_endurecimiento.sql`: **9/9**
+   (antes de migrar salen `true` solo la 2 y la 8).
+7. *Advisors* (`get_advisors`): `unindexed_foreign_keys` debe desaparecer. Aparecerán como
+   `unused_index` (INFO) los índices nuevos: esperado con pocos datos.
+8. `pnpm db:tipos`: no debería cambiar nada (sin columnas ni funciones nuevas).
+9. Regresiones de RLS (opcional, con `rollback`): `rls-fase13-acceso-por-tabla.sql`
+   (debe seguir 52/52) y `rls-fase2-tenancy.sql`.
+10. Actualizar esta sección, la tabla de Migraciones, PLAN-SAAS §6 y
+    [arquitectura](arquitectura.md) con la fecha real.
+
+**Prueba con `rollback` (2026-11-19, en producción, con el MCP `execute_sql`):** el cuerpo
+de la migración (sin su `begin`/`commit`) y la verificación en la misma transacción dieron
+8/9 (la 9, «migración registrada», solo pasa con un `db push` real). Además, en la misma
+transacción: `crear_organizacion` con `api` y con `Estado` (se pasa a minúsculas) → `23514`,
+con un slug libre → crea; el propietario no puede renombrar a `docs` (`23514`) y sí a uno
+libre; `service_role` tampoco inserta `admin`; reactivar una API key revocada con la sesión
+sigue dando `22023` (el trigger corre tras el `revoke`); y con `enable_seqscan = off` las dos
+consultas de `/estado` usan los índices nuevos. Después del `rollback`, el check y los índices
+no existen y no quedaron usuarios ni organizaciones de prueba.
+
+**Simulación RLS por tabla (Fase 13):** `supabase/verificaciones/rls-fase13-acceso-por-tabla.sql`
+recorre las 39 tablas y 4 vistas con 7 roles (`anon`, otra organización, lector, emisor,
+administrador, propietario, `service_role`) y select/insert/update/delete, contra
+[acceso por tabla](../03-api-reference/acceso-por-tabla.md). Corrida en producción el
+2026-11-19: la matriz coincide con el documento en las 39 tablas y en 3 de las 4 vistas; las
+3 filas en `false` de esa primera corrida (preparación, `v_ventas_diarias` y la nota del
+emisor) eran del script (la boleta aceptada colgaba de un envío y un trigger la pasaba a
+`enviado`; el trigger de documentos rechazaba antes que RLS) y se corrigieron y comprobaron
+aparte con `rollback`. Las discrepancias con el documento estaban en el documento (37 tablas
+en vez de 39; `expira_en` en la nota 12) y ya se corrigieron.
+
+**Fuera de la base (los hace el usuario en el panel):**
+
+- *Authentication → Attack Protection*: activar la protección de contraseñas filtradas
+  (aviso `auth_leaked_password_protection`; requiere plan Pro).
+- *Project Settings → Database* (o *Auth*): pasar las conexiones de Auth a porcentaje
+  (aviso `auth_db_connections_absolute`), solo si se va a cambiar el tamaño de la instancia.
+- **Claves legadas** (*Settings → JWT Keys*): revocar la clave HS256 *Previously used*. En
+  `edge_logs` del 2026-11-13 al 2026-11-19 todas las peticiones de la app traen `sb_secret_…`
+  o `sb_publishable_…`; las únicas con un JWT HS256 como `apikey` son de la propia
+  plataforma (`/admin/v1/service/versions` y `/admin/v1/network-bans/retrieve`, rol
+  `supabase_admin`, *user agent* `@supabase-infra/mgmt-api`, 1–5 por día), no de clientes.
+  Los websockets de Realtime registran la clave como `REDACTED`, pero respondieron 101 y las
+  legadas dan 401 desde el 2026-11-13. Consulta para repetirlo (MCP `query_logs`, ventanas de
+  24 h):
+
+  ```sql
+  select toDate(timestamp) dia, count(*) total,
+    countIf(startsWith(log_attributes['request.sb.apikey.apikey.prefix'], 'sb_')) con_sb,
+    countIf(mapContains(log_attributes, 'request.sb.jwt.apikey.payload.role')
+            and not startsWith(log_attributes['request.path'], '/admin/')) jwt_de_clientes
+  from logs where source = 'edge_logs' group by dia order by dia
+  ```
 
 ## Requisitos del proyecto
 

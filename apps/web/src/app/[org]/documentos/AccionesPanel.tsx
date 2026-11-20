@@ -4,15 +4,15 @@ import { Download, Mail, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useId, useRef, useState } from 'react';
 import { Alerta, Boton } from '@/components/boleteame';
-import type { ArchivoDocumento } from '@/lib/emision';
 import {
   type AvisoUi,
   avisoConsulta,
   type EstadoDocumentoBd,
   motivoSinConsulta,
   textoSinConsulta,
-} from '@/server/documentos/presentacion';
-import type { MensajeError } from '@/server/equipo-errores';
+} from '@/lib/documentos-presentacion';
+import type { ArchivoDocumento } from '@/lib/emision';
+import type { MensajeError } from '@/lib/equipo-errores';
 import { estadoVigente } from '@/stores/enVivo';
 import { useEnVivoStore } from '@/stores/ProveedorEnVivo';
 import { consultarEstado, enlaceArchivo, reenviarAlReceptor } from './acciones';

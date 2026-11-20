@@ -1290,3 +1290,38 @@ Decisiones y trampas de la fase (detalle en la [guía](../02-guias/sitio-publico
   falla cerrado: responde «no disponible» y avisa a Sentry. Hoy la clave está configurada en
   *Production*.
 - **`apple-icon` opaco:** iOS rellena de negro lo transparente; por eso lleva fondo `surface`.
+
+## Endurecimiento y lanzamiento (Fase 13)
+
+- **PITR está apagado** (comprobado el 2026-11-19 con `supabase backups list`:
+  `pitr_enabled: false`). Solo hay respaldos diarios (7 días): una «hora previa para PITR»
+  anotada antes de migrar no sirve para restaurar a esa hora
+  ([respaldo](respaldo-y-restauracion.md)).
+- **Restaurar en el mismo proyecto hace retroceder `cafs.siguiente_folio`**: la app
+  reasignaría folios ya enviados al SII. Antes de reabrir la emisión hay que reconciliar
+  los folios ([peligros](respaldo-y-restauracion.md#restaurar-en-el-mismo-proyecto-peligros-para-boletéame)).
+- **Una restauración a un proyecto nuevo arranca los jobs de pg_cron**, que llaman a
+  `https://boleteame.dev/api/cron/*` con el `cron_token` copiado: desactivarlos al tiro.
+- **`SII_TOKENS_KEY` es una sola llave y la comparten local y producción** (misma base):
+  rotarla en Vercel sin cambiar `.env.local` hace que cada ejecución local invalide los
+  cachés de producción ([rotación](respaldo-y-restauracion.md#rotación-de-sii_tokens_key)).
+- **Sentry agrupa las operaciones por operación y resultado** (fingerprint
+  `['operacion_sii', op, resultado]`): «issue nuevo» avisa solo el primer incierto. Las
+  alertas usan además la regresión y la frecuencia, y hay que resolver el issue después de
+  atender cada caso ([observabilidad](observabilidad-sentry.md#cómo-agrupa-sentry-estos-eventos)).
+- **Los `captureMessage` son `event.type:default`**, no `error`: una consulta o alerta con
+  `event.type:error` no ve los `incierto` ni los `transporte`.
+- **Sentry no ve los éxitos** (`ok` es breadcrumb): una tasa de fallas en porcentaje sale de
+  `operaciones_sii`, no de Sentry.
+- **Los cron monitors no tenían alerta**: un monitor en rojo abre un issue, pero sin una
+  automatización conectada nadie recibe el aviso.
+- **`return` sin `await` dentro de un bloque `await using transporte`** cierra el transporte
+  al salir de la función, antes de que la promesa haga sus peticiones. Pasó en `descargarSet`
+  (`server/certificacion/set.ts`): «Descargar el set» fallaba siempre con «El transporte
+  HTTP ya se cerró». Lo destapó la e2e del flujo crítico (2026-11-19). Si la promesa que se
+  devuelve usa el transporte, va `return await`.
+- **El SII falso de las e2e (`E2E_SII_FALSO_URL`)** solo funciona fuera de Vercel, con
+  `NODE_ENV` distinto de `production` y hacia loopback. El cron de seguimiento de
+  *Production* lee la misma base: un envío de prueba que quede en `enviado` lo consultaría
+  con el SII real. Por eso la e2e consulta de inmediato y limpia
+  ([guía](../05-pruebas/e2e-flujo-critico.md)).

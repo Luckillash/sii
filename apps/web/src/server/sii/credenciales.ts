@@ -7,8 +7,8 @@ import {
   type Reloj,
   relojSistema,
 } from '@winex/certificacion';
+import type { MensajeError } from '@/lib/equipo-errores';
 import { formatearFecha } from '@/lib/formatos';
-import type { MensajeError } from '@/server/equipo-errores';
 import type { ClienteServicio } from '../supabase/service';
 
 // Credenciales del SII de una empresa (PLAN-SAAS Fase 4): lee el .pfx (base64) y su

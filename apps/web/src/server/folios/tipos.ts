@@ -1,3 +1,4 @@
+import 'server-only';
 import type { EstadoFolios } from '@/components/boleteame/folios';
 import type { ResultadoOperacion } from '@/lib/certificacion';
 import type { AmbienteSii, EstadoCaf, EstadoSolicitudFolios, TipoFolio } from '@/lib/folios';

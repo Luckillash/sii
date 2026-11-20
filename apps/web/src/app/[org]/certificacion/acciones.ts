@@ -3,10 +3,10 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import type { ResultadoPaso } from '@/lib/certificacion';
+import { MENSAJE_GENERICO, type MensajeError } from '@/lib/equipo-errores';
 import { puedeAdministrar } from '@/lib/permisos';
 import * as certificacion from '@/server/certificacion';
 import { obtenerEmpresa } from '@/server/empresas';
-import { MENSAJE_GENERICO, type MensajeError } from '@/server/equipo-errores';
 import { exigirMembresia } from '@/server/sesion';
 import {
   camposDe,

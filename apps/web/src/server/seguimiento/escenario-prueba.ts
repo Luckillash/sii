@@ -12,6 +12,7 @@
 //   - un historial de los estados por los que pasa cada documento (para probar que los
 //     triggers nunca dejan un estado final intermedio).
 
+import 'server-only';
 import {
   ErrorTransporte,
   EstadoEnvio,

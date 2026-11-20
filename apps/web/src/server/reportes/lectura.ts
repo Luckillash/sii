@@ -1,5 +1,6 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { AmbienteSii, EstadoDocumentoBd } from '@/lib/documentos-presentacion';
 import { fallaBase } from '../certificacion/comun';
 import {
   armarConsulta,
@@ -7,7 +8,6 @@ import {
   type FiltrosDocumentos,
   rangoPeriodo,
 } from '../documentos/filtros';
-import type { AmbienteSii, EstadoDocumentoBd } from '../documentos/presentacion';
 import { clienteServidor } from '../supabase/servidor';
 import type { Database } from '../supabase/tipos';
 import { agruparPorDia, type DiaResumen, type DocumentoExportado, MAXIMO_FILAS } from './filas';

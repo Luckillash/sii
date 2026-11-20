@@ -6,7 +6,7 @@ import {
   fallasSeguidas,
   prefijoVisible,
   sePuedeReenviar,
-} from './presentacion';
+} from './integraciones-presentacion';
 
 function entrega(estado: EntregaVista['estado'], id = 1): EntregaVista {
   return {

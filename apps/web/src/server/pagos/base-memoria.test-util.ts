@@ -1,3 +1,4 @@
+import 'server-only';
 import type { ClienteServicio } from '../supabase/service';
 
 // Cliente de Supabase falso en memoria para las pruebas de `server/pagos/`. Cubre lo que

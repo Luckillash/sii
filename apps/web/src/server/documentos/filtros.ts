@@ -1,8 +1,9 @@
+import 'server-only';
 import { z } from 'zod';
 import type { EstadoDte } from '@/components/boleteame/tipos';
+import type { AmbienteSii, EstadoDocumentoBd } from '@/lib/documentos-presentacion';
 import { hoyEnChile } from '@/lib/formatos';
 import { patronBusqueda } from '../emision/catalogo';
-import type { AmbienteSii, EstadoDocumentoBd } from './presentacion';
 
 // Filtros de `/[org]/documentos` (PLAN-SAAS Fase 8, §4.3). La URL (`searchParams`) es la
 // fuente de verdad: esto la lee (sin lanzar: un valor raro vuelve al valor por defecto),

@@ -1,4 +1,4 @@
-import type { MensajeError } from '@/server/equipo-errores';
+import type { MensajeError } from '@/lib/equipo-errores';
 import type { Database } from '@/server/supabase/tipos';
 
 // Contrato de la Fase 8 (seguimiento de envíos) entre `server/seguimiento/` y la UI de

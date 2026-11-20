@@ -3,6 +3,7 @@
 // certificado de prueba generados al vuelo, sin red. De ella salen el `<TED>` como texto
 // `latin1` y los `DatosRepresentacion` con las cifras que escribió la librería.
 
+import 'server-only';
 import { ArmadorBoleta, Certificado, FirmaElectronica, relojFijo } from '@winex/certificacion';
 import { cafPrueba } from '../../../test/caf-prueba';
 import { certificado, pfx } from '../../../test/pfx-prueba';

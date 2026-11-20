@@ -1,8 +1,8 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { AmbienteSii } from '@/lib/documentos-presentacion';
 import { fallaBase } from '../certificacion/comun';
 import { rangoPeriodo } from '../documentos/filtros';
-import type { AmbienteSii } from '../documentos/presentacion';
 import { clienteServidor } from '../supabase/servidor';
 import type { Database } from '../supabase/tipos';
 import {

@@ -27,6 +27,7 @@ import {
   Th,
   TipoDTE,
 } from '@/components/boleteame';
+import type { MensajeError } from '@/lib/equipo-errores';
 import {
   AMBIENTES_FOLIO,
   type AmbienteSii,
@@ -49,7 +50,6 @@ import {
   validarRangoAnulacion,
 } from '@/lib/folios';
 import { formatearFecha, formatearFechaHora, formatearMiles, formatearRut } from '@/lib/formatos';
-import type { MensajeError } from '@/server/equipo-errores';
 // Solo tipos (se borran al compilar): no arrastran `server-only` al bundle.
 import type { FilaCaf, ResumenTipo, VistaFolios } from '@/server/folios';
 import { anularFolios, marcarRevisada, solicitarFolios, subirCaf } from './acciones';

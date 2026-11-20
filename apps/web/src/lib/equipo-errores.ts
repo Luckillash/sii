@@ -1,5 +1,6 @@
 // Traducción de errores de Postgres/PostgREST a mensajes del design system (qué pasó y
-// qué hacer) para el equipo y las invitaciones. Puro, sin `server-only`: se prueba con
+// qué hacer) para el equipo y las invitaciones. Puro y en `lib/` (no en `server/`, donde todo
+// importa `server-only`) porque también lo importan componentes cliente. Se prueba con
 // Vitest. Cada caso sale de supabase/migrations/0001_esquema_inicial.sql:
 //
 //   42501  RLS (WITH CHECK) o `raise ... errcode '42501'` en crear_invitacion(),
@@ -42,6 +43,12 @@ export const MENSAJE_SIN_EFECTO: MensajeError = {
   titulo: 'No se aplicó el cambio',
   detalle:
     'Puede que ya no exista o que tu rol no lo permita. Recarga la página para ver el estado actual.',
+};
+
+/** `getUser()` no confirmó la sesión antes de una operación sensible (revocada o baneada). */
+export const SESION_VENCIDA: MensajeError = {
+  titulo: 'Tu sesión ya no es válida',
+  detalle: 'Por seguridad, vuelve a ingresar y repite la operación.',
 };
 
 export function mensajeCupo(

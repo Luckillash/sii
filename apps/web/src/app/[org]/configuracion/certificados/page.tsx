@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Alerta, Tarjeta } from '@/components/boleteame';
+import { alertasCertificados } from '@/lib/certificados-estado';
 import { puedeAdministrar } from '@/lib/permisos';
 import { listarCertificados, listarEmpresasBasicas } from '@/server/certificados/consultas';
-import { alertasCertificados } from '@/server/certificados/estado';
 import { exigirMembresia } from '@/server/sesion';
 import org from '../../organizacion.module.css';
 import estilos from './certificados.module.css';

@@ -3,7 +3,6 @@
 import { useState, useTransition } from 'react';
 import { Alerta, Boton, Dialogo, Tabla, TablaVacia, Td, Th } from '@/components/boleteame';
 import { formatearFecha, formatearFechaHora, formatearRut } from '@/lib/formatos';
-import type { MensajeError } from '@/server/integraciones/errores';
 import {
   type ClaveApiVista,
   type EstadoClave,
@@ -11,7 +10,8 @@ import {
   ETIQUETA_ESTADO_CLAVE,
   estadoClave,
   prefijoVisible,
-} from '@/server/integraciones/presentacion';
+} from '@/lib/integraciones-presentacion';
+import type { MensajeError } from '@/server/integraciones/errores';
 import { revocarClaveApi } from './acciones';
 import estilos from './api.module.css';
 

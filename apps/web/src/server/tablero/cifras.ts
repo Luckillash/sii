@@ -1,3 +1,5 @@
+import 'server-only';
+import type { AmbienteSii, EstadoDocumentoBd } from '@/lib/documentos-presentacion';
 import { formatearMiles, formatearMonto, nombreTipoDte } from '@/lib/formatos';
 import {
   leerFiltros,
@@ -6,7 +8,6 @@ import {
   periodoActual,
   TODOS_LOS_PERIODOS,
 } from '../documentos/filtros';
-import type { AmbienteSii, EstadoDocumentoBd } from '../documentos/presentacion';
 import type { ResumenTipo } from '../folios/tipos';
 
 // Lógica pura del Tablero (PLAN-SAAS Fase 9): filtros de la URL, cifras del período a

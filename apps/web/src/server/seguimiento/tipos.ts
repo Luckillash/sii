@@ -1,3 +1,4 @@
+import 'server-only';
 import type { DetalleRepRechRest, EstadisticaEnvioRest } from '@winex/certificacion';
 import type { ClasificacionEnvio } from '@/lib/seguimiento';
 import type { Database } from '@/server/supabase/tipos';

@@ -13,11 +13,12 @@ import {
   Tarjeta,
   TipoDTE,
 } from '@/components/boleteame';
+import { type AlertaCertificados, alertasCertificados } from '@/lib/certificados-estado';
+import { enAmbiente, nombreAmbiente } from '@/lib/documentos-presentacion';
 import { formatearFechaHora, formatearMiles, formatearRut, nombreTipoDte } from '@/lib/formatos';
 import { puedeAdministrar, puedeEmitir } from '@/lib/permisos';
 import { type FormatoReporte, hrefExportacion, type Reporte } from '@/lib/reportes';
 import { estadosCertificados } from '@/server/certificados/consultas';
-import { type AlertaCertificados, alertasCertificados } from '@/server/certificados/estado';
 import {
   ambientePorDefecto,
   type EnvioIncierto,
@@ -31,7 +32,6 @@ import {
   hrefInciertos,
   nombrePeriodo,
 } from '@/server/documentos/filtros';
-import { enAmbiente, nombreAmbiente } from '@/server/documentos/presentacion';
 import { listarEmpresas } from '@/server/empresas';
 import { leerResumenFolios, type ResumenTipo } from '@/server/folios';
 import { exigirMembresia, obtenerPerfil } from '@/server/sesion';

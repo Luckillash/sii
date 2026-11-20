@@ -2,6 +2,8 @@
 // valores crudos. Cada formato (`csv.ts`, `xlsx.ts`) decide cómo escribir cada tipo, así
 // las filas se arman una sola vez (`filas.ts`). Puro.
 
+import 'server-only';
+
 /**
  * - `texto`: tal cual (en CSV, neutralizado contra fórmulas).
  * - `entero`: número sin separador de miles (folio, código, cantidad).

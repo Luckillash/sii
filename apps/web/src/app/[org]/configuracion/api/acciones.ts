@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { ALCANCES_OFRECIDOS } from '@/lib/api-publica';
+import { expiracionDesde } from '@/lib/integraciones-presentacion';
 import { puedeAdministrar } from '@/lib/permisos';
 import { confirmarSesion } from '@/server/certificados/acceso';
 import {
@@ -16,7 +17,6 @@ import {
   SIN_PERMISO,
   traducirErrorIntegracion,
 } from '@/server/integraciones/errores';
-import { expiracionDesde } from '@/server/integraciones/presentacion';
 import { type ContextoOrganizacion, exigirMembresia } from '@/server/sesion';
 import { clienteServidor } from '@/server/supabase/servidor';
 

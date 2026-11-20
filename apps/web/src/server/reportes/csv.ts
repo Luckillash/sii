@@ -1,3 +1,4 @@
+import 'server-only';
 import { FECHA_ISO, type Tabla, type TipoColumna, type Valor } from './tabla';
 
 // CSV de las exportaciones (PLAN-SAAS Fase 9), pensado para abrirlo con doble clic en

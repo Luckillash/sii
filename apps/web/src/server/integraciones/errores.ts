@@ -1,4 +1,5 @@
-import type { MensajeError } from '../equipo-errores';
+import 'server-only';
+import type { MensajeError } from '@/lib/equipo-errores';
 
 // Traducción de errores de Postgres/PostgREST a mensajes del design system (qué pasó y
 // qué hacer) para Configuración → API y Webhooks (PLAN-SAAS Fase 11). Puro, sin
@@ -18,7 +19,7 @@ import type { MensajeError } from '../equipo-errores';
 //          eventos y alcances fuera de la lista (0001).
 //   22P02  un id con formato inválido.
 
-export type { MensajeError } from '../equipo-errores';
+export type { MensajeError } from '@/lib/equipo-errores';
 
 export type OperacionIntegracion =
   | 'crear_clave'

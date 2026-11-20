@@ -125,4 +125,27 @@ describe('anularFolios', () => {
     );
     expect(r).toMatchObject({ tipo: 'error', motivo: 'caf_no_encontrado' });
   });
+
+  it('confirma la sesión con getUser() antes de anular: revocada, no anula nada', async () => {
+    const e = escenarioCaf();
+    const confirmadas: string[] = [];
+    const r = await anularFolios(
+      e.ctx,
+      { cafId: CAF, desde: 5, hasta: 7, motivo: 'Corte de luz' },
+      {
+        ...e.deps,
+        operacion: {
+          ...e.deps.operacion,
+          confirmarSesion: async (id: string) => {
+            confirmadas.push(id);
+            return false;
+          },
+        },
+      },
+    );
+    expect(r).toMatchObject({ tipo: 'error', motivo: 'sesion_invalida' });
+    expect(confirmadas).toEqual([e.ctx.usuarioId]);
+    expect(e.sesion.rpcs).toEqual([]);
+    expect(e.falso.tabla('folios_anulados')).toEqual([]);
+  });
 });

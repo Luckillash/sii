@@ -12,6 +12,7 @@ import {
   Select,
   textoEstadoDte,
 } from '@/components/boleteame';
+import { nombreAmbiente } from '@/lib/documentos-presentacion';
 import { formatearMiles, formatearRut } from '@/lib/formatos';
 import { puedeAdministrar, puedeEmitir } from '@/lib/permisos';
 import { ambientePorDefecto, leerDetalleDocumento, listarDocumentos } from '@/server/documentos';
@@ -26,7 +27,6 @@ import {
   POR_PAGINA,
   TODOS_LOS_PERIODOS,
 } from '@/server/documentos/filtros';
-import { nombreAmbiente } from '@/server/documentos/presentacion';
 import { listarEmpresas } from '@/server/empresas';
 import { hrefExportar } from '@/server/reportes/filas';
 import { exigirMembresia, obtenerPerfil } from '@/server/sesion';

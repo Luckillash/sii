@@ -17,6 +17,9 @@ const destino = resolve(raiz, 'apps/web/src/server/supabase/tipos.ts');
 
 const CABECERA = `// Generado desde el proyecto de Supabase (rbrntkztzijaxsnpgpqn). No editar a mano:
 // regenerar con \`pnpm db:tipos\` o el MCP generate_typescript_types tras cada migración.
+// Solo de servidor, como todo src/server/: el cliente lo importa con \`import type\`.
+
+import 'server-only';
 
 `;
 

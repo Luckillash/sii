@@ -189,7 +189,9 @@ export async function descargarSet(
       const declaracion = deps.sii.declaracion({ transporte, reloj: deps.reloj });
       const rut = p.empresa.rut;
 
-      return conSesionSii(
+      // `return await`: sin el await, `await using` cierra el transporte al salir de la
+      // función, antes de que la sesión haga sus peticiones («El transporte HTTP ya se cerró»).
+      return await conSesionSii(
         deps,
         cliente,
         p.certificado,

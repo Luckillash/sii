@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { alertasCertificados, type FilaEstadoCertificado, textoDias } from './estado';
+import { alertasCertificados, type FilaEstadoCertificado, textoDias } from './certificados-estado';
 
 function fila(parcial: Partial<FilaEstadoCertificado>): FilaEstadoCertificado {
   return {

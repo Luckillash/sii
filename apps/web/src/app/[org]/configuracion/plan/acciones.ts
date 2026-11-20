@@ -2,9 +2,10 @@
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { type MensajeError, SESION_VENCIDA } from '@/lib/equipo-errores';
 import { formatearFecha } from '@/lib/formatos';
 import { puedeAdministrar } from '@/lib/permisos';
-import type { MensajeError } from '@/server/equipo-errores';
+import { confirmarSesion } from '@/server/certificados/acceso';
 import {
   cambiarDePlan,
   cancelarSuscripcion,
@@ -15,7 +16,6 @@ import {
 } from '@/server/pagos';
 import { mensajeFallaPagos } from '@/server/pagos/errores';
 import { type ContextoOrganizacion, exigirMembresia } from '@/server/sesion';
-import { clienteServidor } from '@/server/supabase/servidor';
 
 // Acciones de Configuración → Plan (PLAN-SAAS Fase 10). Solo propietarios y
 // administradores (como el resto de la configuración de la organización). La sesión se
@@ -41,17 +41,7 @@ async function contextoAdmin(slug: string): Promise<ContextoOrganizacion | Falla
   if (!puedeAdministrar(ctx.rol)) return { ok: false, error: SIN_PERMISO };
   // getClaims verifica la firma localmente; antes de una operación con cobro se confirma
   // con Auth que la sesión no fue revocada (PLAN-SAAS Fase 13, punto 1).
-  const supabase = await clienteServidor();
-  const { data, error } = await supabase.auth.getUser();
-  if (error || data.user?.id !== ctx.usuario.id) {
-    return {
-      ok: false,
-      error: {
-        titulo: 'Tu sesión ya no es válida',
-        detalle: 'Vuelve a ingresar y repite la operación.',
-      },
-    };
-  }
+  if (!(await confirmarSesion(ctx.usuario.id))) return { ok: false, error: SESION_VENCIDA };
   return ctx;
 }
 

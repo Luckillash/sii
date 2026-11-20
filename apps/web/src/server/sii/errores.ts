@@ -12,8 +12,8 @@ import {
   hostDe,
   SiiError,
 } from '@winex/certificacion';
+import type { MensajeError } from '@/lib/equipo-errores';
 import { depurarBreadcrumb, depurarTexto, FILTRADO } from '@/lib/sentry/depurar';
-import type { MensajeError } from '@/server/equipo-errores';
 import type { Database } from '@/server/supabase/tipos';
 
 // Errores de la capa SII y su traducción a `resultado_operacion` (PLAN-SAAS Fase 4,

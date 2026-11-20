@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { Alerta, Boton, Dialogo, Select, Tabla, TablaVacia, Td, Th } from '@/components/boleteame';
+import { type MensajeError, traducirErrorEquipo } from '@/lib/equipo-errores';
 import { formatearFecha } from '@/lib/formatos';
 import {
   DESCRIPCION_ROL,
@@ -13,7 +14,6 @@ import {
   rolesAsignables,
 } from '@/lib/permisos';
 import type { InvitacionPendiente, Miembro } from '@/server/equipo';
-import { type MensajeError, traducirErrorEquipo } from '@/server/equipo-errores';
 import {
   cambiarRol,
   quitarMiembro,

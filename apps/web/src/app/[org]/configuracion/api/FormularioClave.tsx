@@ -4,7 +4,7 @@ import { useActionState, useEffect, useId, useMemo, useState } from 'react';
 import { Alerta, Boton, Campo, Input, Select } from '@/components/boleteame';
 import { ALCANCES_OFRECIDOS, ALCANCES_POR_DEFECTO, DESCRIPCION_ALCANCE } from '@/lib/api-publica';
 import { formatearRut } from '@/lib/formatos';
-import { PLAZOS_EXPIRACION } from '@/server/integraciones/presentacion';
+import { PLAZOS_EXPIRACION } from '@/lib/integraciones-presentacion';
 import { crearClaveApi, type ResultadoCrearClave } from './acciones';
 import estilos from './api.module.css';
 import { SecretoParaCopiar } from './SecretoParaCopiar';

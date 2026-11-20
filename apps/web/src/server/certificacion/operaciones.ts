@@ -1,8 +1,13 @@
 import 'server-only';
 import type { ResultadoPaso } from '@/lib/certificacion';
 import { formatearFechaHora } from '@/lib/formatos';
+import { confirmarSesion as confirmarSesionConAuth } from '../certificados/acceso';
 import type { MensajeError } from '../sii/errores';
-import { MINUTOS_EN_CURSO_ABANDONADA, marcarInciertaRevisada } from '../sii/operacion';
+import {
+  MENSAJE_SESION_INVALIDA,
+  MINUTOS_EN_CURSO_ABANDONADA,
+  marcarInciertaRevisada,
+} from '../sii/operacion';
 import type { ClienteServicio } from '../supabase/service';
 import { AMBIENTE, fallaBase, ok } from './comun';
 import { type DependenciasCertificacion, resolverDependencias } from './dependencias';
@@ -80,7 +85,9 @@ export async function bloqueoEnvioSet(
 
 /**
  * Marca como revisada una operación incierta de la empresa (envuelve
- * `marcarInciertaRevisada`; quien llama ya verificó que es administrador).
+ * `marcarInciertaRevisada`; quien llama ya verificó que es administrador). Desbloquea un
+ * reintento que podría duplicar un envío al SII, así que antes confirma la sesión con Auth
+ * (`getUser()`, PLAN-SAAS Fase 13, punto 1). La usan Certificación y Folios.
  */
 export async function marcarRevisada(
   ctx: ContextoCertificacion,
@@ -118,6 +125,16 @@ export async function marcarRevisada(
         };
   }
   if (!data || data.empresa_id !== ctx.empresaId) return noEncontrada;
+
+  const confirmar = deps.operacion.confirmarSesion ?? confirmarSesionConAuth;
+  if (!(await confirmar(ctx.usuarioId).catch(() => false))) {
+    return {
+      tipo: 'error',
+      mensaje: { ...MENSAJE_SESION_INVALIDA },
+      operacionId: null,
+      motivo: 'sesion_invalida',
+    };
+  }
 
   const r = await marcarInciertaRevisada(
     cliente,

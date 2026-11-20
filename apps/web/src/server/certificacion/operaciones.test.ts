@@ -50,4 +50,22 @@ describe('marcarRevisada', () => {
     const r = await marcarRevisada(e.ctx, OP, e.deps);
     expect(r).toMatchObject({ tipo: 'error', motivo: 'no_revisable' });
   });
+
+  it('confirma la sesión con getUser() antes de marcar: revocada, no desbloquea el reintento', async () => {
+    const e = conIncierta();
+    const confirmadas: string[] = [];
+    const r = await marcarRevisada(e.ctx, OP, {
+      ...e.deps,
+      operacion: {
+        ...e.deps.operacion,
+        confirmarSesion: async (id: string) => {
+          confirmadas.push(id);
+          return false;
+        },
+      },
+    });
+    expect(r).toMatchObject({ tipo: 'error', motivo: 'sesion_invalida' });
+    expect(confirmadas).toEqual([USUARIO]);
+    expect(e.falso.tabla('operaciones_sii')[0]?.detalle).not.toHaveProperty('revisada_en');
+  });
 });

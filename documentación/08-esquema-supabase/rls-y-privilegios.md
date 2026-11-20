@@ -16,7 +16,7 @@ agregan funciones y tablas con sus propios grants (abajo, la `0005`; las demás 
 
 ## Reglas generales
 
-- **RLS activo en las 37 tablas de `public`** (33 de la `0001` y 3 de la `0016`, aplicada el 2026-11-18; la `0018`, aplicada el 2026-11-19, suma `api_idempotencia`: 37). Una tabla sin política para una acción la
+- **RLS activo en las 39 tablas de `public`** (33 de la `0001`, `bloqueos_sii` de la `0007`, `notificaciones` de la `0013`, 3 de la `0016` y `api_idempotencia` de la `0018`; contadas en la base el 2026-11-19 por `rls-fase13-acceso-por-tabla.sql`, que antes figuraban como 37). Una tabla sin política para una acción la
   niega a `authenticated`; `service_role` omite RLS.
 - **Autoridad = RLS, no la UI.** La UI oculta acciones según el rol, pero la base decide.
 - **Helpers** (`security definer`, con `execute` para `authenticated`):

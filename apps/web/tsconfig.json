@@ -17,6 +17,7 @@
     "skipLibCheck": true,
     "allowJs": false,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "incremental": true,
     "types": ["node"],
     "plugins": [

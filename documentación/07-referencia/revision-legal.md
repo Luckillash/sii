@@ -76,6 +76,9 @@ adecuados, cláusulas contractuales, consentimiento) y si la frase debe redactar
   conservar algo por su cuenta.
 - Respaldos: el texto es genérico («se renuevan periódicamente»), porque no está
   documentada la retención exacta de los respaldos del proveedor de base de datos.
+  Dato al 2026-11-19: respaldos diarios de la base con 7 días de retención, sin PITR, y los
+  archivos (XML y PDF) fuera de esos respaldos ([respaldo](respaldo-y-restauracion.md)); si
+  se activa PITR, la ventana pasa a ser la elegida (7, 14 o 28 días).
 
 ## 6. Documento tributario por cada cobro
 

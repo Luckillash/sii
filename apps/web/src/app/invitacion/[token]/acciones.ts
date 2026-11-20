@@ -2,8 +2,8 @@
 
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { type MensajeError, traducirErrorEquipo } from '@/lib/equipo-errores';
 import { urlIngresar } from '@/lib/rutas';
-import { type MensajeError, traducirErrorEquipo } from '@/server/equipo-errores';
 import { obtenerUsuario } from '@/server/sesion';
 import { clienteServidor } from '@/server/supabase/servidor';
 import { ipCliente, verificarTurnstile } from '@/server/turnstile';

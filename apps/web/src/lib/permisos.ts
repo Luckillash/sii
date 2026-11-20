@@ -7,7 +7,7 @@ import type { Database } from '@/server/supabase/tipos';
 // §17 políticas); si cambia el SQL, cambia aquí y en permisos.test.ts.
 //
 // `Database` llega con `import type` (se borra al compilar): `tipos.ts` está en
-// `server/` pero es solo tipos, sin `server-only`, así que no arrastra nada al bundle.
+// `server/` (con `server-only`), pero `import type` no arrastra nada al bundle.
 
 export type RolMiembro = Database['public']['Enums']['rol_miembro'];
 

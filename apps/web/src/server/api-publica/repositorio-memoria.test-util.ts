@@ -1,3 +1,4 @@
+import 'server-only';
 import { vi } from 'vitest';
 import type { DocumentoApi } from '@/lib/api-publica';
 import type { ResultadoEmision } from '@/lib/emision';

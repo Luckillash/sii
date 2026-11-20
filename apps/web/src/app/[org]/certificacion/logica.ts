@@ -9,6 +9,7 @@ import {
   pasoDeEtapa,
   type ResultadoOperacion,
 } from '@/lib/certificacion';
+import type { MensajeError } from '@/lib/equipo-errores';
 import {
   correoSiiValido,
   formatearFecha,
@@ -16,7 +17,6 @@ import {
   rutSii,
   rutValidoSii,
 } from '@/lib/formatos';
-import type { MensajeError } from '@/server/equipo-errores';
 
 // Lógica pura del asistente de certificación (PLAN-SAAS Fase 5): qué acción ofrece cada
 // paso, qué falta, cómo se nombran las operaciones y la validación de los formularios.

@@ -1,3 +1,4 @@
+import 'server-only';
 import type { EtapaCertificacion, OperacionSii, ResultadoOperacion } from '@/lib/certificacion';
 
 // Tipos públicos de la capa de certificación (contrato de la Fase 5 con la UI). Solo

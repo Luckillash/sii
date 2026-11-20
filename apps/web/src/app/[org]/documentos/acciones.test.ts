@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { MENSAJE_GENERICO } from '@/server/equipo-errores';
+import { MENSAJE_GENERICO } from '@/lib/equipo-errores';
 
 // Server Actions de `/[org]/documentos` con dobles: la sesión, `server/documentos`,
 // `server/emision` y `server/seguimiento` se simulan. No hay red, base ni SII.

@@ -3,6 +3,8 @@
 // importa `server-only`). El contrato con la UI y las reglas comunes están en
 // `comun.ts` y en `@/lib/certificacion`.
 
+import 'server-only';
+
 export { verificarAutorizacion } from './autorizacion';
 export { guardarDatosDeclaracion, guardarDatosPostulacion } from './datos';
 export {

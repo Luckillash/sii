@@ -5,6 +5,7 @@ import {
   marcarEnvioRevisado,
   REVISION_NO_ENCONTRADO,
   REVISION_NO_INCIERTO,
+  REVISION_SESION_VENCIDA,
   REVISION_SIN_OPERACION,
 } from './revisar';
 
@@ -50,9 +51,21 @@ function operacion(id: string, envioId: string, parcial: Fila = {}): Fila {
   };
 }
 
+let confirmadas: string[] = [];
+let sesionValida = true;
+
 function deps() {
   const base = () => baseFalsa({ envios, operaciones_sii: operaciones, documentos }, escrituras);
-  return { sesion: async () => base(), servicio: base, marcar, ahora: () => AHORA };
+  return {
+    sesion: async () => base(),
+    servicio: base,
+    marcar,
+    ahora: () => AHORA,
+    confirmarSesion: async (id: string) => {
+      confirmadas.push(id);
+      return sesionValida;
+    },
+  };
 }
 
 beforeEach(() => {
@@ -63,6 +76,8 @@ beforeEach(() => {
     { organizacion_id: ORG, envio_id: E2, tipo_dte: 39, folio: 43 },
   ];
   escrituras = [];
+  confirmadas = [];
+  sesionValida = true;
   marcar.mockReset().mockImplementation(async (_c, datos: { operacionId: string }) => {
     // Como `marcarInciertaRevisada`: deja `detalle.revisada_en`.
     const o = operaciones.find((x) => x.id === datos.operacionId);
@@ -86,6 +101,20 @@ describe('marcarEnvioRevisado', () => {
       operacionId: 'op-1',
       usuarioId: 'usuario-1',
     });
+    expect(confirmadas).toEqual(['usuario-1']);
+  });
+
+  it('confirma la sesión con getUser() antes de marcar: revocada, no desbloquea nada', async () => {
+    sesionValida = false;
+    const r = await marcarEnvioRevisado(
+      { organizacionId: ORG, usuarioId: 'usuario-1' },
+      E1,
+      deps(),
+    );
+    expect(r).toEqual({ ok: false, mensaje: REVISION_SESION_VENCIDA });
+    expect(confirmadas).toEqual(['usuario-1']);
+    expect(marcar).not.toHaveBeenCalled();
+    expect(operaciones[0]?.detalle).toEqual({});
   });
 
   it('ya revisado: no vuelve a marcar (idempotente)', async () => {

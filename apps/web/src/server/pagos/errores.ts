@@ -1,4 +1,5 @@
-import type { MensajeError } from '../equipo-errores';
+import 'server-only';
+import type { MensajeError } from '@/lib/equipo-errores';
 import type { FallaPagos } from './suscripciones';
 
 // Mensajes para el usuario de las fallas de pagos (formato del design system: qué pasó y

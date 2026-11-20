@@ -1,3 +1,4 @@
+import 'server-only';
 import type { BorradorValido, NivelEmision } from '@/lib/emision';
 
 // Tipos públicos de la capa de emisión (contrato de la Fase 7 con la UI). Solo tipos: los

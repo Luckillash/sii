@@ -9,6 +9,7 @@ import {
   TransporteUndici,
   urlSinQuery,
 } from '@winex/certificacion';
+import { transporteSiiFalso } from './sii-falso';
 
 // Un transporte HTTP por invocación (PLAN-SAAS Fase 4), cerrado con `await using`:
 //
@@ -23,6 +24,8 @@ import {
 //
 // En las pruebas se inyecta un `TransporteFalso` (nunca sale a la red). Quien lo
 // inyecta es su dueño: al cerrar no se cierra el inyectado, solo se deja de usar.
+// En las e2e, `E2E_SII_FALSO_URL` cambia el SII por un simulador local (`sii-falso.ts`:
+// solo con `next dev` y hacia loopback; nunca en Vercel).
 
 /** Transporte que se cierra al salir del bloque `await using`. */
 export type TransporteInvocacion = TransporteHttp & AsyncDisposable;
@@ -63,5 +66,7 @@ class TransporteInyectado implements TransporteInvocacion {
 export function crearTransporte(opciones: OpcionesTransporte = {}): TransporteInvocacion {
   const { transporte, ...undici } = opciones;
   if (transporte !== undefined) return new TransporteInyectado(transporte);
+  const falso = transporteSiiFalso();
+  if (falso !== null) return new TransporteInyectado(falso);
   return new TransporteUndici(undici);
 }

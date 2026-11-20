@@ -1,8 +1,8 @@
 import type { EstadoDte, Tono } from '@/components/boleteame/tipos';
 import { formatearFechaHora, formatearMiles } from '@/lib/formatos';
 import type { ClasificacionEnvio, ResultadoConsultaEnvio } from '@/lib/seguimiento';
-import type { MensajeError } from '../equipo-errores';
-import type { Database, Json } from '../supabase/tipos';
+import type { Database, Json } from '@/server/supabase/tipos';
+import type { MensajeError } from './equipo-errores';
 
 // Presentación de documentos y envíos (PLAN-SAAS Fase 8) con el tono del design system.
 // Puro y sin `server-only`: lo usan las páginas (servidor), los componentes cliente de

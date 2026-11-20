@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { MENSAJE_GENERICO, type MensajeError } from '@/lib/equipo-errores';
 import {
   erroresPorCampo,
   esquemaAmbienteCaf,
@@ -13,7 +14,6 @@ import {
 import { puedeAdministrar } from '@/lib/permisos';
 import { marcarRevisada as marcarRevisadaCertificacion } from '@/server/certificacion';
 import { obtenerEmpresa } from '@/server/empresas';
-import { MENSAJE_GENERICO, type MensajeError } from '@/server/equipo-errores';
 import * as folios from '@/server/folios';
 import { exigirMembresia } from '@/server/sesion';
 

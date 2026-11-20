@@ -3,7 +3,7 @@ import {
   ESTADOS_CERTIFICADO,
   type EstadoCertificado as Estado,
   textoDias,
-} from '@/server/certificados/estado';
+} from '@/lib/certificados-estado';
 import estilos from './certificados.module.css';
 
 export interface EstadoCertificadoProps {

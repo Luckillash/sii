@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { type ReactElement, useState, useTransition } from 'react';
 import { Alerta, Boton, Dialogo, Tarjeta } from '@/components/boleteame';
+import type { MensajeError } from '@/lib/equipo-errores';
 import { formatearFecha, formatearMonto } from '@/lib/formatos';
 import {
   caracteristicasPlan,
@@ -10,7 +11,6 @@ import {
   type Plan,
   type UsoOrganizacion,
 } from '@/lib/planes';
-import type { MensajeError } from '@/server/equipo-errores';
 import { cambiarPlan, cancelarPlan, contratar, vistaPreviaCambio } from './acciones';
 import estilos from './plan.module.css';
 

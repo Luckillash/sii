@@ -12,10 +12,6 @@ import {
   Th,
   TipoDTE,
 } from '@/components/boleteame';
-import { formatearFecha, formatearFechaHora, formatearMiles, formatearRut } from '@/lib/formatos';
-import { puedeEmitir } from '@/lib/permisos';
-import { leerEnvio } from '@/server/documentos';
-import { hrefDocumentos, leerFiltros, TODOS_LOS_PERIODOS } from '@/server/documentos/filtros';
 import {
   guiaIncierto,
   mensajeRechazoEnvio,
@@ -24,7 +20,11 @@ import {
   textoClasificacion,
   textoEstadoSii,
   textoRevisado,
-} from '@/server/documentos/presentacion';
+} from '@/lib/documentos-presentacion';
+import { formatearFecha, formatearFechaHora, formatearMiles, formatearRut } from '@/lib/formatos';
+import { puedeEmitir } from '@/lib/permisos';
+import { leerEnvio } from '@/server/documentos';
+import { hrefDocumentos, leerFiltros, TODOS_LOS_PERIODOS } from '@/server/documentos/filtros';
 import { exigirMembresia } from '@/server/sesion';
 import type { Json } from '@/server/supabase/tipos';
 import { ProveedorEnVivo } from '@/stores/ProveedorEnVivo';

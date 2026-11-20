@@ -1,12 +1,13 @@
 // Errores y mensajes de los certificados digitales (PLAN-SAAS Fase 3), con el formato
-// del design system: qué pasó y qué hacer. Puro, sin `server-only`: lo usan el
-// servidor y los componentes cliente, y se prueba con Vitest.
+// del design system: qué pasó y qué hacer. Puro (los componentes cliente solo importan
+// sus tipos) y se prueba con Vitest.
 //
 // Ningún mensaje lleva la clave, el contenido del .pfx (ni su base64) ni el nombre
 // del archivo (los .pfx del SII suelen llevar el RUT en el nombre).
 
+import 'server-only';
+import type { ErrorBase, MensajeError } from '@/lib/equipo-errores';
 import { formatearFecha } from '@/lib/formatos';
-import type { ErrorBase, MensajeError } from '@/server/equipo-errores';
 
 export type { MensajeError };
 

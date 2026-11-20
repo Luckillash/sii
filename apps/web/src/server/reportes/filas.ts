@@ -1,5 +1,7 @@
+import 'server-only';
 import { z } from 'zod';
 import { textoEstadoDte } from '@/components/boleteame/EstadoDTE';
+import { type AmbienteSii, type EstadoDocumentoBd, estadoUi } from '@/lib/documentos-presentacion';
 import { formatearRut, nombreTipoDte, rutSii } from '@/lib/formatos';
 import { FORMATOS_REPORTE, type FormatoReporte, REPORTES, type Reporte } from '@/lib/reportes';
 import {
@@ -8,7 +10,6 @@ import {
   parametrosDe,
   TODOS_LOS_PERIODOS,
 } from '../documentos/filtros';
-import { type AmbienteSii, type EstadoDocumentoBd, estadoUi } from '../documentos/presentacion';
 import type { Columna, Fila, Tabla } from './tabla';
 
 // Exportaciones de la Fase 9 (PLAN-SAAS, punto 2): qué se pide (`reporte` y `formato` de
