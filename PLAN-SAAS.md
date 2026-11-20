@@ -925,7 +925,7 @@ Avance:
 
 Lo que las plantillas muestran y la librería todavía no hace (H1–H3). Requiere un plan
 propio en `certificacion-node` con la misma disciplina de paridad y validación en
-certificación:
+certificación. **Ese plan es `certificacion-node/PLAN-FACTURAS.md`** (2026-11-19, fases F0–F11):
 
 - Generador y armador de DTE 33, 34, 52, 56 y 61 (con referencias), y sobre `EnvioDTE` por DTEUpload.
 - Intercambio entre contribuyentes (recepción, acuse de recibo, aceptación/reclamo), documentos recibidos.
